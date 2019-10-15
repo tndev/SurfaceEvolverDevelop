@@ -1,0 +1,8 @@
+﻿  Geometry.cpp
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry.cpp(24,21): warning C4018: '<': signed/unsigned mismatch
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry.cpp(29,20): warning C4018: '<': signed/unsigned mismatch
+  SurfaceEvolver.cpp
+  Vector3.cpp
+  Generating Code...
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry.cpp(33,20): warning C4018: '<': signed/unsigned mismatch
+  SurfaceEvolver.vcxproj -> D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\x64\Debug\SurfaceEvolver.exe
