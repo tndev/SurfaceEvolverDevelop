@@ -1,8 +1,9 @@
 
+#include <iostream>
 #include "Geometry.h"
+#include "Matrix4.h"
 #include "Vector3.h"
 #include "Icosphere.h"
-#include <iostream>
 
 int main()
 {
@@ -12,5 +13,6 @@ int main()
 	Vector3 d = a - 2 * b;
     std::cout << "d = " << normalize(d);
 
+	Matrix4 m = Matrix4();
 	Icosphere ico = Icosphere(0, 2);
 }

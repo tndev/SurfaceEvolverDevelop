@@ -2,6 +2,7 @@
 #define GEOMETRY_H_
 
 #include <vector>
+#include "Matrix4.h"
 
 class Geometry
 {
@@ -17,6 +18,8 @@ public:
 	bool hasNormals();
 	void copy(Geometry other);
 	Geometry clone();
+
+	void applyMatrix(Matrix4 m);
 protected:
 	void clear();
 };

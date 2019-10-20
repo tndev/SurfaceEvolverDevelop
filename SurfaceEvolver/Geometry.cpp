@@ -39,6 +39,13 @@ Geometry Geometry::clone()
 	return *result;
 }
 
+void Geometry::applyMatrix(Matrix4 m)
+{
+	for (int i = 0; i < vertices.size(); i += 3) {
+
+	}
+}
+
 void Geometry::clear()
 {
 	vertices.clear();

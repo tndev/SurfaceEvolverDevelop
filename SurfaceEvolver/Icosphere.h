@@ -2,6 +2,7 @@
 #define ICOSPHERE_H_
 
 #include "Geometry.h"
+
 class Icosphere :
 	public Geometry
 {

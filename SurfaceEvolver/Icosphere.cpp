@@ -1,6 +1,7 @@
 #include "Icosphere.h"
 #include "Vector3.h"
 #include <vector>
+#include <array>
 #include <map>
 
 Icosphere::Icosphere()
@@ -31,6 +32,9 @@ Icosphere Icosphere::clone()
 	return *result;
 }
 
+// ===============================================
+// ======== Pre-requisites for Icosphere =========
+
 struct Triangle {
 	unsigned int vertex[3];
 };
@@ -39,13 +43,13 @@ using TriangleList = std::vector<Triangle>;
 using VertexList = std::vector<Vector3>;
 
 namespace Icosahedron {
-	const float t = (1.f + sqrt(5.f)) / 2.f;
-	const float norm = sqrt(1.f + t * t);
+	const float t = (1.0f + sqrt(5.f)) / 2.0f;
+	const float norm = sqrt(1.0f + t * t);
 
 	static const VertexList vertices = {
-		   {-1.f / norm, t / norm, 0.f}, {1.f / norm, t / norm, 0.f},   {-1.f / norm, -t / norm,  0.f},    {1.f / norm, -t / norm, 0.f},
-		   {0.f, -1.f / norm, t / norm}, {0.f, 1.f / norm, t / norm},    {0.f, -1.f / norm, -t / norm},    {0.f, 1.f / norm, -t / norm},
-		   {t / norm, 0.f, -1.f / norm}, {t / norm, 0.f, 1.f / norm},    {-t / norm, 0.f, -1.f / norm},    {-t / norm, 0.f, 1.f / norm}
+		{-1.0f / norm, t / norm, 0.0f}, {1.0f / norm, t / norm, 0.0f},   {-1.0f / norm, -t / norm,  0.0f},    {1.0f / norm, -t / norm, 0.0f},
+		{0.0f, -1.0f / norm, t / norm}, {0.0f, 1.0f / norm, t / norm},    {0.0f, -1.0f / norm, -t / norm},    {0.0f, 1.0f / norm, -t / norm},
+		{t / norm, 0.0f, -1.0f / norm}, {t / norm, 0.0f, 1.0f / norm},    {-t / norm, 0.0f, -1.0f / norm},    {-t / norm, 0.0f, 1.0f / norm}
 	};
 
 	static const TriangleList triangles = {
@@ -55,7 +59,6 @@ namespace Icosahedron {
 		{4, 9, 5},    {2, 4, 11},    {6, 2, 10},     {8, 6, 7},      {9, 8, 1}
 	};
 };
-
 
 using Lookup = std::map<std::pair<unsigned int, unsigned int>, unsigned int>;
 
@@ -77,7 +80,24 @@ unsigned int midpointId(Lookup& lookup, VertexList& vertices, unsigned int first
 	return inserted.first->second;
 };
 
-// using IndexedMesh = std::pair<VertexList, TriangleList>;
+TriangleList subdivide(VertexList& vertices, TriangleList triangles) {
+	Lookup lookup;
+	TriangleList result;
+
+	for (auto&& each:triangles) {
+		std::array<unsigned int, 3> mid;
+		for (int edge = 0; edge < 3; ++edge) {
+			mid[edge] = midpointId(lookup, vertices, each.vertex[edge], each.vertex[(edge + 1) % 3]);
+		}
+
+		result.push_back({ each.vertex[0], mid[0], mid[2] });
+		result.push_back({ each.vertex[1], mid[1], mid[0] });
+		result.push_back({ each.vertex[2], mid[2], mid[1] });
+		result.push_back({ mid[0], mid[1], mid[2] });
+	}
+
+	return result;
+}
 
 
 void Icosphere::build()
@@ -86,8 +106,20 @@ void Icosphere::build()
 	TriangleList triangles = Icosahedron::triangles;
 
 	for (unsigned int i = 0; i < detail; i++) {
-
+		triangles = subdivide(vertices, triangles);
 	}
 
+	for (unsigned int i = 0; i < triangles.size(); i++) {
+		for (unsigned int j = 0; j < 3; j++) {
+			Vector3& v = vertices[triangles[i].vertex[j]];
+			this->normals.push_back(v.x);
+			this->normals.push_back(v.y);
+			this->normals.push_back(v.z);
 
+			this->vertices.push_back(radius * v.x);
+			this->vertices.push_back(radius * v.y);
+			this->vertices.push_back(radius * v.z + radius);
+			this->vertexIndices.push_back(triangles[i].vertex[j]);
+		}
+	}
 }
