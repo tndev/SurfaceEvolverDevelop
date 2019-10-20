@@ -1,8 +1,3 @@
-﻿  Geometry.cpp
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry.cpp(24,21): warning C4018: '<': signed/unsigned mismatch
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry.cpp(29,20): warning C4018: '<': signed/unsigned mismatch
-  SurfaceEvolver.cpp
-  Vector3.cpp
-  Generating Code...
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry.cpp(33,20): warning C4018: '<': signed/unsigned mismatch
-  SurfaceEvolver.vcxproj -> D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\x64\Debug\SurfaceEvolver.exe
+﻿  Primitive.cpp
+SurfaceEvolver.obj : error LNK2005: "class Geometry __cdecl icoSphere(unsigned int,float)" (?icoSphere@@YA?AVGeometry@@IM@Z) already defined in Primitive.obj
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\x64\Debug\SurfaceEvolver.exe : fatal error LNK1169: one or more multiply defined symbols found

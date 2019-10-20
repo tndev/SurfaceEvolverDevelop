@@ -11,27 +11,24 @@ Geometry::~Geometry()
 
 bool Geometry::hasNormals()
 {
-	return (normals != nullptr);
+	return normals.size();
 }
 
 void Geometry::copy(Geometry other)
 {
-	nVerts = other.nVerts; nTris = other.nTris; quadified = other.quadified;
-	vertices = new float[3 * nVerts];
+	quadified = other.quadified;
 	if (other.hasNormals()) {
-		normals = new float[3 * nVerts];
-
-		for (int i = 0; i < 3 * nVerts; i++) {
-			normals[i] = other.normals[i];
+		for (unsigned int i = 0; i < other.normals.size(); i++) {
+			normals.push_back(other.normals[i]);
 		}
 	}
 
-	for (int i = 0; i < 3 * nVerts; i++) {
-		vertices[i] = other.vertices[i];		
+	for (unsigned int i = 0; i < other.vertices.size(); i++) {
+		vertices.push_back(other.vertices[i]);		
 	}
 
-	for (int i = 0; i < 3 * nTris; i++) {
-		vertexIndices[i] = other.vertexIndices[i];
+	for (unsigned int i = 0; i < other.vertexIndices.size(); i++) {
+		vertexIndices.push_back(other.vertexIndices[i]);
 	}
 }
 
@@ -44,8 +41,8 @@ Geometry Geometry::clone()
 
 void Geometry::clear()
 {
-	delete vertices;
-	delete normals;
-	delete vertexIndices;
-	nVerts = 0; nTris = 0; quadified = false;
+	vertices.clear();
+	normals.clear();
+	vertexIndices.clear();
+	quadified = false;
 }
