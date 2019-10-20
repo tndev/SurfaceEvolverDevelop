@@ -3,6 +3,7 @@
 
 #include <vector>
 #include "Matrix4.h"
+#include "Vector3.h"
 
 class Geometry
 {
@@ -19,7 +20,9 @@ public:
 	void copy(Geometry other);
 	Geometry clone();
 
+	void flipFaceOrientation();
 	void applyMatrix(Matrix4 m);
+
 protected:
 	void clear();
 };

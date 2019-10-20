@@ -153,6 +153,7 @@
   <ItemGroup>
     <ClCompile Include="Geometry.cpp" />
     <ClCompile Include="Icosphere.cpp" />
+    <ClCompile Include="Matrix3.cpp" />
     <ClCompile Include="Matrix4.cpp" />
     <ClCompile Include="SurfaceEvolver.cpp" />
     <ClCompile Include="Vector3.cpp" />
@@ -160,6 +161,7 @@
   <ItemGroup>
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="Icosphere.h" />
+    <ClInclude Include="Matrix3.h" />
     <ClInclude Include="Matrix4.h" />
     <ClInclude Include="Vector3.h" />
   </ItemGroup>

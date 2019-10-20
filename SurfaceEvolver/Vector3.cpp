@@ -35,9 +35,14 @@ void Vector3::copy(Vector3 other)
 
 Vector3 Vector3::clone()
 {
-	Vector3* result = new Vector3();
-	result->copy(*this);
-	return *result;
+	Vector3 result = Vector3();
+	result.copy(*this);
+	return result;
+}
+
+void Vector3::set(float x, float y, float z)
+{
+	this->x = x; this->y = y; this->z = z;
 }
 
 void Vector3::negate()
@@ -69,15 +74,15 @@ void Vector3::toArray(float* a)
 	a[2] = z;
 }
 
-void Vector3::applyMatrix(Matrix4 m)
+void Vector3::applyMatrix4(Matrix4& m)
 {
-	float* e = m.elements;
 	Vector3 a = this->clone();
+	float* e = m.elements;
 	float w = 1.f / (e[3] * a.x + e[7] * a.y + e[11] * a.z + e[15]);
 
-	x = (e[0] * a.x + e[4] * a.y + e[8] * a.z + e[12]) * w;
-	y = (e[1] * a.x + e[5] * a.y + e[9] * a.z + e[13]) * w;
-	z = (e[2] * a.x + e[6] * a.y + e[10] * a.z + e[14]) * w;
+	this->x = (e[0] * a.x + e[4] * a.y + e[8] * a.z + e[12]) * w;
+	this->y = (e[1] * a.x + e[5] * a.y + e[9] * a.z + e[13]) * w;
+	this->z = (e[2] * a.x + e[6] * a.y + e[10] * a.z + e[14]) * w;
 }
 
 void Vector3::normalize()
@@ -85,7 +90,7 @@ void Vector3::normalize()
 	float len = length();
 	int e = zeroVect;
 	try {
-		if (len < 10 * DBL_MIN && len > -10 * DBL_MIN) {
+		if (fabs(len) < FLT_MIN) {
 			throw(zeroVect);
 		}
 		x /= len;
@@ -108,6 +113,15 @@ float dot(Vector3 a, Vector3 b)
 	return a.clone().dot(b);
 }
 
+void Vector3::applyMatrix3(Matrix3& m)
+{
+	Vector3 a = this->clone();
+	float* e = m.elements;
+	this->x = e[0] * x + e[3] * y + e[6] * z;
+	this->y = e[1] * x + e[4] * y + e[7] * z;
+	this->z = e[2] * x + e[5] * y + e[8] * z;
+}
+
 Vector3 Vector3::operator+(Vector3 other)
 {
 	return Vector3(x + other.x, y + other.y, z + other.z);
@@ -128,10 +142,17 @@ Vector3 Vector3::operator/(float scalar)
 	return Vector3(x / scalar, y / scalar, z / scalar);
 }
 
+Vector3 operator*(Matrix3 m, Vector3 a)
+{
+	Vector3 result = a.clone();
+	result.applyMatrix3(m);
+	return result;
+}
+
 Vector3 operator*(Matrix4 m, Vector3 a)
 {
 	Vector3 result = a.clone();
-	result.applyMatrix(m);
+	result.applyMatrix4(m);
 	return result;
 }
 

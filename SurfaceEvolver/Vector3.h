@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include "Matrix4.h"
+#include "Matrix3.h"
 
 class Vector3
 {
@@ -16,6 +17,7 @@ public:
 	void copy(Vector3 other);
 	Vector3 clone();
 
+	void set(float x, float y, float z);
 	void negate();
 	float dot(Vector3 other);
 	void normalize();
@@ -25,12 +27,14 @@ public:
 
 	void toArray(float* a);
 
-	void applyMatrix(Matrix4 m);
+	void applyMatrix4(Matrix4& m);
+	void applyMatrix3(Matrix3& m);
 
 	Vector3 operator+ (Vector3 other);
 	Vector3 operator- (Vector3 other);
 	Vector3 operator* (float scalar);
 	Vector3 operator/ (float scalar);
+	friend Vector3 operator* (Matrix3 m, Vector3 a);
 	friend Vector3 operator* (Matrix4 m, Vector3 a);
 	friend Vector3 operator* (float scalar, Vector3 a);
 	friend Vector3 operator/ (float scalar, Vector3 a);
