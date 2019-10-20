@@ -14,9 +14,13 @@ bool Geometry::hasNormals()
 	return normals.size();
 }
 
+bool Geometry::hasTriangulations()
+{
+	return triangulations.size();
+}
+
 void Geometry::copy(Geometry other)
 {
-	quadified = other.quadified;
 	if (other.hasNormals()) {
 		for (unsigned int i = 0; i < other.normals.size(); i++) {
 			normals.push_back(other.normals[i]);
@@ -30,7 +34,36 @@ void Geometry::copy(Geometry other)
 	for (unsigned int i = 0; i < other.vertexIndices.size(); i++) {
 		vertexIndices.push_back(other.vertexIndices[i]);
 	}
+
+	if (other.hasTriangulations()) {
+		unsigned int NPoly = other.triangulations.size();
+		std::vector<unsigned int> polygonVertexIds;
+		for (unsigned int i = 0; i < NPoly; i++) {
+			unsigned int NTri = other.triangulations[i].size();
+			for (unsigned int j = 0; j < NTri; j++) {
+				polygonVertexIds.push_back(other.triangulations[i][j]);
+			}
+			triangulations.push_back(polygonVertexIds);
+			polygonVertexIds.clear();
+		}
+	}
 }
+
+/*
+std::vector<unsigned int> Geometry::getIndicesForPolygons(std::vector<unsigned int>& indices)
+{
+	std::vector<unsigned int> result = std::vector<unsigned int>();
+	for (unsigned int i = 0; i < triangulations.size(); i++) {
+		std::vector<unsigned int> tri = triangulations[i];
+		std::vector<unsigned int> newTri = std::vector<unsigned int>();
+		for (unsigned int j = 0; j < tri.size(); j++) {
+			unsigned int j0 = 3 * tri[j], j1 = 3 * tri[j] + 1, j2 = 3 * tri[j] + 2;
+			newTri.push_back(indices[j0]);
+			newTri.push_back(indices[j1]);
+			newTri.push_back(indices[j2]);
+		}
+	}
+}*/
 
 Geometry Geometry::clone()
 {
@@ -121,5 +154,5 @@ void Geometry::clear()
 	vertices.clear();
 	normals.clear();
 	vertexIndices.clear();
-	quadified = false;
+	triangulations.clear();
 }

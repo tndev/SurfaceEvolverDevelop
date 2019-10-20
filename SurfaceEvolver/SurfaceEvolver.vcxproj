@@ -157,6 +157,7 @@
     <ClCompile Include="Matrix4.cpp" />
     <ClCompile Include="SurfaceEvolver.cpp" />
     <ClCompile Include="Vector3.cpp" />
+    <ClCompile Include="VTKExporter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Geometry.h" />
@@ -164,6 +165,7 @@
     <ClInclude Include="Matrix3.h" />
     <ClInclude Include="Matrix4.h" />
     <ClInclude Include="Vector3.h" />
+    <ClInclude Include="VTKExporter.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
