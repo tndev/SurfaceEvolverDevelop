@@ -36,11 +36,11 @@ void Geometry::copy(Geometry other)
 	}
 
 	if (other.hasTriangulations()) {
-		unsigned int NPoly = other.triangulations.size();
+		size_t NPoly = other.triangulations.size();
 		std::vector<unsigned int> polygonVertexIds;
 		for (unsigned int i = 0; i < NPoly; i++) {
-			unsigned int NTri = other.triangulations[i].size();
-			for (unsigned int j = 0; j < NTri; j++) {
+			size_t NTri = other.triangulations[i].size();
+			for (unsigned int  j = 0; j < NTri; j++) {
 				polygonVertexIds.push_back(other.triangulations[i][j]);
 			}
 			triangulations.push_back(polygonVertexIds);

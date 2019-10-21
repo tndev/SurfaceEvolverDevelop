@@ -43,13 +43,13 @@ using TriangleList = std::vector<Triangle>;
 using VertexList = std::vector<Vector3>;
 
 namespace Icosahedron {
-	const float t = (1.0f + sqrt(5.f)) / 2.0f;
+	const float t = (1.0f + sqrt(5.0f)) / 2.0f;
 	const float norm = sqrt(1.0f + t * t);
 
 	static const VertexList vertices = {
-		{-1.0f / norm, t / norm, 0.0f}, {1.0f / norm, t / norm, 0.0f},   {-1.0f / norm, -t / norm,  0.0f},    {1.0f / norm, -t / norm, 0.0f},
-		{0.0f, -1.0f / norm, t / norm}, {0.0f, 1.0f / norm, t / norm},    {0.0f, -1.0f / norm, -t / norm},    {0.0f, 1.0f / norm, -t / norm},
-		{t / norm, 0.0f, -1.0f / norm}, {t / norm, 0.0f, 1.0f / norm},    {-t / norm, 0.0f, -1.0f / norm},    {-t / norm, 0.0f, 1.0f / norm}
+		{-1.0f / norm, t / norm, 0.0f},    {1.0f / norm, t / norm, 0.0f},   {-1.0f / norm, -t / norm,  0.0f},    {1.0f / norm, -t / norm, 0.0f},
+		{0.0f, -1.0f / norm, t / norm},    {0.0f, 1.0f / norm, t / norm},    {0.0f, -1.0f / norm, -t / norm},    {0.0f, 1.0f / norm, -t / norm},
+		{t / norm, 0.0f, -1.0f / norm},    {t / norm, 0.0f, 1.0f / norm},    {-t / norm, 0.0f, -1.0f / norm},    {-t / norm, 0.0f, 1.0f / norm}
 	};
 
 	static const TriangleList triangles = {
@@ -80,7 +80,7 @@ unsigned int midpointId(Lookup& lookup, VertexList& vertices, unsigned int first
 	return inserted.first->second;
 };
 
-TriangleList subdivide(VertexList& vertices, TriangleList triangles) {
+TriangleList subdivide(VertexList& vertices, TriangleList& triangles) {
 	Lookup lookup;
 	TriangleList result;
 
@@ -109,16 +109,18 @@ void Icosphere::build()
 		triangles = subdivide(vertices, triangles);
 	}
 
+	for (unsigned int i = 0; i < vertices.size(); i++) {
+		this->normals.push_back(vertices[i].x);
+		this->normals.push_back(vertices[i].y);
+		this->normals.push_back(vertices[i].z);
+
+		this->vertices.push_back(radius * vertices[i].x);
+		this->vertices.push_back(radius * vertices[i].y);
+		this->vertices.push_back(radius * vertices[i].z);
+	}
+
 	for (unsigned int i = 0; i < triangles.size(); i++) {
 		for (unsigned int j = 0; j < 3; j++) {
-			Vector3& v = vertices[triangles[i].vertex[j]];
-			this->normals.push_back(v.x);
-			this->normals.push_back(v.y);
-			this->normals.push_back(v.z);
-
-			this->vertices.push_back(radius * v.x);
-			this->vertices.push_back(radius * v.y);
-			this->vertices.push_back(radius * v.z + radius);
 			this->vertexIndices.push_back(triangles[i].vertex[j]);
 		}
 	}
