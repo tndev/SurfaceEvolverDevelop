@@ -18,9 +18,15 @@ public:
 	Vector3 clone();
 
 	void set(float x, float y, float z);
+	void min(Vector3 other);
+	void max(Vector3 other);
+
+	bool equals(Vector3 other);
+
 	void negate();
 	float dot(Vector3 other);
 	void normalize();
+	void lerp(Vector3 other, float param);
 
 	float lengthSq();
 	float length();
@@ -43,6 +49,7 @@ public:
 
 Vector3 normalize(Vector3 target);
 float dot(Vector3 a, Vector3 b);
+Vector3 lerp(Vector3 v1, Vector3 v2, float param);
 
 #endif
 

@@ -110,13 +110,13 @@ void IcoSphere::build()
 	}
 
 	for (unsigned int i = 0; i < vertices.size(); i++) {
-		this->normals.push_back(vertices[i].x);
-		this->normals.push_back(vertices[i].y);
-		this->normals.push_back(vertices[i].z);
+		this->vertices.push_back(vertices[i].x);
+		this->vertices.push_back(vertices[i].y);
+		this->vertices.push_back(vertices[i].z);
 
-		this->vertices.push_back(radius * vertices[i].x);
-		this->vertices.push_back(radius * vertices[i].y);
-		this->vertices.push_back(radius * vertices[i].z);
+		this->uniqueVertices.push_back(radius * vertices[i].x);
+		this->uniqueVertices.push_back(radius * vertices[i].y);
+		this->uniqueVertices.push_back(radius * vertices[i].z);
 	}
 
 	for (unsigned int i = 0; i < triangles.size(); i++) {
@@ -124,4 +124,69 @@ void IcoSphere::build()
 			this->vertexIndices.push_back(triangles[i].vertex[j]);
 		}
 	}
+
+	std::vector<float> geometryVertices = std::vector<float>(3 * this->vertexIndices.size());
+	this->normals = std::vector<float>(3 * this->vertexIndices.size());
+
+	for (unsigned int i = 0; i < this->vertexIndices.size(); i++) {
+		geometryVertices[i * 3] = radius * this->vertices[this->vertexIndices[i] * 3];
+		geometryVertices[i * 3 + 1] = radius * this->vertices[this->vertexIndices[i] * 3 + 1];
+		geometryVertices[i * 3 + 2] = radius * this->vertices[this->vertexIndices[i] * 3 + 2];
+	}
+
+	unsigned int triId = 0;
+
+	auto bufferTriangleFromIds = [&](
+		unsigned int i0, unsigned int i1, unsigned int i2
+	) {
+			this->vertexIndices[3 * triId] = i0;
+			this->vertexIndices[3 * triId + 1] = i1;
+			this->vertexIndices[3 * triId + 2] = i2;
+
+			if (detail > 0) {
+				this->normals[9 * triId] = this->vertices[3 * i0];
+				this->normals[9 * triId + 1] = this->vertices[3 * i0 + 1];
+				this->normals[9 * triId + 2] = this->vertices[3 * i0 + 2];
+
+				this->normals[9 * triId + 3] = this->vertices[3 * i1];
+				this->normals[9 * triId + 4] = this->vertices[3 * i1 + 1];
+				this->normals[9 * triId + 5] = this->vertices[3 * i1 + 2];
+
+				this->normals[9 * triId + 6] = this->vertices[3 * i2];
+				this->normals[9 * triId + 7] = this->vertices[3 * i2 + 1];
+				this->normals[9 * triId + 8] = this->vertices[3 * i2 + 2];
+			}
+			else {
+				Vector3 pA = Vector3(this->vertices[3 * i0], this->vertices[3 * i0 + 1], this->vertices[3 * i0 + 2]);
+				Vector3 pB = Vector3(this->vertices[3 * i1], this->vertices[3 * i1 + 1], this->vertices[3 * i1 + 2]);
+				Vector3 pC = Vector3(this->vertices[3 * i2], this->vertices[3 * i2 + 1], this->vertices[3 * i2 + 2]);
+				Vector3 centroid = Vector3();
+
+				centroid = (pA + pB + pC) / 3.0f;
+
+				float norm = centroid.length();
+
+				this->normals[9 * triId] = centroid.x / norm;
+				this->normals[9 * triId + 1] = centroid.y / norm;
+				this->normals[9 * triId + 2] = centroid.z / norm;
+
+				this->normals[9 * triId + 3] = centroid.x / norm;
+				this->normals[9 * triId + 4] = centroid.y / norm;
+				this->normals[9 * triId + 5] = centroid.z / norm;
+
+				this->normals[9 * triId + 6] = centroid.x / norm;
+				this->normals[9 * triId + 7] = centroid.y / norm;
+				this->normals[9 * triId + 8] = centroid.z / norm;
+			}
+
+			this->triangulations.push_back({ triId });
+	};
+
+	// buffer geom postprocessing
+	for (unsigned int i = 0; i < this->vertexIndices.size(); i += 3) {
+		bufferTriangleFromIds(this->vertexIndices[i], this->vertexIndices[i + 1], this->vertexIndices[i + 2]);
+		triId++;
+	}
+
+	this->vertices = std::vector<float>(geometryVertices);
 }

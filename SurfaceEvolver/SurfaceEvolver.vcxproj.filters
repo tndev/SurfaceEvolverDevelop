@@ -42,6 +42,12 @@
     <ClCompile Include="PrimitiveBox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Deform.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Box3.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Geometry.h">
@@ -66,6 +72,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PrimitiveBox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Deform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Box3.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

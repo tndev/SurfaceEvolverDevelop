@@ -10,7 +10,7 @@ VTKExporter::~VTKExporter()
 
 void VTKExporter::initExport(Geometry object, std::string filename)
 {
-	size_t pointCount = object.vertices.size() / 3;
+	size_t pointCount = object.uniqueVertices.size() / 3;
 	std::fstream vtk(pathPrefix + filename + ".vtk", std::fstream::out);
 
 	vtk << "# vtk DataFile Version 4.2" << std::endl;
@@ -22,28 +22,29 @@ void VTKExporter::initExport(Geometry object, std::string filename)
 	if (pointCount > 0) {
 		for (int i = 0; i < pointCount; i++) {
 			unsigned int i0 = 3 * i, i1 = 3 * i + 1, i2 = 3 * i + 2;
-			vtk << object.vertices[i0] << " " << object.vertices[i1] << " " << object.vertices[i2] << std::endl;
+			vtk << object.uniqueVertices[i0] << " " << object.uniqueVertices[i1] << " " << object.uniqueVertices[i2] << std::endl;
 		}
 	}
 
-	// Temporary solution: hasTriangulations corresponds to quads;
-	unsigned int hasTriangulations = object.hasTriangulations();
-	unsigned int step = 3;
-	size_t polyCount = object.vertexIndices.size() / step;
-	unsigned int vtkRowLength = 4 + hasTriangulations;
+	// TODO: divide all polygons into groups according to their number of sides and write those as separate index groups in the file
+	if (object.hasTriangulations()) {
+		size_t polyCount = object.triangulations.size();
+		unsigned int vtkRowLength = 3 + object.triangulations[0].size(); // assuming all faces have the same number of sides
 
-	vtk << "POLYGONS" << " " << polyCount << " " << vtkRowLength * (polyCount / (hasTriangulations + 1)) << " " << std::endl;
+		vtk << "POLYGONS" << " " << polyCount << " " << vtkRowLength * polyCount << " " << std::endl;
 
-	if (polyCount > 0 && hasTriangulations) {
-		// Temporary solution: considering that the geometry is composed of pairs of triangles - quads
-		for (unsigned int i = 0; i < polyCount; i += 2) {
-			unsigned int i0 = 3 * i, i1 = 3 * i + 4, i2 = 3 * i + 1, i3 = 3 * i + 2;
-			vtk << 4 << " " << object.vertexIndices[i0] << " " << object.vertexIndices[i1] << " " << object.vertexIndices[i2] << " " << object.vertexIndices[i3] << std::endl;
-		}
-	} else if (polyCount > 0 && !hasTriangulations) {
 		for (unsigned int i = 0; i < polyCount; i++) {
-			unsigned int i0 = 3 * i, i1 = 3 * i + 1, i2 = 3 * i + 2;
-			vtk << 3 << " " << object.vertexIndices[i0] << " " << object.vertexIndices[i1] << " " << object.vertexIndices[i2] << std::endl;
+			std::vector<unsigned int> t = object.triangulations[i];
+			std::vector<std::vector<unsigned int>> triangles = std::vector<std::vector<unsigned int>>();
+			for (unsigned int j = 0; j < t.size(); j++) {
+				triangles.push_back({object.vertexIndices[3 * t[j]], object.vertexIndices[3 * t[j] + 1], object.vertexIndices[3 * t[j] + 2]});
+			}
+			std::vector<unsigned int> polygonIds = object.getPolygonVerticesFromTriangulation(triangles);
+
+			vtk << vtkRowLength - 1 << " ";
+			for (unsigned int j = 0; j < polygonIds.size(); j++) {
+				vtk << polygonIds[j] << (j < polygonIds.size() - 1 ? " " : "\n");
+			}
 		}
 	}
 

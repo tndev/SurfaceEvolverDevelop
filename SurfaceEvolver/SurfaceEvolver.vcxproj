@@ -151,7 +151,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Box3.cpp" />
     <ClCompile Include="CubeSphere.cpp" />
+    <ClCompile Include="Deform.cpp" />
     <ClCompile Include="Geometry.cpp" />
     <ClCompile Include="Icosphere.cpp" />
     <ClCompile Include="Matrix3.cpp" />
@@ -162,7 +164,9 @@
     <ClCompile Include="VTKExporter.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Box3.h" />
     <ClInclude Include="CubeSphere.h" />
+    <ClInclude Include="Deform.h" />
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="Icosphere.h" />
     <ClInclude Include="Matrix3.h" />

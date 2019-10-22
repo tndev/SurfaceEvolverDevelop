@@ -45,6 +45,29 @@ void Vector3::set(float x, float y, float z)
 	this->x = x; this->y = y; this->z = z;
 }
 
+void Vector3::min(Vector3 other)
+{
+	this->x = std::fminf(this->x, other.x);
+	this->y = std::fminf(this->y, other.y);
+	this->z = std::fminf(this->z, other.z);
+}
+
+void Vector3::max(Vector3 other)
+{
+	this->x = std::fmaxf(this->x, other.x);
+	this->y = std::fmaxf(this->y, other.y);
+	this->z = std::fmaxf(this->z, other.z);
+}
+
+bool Vector3::equals(Vector3 other)
+{
+	return (
+		fabs(this->x - other.x) < 2.0f * FLT_EPSILON &&
+		fabs(this->y - other.y) < 2.0f * FLT_EPSILON &&
+		fabs(this->z - other.z) < 2.0f * FLT_EPSILON
+	);
+}
+
 void Vector3::negate()
 {
 	this->x = -x;
@@ -102,6 +125,13 @@ void Vector3::normalize()
 	}
 }
 
+void Vector3::lerp(Vector3 other, float param)
+{
+	this->x += (other.x - x) * param;
+	this->y += (other.y - y) * param;
+	this->z += (other.z - z) * param;
+}
+
 Vector3 normalize(Vector3 target)
 {
 	target.normalize();
@@ -111,6 +141,13 @@ Vector3 normalize(Vector3 target)
 float dot(Vector3 a, Vector3 b)
 {
 	return a.clone().dot(b);
+}
+
+Vector3 lerp(Vector3 v1, Vector3 v2, float param)
+{
+	Vector3 result = v1.clone();
+	result.lerp(v2, param);
+	return result;
 }
 
 void Vector3::applyMatrix3(Matrix3& m)

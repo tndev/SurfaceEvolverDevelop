@@ -22,54 +22,80 @@ bool Geometry::hasTriangulations()
 void Geometry::copy(Geometry other)
 {
 	if (other.hasNormals()) {
-		for (unsigned int i = 0; i < other.normals.size(); i++) {
-			normals.push_back(other.normals[i]);
-		}
+		normals = std::vector<float>(other.normals);
 	}
 
-	for (unsigned int i = 0; i < other.vertices.size(); i++) {
-		vertices.push_back(other.vertices[i]);		
-	}
-
-	for (unsigned int i = 0; i < other.vertexIndices.size(); i++) {
-		vertexIndices.push_back(other.vertexIndices[i]);
-	}
+	vertices = std::vector<float>(other.vertices);
+	uniqueVertices = std::vector<float>(other.uniqueVertices);
+	vertexIndices = std::vector<unsigned int>(other.vertexIndices);
 
 	if (other.hasTriangulations()) {
-		size_t NPoly = other.triangulations.size();
-		std::vector<unsigned int> polygonVertexIds;
-		for (unsigned int i = 0; i < NPoly; i++) {
-			size_t NTri = other.triangulations[i].size();
-			for (unsigned int  j = 0; j < NTri; j++) {
-				polygonVertexIds.push_back(other.triangulations[i][j]);
-			}
-			triangulations.push_back(polygonVertexIds);
-			polygonVertexIds.clear();
-		}
+		triangulations = std::vector<std::vector<unsigned int>>(other.triangulations);
 	}
 }
 
-/*
-std::vector<unsigned int> Geometry::getIndicesForPolygons(std::vector<unsigned int>& indices)
-{
-	std::vector<unsigned int> result = std::vector<unsigned int>();
-	for (unsigned int i = 0; i < triangulations.size(); i++) {
-		std::vector<unsigned int> tri = triangulations[i];
-		std::vector<unsigned int> newTri = std::vector<unsigned int>();
-		for (unsigned int j = 0; j < tri.size(); j++) {
-			unsigned int j0 = 3 * tri[j], j1 = 3 * tri[j] + 1, j2 = 3 * tri[j] + 2;
-			newTri.push_back(indices[j0]);
-			newTri.push_back(indices[j1]);
-			newTri.push_back(indices[j2]);
-		}
-	}
-}*/
-
 Geometry Geometry::clone()
 {
-	Geometry *result = new Geometry();
-	result->copy(*this);
-	return *result;
+	Geometry result = Geometry();
+	result.copy(*this);
+	return result;
+}
+
+Box3 Geometry::getBoundingBox(Box3 bbox, Matrix4 matrix)
+{
+	Vector3 helperVector = Vector3();
+	for (unsigned int i = 0; i < vertices.size(); i += 3) {
+		helperVector.set(vertices[i], vertices[i + 1], vertices[i + 2]);
+		helperVector.applyMatrix4(matrix);
+		bbox.expandByPoint(helperVector);
+	}
+	return bbox;
+}
+
+std::vector<unsigned int> Geometry::getPolygonVerticesFromTriangulation(std::vector<std::vector<unsigned int>> triangles)
+{
+	if (triangles.size() > 1) {
+		std::vector<std::vector<unsigned int>> edges = std::vector<std::vector<unsigned int>>();
+
+		for (auto&& t : triangles) {
+			edges.push_back({ t[0], t[1] });
+			edges.push_back({ t[1], t[2] });
+			edges.push_back({ t[2], t[0] });
+		}
+		for (unsigned int i = 0; i < edges.size() - 1; i++) {
+			for (unsigned int j = i + 1; j < edges.size(); j++) {
+				if ((edges[i][0] == edges[j][0] && edges[i][1] == edges[j][1]) || (edges[i][0] == edges[j][1] && edges[i][1] == edges[j][0])) {
+					edges.erase(edges.begin() + j);
+					edges.erase(edges.begin() + i);
+					i--;
+					break;
+				}
+			}
+		}
+
+		std::vector<unsigned int> faceVertIndices = std::vector<unsigned int>();
+		faceVertIndices.push_back(edges[0][1]);
+
+		std::vector<std::vector<unsigned int>> edgesSet = std::vector<std::vector<unsigned int>>(edges);
+		edgesSet.erase(edgesSet.begin());
+
+		for (unsigned int i = 1; i < edges.size(); i++) {
+			for (unsigned int j = 0; j < edgesSet.size(); j++) {
+				if (edgesSet[j][0] == faceVertIndices[faceVertIndices.size() - 1]) {
+					faceVertIndices.push_back(edgesSet[j][1]);
+					edgesSet.erase(edgesSet.begin() + j);
+					break;
+				}
+			}
+		}
+
+		return faceVertIndices;
+	}
+	else if (triangles.size() == 1) {
+		return triangles[0];
+	}
+
+	return std::vector<unsigned int>();
 }
 
 template<class T>

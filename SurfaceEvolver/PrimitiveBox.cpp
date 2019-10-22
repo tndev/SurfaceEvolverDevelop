@@ -82,7 +82,6 @@ void PrimitiveBox::build()
 
 	triangulations = std::vector<std::vector<unsigned int>>();
 	unsigned int triId = 0;
-	unsigned int uvId = 0;
 
 	auto bufferQuadFromIds = [&](
 		unsigned int i0, unsigned int i1, unsigned int i2, unsigned int i3,
@@ -120,8 +119,7 @@ void PrimitiveBox::build()
 			normals[9 * (triId + 1) + 7] = normal.y;
 			normals[9 * (triId + 1) + 8] = normal.z;
 
-			std::vector<unsigned int> triangulation = { triId, triId + 1 };
-			triangulations.push_back(triangulation);
+			triangulations.push_back({ triId, triId + 1 });
 	};
 
 	Vector3 currentNormal = Vector3(0, 0, -1);
@@ -481,4 +479,15 @@ void PrimitiveBox::build()
 			currentNormal
 		);
 	}
+
+	uniqueVertices = std::vector<float>(this->vertices);
+	std::vector<float> geometryVertices = std::vector<float>(3 * this->vertexIndices.size());
+
+	for (unsigned int i = 0; i < this->vertexIndices.size(); i++) {
+		geometryVertices[i * 3] = this->vertices[this->vertexIndices[i] * 3];
+		geometryVertices[i * 3 + 1] = this->vertices[this->vertexIndices[i] * 3 + 1];
+		geometryVertices[i * 3 + 2] = this->vertices[this->vertexIndices[i] * 3 + 2];
+	}
+
+	this->vertices = std::vector<float>(geometryVertices);
 }
