@@ -27,17 +27,17 @@ void VTKExporter::initExport(Geometry object, std::string filename)
 	}
 
 	// Temporary solution: hasTriangulations corresponds to quads;
-	bool hasTriangulations = object.hasTriangulations();
-	unsigned int step = 3 + (hasTriangulations ? 3 : 0);
+	unsigned int hasTriangulations = object.hasTriangulations();
+	unsigned int step = 3;
 	size_t polyCount = object.vertexIndices.size() / step;
-	unsigned int vtkRowLength = 4 + (hasTriangulations ? 1 : 0);
+	unsigned int vtkRowLength = 4 + hasTriangulations;
 
-	vtk << "POLYGONS" << " " << polyCount << " " << vtkRowLength * polyCount << " " << std::endl;
+	vtk << "POLYGONS" << " " << polyCount << " " << vtkRowLength * (polyCount / (hasTriangulations + 1)) << " " << std::endl;
 
 	if (polyCount > 0 && hasTriangulations) {
-		size_t NPoly = object.triangulations.size();
-		for (unsigned int i = 0; i < polyCount; i++)	{
-			unsigned int i0 = 3 * i, i1 = 3 * i + 1, i2 = 3 * i + 2, i3 = 3 * (i + 1) + 2;
+		// Temporary solution: considering that the geometry is composed of pairs of triangles - quads
+		for (unsigned int i = 0; i < polyCount; i += 2) {
+			unsigned int i0 = 3 * i, i1 = 3 * i + 4, i2 = 3 * i + 1, i3 = 3 * i + 2;
 			vtk << 4 << " " << object.vertexIndices[i0] << " " << object.vertexIndices[i1] << " " << object.vertexIndices[i2] << " " << object.vertexIndices[i3] << std::endl;
 		}
 	} else if (polyCount > 0 && !hasTriangulations) {

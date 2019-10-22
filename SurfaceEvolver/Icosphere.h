@@ -3,18 +3,18 @@
 
 #include "Geometry.h"
 
-class Icosphere :
+class IcoSphere :
 	public Geometry
 {
 public:
 	unsigned int detail = 0;
-	float radius = 1.;
-	Icosphere();
-	Icosphere(unsigned int detail, float radius);
-	~Icosphere();
+	float radius = 50.0f;
+	IcoSphere();
+	IcoSphere(unsigned int detail, float radius);
+	~IcoSphere();
 
-	void copy(Icosphere other);
-	Icosphere clone();
+	void copy(IcoSphere other);
+	IcoSphere clone();
 
 	void build();
 };

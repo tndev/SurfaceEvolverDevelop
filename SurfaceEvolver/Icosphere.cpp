@@ -4,32 +4,32 @@
 #include <array>
 #include <map>
 
-Icosphere::Icosphere()
+IcoSphere::IcoSphere()
 {
 }
 
-Icosphere::Icosphere(unsigned int detail, float radius)
+IcoSphere::IcoSphere(unsigned int detail, float radius)
 {
 	this->detail = detail; this->radius = radius;
 	build();
 }
 
-Icosphere::~Icosphere()
+IcoSphere::~IcoSphere()
 {
 }
 
-void Icosphere::copy(Icosphere other)
+void IcoSphere::copy(IcoSphere other)
 {
 	Geometry::copy(other);
 	detail = other.detail;
 	radius = other.radius;
 }
 
-Icosphere Icosphere::clone()
+IcoSphere IcoSphere::clone()
 {
-	Icosphere* result = new Icosphere();
-	result->copy(*this);
-	return *result;
+	IcoSphere result = IcoSphere();
+	result.copy(*this);
+	return result;
 }
 
 // ===============================================
@@ -100,7 +100,7 @@ TriangleList subdivide(VertexList& vertices, TriangleList& triangles) {
 }
 
 
-void Icosphere::build()
+void IcoSphere::build()
 {
 	VertexList vertices = Icosahedron::vertices;
 	TriangleList triangles = Icosahedron::triangles;

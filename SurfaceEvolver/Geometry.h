@@ -8,10 +8,10 @@
 class Geometry
 {
 public:
-	std::vector<float> vertices; 
-	std::vector<float> normals; // vertex normals
-	std::vector<unsigned int> vertexIndices; // [0, 1, 2, 0, 2, 3, ... ]
-	std::vector<std::vector<unsigned int>> triangulations;
+	std::vector<float> vertices; // unique! no copies based on vertex indices
+	std::vector<float> normals; // vertex normals (for each triangle, i.e.: there's as many as there are vertex indices)
+	std::vector<unsigned int> vertexIndices; // [0, 1, 2, 0, 2, 3, ... ] (e.g.: quads are made of 2 consecutive triplets of vert indices)
+	std::vector<std::vector<unsigned int>> triangulations; // each contains ids of triangles inside a polygon
 
 	Geometry();
 	~Geometry();
