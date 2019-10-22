@@ -29,6 +29,7 @@ void Deform::spherify(float param)
 
 	for (unsigned int i = 0; i < geom->vertices.size(); i += 3) {
 		vertex.set(geom->vertices[i], geom->vertices[i + 1], geom->vertices[i + 2]);
+		normal.set(geom->normals[i], geom->normals[i + 1], geom->normals[i + 2]);
 
 		helperVector.copy(vertex);
 

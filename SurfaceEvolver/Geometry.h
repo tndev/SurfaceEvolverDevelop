@@ -10,7 +10,6 @@
 class Geometry
 {
 public:
-	std::vector<float> uniqueVertices; // I need these for export to VTK polydata, but I'm sure there's a workaround
 	std::vector<float> vertices; // duplicated (for each triangle)
 	std::vector<float> normals; // vertex normals (for each triangle, i.e.: there's as many as there are vertex indices)
 	std::vector<unsigned int> vertexIndices; // [0, 1, 2, 0, 2, 3, ... ] (e.g.: quads are made of 2 consecutive triplets of vert indices)
@@ -27,6 +26,7 @@ public:
 	Box3 getBoundingBox(Box3 bbox = Box3(), Matrix4 matrix = Matrix4());
 
 	std::vector<unsigned int> getPolygonVerticesFromTriangulation(std::vector<std::vector<unsigned int>> triangles);
+	std::vector<Vector3> getUniqueVertices();
 
 	void flipFaceOrientation();
 	void applyMatrix(Matrix4 m);

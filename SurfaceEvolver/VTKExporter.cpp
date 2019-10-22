@@ -10,8 +10,10 @@ VTKExporter::~VTKExporter()
 
 void VTKExporter::initExport(Geometry object, std::string filename)
 {
-	size_t pointCount = object.uniqueVertices.size() / 3;
 	std::fstream vtk(pathPrefix + filename + ".vtk", std::fstream::out);
+
+	std::vector<Vector3> uniqueVertices = object.getUniqueVertices();
+	size_t pointCount = uniqueVertices.size();
 
 	vtk << "# vtk DataFile Version 4.2" << std::endl;
 	vtk << "vtk output" << std::endl;
@@ -21,8 +23,7 @@ void VTKExporter::initExport(Geometry object, std::string filename)
 
 	if (pointCount > 0) {
 		for (int i = 0; i < pointCount; i++) {
-			unsigned int i0 = 3 * i, i1 = 3 * i + 1, i2 = 3 * i + 2;
-			vtk << object.uniqueVertices[i0] << " " << object.uniqueVertices[i1] << " " << object.uniqueVertices[i2] << std::endl;
+			vtk << uniqueVertices[i].x << " " << uniqueVertices[i].y << " " << uniqueVertices[i].z << std::endl;
 		}
 	}
 

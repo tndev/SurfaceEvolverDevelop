@@ -26,7 +26,6 @@ void Geometry::copy(Geometry other)
 	}
 
 	vertices = std::vector<float>(other.vertices);
-	uniqueVertices = std::vector<float>(other.uniqueVertices);
 	vertexIndices = std::vector<unsigned int>(other.vertexIndices);
 
 	if (other.hasTriangulations()) {
@@ -96,6 +95,26 @@ std::vector<unsigned int> Geometry::getPolygonVerticesFromTriangulation(std::vec
 	}
 
 	return std::vector<unsigned int>();
+}
+
+std::vector<Vector3> Geometry::getUniqueVertices()
+{
+	std::vector<Vector3> vertices = std::vector<Vector3>();
+	std::set<Vector3> vertexSet = std::set<Vector3>();
+
+	for (unsigned int i = 0; i < this->vertices.size(); i += 9) {
+
+		for (unsigned int j = 0; j < 3; j++) {
+			unsigned int vId = i + 3 * j;
+			Vector3 v = Vector3(this->vertices[vId], this->vertices[vId + 1], this->vertices[vId + 2]);
+			std::pair<std::set<Vector3>::iterator, bool> unique = vertexSet.insert(v);
+
+			if (unique.second) {
+				vertices.push_back(v);
+			}
+		}
+	}
+	return vertices;
 }
 
 template<class T>

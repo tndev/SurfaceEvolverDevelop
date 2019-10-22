@@ -480,7 +480,6 @@ void PrimitiveBox::build()
 		);
 	}
 
-	uniqueVertices = std::vector<float>(this->vertices);
 	std::vector<float> geometryVertices = std::vector<float>(3 * this->vertexIndices.size());
 
 	for (unsigned int i = 0; i < this->vertexIndices.size(); i++) {

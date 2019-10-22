@@ -2,6 +2,8 @@
 #define CUBESPHERE_H_
 
 #include "Geometry.h"
+#include "PrimitiveBox.h"
+#include "Deform.h"
 
 class CubeSphere :
 	public Geometry

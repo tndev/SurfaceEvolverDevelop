@@ -208,3 +208,22 @@ std::ostream& operator<<(std::ostream& out, const Vector3& v)
 	out << "(" << v.x << ", " << v.y << ", " << v.z << ")";
 	return out;
 }
+
+bool operator==(const Vector3& left, const Vector3& right)
+{
+	return (
+		fabs(left.x - right.x) < 2.0f * FLT_EPSILON &&
+		fabs(left.y - right.y) < 2.0f * FLT_EPSILON &&
+		fabs(left.z - right.z) < 2.0f * FLT_EPSILON
+	);
+}
+
+
+bool operator<(const Vector3& left, const Vector3& right)
+{
+	return (
+		fabs(left.x - right.x) > 2.0f * FLT_EPSILON &&
+		fabs(left.y - right.y) > 2.0f * FLT_EPSILON &&
+		fabs(left.z - right.z) > 2.0f * FLT_EPSILON
+	);
+}

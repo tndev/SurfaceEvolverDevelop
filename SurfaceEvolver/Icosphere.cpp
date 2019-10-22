@@ -114,9 +114,9 @@ void IcoSphere::build()
 		this->vertices.push_back(vertices[i].y);
 		this->vertices.push_back(vertices[i].z);
 
-		this->uniqueVertices.push_back(radius * vertices[i].x);
-		this->uniqueVertices.push_back(radius * vertices[i].y);
-		this->uniqueVertices.push_back(radius * vertices[i].z);
+		this->vertices.push_back(vertices[i].x);
+		this->vertices.push_back(vertices[i].y);
+		this->vertices.push_back(vertices[i].z);
 	}
 
 	for (unsigned int i = 0; i < triangles.size(); i++) {
@@ -128,6 +128,8 @@ void IcoSphere::build()
 	std::vector<float> geometryVertices = std::vector<float>(3 * this->vertexIndices.size());
 	this->normals = std::vector<float>(3 * this->vertexIndices.size());
 
+
+	// apply radius to duplicate vertices
 	for (unsigned int i = 0; i < this->vertexIndices.size(); i++) {
 		geometryVertices[i * 3] = radius * this->vertices[this->vertexIndices[i] * 3];
 		geometryVertices[i * 3 + 1] = radius * this->vertices[this->vertexIndices[i] * 3 + 1];
