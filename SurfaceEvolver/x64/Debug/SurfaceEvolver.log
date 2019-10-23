@@ -1,54 +1,6 @@
-﻿  Box3.cpp
-  CubeSphere.cpp
-  Deform.cpp
-  Geometry.cpp
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Deform.cpp(21,15): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry.cpp(118,20): warning C4244: '=': conversion from '_Ty' to 'float', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry.cpp(118,20): warning C4244:         with
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry.cpp(118,20): warning C4244:         [
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry.cpp(118,20): warning C4244:             _Ty=unsigned int
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry.cpp(118,20): warning C4244:         ]
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry.cpp(132): message : see reference to function template instantiation 'void flipArray<unsigned int>(std::vector<unsigned int,std::allocator<_Ty>>,unsigned int)' being compiled
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry.cpp(132): message :         with
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry.cpp(132): message :         [
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry.cpp(132): message :             _Ty=unsigned int
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry.cpp(132): message :         ]
-  Icosphere.cpp
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry.cpp(120,20): warning C4244: '=': conversion from 'float' to '_Ty', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry.cpp(120,20): warning C4244:         with
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry.cpp(120,20): warning C4244:         [
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry.cpp(120,20): warning C4244:             _Ty=unsigned int
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry.cpp(120,20): warning C4244:         ]
-D:\VS Community\VC\Tools\MSVC\14.23.28105\include\utility(127,1): warning C4267: 'initializing': conversion from 'size_t' to '_Ty2', possible loss of data
-D:\VS Community\VC\Tools\MSVC\14.23.28105\include\utility(127,1): warning C4267:         with
-D:\VS Community\VC\Tools\MSVC\14.23.28105\include\utility(127,1): warning C4267:         [
-D:\VS Community\VC\Tools\MSVC\14.23.28105\include\utility(127,1): warning C4267:             _Ty2=unsigned int
-D:\VS Community\VC\Tools\MSVC\14.23.28105\include\utility(127,1): warning C4267:         ]
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Icosphere.cpp(61): message : see reference to function template instantiation 'std::pair<const _Kty,_Ty>::pair<std::pair<unsigned int,unsigned int>&,unsigned __int64,0>(_Other1,_Other2 &&) noexcept' being compiled
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Icosphere.cpp(61): message :         with
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Icosphere.cpp(61): message :         [
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Icosphere.cpp(61): message :             _Kty=std::pair<unsigned int,unsigned int>,
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Icosphere.cpp(61): message :             _Ty=unsigned int,
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Icosphere.cpp(61): message :             _Other1=std::pair<unsigned int,unsigned int> &,
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Icosphere.cpp(61): message :             _Other2=unsigned __int64
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Icosphere.cpp(61): message :         ]
-  PrimitiveBox.cpp
-  VTKExporter.cpp
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Icosphere.cpp(61): message : see reference to function template instantiation 'std::pair<const _Kty,_Ty>::pair<std::pair<unsigned int,unsigned int>&,unsigned __int64,0>(_Other1,_Other2 &&) noexcept' being compiled
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Icosphere.cpp(61): message :         with
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Icosphere.cpp(61): message :         [
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Icosphere.cpp(61): message :             _Kty=std::pair<unsigned int,unsigned int>,
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Icosphere.cpp(61): message :             _Ty=unsigned int,
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Icosphere.cpp(61): message :             _Other1=std::pair<unsigned int,unsigned int> &,
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Icosphere.cpp(61): message :             _Other2=unsigned __int64
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Icosphere.cpp(61): message :         ]
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\VTKExporter.cpp(42,58): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
-  Vector3.cpp
-  main.cpp
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\VTKExporter.cpp(56,20): warning C4267: '+=': conversion from 'size_t' to 'unsigned int', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\main.cpp(17,10): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\main.cpp(26,65): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\main.cpp(26,56): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-  Generating Code...
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\main.cpp(26,47): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+﻿  main.cpp
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\main.cpp(26,10): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\main.cpp(35,65): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\main.cpp(35,56): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\main.cpp(35,47): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
   SurfaceEvolver.vcxproj -> D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\x64\Debug\SurfaceEvolver.exe

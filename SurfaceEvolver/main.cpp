@@ -9,6 +9,15 @@
 #include "CubeSphere.h"
 #include "VTKExporter.h"
 
+//   TODO:
+// - Add an AABBTree structure
+// - Make a fast cell intersection query
+// - Set intersected cell values to 0 and INFINITY everywhere else
+// - Apply Fast Sweeping Method
+// - Alternatively: Make a fast distance query (CUDA?)
+// - Interior/Exterior sign
+// - SDF
+
 int main()
 {
 	float r = 50.0f;
