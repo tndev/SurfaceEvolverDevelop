@@ -28,10 +28,6 @@ IcoSphere::~IcoSphere()
 // ===============================================
 // ======== Pre-requisites for Icosphere =========
 
-struct Triangle {
-	unsigned int vertex[3];
-};
-
 using TriangleList = std::vector<Triangle>;
 using VertexList = std::vector<Vector3>;
 
@@ -80,12 +76,12 @@ TriangleList subdivide(VertexList& vertices, TriangleList& triangles) {
 	for (auto&& each:triangles) {
 		std::array<unsigned int, 3> mid;
 		for (int edge = 0; edge < 3; ++edge) {
-			mid[edge] = midpointId(lookup, vertices, each.vertex[edge], each.vertex[(edge + 1) % 3]);
+			mid[edge] = midpointId(lookup, vertices, each[edge], each[(edge + 1) % 3]);
 		}
 
-		result.push_back({ each.vertex[0], mid[0], mid[2] });
-		result.push_back({ each.vertex[1], mid[1], mid[0] });
-		result.push_back({ each.vertex[2], mid[2], mid[1] });
+		result.push_back({ each[0], mid[0], mid[2] });
+		result.push_back({ each[1], mid[1], mid[0] });
+		result.push_back({ each[2], mid[2], mid[1] });
 		result.push_back({ mid[0], mid[1], mid[2] });
 	}
 
@@ -112,7 +108,7 @@ void IcoSphere::build()
 
 	for (unsigned int i = 0; i < triangles.size(); i++) {
 		for (unsigned int j = 0; j < 3; j++) {
-			this->vertexIndices.push_back(triangles[i].vertex[j]);
+			this->vertexIndices.push_back(triangles[i][j]);
 		}
 	}
 

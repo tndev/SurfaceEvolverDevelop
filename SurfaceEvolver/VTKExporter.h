@@ -6,6 +6,7 @@
 #include <string>
 #include "Geometry.h"
 
+
 class VTKExporter
 {
 public:
@@ -14,6 +15,8 @@ public:
 	~VTKExporter();
 
 	void initExport(Geometry object, std::string filename);
+private:
+	std::pair<std::vector<Triangulation>, std::vector<size_t>> getSortedPolygonTriangulationsAndSizes(std::vector<Triangulation>& triangulations);
 };
 
 #endif

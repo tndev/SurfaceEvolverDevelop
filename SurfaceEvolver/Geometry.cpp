@@ -39,7 +39,18 @@ Box3 Geometry::getBoundingBox(Box3 bbox, Matrix4 matrix)
 	return bbox;
 }
 
-std::vector<unsigned int> Geometry::getPolygonVerticesFromTriangulation(std::vector<std::vector<unsigned int>> triangles)
+std::vector<unsigned int> Geometry::getPolygonIndicesFromTriangulation(Triangulation t)
+{
+	Geometry* g = this;
+	std::vector<Triangle> triangles = std::vector<Triangle>();
+	for (unsigned int k = 0; k < t.size(); k++) {
+		triangles.push_back({ g->vertexIndices[3 * t[k]], g->vertexIndices[3 * t[k] + 1], g->vertexIndices[3 * t[k] + 2] });
+	}
+	std::vector<unsigned int> polygonIds = g->getPolygonIndicesFromTriangles(triangles);
+	return polygonIds;
+}
+
+std::vector<unsigned int> Geometry::getPolygonIndicesFromTriangles(std::vector<Triangle> triangles)
 {
 	if (triangles.size() > 1) {
 		std::vector<std::vector<unsigned int>> edges = std::vector<std::vector<unsigned int>>();

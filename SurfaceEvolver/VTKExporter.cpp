@@ -27,27 +27,58 @@ void VTKExporter::initExport(Geometry object, std::string filename)
 		}
 	}
 
-	// TODO: divide all polygons into groups according to their number of sides and write those as separate index groups in the file
+	// divide all polygons into groups according to their number of sides and write those as separate index groups in the file
 	if (object.hasTriangulations()) {
-		size_t polyCount = object.triangulations.size();
-		unsigned int vtkRowLength = 3 + object.triangulations[0].size(); // assuming all faces have the same number of sides
+		auto triAndSizes = getSortedPolygonTriangulationsAndSizes(object.triangulations);
+		std::vector<Triangulation> polygonTriangulations = triAndSizes.first;
+		std::vector<size_t> sizes = triAndSizes.second;
+		size_t NPolyTypes = sizes.size();
+		unsigned int pos = 0;
 
-		vtk << "POLYGONS" << " " << polyCount << " " << vtkRowLength * polyCount << " " << std::endl;
+		vtk << std::endl;
 
-		for (unsigned int i = 0; i < polyCount; i++) {
-			std::vector<unsigned int> t = object.triangulations[i];
-			std::vector<std::vector<unsigned int>> triangles = std::vector<std::vector<unsigned int>>();
-			for (unsigned int j = 0; j < t.size(); j++) {
-				triangles.push_back({object.vertexIndices[3 * t[j]], object.vertexIndices[3 * t[j] + 1], object.vertexIndices[3 * t[j] + 2]});
+		for (unsigned int i = 0; i < NPolyTypes; i++) {
+			size_t polyCount = sizes[i];
+			unsigned int tSize = polygonTriangulations[pos].size();
+			unsigned int vtkRowLength = 3 + tSize;
+
+			vtk << "POLYGONS" << " " << polyCount << " " << vtkRowLength * polyCount << " " << std::endl;
+			
+			for (unsigned int j = 0; j < polyCount; j++) {
+				unsigned int ptj = pos + j;
+				std::vector<unsigned int> polygonIds = object.getPolygonIndicesFromTriangulation(polygonTriangulations[ptj]);
+				vtk << vtkRowLength - 1 << " ";
+				for (unsigned int k = 0; k < polygonIds.size(); k++) {
+					vtk << polygonIds[k] << (k < polygonIds.size() - 1 ? " " : "\n");
+				}
 			}
-			std::vector<unsigned int> polygonIds = object.getPolygonVerticesFromTriangulation(triangles);
 
-			vtk << vtkRowLength - 1 << " ";
-			for (unsigned int j = 0; j < polygonIds.size(); j++) {
-				vtk << polygonIds[j] << (j < polygonIds.size() - 1 ? " " : "\n");
-			}
+			pos += polyCount;
 		}
 	}
 
 	vtk.close();
+}
+
+std::pair<std::vector<Triangulation>, std::vector<size_t>> VTKExporter::getSortedPolygonTriangulationsAndSizes(std::vector<Triangulation>& triangulations)
+{
+	std::vector<Triangulation> T = triangulations;
+	std::vector<size_t> sizes = std::vector<size_t>();
+	std::sort(T.begin(), T.end(), [](const Triangulation& a, const Triangulation& b) { return a.size() < b.size(); });
+	unsigned int tCount = 0; // triangulation count
+	size_t currentSize = T.begin()->size();
+
+	for (std::vector<Triangulation>::iterator it = T.begin(); it < T.end(); ++it) {
+		if (it->size() > currentSize) {
+			currentSize = it->size();
+			sizes.push_back(tCount);
+			tCount = 0;
+			continue;
+		}
+		tCount++;
+	}
+	sizes.push_back(tCount);
+
+	std::pair<std::vector<Triangulation>, std::vector<size_t>> result = { T, sizes };
+	return result;
 }
