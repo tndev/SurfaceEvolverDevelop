@@ -159,7 +159,7 @@
     <ClCompile Include="Matrix3.cpp" />
     <ClCompile Include="Matrix4.cpp" />
     <ClCompile Include="PrimitiveBox.cpp" />
-    <ClCompile Include="SurfaceEvolver.cpp" />
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="Vector3.cpp" />
     <ClCompile Include="VTKExporter.cpp" />
   </ItemGroup>

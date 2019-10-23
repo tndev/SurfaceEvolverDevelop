@@ -42,8 +42,14 @@ void CubeSphere::build()
 {
 	float a = 2 * radius / sqrt(3.);
 	PrimitiveBox box = PrimitiveBox(a, a, a, detail, detail, detail);
-	Deform def = Deform(&box);
 
+	// translate to center
+	Matrix4 T = Matrix4();
+	T.makeTranslation(-a / 2., -a / 2., -a / 2.);
+	box.applyMatrix(T);
+
+	// spherify
+	Deform def = Deform(&box);
 	def.spherify(1.);
 
 	Geometry result = def.result;

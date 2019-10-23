@@ -22,6 +22,11 @@ int main()
 	VTKExporter e = VTKExporter();
 	e.initExport(ico, "icosphere");
 	e.initExport(box, "box");
+
+	Matrix4 m = Matrix4();
+	m.makeTranslation(-a / 2., -a / 2., -a / 2.);
+	box.applyMatrix(m);
+	e.initExport(box, "boxTranslated");
 	e.initExport(cs, "cubesphere");
 
 	return 1;

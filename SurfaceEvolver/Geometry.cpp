@@ -169,6 +169,8 @@ void Geometry::applyMatrix(Matrix4 m)
 		vertices[i1] = helperVector.y;
 		vertices[i2] = helperVector.z;
 
+		this->uniqueVertices[this->vertexIndices[i / 3]] = helperVector.clone();
+
 		if (hasNormals) {
 			helperVector.set(normals[i0], normals[i1], normals[i2]);
 			helperVector.applyMatrix3(matrix3InverseTransposed);

@@ -101,11 +101,11 @@ void Vector3::applyMatrix4(Matrix4& m)
 {
 	Vector3 a = this->clone();
 	float* e = m.elements;
-	float w = 1.f / (e[3] * a.x + e[7] * a.y + e[11] * a.z + e[15]);
+	float w = 1.0f / (e[12] * a.x + e[13] * a.y + e[14] * a.z + e[15]);
 
-	this->x = (e[0] * a.x + e[4] * a.y + e[8] * a.z + e[12]) * w;
-	this->y = (e[1] * a.x + e[5] * a.y + e[9] * a.z + e[13]) * w;
-	this->z = (e[2] * a.x + e[6] * a.y + e[10] * a.z + e[14]) * w;
+	this->x = (e[0] * a.x + e[1] * a.y + e[2] * a.z + e[3]) * w;
+	this->y = (e[4] * a.x + e[5] * a.y + e[6] * a.z + e[7]) * w;
+	this->z = (e[8] * a.x + e[9] * a.y + e[10] * a.z + e[11]) * w;
 }
 
 void Vector3::normalize()

@@ -16,6 +16,16 @@ Matrix4::Matrix4(float* elems)
 	e[12] = elems[12];	e[13] = elems[13];	e[14] = elems[14];	e[15] = elems[15];
 }
 
+Matrix4::Matrix4(float m00, float m01, float m02, float m03, float m10, float m11, float m12, float m13, float m20, float m21, float m22, float m23, float m30, float m31, float m32, float m33)
+{
+	this->set(
+		m00, m01, m02, m03,
+		m10, m11, m12, m13,
+		m20, m21, m22, m23,
+		m30, m31, m32, m33
+	);
+}
+
 Matrix4::~Matrix4()
 {
 }
@@ -28,6 +38,15 @@ void Matrix4::copy(Matrix4& other)
 	e[4] = elems[4];	e[5] = elems[5];	e[6] = elems[6];	e[7] = elems[7];
 	e[8] = elems[8];	e[9] = elems[9];	e[10] = elems[10];	e[11] = elems[11];
 	e[12] = elems[12];	e[13] = elems[13];	e[14] = elems[14];	e[15] = elems[15];
+}
+
+void Matrix4::set(float m00, float m01, float m02, float m03, float m10, float m11, float m12, float m13, float m20, float m21, float m22, float m23, float m30, float m31, float m32, float m33)
+{
+	float* e = elements;
+	e[0] = m00;		e[1] = m01;		e[2] = m02;		e[3] = m03;
+	e[4] = m10;		e[5] = m11;		e[6] = m12;		e[7] = m13;
+	e[8] = m20;		e[9] = m21;		e[10] = m22;	e[11] = m23;
+	e[12] = m30;	e[13] = m31;	e[14] = m32;	e[15] = m33;
 }
 
 Matrix4 Matrix4::clone()
@@ -62,22 +81,23 @@ bool Matrix4::isIdentity()
 
 void Matrix4::setToIdentity()
 {
-	float* e = elements;
-	e[0] = 1.0f;	e[1] = 0.0f;	e[2] = 0.0f;	e[3] = 0.0f;
-	e[4] = 0.0f;	e[5] = 1.0f;	e[6] = 0.0f;	e[7] = 0.0f;
-	e[8] = 0.0f;	e[9] = 0.0f;	e[10] = 1.0f;	e[11] = 0.0f;
-	e[12] = 0.0f;	e[13] = 0.0f;	e[14] = 0.0f;	e[15] = 1.0f;
+	this->set(
+		1.0f, 0.0f, 0.0f, 0.0f,
+		0.0f, 1.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 1.0f, 0.0f,
+		0.0f, 0.0f, 0.0f, 1.0f
+	);
 }
 
 void Matrix4::transpose()
 {
-	Matrix4 result = Matrix4();
-	float* e = result.elements;
-	float* elems = elements;
-	e[0] = elems[0];	e[1] = elems[4];	e[2] = elems[8];	e[3] = elems[12];
-	e[4] = elems[1];	e[5] = elems[5];	e[6] = elems[9];	e[7] = elems[13];
-	e[8] = elems[2];	e[9] = elems[6];	e[10] = elems[10];	e[11] = elems[14];
-	e[12] = elems[3];	e[13] = elems[7];	e[14] = elems[11];	e[15] = elems[15];
+	float* e = elements;
+	this->set(
+		e[0], e[4], e[8], e[12],
+		e[1], e[5], e[9], e[13],
+		e[2], e[6], e[10], e[14],
+		e[3], e[7], e[11], e[15]
+	);
 }
 
 void Matrix4::multiplyScalar(float scalar)
@@ -86,6 +106,40 @@ void Matrix4::multiplyScalar(float scalar)
 	for (int i = 0; i < 16; i++) {
 		e[i] *= scalar;
 	}
+}
+
+void Matrix4::setToScale(float sx, float sy, float sz)
+{
+	this->set(
+		sx,   0.0f, 0.0f, 0.0f,
+		0.0f, sy,   0.0f, 0.0f,
+		0.0f, 0.0f, sz,   0.0f,
+		0.0f, 0.0f, 0.0f, 1.0f
+	);
+}
+
+void Matrix4::makeRotationAxis(float ax, float ay, float az, float angle)
+{
+	float c = cos(angle), s = sin(angle);
+	float t = 1 - c;
+	float tx = t * ax, ty = t * ay;
+
+	this->set(
+		tx * ax + c, tx * ay - s * az, tx * az + s * ay, 0.0f,
+		tx * ay + s * az, ty * ay + c, ty * az - s * ax, 0.0f,
+		tx * az - s * ay, ty * az + s * ax, t * az * az + c, 0.0f,
+		0.0f, 0.0f, 0.0f, 1.0f
+	);
+}
+
+void Matrix4::makeTranslation(float tx, float ty, float tz)
+{
+	this->set(
+		1.0f, 0.0f, 0.0f, tx,
+		0.0f, 1.0f, 0.0f, ty,
+		0.0f, 0.0f, 1.0f, tz,
+		0.0f, 0.0f, 0.0f, 1.0f
+	);
 }
 
 float Matrix4::determinant()
