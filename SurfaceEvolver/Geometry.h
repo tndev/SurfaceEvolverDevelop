@@ -22,6 +22,8 @@ public:
 	std::vector<unsigned int> vertexIndices; // values correspond to the positions in uniqueVertices array;
 	std::vector<Triangulation> triangulations; // each contains ids of triangles inside a polygon
 
+	// TODO: tangents and uvs
+
 	Geometry();
 	~Geometry();
 	Geometry(const Geometry& other);
