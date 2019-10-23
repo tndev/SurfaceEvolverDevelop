@@ -150,6 +150,16 @@ Vector3 lerp(Vector3 v1, Vector3 v2, float param)
 	return result;
 }
 
+bool equal(Vector3& a, Vector3& b)
+{
+	return a.equals(b);
+}
+
+bool notEqual(Vector3& a, Vector3& b)
+{
+	return !a.equals(b);
+}
+
 void Vector3::applyMatrix3(Matrix3& m)
 {
 	Vector3 a = this->clone();
@@ -207,23 +217,4 @@ std::ostream& operator<<(std::ostream& out, const Vector3& v)
 {
 	out << "(" << v.x << ", " << v.y << ", " << v.z << ")";
 	return out;
-}
-
-bool operator==(const Vector3& left, const Vector3& right)
-{
-	return (
-		fabs(left.x - right.x) < 2.0f * FLT_EPSILON &&
-		fabs(left.y - right.y) < 2.0f * FLT_EPSILON &&
-		fabs(left.z - right.z) < 2.0f * FLT_EPSILON
-	);
-}
-
-
-bool operator<(const Vector3& left, const Vector3& right)
-{
-	return (
-		fabs(left.x - right.x) > 2.0f * FLT_EPSILON &&
-		fabs(left.y - right.y) > 2.0f * FLT_EPSILON &&
-		fabs(left.z - right.z) > 2.0f * FLT_EPSILON
-	);
 }

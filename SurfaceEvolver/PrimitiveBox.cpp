@@ -480,6 +480,7 @@ void PrimitiveBox::build()
 		);
 	}
 
+	// duplicate vertices into geometryVertices
 	std::vector<float> geometryVertices = std::vector<float>(3 * this->vertexIndices.size());
 
 	for (unsigned int i = 0; i < this->vertexIndices.size(); i++) {
@@ -488,5 +489,7 @@ void PrimitiveBox::build()
 		geometryVertices[i * 3 + 2] = this->vertices[this->vertexIndices[i] * 3 + 2];
 	}
 
+	// copy unique vertex coords into uniqueVertices
+	this->uniqueVertices = std::vector<Vector3>(this->getVertices());
 	this->vertices = std::vector<float>(geometryVertices);
 }

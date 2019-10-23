@@ -45,13 +45,13 @@ public:
 	friend Vector3 operator* (float scalar, Vector3 a);
 	friend Vector3 operator/ (float scalar, Vector3 a);
 	friend std::ostream& operator<< (std::ostream& out, const Vector3& v);
-
-	friend bool operator< (const Vector3& left, const Vector3& right);
 };
 
 Vector3 normalize(Vector3 target);
 float dot(Vector3 a, Vector3 b);
 Vector3 lerp(Vector3 v1, Vector3 v2, float param);
+bool equal(Vector3& a, Vector3& b);
+bool notEqual(Vector3& a, Vector3& b);
 
 #endif
 

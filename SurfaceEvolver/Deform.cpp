@@ -49,9 +49,11 @@ void Deform::spherify(float param)
 		result.vertices[i + 1] = vertex.y;
 		result.vertices[i + 2] = vertex.z;
 
-		result.normals[i] = vertex.x;
-		result.normals[i + 1] = vertex.y;
-		result.normals[i + 2] = vertex.z;
+		result.normals[i] = normal.x;
+		result.normals[i + 1] = normal.y;
+		result.normals[i + 2] = normal.z;
+
+		result.uniqueVertices[geom->vertexIndices[i / 3]] = vertex;
 	}
 }
 

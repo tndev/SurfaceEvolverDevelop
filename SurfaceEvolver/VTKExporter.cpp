@@ -12,7 +12,7 @@ void VTKExporter::initExport(Geometry object, std::string filename)
 {
 	std::fstream vtk(pathPrefix + filename + ".vtk", std::fstream::out);
 
-	std::vector<Vector3> uniqueVertices = object.getUniqueVertices();
+	std::vector<Vector3> uniqueVertices = object.uniqueVertices;
 	size_t pointCount = uniqueVertices.size();
 
 	vtk << "# vtk DataFile Version 4.2" << std::endl;

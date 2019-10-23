@@ -40,12 +40,14 @@ using VertexList = std::vector<Vector3>;
 
 void CubeSphere::build()
 {
-	PrimitiveBox box = PrimitiveBox(2 * radius, 2 * radius, 2 * radius, detail, detail, detail);
+	float a = 2 * radius / sqrt(3.);
+	PrimitiveBox box = PrimitiveBox(a, a, a, detail, detail, detail);
 	Deform def = Deform(&box);
 
 	def.spherify(1.);
 
-	Geometry result = def.geom->clone();
+	Geometry result = def.result;
+	this->uniqueVertices = result.uniqueVertices;
 	this->vertices = result.vertices;
 	this->normals = result.normals;
 	this->vertexIndices = result.vertexIndices;

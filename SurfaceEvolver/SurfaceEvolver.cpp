@@ -11,12 +11,18 @@
 
 int main()
 {
-	IcoSphere ico = IcoSphere(1, 50.);
-	PrimitiveBox box = PrimitiveBox(53., 52., 51., 4, 3, 3);
+	float r = 50.0f;
+	unsigned int d = 3;
+	IcoSphere ico = IcoSphere(d, r);
+	float a = 2 * r / sqrt(3.);
+	unsigned int ns = 10;
+	PrimitiveBox box = PrimitiveBox(a, a, a, ns, ns, ns);
+	CubeSphere cs = CubeSphere(ns, r);
 
 	VTKExporter e = VTKExporter();
 	e.initExport(ico, "icosphere");
 	e.initExport(box, "box");
+	e.initExport(cs, "cubesphere");
 
 	return 1;
 }

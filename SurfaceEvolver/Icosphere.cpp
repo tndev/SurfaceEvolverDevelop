@@ -114,9 +114,7 @@ void IcoSphere::build()
 		this->vertices.push_back(vertices[i].y);
 		this->vertices.push_back(vertices[i].z);
 
-		this->vertices.push_back(vertices[i].x);
-		this->vertices.push_back(vertices[i].y);
-		this->vertices.push_back(vertices[i].z);
+		this->uniqueVertices.push_back(radius * vertices[i]);
 	}
 
 	for (unsigned int i = 0; i < triangles.size(); i++) {
