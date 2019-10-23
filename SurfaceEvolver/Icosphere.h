@@ -10,11 +10,9 @@ public:
 	unsigned int detail = 0;
 	float radius = 50.0f;
 	IcoSphere();
+	IcoSphere(const IcoSphere& other);
 	IcoSphere(unsigned int detail, float radius);
 	~IcoSphere();
-
-	void copy(IcoSphere other);
-	IcoSphere clone();
 
 	void build();
 };

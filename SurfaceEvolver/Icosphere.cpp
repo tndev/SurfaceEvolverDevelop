@@ -8,6 +8,13 @@ IcoSphere::IcoSphere()
 {
 }
 
+IcoSphere::IcoSphere(const IcoSphere& other)
+{
+	Geometry::Geometry(other);
+	detail = other.detail;
+	radius = other.radius;
+}
+
 IcoSphere::IcoSphere(unsigned int detail, float radius)
 {
 	this->detail = detail; this->radius = radius;
@@ -16,20 +23,6 @@ IcoSphere::IcoSphere(unsigned int detail, float radius)
 
 IcoSphere::~IcoSphere()
 {
-}
-
-void IcoSphere::copy(IcoSphere other)
-{
-	Geometry::copy(other);
-	detail = other.detail;
-	radius = other.radius;
-}
-
-IcoSphere IcoSphere::clone()
-{
-	IcoSphere result = IcoSphere();
-	result.copy(*this);
-	return result;
 }
 
 // ===============================================

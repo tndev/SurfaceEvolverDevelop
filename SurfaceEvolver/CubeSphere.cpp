@@ -14,20 +14,6 @@ CubeSphere::~CubeSphere()
 {
 }
 
-void CubeSphere::copy(CubeSphere other)
-{
-	Geometry::copy(other);
-	detail = other.detail;
-	radius = other.radius;
-}
-
-CubeSphere CubeSphere::clone()
-{
-	CubeSphere result = CubeSphere();
-	result.copy(*this);
-	return result;
-}
-
 // =======================================================
 // ============ Pre-requisites for CubeSphere ============
 

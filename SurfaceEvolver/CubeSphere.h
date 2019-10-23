@@ -15,9 +15,6 @@ public:
 	CubeSphere(unsigned int detail, float radius);
 	~CubeSphere();
 
-	void copy(CubeSphere other);
-	CubeSphere clone();
-
 	void build();
 };
 

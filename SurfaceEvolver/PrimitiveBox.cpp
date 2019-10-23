@@ -4,6 +4,18 @@ PrimitiveBox::PrimitiveBox()
 {
 }
 
+PrimitiveBox::PrimitiveBox(const PrimitiveBox& other)
+{
+	Geometry::Geometry(other);
+	this->dimensions[0] = other.dimensions[0];
+	this->dimensions[2] = other.dimensions[1];
+	this->dimensions[1] = other.dimensions[2];
+
+	this->segments[0] = other.segments[0];
+	this->segments[2] = other.segments[1];
+	this->segments[1] = other.segments[2];
+}
+
 PrimitiveBox::PrimitiveBox(float x, float y, float z, unsigned int sx, unsigned int sy, unsigned int sz)
 {
 	this->dimensions[0] = x;
@@ -19,23 +31,6 @@ PrimitiveBox::PrimitiveBox(float x, float y, float z, unsigned int sx, unsigned 
 PrimitiveBox::~PrimitiveBox()
 {
 }
-
-void PrimitiveBox::copy(PrimitiveBox other)
-{
-	Geometry::copy(other);
-	for (int i = 0; i < 3; i++) {
-		this->dimensions[i] = other.dimensions[i];
-		this->segments[i] = other.segments[i];
-	}
-}
-
-PrimitiveBox PrimitiveBox::clone()
-{
-	PrimitiveBox result = PrimitiveBox();
-	result.copy(*this);
-	return result;
-}
-
 
 
 void PrimitiveBox::build()

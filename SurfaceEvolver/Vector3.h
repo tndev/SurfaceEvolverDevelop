@@ -11,11 +11,10 @@ public:
 	float x, y, z;
 
 	Vector3();
+	Vector3(const Vector3& other);
 	Vector3(float x, float, float z);
 	Vector3(float v[3]);
 	~Vector3();
-	void copy(Vector3 other);
-	Vector3 clone();
 
 	void set(float x, float y, float z);
 	void min(Vector3 other);

@@ -9,6 +9,15 @@ Geometry::~Geometry()
 	clear();
 }
 
+Geometry::Geometry(const Geometry& other)
+{
+	normals = std::vector<float>(other.normals);
+	uniqueVertices = std::vector<Vector3>(other.uniqueVertices);
+	vertices = std::vector<float>(other.vertices);
+	vertexIndices = std::vector<unsigned int>(other.vertexIndices);
+	triangulations = std::vector<std::vector<unsigned int>>(other.triangulations);
+}
+
 bool Geometry::hasNormals()
 {
 	return normals.size();
@@ -17,28 +26,6 @@ bool Geometry::hasNormals()
 bool Geometry::hasTriangulations()
 {
 	return triangulations.size();
-}
-
-void Geometry::copy(Geometry other)
-{
-	if (other.hasNormals()) {
-		normals = std::vector<float>(other.normals);
-	}
-
-	uniqueVertices = std::vector<Vector3>(other.uniqueVertices);
-	vertices = std::vector<float>(other.vertices);
-	vertexIndices = std::vector<unsigned int>(other.vertexIndices);
-
-	if (other.hasTriangulations()) {
-		triangulations = std::vector<std::vector<unsigned int>>(other.triangulations);
-	}
-}
-
-Geometry Geometry::clone()
-{
-	Geometry result = Geometry();
-	result.copy(*this);
-	return result;
 }
 
 Box3 Geometry::getBoundingBox(Box3 bbox, Matrix4 matrix)
@@ -169,7 +156,7 @@ void Geometry::applyMatrix(Matrix4 m)
 		vertices[i1] = helperVector.y;
 		vertices[i2] = helperVector.z;
 
-		this->uniqueVertices[this->vertexIndices[i / 3]] = helperVector.clone();
+		this->uniqueVertices[this->vertexIndices[i / 3]] = helperVector;
 
 		if (hasNormals) {
 			helperVector.set(normals[i0], normals[i1], normals[i2]);

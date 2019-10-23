@@ -21,11 +21,10 @@ public:
 
 	Geometry();
 	~Geometry();
+	Geometry(const Geometry& other);
 
 	bool hasNormals();
 	bool hasTriangulations();
-	void copy(Geometry other);
-	Geometry clone();
 
 	Box3 getBoundingBox(Box3 bbox = Box3(), Matrix4 matrix = Matrix4());
 

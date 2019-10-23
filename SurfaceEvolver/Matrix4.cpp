@@ -7,6 +7,17 @@ Matrix4::Matrix4()
 {
 }
 
+Matrix4::Matrix4(const Matrix4& other)
+{
+	const float* e = other.elements;
+	this->set(
+		e[0], e[1], e[2], e[3],
+		e[4], e[5], e[6], e[7],
+		e[8], e[9], e[10], e[11],
+		e[12], e[13], e[14], e[15]
+	);
+}
+
 Matrix4::Matrix4(float* elems)
 {
 	float* e = elements;
@@ -30,16 +41,6 @@ Matrix4::~Matrix4()
 {
 }
 
-void Matrix4::copy(Matrix4& other)
-{
-	float* elems = other.elements;
-	float* e = elements;
-	e[0] = elems[0];	e[1] = elems[1];	e[2] = elems[2];	e[3] = elems[3];
-	e[4] = elems[4];	e[5] = elems[5];	e[6] = elems[6];	e[7] = elems[7];
-	e[8] = elems[8];	e[9] = elems[9];	e[10] = elems[10];	e[11] = elems[11];
-	e[12] = elems[12];	e[13] = elems[13];	e[14] = elems[14];	e[15] = elems[15];
-}
-
 void Matrix4::set(float m00, float m01, float m02, float m03, float m10, float m11, float m12, float m13, float m20, float m21, float m22, float m23, float m30, float m31, float m32, float m33)
 {
 	float* e = elements;
@@ -48,14 +49,6 @@ void Matrix4::set(float m00, float m01, float m02, float m03, float m10, float m
 	e[8] = m20;		e[9] = m21;		e[10] = m22;	e[11] = m23;
 	e[12] = m30;	e[13] = m31;	e[14] = m32;	e[15] = m33;
 }
-
-Matrix4 Matrix4::clone()
-{
-	Matrix4 result = Matrix4();
-	result.copy(*this);
-	return result;
-}
-
 
 Matrix3 Matrix4::getSubMatrix3()
 {
@@ -257,7 +250,7 @@ Matrix4 Matrix4::operator*(Matrix4 other)
 
 Matrix4 operator*(float scalar, Matrix4 m)
 {
-	Matrix4 result = m.clone();
+	Matrix4 result = m;
 	result.multiplyScalar(scalar);
 	return result;
 }
@@ -270,7 +263,7 @@ Matrix4 inverse(Matrix4& m)
 
 Matrix4 transpose(Matrix4& m)
 {
-	Matrix4 result = m.clone();
+	Matrix4 result = m;
 	result.transpose();
 	return result;
 }

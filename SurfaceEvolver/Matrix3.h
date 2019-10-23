@@ -13,16 +13,21 @@ public:
 	};
 
 	Matrix3();
+	Matrix3(const Matrix3& other);
 	Matrix3(float* elems);
 	~Matrix3();
 
-	void copy(Matrix3 other);
-	Matrix3 clone();
-
 	bool isIdentity();
 	void setToIdentity();
+	void set(
+		float m00, float m01, float m02,
+		float m10, float m11, float m12,
+		float m20, float m21, float m22
+	);
+
 	void transpose();
 	void multiplyScalar(float scalar);
+
 	float determinant();
 	Matrix3 getInverse(Matrix3& from);
 

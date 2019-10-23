@@ -10,6 +10,13 @@ Vector3::Vector3()
 	this->z = 0.;
 }
 
+Vector3::Vector3(const Vector3& other)
+{
+	this->x = other.x;
+	this->y = other.y;
+	this->z = other.z;
+}
+
 Vector3::Vector3(float x, float y, float z)
 {
 	this->x = x;
@@ -24,20 +31,6 @@ Vector3::Vector3(float v[3])
 
 Vector3::~Vector3()
 {
-}
-
-void Vector3::copy(Vector3 other)
-{
-	this->x = other.x;
-	this->y = other.y;
-	this->z = other.z;
-}
-
-Vector3 Vector3::clone()
-{
-	Vector3 result = Vector3();
-	result.copy(*this);
-	return result;
 }
 
 void Vector3::set(float x, float y, float z)
@@ -99,7 +92,7 @@ void Vector3::toArray(float* a)
 
 void Vector3::applyMatrix4(Matrix4& m)
 {
-	Vector3 a = this->clone();
+	Vector3 a = *this;
 	float* e = m.elements;
 	float w = 1.0f / (e[12] * a.x + e[13] * a.y + e[14] * a.z + e[15]);
 
@@ -140,12 +133,12 @@ Vector3 normalize(Vector3 target)
 
 float dot(Vector3 a, Vector3 b)
 {
-	return a.clone().dot(b);
+	return Vector3(a).dot(b);
 }
 
 Vector3 lerp(Vector3 v1, Vector3 v2, float param)
 {
-	Vector3 result = v1.clone();
+	Vector3 result = v1;
 	result.lerp(v2, param);
 	return result;
 }
@@ -162,7 +155,7 @@ bool notEqual(Vector3& a, Vector3& b)
 
 void Vector3::applyMatrix3(Matrix3& m)
 {
-	Vector3 a = this->clone();
+	Vector3 a = *this;
 	float* e = m.elements;
 	this->x = e[0] * x + e[3] * y + e[6] * z;
 	this->y = e[1] * x + e[4] * y + e[7] * z;
@@ -191,14 +184,14 @@ Vector3 Vector3::operator/(float scalar)
 
 Vector3 operator*(Matrix3 m, Vector3 a)
 {
-	Vector3 result = a.clone();
+	Vector3 result = a;
 	result.applyMatrix3(m);
 	return result;
 }
 
 Vector3 operator*(Matrix4 m, Vector3 a)
 {
-	Vector3 result = a.clone();
+	Vector3 result = a;
 	result.applyMatrix4(m);
 	return result;
 }

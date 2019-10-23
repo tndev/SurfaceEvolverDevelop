@@ -15,7 +15,7 @@ Deform::~Deform()
 
 void Deform::spherify(float param)
 {
-	result = geom->clone();
+	result = Geometry(*geom);
 	Box3 bbox = geom->getBoundingBox();
 	Vector3 center = bbox.getCenter();
 	float radius = 0.5 * bbox.getSize().length();
@@ -31,11 +31,11 @@ void Deform::spherify(float param)
 		vertex.set(geom->vertices[i], geom->vertices[i + 1], geom->vertices[i + 2]);
 		normal.set(geom->normals[i], geom->normals[i + 1], geom->normals[i + 2]);
 
-		helperVector.copy(vertex);
+		helperVector = vertex;
 
 		targetNormal = normalize(vertex - center);
 		if (!targetNormal.lengthSq()) {
-			targetNormal.copy(normal);
+			targetNormal = normal;
 		}
 
 		targetVertex = radius * targetNormal + center;
