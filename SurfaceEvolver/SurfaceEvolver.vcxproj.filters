@@ -1,84 +1,85 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Main">
+      <UniqueIdentifier>{6c46a085-5a63-43b7-96cd-66aa4fb07c2a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Geometry">
+      <UniqueIdentifier>{7fcf110d-4db4-4f85-b334-d42fc0488cd8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GeometryObject">
+      <UniqueIdentifier>{2d3fd494-3370-4bc6-842d-9eca0365323c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Geometry.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Vector3.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Icosphere.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Matrix4.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Matrix3.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="VTKExporter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="CubeSphere.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PrimitiveBox.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Deform.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="main.cpp">
+      <Filter>Main</Filter>
     </ClCompile>
     <ClCompile Include="Box3.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Geometry</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Geometry.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="Matrix3.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="Matrix4.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="Vector3.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="CubeSphere.cpp">
+      <Filter>GeometryObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Deform.cpp">
+      <Filter>GeometryObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Icosphere.cpp">
+      <Filter>GeometryObject</Filter>
+    </ClCompile>
+    <ClCompile Include="PrimitiveBox.cpp">
+      <Filter>GeometryObject</Filter>
+    </ClCompile>
+    <ClCompile Include="VTKExporter.cpp">
+      <Filter>Main</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Box3.h">
+      <Filter>Geometry</Filter>
+    </ClInclude>
     <ClInclude Include="Geometry.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Vector3.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Icosphere.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Matrix4.h">
-      <Filter>Header Files</Filter>
+      <Filter>Geometry</Filter>
     </ClInclude>
     <ClInclude Include="Matrix3.h">
-      <Filter>Header Files</Filter>
+      <Filter>Geometry</Filter>
     </ClInclude>
-    <ClInclude Include="VTKExporter.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Matrix4.h">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector3.h">
+      <Filter>Geometry</Filter>
     </ClInclude>
     <ClInclude Include="CubeSphere.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PrimitiveBox.h">
-      <Filter>Header Files</Filter>
+      <Filter>GeometryObject</Filter>
     </ClInclude>
     <ClInclude Include="Deform.h">
-      <Filter>Header Files</Filter>
+      <Filter>GeometryObject</Filter>
     </ClInclude>
-    <ClInclude Include="Box3.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Icosphere.h">
+      <Filter>GeometryObject</Filter>
+    </ClInclude>
+    <ClInclude Include="PrimitiveBox.h">
+      <Filter>GeometryObject</Filter>
+    </ClInclude>
+    <ClInclude Include="VTKExporter.h">
+      <Filter>Main</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
