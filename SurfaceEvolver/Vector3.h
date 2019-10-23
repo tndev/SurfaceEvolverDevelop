@@ -34,6 +34,7 @@ public:
 
 	void applyMatrix4(Matrix4& m);
 	void applyMatrix3(Matrix3& m);
+	void addScalar(float scalar);
 
 	Vector3 operator+ (Vector3 other);
 	Vector3 operator- (Vector3 other);

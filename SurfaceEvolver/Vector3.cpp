@@ -162,6 +162,13 @@ void Vector3::applyMatrix3(Matrix3& m)
 	this->z = e[2] * x + e[5] * y + e[8] * z;
 }
 
+void Vector3::addScalar(float scalar)
+{
+	this->x += scalar;
+	this->y += scalar;
+	this->z += scalar;
+}
+
 Vector3 Vector3::operator+(Vector3 other)
 {
 	return Vector3(x + other.x, y + other.y, z + other.z);

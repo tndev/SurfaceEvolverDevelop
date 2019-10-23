@@ -17,26 +17,17 @@ CubeSphere::~CubeSphere()
 // =======================================================
 // ============ Pre-requisites for CubeSphere ============
 
-struct Quad {
-	unsigned int vertex[4];
-};
-
-using QuadList = std::vector<Quad>;
-using VertexList = std::vector<Vector3>;
-
 void CubeSphere::build()
 {
-	float a = 2 * radius / sqrt(3.);
+	float a = 2.0f * radius / sqrt(3.0f);
 	PrimitiveBox box = PrimitiveBox(a, a, a, detail, detail, detail);
 
 	// translate to center
-	Matrix4 T = Matrix4();
-	T.makeTranslation(-a / 2., -a / 2., -a / 2.);
-	box.applyMatrix(T);
+	box.applyMatrix(Matrix4().makeTranslation(-a / 2.0f, -a / 2.0f, -a / 2.0f));
 
 	// spherify
 	Deform def = Deform(&box);
-	def.spherify(1.);
+	def.spherify(1.0f);
 
 	Geometry result = def.result;
 	this->uniqueVertices = result.uniqueVertices;

@@ -23,9 +23,7 @@ int main()
 	e.initExport(ico, "icosphere");
 	e.initExport(box, "box");
 
-	Matrix4 m = Matrix4();
-	m.makeTranslation(-a / 2., -a / 2., -a / 2.);
-	box.applyMatrix(m);
+	box.applyMatrix(Matrix4().makeTranslation(-a / 2., -a / 2., -a / 2.));
 	e.initExport(box, "boxTranslated");
 	e.initExport(cs, "cubesphere");
 

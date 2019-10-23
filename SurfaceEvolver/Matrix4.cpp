@@ -101,7 +101,7 @@ void Matrix4::multiplyScalar(float scalar)
 	}
 }
 
-void Matrix4::setToScale(float sx, float sy, float sz)
+Matrix4 Matrix4::setToScale(float sx, float sy, float sz)
 {
 	this->set(
 		sx,   0.0f, 0.0f, 0.0f,
@@ -109,9 +109,11 @@ void Matrix4::setToScale(float sx, float sy, float sz)
 		0.0f, 0.0f, sz,   0.0f,
 		0.0f, 0.0f, 0.0f, 1.0f
 	);
+
+	return *this;
 }
 
-void Matrix4::makeRotationAxis(float ax, float ay, float az, float angle)
+Matrix4 Matrix4::makeRotationAxis(float ax, float ay, float az, float angle)
 {
 	float c = cos(angle), s = sin(angle);
 	float t = 1 - c;
@@ -123,9 +125,11 @@ void Matrix4::makeRotationAxis(float ax, float ay, float az, float angle)
 		tx * az - s * ay, ty * az + s * ax, t * az * az + c, 0.0f,
 		0.0f, 0.0f, 0.0f, 1.0f
 	);
+
+	return *this;
 }
 
-void Matrix4::makeTranslation(float tx, float ty, float tz)
+Matrix4 Matrix4::makeTranslation(float tx, float ty, float tz)
 {
 	this->set(
 		1.0f, 0.0f, 0.0f, tx,
@@ -133,6 +137,8 @@ void Matrix4::makeTranslation(float tx, float ty, float tz)
 		0.0f, 0.0f, 1.0f, tz,
 		0.0f, 0.0f, 0.0f, 1.0f
 	);
+
+	return *this;
 }
 
 float Matrix4::determinant()

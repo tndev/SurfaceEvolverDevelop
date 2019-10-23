@@ -6,8 +6,8 @@
 class Box3
 {
 public:
-	Vector3 min = Vector3(FLT_MAX, FLT_MAX, FLT_MAX);
-	Vector3 max = Vector3(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+	Vector3 min = Vector3(INFINITY, INFINITY, INFINITY);
+	Vector3 max = Vector3(-INFINITY, -INFINITY, -INFINITY);
 
 	Box3();
 	~Box3();
@@ -15,6 +15,7 @@ public:
 	bool isEmpty();
 
 	void expandByPoint(Vector3 p);
+	void expandByOffset(float offset);
 	Vector3 getCenter();
 	Vector3 getSize();
 };
