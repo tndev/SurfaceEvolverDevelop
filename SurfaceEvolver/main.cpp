@@ -38,8 +38,8 @@ int main()
 	e.initExport(cs, "cubesphere");
 
 	OBJImporter im = OBJImporter();
-	Geometry polySphere = im.importOBJGeometry("PolygonalSphere.obj");
-	e.initExport(polySphere, "polySphere");
+	Geometry cube = im.importOBJGeometry("Cube.obj");
+	e.initExport(cube, "cube");
 
 	return 1;
 }
