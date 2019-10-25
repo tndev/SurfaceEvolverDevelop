@@ -239,5 +239,9 @@ std::ostream& operator<<(std::ostream& out, const Vector3& v)
 
 bool operator<(const Vector3& left, const Vector3& right)
 {
-	return left.x < right.x;
+	return (
+		left.x < right.x ||
+		(fabs(left.x - right.x) < FLT_MIN && left.y < right.y) ||
+		fabs(left.x - right.x) < FLT_MIN && fabs(left.y - right.y) < FLT_MIN && left.z < right.z
+	);
 }

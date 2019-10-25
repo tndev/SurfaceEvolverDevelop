@@ -108,7 +108,7 @@ std::vector<Vector3> Geometry::getVertices()
 	return result;
 }
 
-std::vector<Vector3> Geometry::getProjectionsAlongNormal(std::vector<Vector3> vertices)
+std::vector<Vector3> Geometry::getProjectionsAlongNormal(Face& vertices)
 {
 	Vector3 normal = getNormal(vertices); // directions
 	Vector3 referencePoint = vertices[0];
@@ -154,7 +154,7 @@ std::vector<Vector3> Geometry::getProjectionsAlongNormal(std::vector<Vector3> ve
 	return projections;
 }
 
-std::vector<std::vector<unsigned int>> Geometry::getTriangulatedIndices(std::vector<Vector3>& vertices)
+std::vector<std::vector<unsigned int>> Geometry::getTriangulatedIndices(Face& vertices)
 {
 	std::vector<std::vector<unsigned int>> faces = std::vector<std::vector<unsigned int>>();
 	if (vertices.size() < 3) {

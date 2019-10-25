@@ -161,7 +161,7 @@ void OBJImporter::setGeometry(Geometry& geom,
 
 	geom.uniqueVertices = vertices;
 	geom.vertices = std::vector<float>(3 * nTriangles);
-	geom.vertexIndices = std::vector<unsigned int>(3 * nTriangles);
+	geom.vertexIndices = std::vector<unsigned int>(nTriangles);
 	geom.normals = std::vector<float>(3 * nTriangles);
 	geom.triangulations = std::vector<Triangulation>();
 
@@ -199,7 +199,7 @@ void OBJImporter::setGeometry(Geometry& geom,
 
 		std::vector<std::vector<unsigned int>> faces = geom.getTriangulatedIndices(faceVerts);
 
-		if (faces.size()) {
+		if (faces.size() > 0) {
 			for (unsigned int k = 0; k < vertCount; k++) {
 				auto found = vertexToIdx.find(faceVerts[k]);
 				if (found == vertexToIdx.end()) {

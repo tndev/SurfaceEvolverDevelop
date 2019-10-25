@@ -1,7 +1,2 @@
-﻿  main.cpp
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\poly2tri\sweep\sweep_context.h(161,24): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\main.cpp(27,10): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\main.cpp(36,65): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\main.cpp(36,56): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\main.cpp(36,47): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+﻿  Vector3.cpp
   SurfaceEvolver.vcxproj -> D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\x64\Debug\SurfaceEvolver.exe
