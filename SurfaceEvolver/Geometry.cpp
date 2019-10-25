@@ -163,11 +163,14 @@ std::vector<std::vector<unsigned int>> Geometry::getTriangulatedIndices(Face& ve
 		faces = { {0, 1, 2} };
 	}
 	else if (vertices.size() == 4) {
+		// [[0, 1, 2], [0, 2, 3]];
 		faces = { {0, 1, 2}, {0, 2, 3} };
 		Vector3 e2 = vertices[2] - vertices[0];
 		Vector3 e1 = vertices[1] - vertices[0];
 		Vector3 e3 = vertices[3] - vertices[0];
-		if (dot(cross(e2, e1), cross(e2, e3)) > 0.0) {
+		Vector3 c21 = cross(e2, e1);
+		Vector3 c23 = cross(e2, e3);
+		if (dot(c21, c23) > 0.0) {
 			faces = { {0, 1, 3}, {1, 2, 3} };
 		}
 	}
@@ -176,7 +179,6 @@ std::vector<std::vector<unsigned int>> Geometry::getTriangulatedIndices(Face& ve
 
 		std::vector<Vector3> projections = getProjectionsAlongNormal(vertices);
 
-		p2t::SweepContext* swctx = nullptr;
 		p2t::CDT* cdt = NULL;
 
 		// poly2tri doesn't work well with duplicate or collinear points. it is possible that it will fail on certain inputs

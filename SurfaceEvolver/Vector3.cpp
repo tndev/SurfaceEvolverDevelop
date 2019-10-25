@@ -241,7 +241,7 @@ bool operator<(const Vector3& left, const Vector3& right)
 {
 	return (
 		left.x < right.x ||
-		(fabs(left.x - right.x) < FLT_MIN && left.y < right.y) ||
-		fabs(left.x - right.x) < FLT_MIN && fabs(left.y - right.y) < FLT_MIN && left.z < right.z
+		(fabs(left.x - right.x) < FLT_EPSILON && left.y < right.y) ||
+		fabs(left.x - right.x) < FLT_EPSILON && fabs(left.y - right.y) < FLT_EPSILON && left.z < right.z
 	);
 }

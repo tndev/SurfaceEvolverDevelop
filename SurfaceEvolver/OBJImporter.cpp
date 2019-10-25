@@ -103,17 +103,17 @@ Geometry OBJImporter::importOBJGeometry(std::string filename)
 
 				if (subTokens.size() > 0) {
 					vi = std::stoi(subTokens[0]);
-					vi = vi > 0 ? vi - 1 : (unsigned int)vertices.size();
+					vi = vi > 0 ? vi - 1 : (unsigned int)vertices.size() + vi;
 				}
 
 				if (subTokens.size() > 1) {
 					ui = std::stoi(subTokens[1]);
-					ui = ui > 0 ? ui - 1 : (unsigned int)uvVertices.size();
+					ui = ui > 0 ? ui - 1 : (unsigned int)uvVertices.size() + ui;
 				}
 
 				if (subTokens.size() > 2) {
 					ni = std::stoi(subTokens[2]);
-					ni = ni > 0 ? ni - 1 : (unsigned int)normals.size();
+					ni = ni > 0 ? ni - 1 : (unsigned int)normals.size() + ni;
 				}
 
 				if (isNaN(vi) || (isNaN(ui) && subTokens.size() > 1) || (isNaN(ni) && subTokens.size() > 2)) {
@@ -158,6 +158,12 @@ void OBJImporter::setGeometry(Geometry& geom,
 	unsigned int idxI = 0;
 	unsigned int totalVerts = 0;
 	unsigned int failedTriangulationCount = 0;
+
+	/* geom.uniqueVertices = std::vector<Vector3>(vertices.size());
+
+	for (unsigned int i = 0, k = 0; i < vertexIndices.size(), k < vertices.size(); i++, k++) {
+		geom.uniqueVertices[k] = vertices[vertexIndices[i]];
+	}*/
 
 	geom.uniqueVertices = vertices;
 	geom.vertices = std::vector<float>(3 * nTriangles);
