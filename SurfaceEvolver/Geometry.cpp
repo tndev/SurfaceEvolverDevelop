@@ -1,5 +1,7 @@
 #include "Geometry.h"
 
+#define failedTriang 0
+
 Geometry::Geometry()
 {
 }
@@ -106,6 +108,132 @@ std::vector<Vector3> Geometry::getVertices()
 	return result;
 }
 
+std::vector<Vector3> Geometry::getProjectionsAlongNormal(std::vector<Vector3> vertices)
+{
+	Vector3 normal = getNormal(vertices); // directions
+	Vector3 referencePoint = vertices[0];
+	Vector3 up = Vector3(0, 0, 1);
+
+	// ------ -----------
+	// TODO: create Quaternion
+
+	if (fabs(dot(normal, up)) >= 0.999) {
+		if (fabs(normal.x) < fabs(normal.y) && fabs(normal.x) < fabs(normal.z)) {
+			up = normalize(Vector3(1, 0, 0).cross(normal));
+		}
+		else if (fabs(normal.y) < fabs(normal.z)) {
+			up = normalize(Vector3(0, 1, 0).cross(normal));
+		}
+		else {
+			up = normalize(Vector3(0, 0, 1).cross(normal));
+		}
+	}
+
+	Vector3 crossProduct = normalize(cross(up, normal));
+	Vector3 pseudoUp = normalize(cross(normal, crossProduct));
+
+	Matrix4 transform = Matrix4(
+		normal.x, normal.y, normal.z, 0,
+		crossProduct.x, crossProduct.y, crossProduct.z, 0,
+		pseudoUp.x, pseudoUp.y, pseudoUp.z, 0,
+		0, 0, 0, 1
+	);
+	transform.transpose();
+
+	Vector3 projX = transform * Vector3(0, 1, 0);
+	Vector3 projY = transform * Vector3(0, 0, 1);
+
+	std::vector<Vector3> projections = std::vector<Vector3>();
+	for (unsigned int k = 0; k < vertices.size(); k++) {
+		Vector3 vec = vertices[k] - referencePoint;
+		float px = dot(vec, projX);
+		float py = dot(vec, projY);
+		projections.push_back(Vector3(px, py, 0.0f));
+	}
+
+	return projections;
+}
+
+std::vector<std::vector<unsigned int>> Geometry::getTriangulatedIndices(std::vector<Vector3>& vertices)
+{
+	std::vector<std::vector<unsigned int>> faces = std::vector<std::vector<unsigned int>>();
+	if (vertices.size() < 3) {
+	}
+	else if (vertices.size() == 3) {
+		faces = { {0, 1, 2} };
+	}
+	else if (vertices.size() == 4) {
+		faces = { {0, 1, 2}, {0, 2, 3} };
+		Vector3 e2 = vertices[2] - vertices[0];
+		Vector3 e1 = vertices[1] - vertices[0];
+		Vector3 e3 = vertices[3] - vertices[0];
+		if (dot(cross(e2, e1), cross(e2, e3)) > 0.0) {
+			faces = { {0, 1, 3}, {1, 2, 3} };
+		}
+	}
+
+	else {
+
+		std::vector<Vector3> projections = getProjectionsAlongNormal(vertices);
+
+		p2t::SweepContext* swctx = nullptr;
+		p2t::CDT* cdt = NULL;
+
+		// poly2tri doesn't work well with duplicate or collinear points. it is possible that it will fail on certain inputs
+		// if it fails, we retry with increasingly higher jitter. it usually works on first retry
+		// if it doesn't work with 42 retries, there is no hope
+		std::vector<p2t::Point> points = {};
+
+		unsigned int MAX_TRIES = 42;
+		unsigned int tries_utilized = 0;
+		srand((unsigned)time(NULL));
+		for (tries_utilized = 0; tries_utilized < MAX_TRIES; tries_utilized++) {
+			//// poly2tri triangulation, seems to work well with holes
+			points.clear();
+			for (unsigned int i = 0; i < projections.size(); i++) {
+				p2t::Point pt = p2t::Point(
+					projections[i].x + (tries_utilized * (rand() / RAND_MAX * 0.001 - 0.0005)),
+					projections[i].y + (tries_utilized * (rand() / RAND_MAX * 0.001 - 0.0005))
+				);
+				pt._vIdx = i;
+				points.push_back(pt);
+			}
+			
+			try {
+				std::vector<p2t::Point*> contour = {};
+				for (unsigned int i = 0; i < points.size(); i++) {
+					contour.push_back(&points[i]);
+				}
+				cdt = new p2t::CDT(contour);
+				cdt->Triangulate();
+				if (cdt == NULL) {
+					throw(failedTriang);
+				}
+			}
+			catch (int e) {
+				continue;
+			}
+			break;// assuming it all goes well
+		}
+		if (cdt == NULL) {
+			std::cout << "ERROR! Triangulation was not able to finish with" << MAX_TRIES << "tries" << std::endl;
+			return {};
+		}
+
+		std::vector<p2t::Triangle*> triangles = cdt->GetTriangles();
+
+		for (unsigned int i = 0; i < triangles.size(); i++) {
+			faces.push_back({
+				triangles[i]->GetPoint(0)->_vIdx,
+				triangles[i]->GetPoint(1)->_vIdx,
+				triangles[i]->GetPoint(2)->_vIdx
+			});
+		}
+	}
+
+	return faces;
+}
+
 template<class T>
 void flipArray(std::vector<T> arr, unsigned int elementSize) {
 	if (arr.size() && elementSize) {
@@ -185,8 +313,22 @@ void Geometry::applyMatrix(Matrix4 m)
 	}
 }
 
+Vector3 Geometry::getNormal(Face f)
+{
+	Vector3 normal = Vector3();
+	for (unsigned int i = 0; i < f.size(); i++) {
+		Vector3 fromNext = f[i] - f[(i + 1) % f.size()];
+		Vector3 plusNext = f[i] + f[(i + 1) % f.size()];
+		normal.x = normal.x + fromNext.y * plusNext.z;
+		normal.y = normal.y + fromNext.z * plusNext.x;
+		normal.z = normal.z + fromNext.x * plusNext.y;
+	}
+	return normalize(normal);
+}
+
 void Geometry::clear()
 {
+	uniqueVertices.clear();
 	vertices.clear();
 	normals.clear();
 	vertexIndices.clear();

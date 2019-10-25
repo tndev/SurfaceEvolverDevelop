@@ -125,6 +125,18 @@ void Vector3::lerp(Vector3 other, float param)
 	this->z += (other.z - z) * param;
 }
 
+Vector3 Vector3::cross(Vector3 other)
+{
+	float ax = this->x, ay = this->y, az = this->z;
+	float bx = other.x, by = other.y, bz = other.z;
+
+	this->x = ay * bz - az * by;
+	this->y = az * bx - ax * bz;
+	this->z = ax * by - ay * bx;
+
+	return *this;
+}
+
 Vector3 normalize(Vector3 target)
 {
 	target.normalize();
@@ -134,6 +146,12 @@ Vector3 normalize(Vector3 target)
 float dot(Vector3 a, Vector3 b)
 {
 	return Vector3(a).dot(b);
+}
+
+Vector3 cross(Vector3 a, Vector3 b)
+{
+	Vector3 result = a;
+	return a.cross(b);
 }
 
 Vector3 lerp(Vector3 v1, Vector3 v2, float param)
@@ -217,4 +235,9 @@ std::ostream& operator<<(std::ostream& out, const Vector3& v)
 {
 	out << "(" << v.x << ", " << v.y << ", " << v.z << ")";
 	return out;
+}
+
+bool operator<(const Vector3& left, const Vector3& right)
+{
+	return left.x < right.x;
 }

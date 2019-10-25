@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <map>
 #include "Geometry.h"
 #include "Vector3.h"
 
@@ -15,6 +16,11 @@ public:
 	~OBJImporter();
 
 	Geometry importOBJGeometry(std::string filename);
+public:
+	void setGeometry(
+		Geometry& geom, std::vector<Vector3>& vertices, std::vector<Vector3>& normals,
+		std::vector<unsigned int>& vertexIndices, std::vector<unsigned int>& normalIndices,
+		unsigned int nTriangles, std::vector<unsigned int>& faceVertexCounts);
 };
 
 #endif

@@ -8,6 +8,7 @@
 #include "PrimitiveBox.h"
 #include "CubeSphere.h"
 #include "VTKExporter.h"
+#include "OBJImporter.h"
 
 //   TODO:
 // - Add an AABBTree structure
@@ -35,6 +36,10 @@ int main()
 	box.applyMatrix(Matrix4().makeTranslation(-a / 2., -a / 2., -a / 2.));
 	e.initExport(box, "boxTranslated");
 	e.initExport(cs, "cubesphere");
+
+	OBJImporter im = OBJImporter();
+	Geometry polySphere = im.importOBJGeometry("PolygonalSphere.obj");
+	e.initExport(polySphere, "polySphere");
 
 	return 1;
 }

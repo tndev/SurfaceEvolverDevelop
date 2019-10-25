@@ -14,6 +14,12 @@
     <Filter Include="GeometryObject">
       <UniqueIdentifier>{2d3fd494-3370-4bc6-842d-9eca0365323c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ExportImport">
+      <UniqueIdentifier>{894459d2-2d8b-461e-9d27-2265c42746c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Poly2Tri">
+      <UniqueIdentifier>{cd07df16-3b3f-4a97-afc5-abe6607f7300}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -47,7 +53,28 @@
       <Filter>GeometryObject</Filter>
     </ClCompile>
     <ClCompile Include="VTKExporter.cpp">
-      <Filter>Main</Filter>
+      <Filter>ExportImport</Filter>
+    </ClCompile>
+    <ClCompile Include="OBJExporter.cpp">
+      <Filter>ExportImport</Filter>
+    </ClCompile>
+    <ClCompile Include="OBJImporter.cpp">
+      <Filter>ExportImport</Filter>
+    </ClCompile>
+    <ClCompile Include="poly2tri\common\shapes.cc">
+      <Filter>Poly2Tri</Filter>
+    </ClCompile>
+    <ClCompile Include="poly2tri\sweep\advancing_front.cc">
+      <Filter>Poly2Tri</Filter>
+    </ClCompile>
+    <ClCompile Include="poly2tri\sweep\cdt.cc">
+      <Filter>Poly2Tri</Filter>
+    </ClCompile>
+    <ClCompile Include="poly2tri\sweep\sweep.cc">
+      <Filter>Poly2Tri</Filter>
+    </ClCompile>
+    <ClCompile Include="poly2tri\sweep\sweep_context.cc">
+      <Filter>Poly2Tri</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -79,7 +106,34 @@
       <Filter>GeometryObject</Filter>
     </ClInclude>
     <ClInclude Include="VTKExporter.h">
-      <Filter>Main</Filter>
+      <Filter>ExportImport</Filter>
+    </ClInclude>
+    <ClInclude Include="OBJExporter.h">
+      <Filter>ExportImport</Filter>
+    </ClInclude>
+    <ClInclude Include="OBJImporter.h">
+      <Filter>ExportImport</Filter>
+    </ClInclude>
+    <ClInclude Include="poly2tri\common\shapes.h">
+      <Filter>Poly2Tri</Filter>
+    </ClInclude>
+    <ClInclude Include="poly2tri\common\utils.h">
+      <Filter>Poly2Tri</Filter>
+    </ClInclude>
+    <ClInclude Include="poly2tri\sweep\advancing_front.h">
+      <Filter>Poly2Tri</Filter>
+    </ClInclude>
+    <ClInclude Include="poly2tri\sweep\cdt.h">
+      <Filter>Poly2Tri</Filter>
+    </ClInclude>
+    <ClInclude Include="poly2tri\sweep\sweep.h">
+      <Filter>Poly2Tri</Filter>
+    </ClInclude>
+    <ClInclude Include="poly2tri\sweep\sweep_context.h">
+      <Filter>Poly2Tri</Filter>
+    </ClInclude>
+    <ClInclude Include="poly2tri\poly2tri.h">
+      <Filter>Poly2Tri</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
