@@ -10,9 +10,17 @@
 #include "Vector3.h"
 #include "poly2tri/poly2tri.h"
 
-using Triangle = std::vector<unsigned int>;
-using Face = std::vector<Vector3>;
-using Triangulation = std::vector<unsigned int>;
+// TODO: types in this namespace should be classes containing all necessary topological info
+namespace StructGeom {
+	using Triangle = std::vector<Vector3>;
+	using Edge = std::pair<Vector3, Vector3>;
+};
+
+namespace BufferGeom {
+	using Triangle = std::vector<unsigned int>;
+	using Face = std::vector<Vector3>;
+	using Triangulation = std::vector<unsigned int>;
+};
 
 class Geometry
 {
@@ -24,7 +32,7 @@ public:
 	std::vector<float> normals; // vertex normals (for each triangle, i.e.: there's as many as there are vertex indices)
 	// [0, 1, 2, 0, 2, 3, ... ] (e.g.: quads are made of 2 consecutive triplets of vert indices)
 	std::vector<unsigned int> vertexIndices; // values correspond to the positions in uniqueVertices array;
-	std::vector<Triangulation> triangulations; // each contains ids of triangles inside a polygon
+	std::vector<BufferGeom::Triangulation> triangulations; // each contains ids of triangles inside a polygon
 
 	// TODO: tangents and uvs
 
@@ -37,19 +45,23 @@ public:
 
 	Box3 getBoundingBox(Box3 bbox = Box3(), Matrix4 matrix = Matrix4());
 
-	std::vector<unsigned int> getPolygonIndicesFromTriangulation(Triangulation t);	
+	std::vector<unsigned int> getPolygonIndicesFromTriangulation(BufferGeom::Triangulation t);
+	std::vector<Vector3> getProjectionsAlongNormal(BufferGeom::Face& vertices); // TODO: use Vector2
+	std::vector<std::vector<unsigned int>> getTriangulatedIndices(BufferGeom::Face& vertices);
+	std::pair<std::vector<BufferGeom::Triangulation>, std::vector<size_t>> getSortedPolygonTriangulationsAndSizes();
+	std::vector<StructGeom::Triangle> getTriangles();
+	std::vector<StructGeom::Edge> getEdges();
 	std::vector<Vector3> getVertices();
-	std::vector<Vector3> getProjectionsAlongNormal(Face& vertices); // TODO: use Vector2
-	std::vector<std::vector<unsigned int>> getTriangulatedIndices(Face& vertices);
+	std::vector<Vector3> getUniqueVertices();
 
-	void flipFaceOrientation();
 	void applyMatrix(Matrix4 m);
-	Vector3 getNormal(Face f);
+	Vector3 getNormal(BufferGeom::Face f);
 
 protected:
 	void clear();
 private:
-	std::vector<unsigned int> getPolygonIndicesFromTriangles(std::vector<Triangle> triangles);
+	void flipFaceOrientation();
+	std::vector<unsigned int> getPolygonIndicesFromTriangles(std::vector<BufferGeom::Triangle> triangles);
 };
 
 #endif

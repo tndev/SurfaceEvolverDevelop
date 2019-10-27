@@ -159,25 +159,19 @@ void OBJImporter::setGeometry(Geometry& geom,
 	unsigned int totalVerts = 0;
 	unsigned int failedTriangulationCount = 0;
 
-	/* geom.uniqueVertices = std::vector<Vector3>(vertices.size());
-
-	for (unsigned int i = 0, k = 0; i < vertexIndices.size(), k < vertices.size(); i++, k++) {
-		geom.uniqueVertices[k] = vertices[vertexIndices[i]];
-	}*/
-
 	geom.uniqueVertices = std::vector<Vector3>(vertices.size());
-	geom.vertices = std::vector<float>(3 * nTriangles);
+	geom.vertices = std::vector<float>(((size_t)3 * nTriangles));
 	geom.vertexIndices = std::vector<unsigned int>(nTriangles);
-	geom.normals = std::vector<float>(3 * nTriangles);
-	geom.triangulations = std::vector<Triangulation>();
+	geom.normals = std::vector<float>(((size_t)3 * nTriangles));
+	geom.triangulations = std::vector<BufferGeom::Triangulation>();
 
 	std::map<Vector3, unsigned int> vertexToIdx = std::map<Vector3, unsigned int>();
 
-	Face helperFace = Face();
+	BufferGeom::Face helperFace = BufferGeom::Face();
 
 	for (auto&& vertCount:faceVertexCounts) {
-		Face faceVerts = Face();
-		Face faceNorms = Face();
+		BufferGeom::Face faceVerts = BufferGeom::Face();
+		BufferGeom::Face faceNorms = BufferGeom::Face();
 
 		// Some .obj files specify uvs or normals only for some of the vertices
 		bool faceHasNormals = true;
@@ -213,7 +207,7 @@ void OBJImporter::setGeometry(Geometry& geom,
 				}
 			}
 
-			Triangulation triang = {};
+			BufferGeom::Triangulation triang = {};
 			for (auto&& f:faces) {
 				for (auto&& i:f) {
 					Vector3 v = faceVerts[i];
@@ -246,8 +240,8 @@ void OBJImporter::setGeometry(Geometry& geom,
 
 	if (failedTriangulationCount > 0) {
 		// triangulation failed and we skipped some triangles. We need to splice the unused part of the buffers..
-		geom.vertices = std::vector<float>(geom.vertices.begin(), geom.vertices.end() - failedTriangulationCount * 3);
-		geom.vertexIndices = std::vector<unsigned int>(geom.vertexIndices.begin(), geom.vertexIndices.end() - failedTriangulationCount);
-		geom.normals = std::vector<float>(geom.normals.begin(), geom.normals.end() - failedTriangulationCount * 3);
+		geom.vertices = std::vector<float>(geom.vertices.begin(), geom.vertices.end() - ((size_t)failedTriangulationCount * 3));
+		geom.vertexIndices = std::vector<unsigned int>(geom.vertexIndices.begin(), geom.vertexIndices.end() - ((size_t)failedTriangulationCount));
+		geom.normals = std::vector<float>(geom.normals.begin(), geom.normals.end() - ((size_t)failedTriangulationCount * 3));
 	}
 }

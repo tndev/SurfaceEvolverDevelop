@@ -41,10 +41,10 @@ Box3 Geometry::getBoundingBox(Box3 bbox, Matrix4 matrix)
 	return bbox;
 }
 
-std::vector<unsigned int> Geometry::getPolygonIndicesFromTriangulation(Triangulation t)
+std::vector<unsigned int> Geometry::getPolygonIndicesFromTriangulation(BufferGeom::Triangulation t)
 {
 	Geometry* g = this;
-	std::vector<Triangle> triangles = std::vector<Triangle>();
+	std::vector<BufferGeom::Triangle> triangles = std::vector<BufferGeom::Triangle>();
 	for (unsigned int k = 0; k < t.size(); k++) {
 		triangles.push_back({ g->vertexIndices[3 * t[k]], g->vertexIndices[3 * t[k] + 1], g->vertexIndices[3 * t[k] + 2] });
 	}
@@ -52,7 +52,7 @@ std::vector<unsigned int> Geometry::getPolygonIndicesFromTriangulation(Triangula
 	return polygonIds;
 }
 
-std::vector<unsigned int> Geometry::getPolygonIndicesFromTriangles(std::vector<Triangle> triangles)
+std::vector<unsigned int> Geometry::getPolygonIndicesFromTriangles(std::vector<BufferGeom::Triangle> triangles)
 {
 	if (triangles.size() > 1) {
 		std::vector<std::vector<unsigned int>> edges = std::vector<std::vector<unsigned int>>();
@@ -108,7 +108,12 @@ std::vector<Vector3> Geometry::getVertices()
 	return result;
 }
 
-std::vector<Vector3> Geometry::getProjectionsAlongNormal(Face& vertices)
+std::vector<Vector3> Geometry::getUniqueVertices()
+{
+	return this->uniqueVertices;
+}
+
+std::vector<Vector3> Geometry::getProjectionsAlongNormal(BufferGeom::Face& vertices)
 {
 	Vector3 normal = getNormal(vertices); // directions
 	Vector3 referencePoint = vertices[0];
@@ -154,7 +159,7 @@ std::vector<Vector3> Geometry::getProjectionsAlongNormal(Face& vertices)
 	return projections;
 }
 
-std::vector<std::vector<unsigned int>> Geometry::getTriangulatedIndices(Face& vertices)
+std::vector<std::vector<unsigned int>> Geometry::getTriangulatedIndices(BufferGeom::Face& vertices)
 {
 	std::vector<std::vector<unsigned int>> faces = std::vector<std::vector<unsigned int>>();
 	if (vertices.size() < 3) {
@@ -314,7 +319,7 @@ void Geometry::applyMatrix(Matrix4 m)
 	}
 }
 
-Vector3 Geometry::getNormal(Face f)
+Vector3 Geometry::getNormal(BufferGeom::Face f)
 {
 	Vector3 normal = Vector3();
 	for (unsigned int i = 0; i < f.size(); i++) {
@@ -334,4 +339,66 @@ void Geometry::clear()
 	normals.clear();
 	vertexIndices.clear();
 	triangulations.clear();
+}
+
+std::pair<std::vector<BufferGeom::Triangulation>, std::vector<size_t>> Geometry::getSortedPolygonTriangulationsAndSizes()
+{
+	std::vector<BufferGeom::Triangulation> T = triangulations;
+	std::vector<size_t> sizes = std::vector<size_t>();
+	std::sort(T.begin(), T.end(), [](const BufferGeom::Triangulation& a, const BufferGeom::Triangulation& b) { return a.size() < b.size(); });
+	unsigned int tCount = 0; // triangulation count
+	size_t currentSize = T.begin()->size();
+
+	for (std::vector<BufferGeom::Triangulation>::iterator it = T.begin(); it < T.end(); ++it) {
+		if (it->size() > currentSize) {
+			currentSize = it->size();
+			sizes.push_back(tCount);
+			tCount = 0;
+			continue;
+		}
+		tCount++;
+	}
+	sizes.push_back(tCount);
+
+	std::pair<std::vector<BufferGeom::Triangulation>, std::vector<size_t>> result = { T, sizes };
+	return result;
+}
+
+std::vector<StructGeom::Triangle> Geometry::getTriangles()
+{
+	std::vector<StructGeom::Triangle> result = std::vector<StructGeom::Triangle>();
+
+	for (unsigned int i = 0; i < this->vertexIndices.size(); i += 3) {
+		Vector3 v0 = this->uniqueVertices[this->vertexIndices[i]];
+		Vector3 v1 = this->uniqueVertices[this->vertexIndices[i + 1]];
+		Vector3 v2 = this->uniqueVertices[this->vertexIndices[i + 2]];
+
+		StructGeom::Triangle T = {v0, v1, v2};
+
+		result.push_back(T);
+	}
+
+	return result;
+}
+
+// TODO: Use sets to get unique edges
+std::vector<StructGeom::Edge> Geometry::getEdges()
+{
+	std::vector<StructGeom::Edge> result = std::vector<StructGeom::Edge>();
+
+	for (unsigned int i = 0; i < this->vertexIndices.size(); i++) {
+		Vector3 v0 = this->uniqueVertices[this->vertexIndices[i]];
+		Vector3 v1 = this->uniqueVertices[this->vertexIndices[i + 1]];
+		Vector3 v2 = this->uniqueVertices[this->vertexIndices[i + 2]];
+
+		StructGeom::Edge e0 = { v0, v1 };
+		StructGeom::Edge e1 = { v1, v2 };
+		StructGeom::Edge e2 = { v2, v0 };
+
+		result.push_back(e0);
+		result.push_back(e1);
+		result.push_back(e2);
+	}
+
+	return result;
 }

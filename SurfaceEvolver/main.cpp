@@ -9,6 +9,7 @@
 #include "CubeSphere.h"
 #include "VTKExporter.h"
 #include "OBJImporter.h"
+#include "AABBTree.h"
 
 //   TODO:
 // - Add an AABBTree structure
@@ -37,7 +38,7 @@ int main()
 	e.initExport(box, "boxTranslated");
 	e.initExport(cs, "cubesphere");
 
-	
+	/*
 	OBJImporter im = OBJImporter();
 	Geometry cube = im.importOBJGeometry("Cube.obj");
 	e.initExport(cube, "cube");
@@ -48,6 +49,13 @@ int main()
 	cubeCorrect.applyMatrix(Matrix4().makeTranslation(-50., -50., 0.));
 
 	e.initExport(cubeCorrect, "cubeCorrect");
+
+	Geometry unstructCube = im.importOBJGeometry("unstructCube.obj");
+	e.initExport(unstructCube, "unstructCube");
+	*/
+
+	std::vector<StructGeom::Triangle> t = cs.getTriangles();
+	// AABBTree<StructGeom::Triangle> tree = AABBTree<StructGeom::Triangle>(t, 100);
 
 	return 1;
 }

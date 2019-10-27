@@ -10,13 +10,14 @@
 class VTKExporter
 {
 public:
+	std::string outputType = "POLYDATA";
 	std::string pathPrefix = ".\\";
-	VTKExporter();
+	VTKExporter(std::string outputType = "POLYDATA");
 	~VTKExporter();
 
 	void initExport(Geometry object, std::string filename);
 private:
-	std::pair<std::vector<Triangulation>, std::vector<size_t>> getSortedPolygonTriangulationsAndSizes(std::vector<Triangulation>& triangulations);
+	size_t countTriangulationIndices(std::vector<BufferGeom::Triangulation>& triangulations);
 };
 
 #endif

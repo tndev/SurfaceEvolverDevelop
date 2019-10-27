@@ -151,6 +151,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AABBNode.cpp" />
+    <ClCompile Include="AABBTree.cpp" />
     <ClCompile Include="Box3.cpp" />
     <ClCompile Include="CubeSphere.cpp" />
     <ClCompile Include="Deform.cpp" />
@@ -171,6 +173,8 @@
     <ClCompile Include="VTKExporter.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AABBNode.h" />
+    <ClInclude Include="AABBTree.h" />
     <ClInclude Include="Box3.h" />
     <ClInclude Include="CubeSphere.h" />
     <ClInclude Include="Deform.h" />
