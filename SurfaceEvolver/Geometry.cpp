@@ -339,6 +339,9 @@ void Geometry::clear()
 	normals.clear();
 	vertexIndices.clear();
 	triangulations.clear();
+
+	triangles.clear();
+	edges.clear();
 }
 
 std::pair<std::vector<BufferGeom::Triangulation>, std::vector<size_t>> Geometry::getSortedPolygonTriangulationsAndSizes()
@@ -366,39 +369,39 @@ std::pair<std::vector<BufferGeom::Triangulation>, std::vector<size_t>> Geometry:
 
 std::vector<StructGeom::Triangle> Geometry::getTriangles()
 {
-	std::vector<StructGeom::Triangle> result = std::vector<StructGeom::Triangle>();
+	if (this->triangles.empty()) {
+		for (unsigned int i = 0; i < this->vertexIndices.size(); i += 3) {
+			Vector3 v0 = this->uniqueVertices[this->vertexIndices[i]];
+			Vector3 v1 = this->uniqueVertices[this->vertexIndices[i + 1]];
+			Vector3 v2 = this->uniqueVertices[this->vertexIndices[i + 2]];
 
-	for (unsigned int i = 0; i < this->vertexIndices.size(); i += 3) {
-		Vector3 v0 = this->uniqueVertices[this->vertexIndices[i]];
-		Vector3 v1 = this->uniqueVertices[this->vertexIndices[i + 1]];
-		Vector3 v2 = this->uniqueVertices[this->vertexIndices[i + 2]];
+			StructGeom::Triangle T = { v0, v1, v2 };
 
-		StructGeom::Triangle T = {v0, v1, v2};
-
-		result.push_back(T);
+			this->triangles.push_back(T);
+		}
 	}
 
-	return result;
+	return this->triangles;
 }
 
 // TODO: Use sets to get unique edges
 std::vector<StructGeom::Edge> Geometry::getEdges()
 {
-	std::vector<StructGeom::Edge> result = std::vector<StructGeom::Edge>();
+	if (this->edges.empty()) {
+		for (unsigned int i = 0; i < this->vertexIndices.size(); i += 3) {
+			Vector3 v0 = this->uniqueVertices[this->vertexIndices[i]];
+			Vector3 v1 = this->uniqueVertices[this->vertexIndices[i + 1]];
+			Vector3 v2 = this->uniqueVertices[this->vertexIndices[i + 2]];
 
-	for (unsigned int i = 0; i < this->vertexIndices.size(); i++) {
-		Vector3 v0 = this->uniqueVertices[this->vertexIndices[i]];
-		Vector3 v1 = this->uniqueVertices[this->vertexIndices[i + 1]];
-		Vector3 v2 = this->uniqueVertices[this->vertexIndices[i + 2]];
+			StructGeom::Edge e0 = { v0, v1 };
+			StructGeom::Edge e1 = { v1, v2 };
+			StructGeom::Edge e2 = { v2, v0 };
 
-		StructGeom::Edge e0 = { v0, v1 };
-		StructGeom::Edge e1 = { v1, v2 };
-		StructGeom::Edge e2 = { v2, v0 };
-
-		result.push_back(e0);
-		result.push_back(e1);
-		result.push_back(e2);
+			this->edges.push_back(e0);
+			this->edges.push_back(e1);
+			this->edges.push_back(e2);
+		}
 	}
 
-	return result;
+	return this->edges;
 }

@@ -1,11 +1,18 @@
 #include "AABBTree.h"
 
-template<typename T>
-AABBTree<T>::AABBTree()
+AABBTree::AABBTree()
 {
 }
 
-template<typename T>
-AABBTree<T>::AABBTree(std::vector<T>& objects, unsigned int depthLefth)
+AABBTree::AABBTree(std::vector<StructGeom::Triangle>& triangles, unsigned int depthLeft)
+{
+	this->buildNode(triangles, depthLeft);
+}
+
+AABBTree::~AABBTree()
+{
+}
+
+void AABBTree::buildNode(std::vector<StructGeom::Triangle>& triangles, unsigned int depthLeft)
 {
 }

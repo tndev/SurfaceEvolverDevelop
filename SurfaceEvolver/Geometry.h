@@ -24,6 +24,9 @@ namespace BufferGeom {
 
 class Geometry
 {
+private:
+	std::vector<StructGeom::Triangle> triangles = {};
+	std::vector<StructGeom::Edge> edges = {};
 public:
 	// every time a geometry is created, it is preferrable to keep an additional array of vertices to, which
 	// vertexIndices actually point

@@ -38,24 +38,8 @@ int main()
 	e.initExport(box, "boxTranslated");
 	e.initExport(cs, "cubesphere");
 
-	/*
-	OBJImporter im = OBJImporter();
-	Geometry cube = im.importOBJGeometry("Cube.obj");
-	e.initExport(cube, "cube");
-	Geometry polySphere = im.importOBJGeometry("PolygonalSphere.obj");
-	e.initExport(polySphere, "polySphere");
-
-	PrimitiveBox cubeCorrect = PrimitiveBox(100., 100., 100., 1, 1, 1);
-	cubeCorrect.applyMatrix(Matrix4().makeTranslation(-50., -50., 0.));
-
-	e.initExport(cubeCorrect, "cubeCorrect");
-
-	Geometry unstructCube = im.importOBJGeometry("unstructCube.obj");
-	e.initExport(unstructCube, "unstructCube");
-	*/
-
 	std::vector<StructGeom::Triangle> t = cs.getTriangles();
-	// AABBTree<StructGeom::Triangle> tree = AABBTree<StructGeom::Triangle>(t, 100);
+	AABBTree T = AABBTree(t, 100);
 
 	return 1;
 }
