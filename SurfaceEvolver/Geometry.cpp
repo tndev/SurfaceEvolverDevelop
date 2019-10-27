@@ -163,7 +163,6 @@ std::vector<std::vector<unsigned int>> Geometry::getTriangulatedIndices(Face& ve
 		faces = { {0, 1, 2} };
 	}
 	else if (vertices.size() == 4) {
-		// [[0, 1, 2], [0, 2, 3]];
 		faces = { {0, 1, 2}, {0, 2, 3} };
 		Vector3 e2 = vertices[2] - vertices[0];
 		Vector3 e1 = vertices[1] - vertices[0];

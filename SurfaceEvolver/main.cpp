@@ -41,8 +41,8 @@ int main()
 	OBJImporter im = OBJImporter();
 	Geometry cube = im.importOBJGeometry("Cube.obj");
 	e.initExport(cube, "cube");
-	/*Geometry polySphere = im.importOBJGeometry("PolygonalSphere.obj");
-	e.initExport(polySphere, "polySphere");*/
+	Geometry polySphere = im.importOBJGeometry("PolygonalSphere.obj");
+	e.initExport(polySphere, "polySphere");
 
 	PrimitiveBox cubeCorrect = PrimitiveBox(100., 100., 100., 1, 1, 1);
 	cubeCorrect.applyMatrix(Matrix4().makeTranslation(-50., -50., 0.));

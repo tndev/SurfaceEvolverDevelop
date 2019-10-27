@@ -165,7 +165,7 @@ void OBJImporter::setGeometry(Geometry& geom,
 		geom.uniqueVertices[k] = vertices[vertexIndices[i]];
 	}*/
 
-	geom.uniqueVertices = vertices;
+	geom.uniqueVertices = std::vector<Vector3>(vertices.size());
 	geom.vertices = std::vector<float>(3 * nTriangles);
 	geom.vertexIndices = std::vector<unsigned int>(nTriangles);
 	geom.normals = std::vector<float>(3 * nTriangles);
@@ -221,7 +221,9 @@ void OBJImporter::setGeometry(Geometry& geom,
 					geom.vertices[idxV++] = v.y;
 					geom.vertices[idxV++] = v.z;
 
-					geom.vertexIndices[idxI++] = vertexToIdx.at(v);
+					unsigned int vId = vertexToIdx.at(v);
+					geom.vertexIndices[idxI++] = vId;
+					geom.uniqueVertices[vId] = v;
 
 					Vector3 norm = faceNorms[i];
 					geom.normals[idxN++] = norm.x;
