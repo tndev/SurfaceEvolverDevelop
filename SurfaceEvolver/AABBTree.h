@@ -26,7 +26,7 @@ public:
 	std::vector<Tri> triangles = {};
 
 	AABBTree();
-	AABBTree(std::vector<Tri> triangles, Box3 bbox, uint depthLeft);
+	AABBTree(std::vector<Tri>& triangles, Box3 bbox, uint depthLeft);
 	~AABBTree();
 
 	void construct(std::vector<Tri>& triangles, uint depthLeft);

@@ -43,10 +43,12 @@ public:
 	~Geometry();
 	Geometry(const Geometry& other);
 
+	bool hasVertexIndices();
 	bool hasNormals();
 	bool hasTriangulations();
 
 	Box3 getBoundingBox(Box3 bbox = Box3(), Matrix4 matrix = Matrix4());
+	void computeNormals();
 
 	std::vector<unsigned int> getPolygonIndicesFromTriangulation(BufferGeom::Triangulation t);
 	std::vector<Vector3> getProjectionsAlongNormal(BufferGeom::Face& vertices); // TODO: use Vector2
@@ -66,5 +68,9 @@ private:
 	void flipFaceOrientation();
 	std::vector<unsigned int> getPolygonIndicesFromTriangles(std::vector<BufferGeom::Triangle> triangles);
 };
+
+// merges an array of geometries into one
+Geometry mergeGeometries(std::vector<Geometry> geometries);
+Vector3 getTriangleNormal(StructGeom::Triangle triangle, Vector3 resultNormal = Vector3());
 
 #endif

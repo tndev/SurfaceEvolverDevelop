@@ -38,11 +38,14 @@ int main()
 	e.initExport(box, "boxTranslated");
 	e.initExport(cs, "cubesphere");
 
-	AABBTree T = AABBTree(cs.getTriangles(), cs.getBoundingBox(), 100);
+	std::vector<Tri> triangs = cs.getTriangles();
+	AABBTree T = AABBTree(triangs, cs.getBoundingBox(), 100);
 
-	std::vector<Geometry> boxes = T.getAABBGeomsOfDepth(3);
-	for (unsigned int i = 0; i < boxes.size(); i++) {
-		e.initExport(boxes[i], "box" + std::to_string(i));
+	for (unsigned int d = 0; d < 10; d++) {
+		std::vector<Geometry> boxes = T.getAABBGeomsOfDepth(d);
+		Geometry resultGeom = mergeGeometries(boxes);
+		e.initExport(resultGeom, "boxes" + std::to_string(d) + "AABB");
+		std::cout << "boxes" << d << "AABB saved" << std::endl;
 	}
 
 	return 1;

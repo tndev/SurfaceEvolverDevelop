@@ -159,7 +159,7 @@ AABBTree::AABBTree()
 {
 }
 
-AABBTree::AABBTree(std::vector<Tri> triangles, Box3 bbox, uint depthLeft)
+AABBTree::AABBTree(std::vector<Tri>& triangles, Box3 bbox, uint depthLeft)
 {
 	this->bbox = bbox;
 	this->bbox.min.addScalar(-0.001);
@@ -212,7 +212,7 @@ void AABBTree::construct(std::vector<Tri>& triangles, uint depthLeft)
 		if (rightTriangles.size()) {
 			Box3 bboxRight = this->bbox;
 			bboxRight.min.setCoordById(this->splitPosition, this->axis);
-			this->right = new AABBTree(leftTriangles, bboxRight, depthLeft - 1);
+			this->right = new AABBTree(rightTriangles, bboxRight, depthLeft - 1);
 			if (!this->right->triangles.size() && this->right->left == nullptr && this->right->right == nullptr) {
 				this->right = nullptr;
 			}
@@ -226,9 +226,12 @@ std::vector<Geometry> AABBTree::getAABBGeomsOfDepth(uint depth)
 	if (this->depth < depth) {
 		std::vector<Geometry> boxesLeft = {};
 		std::vector<Geometry> boxesRight = {};
-		boxesLeft = left->getAABBGeomsOfDepth(depth - 1);
-		boxesRight = right->getAABBGeomsOfDepth(depth - 1);
-
+		if (left != nullptr) {
+			boxesLeft = left->getAABBGeomsOfDepth(depth - 1);
+		}
+		if (right != nullptr) {
+			boxesRight = right->getAABBGeomsOfDepth(depth - 1);
+		}
 		boxesLeft.insert(boxesLeft.end(), boxesRight.begin(), boxesRight.end());
 
 		return boxesLeft;

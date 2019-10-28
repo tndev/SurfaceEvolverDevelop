@@ -20,6 +20,11 @@ Geometry::Geometry(const Geometry& other)
 	triangulations = std::vector<std::vector<unsigned int>>(other.triangulations);
 }
 
+bool Geometry::hasVertexIndices()
+{
+	return this->vertexIndices.size() > 0;
+}
+
 bool Geometry::hasNormals()
 {
 	return normals.size();
@@ -39,6 +44,29 @@ Box3 Geometry::getBoundingBox(Box3 bbox, Matrix4 matrix)
 		bbox.expandByPoint(helperVector);
 	}
 	return bbox;
+}
+
+void Geometry::computeNormals()
+{
+	StructGeom::Triangle faceVerts = { Vector3(), Vector3(), Vector3() };
+
+	Vector3 normal = Vector3();
+	for (unsigned int i = 0; i < this->vertices.size(); i += 9) {
+
+		for (unsigned int j = 0; j < 3; j++) {
+			faceVerts[j].x = this->vertices[i + j * 3];
+			faceVerts[j].y = this->vertices[i + j * 3 + 1];
+			faceVerts[j].z = this->vertices[i + j * 3 + 2];
+		}
+
+		getTriangleNormal(faceVerts, normal);
+
+		for (unsigned int j = 0; j < 3; j++) {
+			this->normals[i + j * 3] = normal.x;
+			this->normals[i + j * 3 + 1] = normal.y;
+			this->normals[i + j * 3 + 2] = normal.z;
+		}
+	}
 }
 
 std::vector<unsigned int> Geometry::getPolygonIndicesFromTriangulation(BufferGeom::Triangulation t)
@@ -404,4 +432,71 @@ std::vector<StructGeom::Edge> Geometry::getEdges()
 	}
 
 	return this->edges;
+}
+
+Geometry mergeGeometries(std::vector<Geometry> geometries)
+{
+	Geometry result = Geometry();
+	unsigned int vertexCount = 0;
+	unsigned int uniqueVertCount = 0;
+
+	for (unsigned int i = 0; i < geometries.size(); i++) {
+		auto g = geometries[i];
+
+		if (!g.hasNormals()) {
+			g.computeNormals();
+		}
+		vertexCount += g.vertices.size() / 3;
+		uniqueVertCount += g.uniqueVertices.size();
+	};
+
+	result.uniqueVertices = {};
+	result.vertices = {};
+	result.normals = {};
+	result.vertexIndices = std::vector<unsigned int>(vertexCount);
+	result.triangulations = {};
+
+	unsigned int idx = 0;
+	unsigned int uIdx = 0;
+	for (unsigned int i = 0; i < geometries.size(); i++) {
+		const unsigned int currVertexCount = geometries[i].vertices.size() / 3;
+		const unsigned int currUniqueCount = geometries[i].uniqueVertices.size();
+
+		result.uniqueVertices.insert(result.uniqueVertices.end(), geometries[i].uniqueVertices.begin(), geometries[i].uniqueVertices.end());
+		result.vertices.insert(result.vertices.end(), geometries[i].vertices.begin(), geometries[i].vertices.end());
+		result.normals.insert(result.normals.end(), geometries[i].normals.begin(), geometries[i].normals.end());
+
+		for (unsigned int j = 0; j < currVertexCount; j++) {
+			const unsigned int vertexIdx = geometries[i].hasVertexIndices() ? geometries[i].vertexIndices[j] : j;
+			result.vertexIndices[j + idx] = vertexIdx + uIdx;
+		}
+
+		if (geometries[i].hasTriangulations()) {
+			for (unsigned int j = 0; j < geometries[i].triangulations.size(); j++) {
+				BufferGeom::Triangulation triangulationCopy = geometries[i].triangulations[j];
+				for (unsigned int k = 0; k < triangulationCopy.size(); k++) {
+					triangulationCopy[k] += idx / 3;
+				}
+				result.triangulations.push_back(triangulationCopy);
+			}
+
+		}
+
+		idx += currVertexCount;
+		uIdx += currUniqueCount;
+	}
+	return result;
+}
+
+Vector3 getTriangleNormal(StructGeom::Triangle triangle, Vector3 resultNormal)
+{
+	Vector3 u = triangle[1] - triangle[0];
+	Vector3 v = triangle[2] - triangle[0];
+
+	resultNormal.set(
+		(u.y * v.z) - (u.z * v.y),
+		(u.z * v.x) - (u.x * v.z),
+		(u.x * v.y) - (u.y * v.x)
+	);
+	return resultNormal;
 }
