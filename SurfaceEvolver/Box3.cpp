@@ -8,6 +8,12 @@ Box3::~Box3()
 {
 }
 
+Box3::Box3(const Box3& other)
+{
+	this->min = other.min;
+	this->max = other.max;
+}
+
 bool Box3::isEmpty()
 {
 	return (

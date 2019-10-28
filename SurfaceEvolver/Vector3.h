@@ -17,8 +17,10 @@ public:
 	~Vector3();
 
 	void set(float x, float y, float z);
+	void setCoordById(float val, unsigned int id);
 	void min(Vector3 other);
 	void max(Vector3 other);
+	float getCoordById(unsigned int id);
 
 	bool equals(Vector3 other);
 
@@ -36,6 +38,7 @@ public:
 	void applyMatrix4(Matrix4& m);
 	void applyMatrix3(Matrix3& m);
 	void addScalar(float scalar);
+	void multiply(Vector3& other);
 
 	Vector3 operator+ (Vector3 other);
 	Vector3 operator- (Vector3 other);
@@ -54,6 +57,7 @@ Vector3 normalize(Vector3 target);
 float dot(Vector3 a, Vector3 b);
 Vector3 cross(Vector3 a, Vector3 b);
 Vector3 lerp(Vector3 v1, Vector3 v2, float param);
+Vector3 multiply(Vector3 a, Vector3 b);
 bool equal(Vector3& a, Vector3& b);
 bool notEqual(Vector3& a, Vector3& b);
 

@@ -2,55 +2,42 @@
 #define AABBTREE_H_
 
 #include <memory>
-#include "Geometry.h"
+#include "PrimitiveBox.h"
+
+#define uint unsigned int
+#define uint32 uint32_t
+
+using Tri = StructGeom::Triangle;
 
 class AABBTree
 {
 public:
+	Box3 bbox;
+
+	AABBTree* left = nullptr;
+	AABBTree* right = nullptr;
+
+	// split axis
+	// x = 0, y = 1, z = 2
+	uint axis = 2;
+	float splitPosition = 0.0f;
+	uint depth = 0;
+
+	std::vector<Tri> triangles = {};
+
 	AABBTree();
-	AABBTree(std::vector<StructGeom::Triangle>& triangles, unsigned int depthLeft);
+	AABBTree(std::vector<Tri> triangles, Box3 bbox, uint depthLeft);
 	~AABBTree();
 
-	void buildNode(std::vector<StructGeom::Triangle>& triangles, unsigned int depthLeft);
-};
+	void construct(std::vector<Tri>& triangles, uint depthLeft);
+	std::vector<Geometry> getAABBGeomsOfDepth(uint depth); // for visualisation
+private:
+	const uint MAX_DEPTH = 100;
 
-struct Node
-{
-	bool IsLeaf(void) const
-	{
-		// The right leaf does not use the same memory as the userdata,
-		// and will always be Null (no children)
-		return right == Null;
-	}
-
-	// Fat AABB for leafs, bounding AABB for branches
-	AABBTree aabb;
-
-	union
-	{
-		int32_t parent;
-		int32_t next; // free list
-	};
-
-	union
-	{
-		// Child indices
-		struct
-		{
-			int32_t left;
-			int32_t right;
-		};
-
-		// Since only leaf nodes hold userdata, we can use the
-		// same memory used for left/right indices to store
-		// the userdata void pointer
-		void* userData;
-	};
-
-	// leaf = 0, free nodes = -1
-	int32_t height;
-
-	static const int32_t Null = -1;
+	float getSplitPosition(std::vector<Tri>& triangles, std::vector<Tri>* out_left, std::vector<Tri>* out_right);
+	float getCostEstimate(float splitPos, uint nLeft, uint nRight);
+	bool hasEnoughBranching(size_t nLeftTris, size_t nRightTris, size_t nTris);
+	void filterTriangles();
 };
 
 #endif

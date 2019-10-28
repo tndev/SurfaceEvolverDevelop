@@ -38,6 +38,19 @@ void Vector3::set(float x, float y, float z)
 	this->x = x; this->y = y; this->z = z;
 }
 
+void Vector3::setCoordById(float val, unsigned int id)
+{
+	if (id == 0) {
+		x = val;
+	}
+	else if (id == 1) {
+		y = val;
+	}
+	else {
+		z = val;
+	}
+}
+
 void Vector3::min(Vector3 other)
 {
 	this->x = std::fminf(this->x, other.x);
@@ -50,6 +63,17 @@ void Vector3::max(Vector3 other)
 	this->x = std::fmaxf(this->x, other.x);
 	this->y = std::fmaxf(this->y, other.y);
 	this->z = std::fmaxf(this->z, other.z);
+}
+
+float Vector3::getCoordById(unsigned int id)
+{
+	if (id == 0) {
+		return this->x;
+	}
+	else if (id == 1) {
+		return this->y;
+	}
+	return this->z;
 }
 
 bool Vector3::equals(Vector3 other)
@@ -161,6 +185,12 @@ Vector3 lerp(Vector3 v1, Vector3 v2, float param)
 	return result;
 }
 
+Vector3 multiply(Vector3 a, Vector3 b)
+{
+	a.multiply(b);
+	return a;
+}
+
 bool equal(Vector3& a, Vector3& b)
 {
 	return a.equals(b);
@@ -185,6 +215,13 @@ void Vector3::addScalar(float scalar)
 	this->x += scalar;
 	this->y += scalar;
 	this->z += scalar;
+}
+
+void Vector3::multiply(Vector3& other)
+{
+	this->x *= other.x;
+	this->y *= other.y;
+	this->z *= other.z;
 }
 
 Vector3 Vector3::operator+(Vector3 other)

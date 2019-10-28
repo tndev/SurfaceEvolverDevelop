@@ -38,8 +38,12 @@ int main()
 	e.initExport(box, "boxTranslated");
 	e.initExport(cs, "cubesphere");
 
-	std::vector<StructGeom::Triangle> t = cs.getTriangles();
-	AABBTree T = AABBTree(t, 100);
+	AABBTree T = AABBTree(cs.getTriangles(), cs.getBoundingBox(), 100);
+
+	std::vector<Geometry> boxes = T.getAABBGeomsOfDepth(3);
+	for (unsigned int i = 0; i < boxes.size(); i++) {
+		e.initExport(boxes[i], "box" + std::to_string(i));
+	}
 
 	return 1;
 }

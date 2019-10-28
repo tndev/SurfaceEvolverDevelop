@@ -11,6 +11,7 @@ public:
 
 	Box3();
 	~Box3();
+	Box3(const Box3& other);
 
 	bool isEmpty();
 
