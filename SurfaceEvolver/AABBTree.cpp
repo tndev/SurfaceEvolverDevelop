@@ -172,6 +172,11 @@ AABBTree::~AABBTree()
 {
 }
 
+bool AABBTree::isLeaf()
+{
+	return (this->left == nullptr && this->right == nullptr);
+}
+
 void AABBTree::construct(std::vector<Tri>& triangles, uint depthLeft)
 {
 	if (depthLeft == 0 || triangles.size() <= 2) {
@@ -231,6 +236,32 @@ std::vector<Geometry> AABBTree::getAABBGeomsOfDepth(uint depth)
 		}
 		if (right != nullptr) {
 			boxesRight = right->getAABBGeomsOfDepth(depth - 1);
+		}
+		boxesLeft.insert(boxesLeft.end(), boxesRight.begin(), boxesRight.end());
+
+		return boxesLeft;
+	}
+
+	float dimX = bbox.max.x - bbox.min.x;
+	float dimY = bbox.max.y - bbox.min.y;
+	float dimZ = bbox.max.z - bbox.min.z;
+	PrimitiveBox box = PrimitiveBox(dimX, dimY, dimZ, 1, 1, 1);
+	Vector3 t = bbox.min;
+	box.applyMatrix(Matrix4().makeTranslation(t.x, t.y, t.z));
+
+	return { box };
+}
+
+std::vector<Geometry> AABBTree::getAABBLeafGeoms()
+{
+	if (!this->isLeaf()) {
+		std::vector<Geometry> boxesLeft = {};
+		std::vector<Geometry> boxesRight = {};
+		if (left != nullptr) {
+			boxesLeft = left->getAABBLeafGeoms();
+		}
+		if (right != nullptr) {
+			boxesRight = right->getAABBLeafGeoms();
 		}
 		boxesLeft.insert(boxesLeft.end(), boxesRight.begin(), boxesRight.end());
 

@@ -29,8 +29,11 @@ public:
 	AABBTree(std::vector<Tri>& triangles, Box3 bbox, uint depthLeft);
 	~AABBTree();
 
+	bool isLeaf();
+
 	void construct(std::vector<Tri>& triangles, uint depthLeft);
 	std::vector<Geometry> getAABBGeomsOfDepth(uint depth); // for visualisation
+	std::vector<Geometry> getAABBLeafGeoms(); // for visualisation
 private:
 	const uint MAX_DEPTH = 100;
 

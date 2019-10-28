@@ -41,12 +41,16 @@ int main()
 	std::vector<Tri> triangs = cs.getTriangles();
 	AABBTree T = AABBTree(triangs, cs.getBoundingBox(), 100);
 
-	for (unsigned int d = 0; d < 10; d++) {
+	for (unsigned int d = 0; d < 100; d++) {
 		std::vector<Geometry> boxes = T.getAABBGeomsOfDepth(d);
 		Geometry resultGeom = mergeGeometries(boxes);
 		e.initExport(resultGeom, "boxes" + std::to_string(d) + "AABB");
 		std::cout << "boxes" << d << "AABB saved" << std::endl;
 	}
+
+	std::vector<Geometry> leafBoxes = T.getAABBLeafGeoms();
+	Geometry leafBoxesGeom = mergeGeometries(leafBoxes);
+	e.initExport(leafBoxesGeom, "leafBoxesAABB");
 
 	return 1;
 }
