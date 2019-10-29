@@ -12,7 +12,7 @@
 #include "AABBTree.h"
 
 //   TODO:
-// - Add an AABBTree structure
+// - Add an AABBTree structure (needs fixing & testing)
 // - Make a fast cell intersection query
 // - Set intersected cell values to 0 and INFINITY everywhere else
 // - Apply Fast Sweeping Method
@@ -26,7 +26,7 @@ int main()
 	unsigned int d = 3;
 	IcoSphere ico = IcoSphere(d, r);
 	float a = 2 * r / sqrt(3.);
-	unsigned int ns = 10;
+	unsigned int ns = 2;
 	PrimitiveBox box = PrimitiveBox(a, a, a, ns, ns, ns);
 	CubeSphere cs = CubeSphere(ns, r);
 
@@ -39,13 +39,19 @@ int main()
 	e.initExport(cs, "cubesphere");
 
 	std::vector<Tri> triangs = cs.getTriangles();
-	AABBTree T = AABBTree(triangs, cs.getBoundingBox(), 100);
+	AABBTree T = AABBTree(triangs, cs.getBoundingBox());
 
-	for (unsigned int d = 0; d < 100; d++) {
+	unsigned int maxDepth = depth(&T);
+
+	for (unsigned int d = 0; d < maxDepth; d++) {
 		std::vector<Geometry> boxes = T.getAABBGeomsOfDepth(d);
+		std::vector<Geometry> triangles = T.getAABBTrianglesOfDepth(d);
 		Geometry resultGeom = mergeGeometries(boxes);
+		Geometry resultTriGeom = mergeGeometries(triangles);
 		e.initExport(resultGeom, "boxes" + std::to_string(d) + "AABB");
 		std::cout << "boxes" << d << "AABB saved" << std::endl;
+		e.initExport(resultTriGeom, "triangles" + std::to_string(d) + "AABB");
+		std::cout << "triangles" << d << "AABB saved" << std::endl;
 	}
 
 	std::vector<Geometry> leafBoxes = T.getAABBLeafGeoms();

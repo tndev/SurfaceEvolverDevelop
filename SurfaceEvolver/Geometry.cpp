@@ -20,6 +20,11 @@ Geometry::Geometry(const Geometry& other)
 	triangulations = std::vector<std::vector<unsigned int>>(other.triangulations);
 }
 
+bool Geometry::hasVertices()
+{
+	return this->vertices.size() > 0;
+}
+
 bool Geometry::hasVertexIndices()
 {
 	return this->vertexIndices.size() > 0;
@@ -27,12 +32,12 @@ bool Geometry::hasVertexIndices()
 
 bool Geometry::hasNormals()
 {
-	return normals.size();
+	return this->normals.size() > 0;
 }
 
 bool Geometry::hasTriangulations()
 {
-	return triangulations.size();
+	return this->triangulations.size() > 0;
 }
 
 Box3 Geometry::getBoundingBox(Box3 bbox, Matrix4 matrix)
@@ -59,14 +64,25 @@ void Geometry::computeNormals()
 			faceVerts[j].z = this->vertices[i + j * 3 + 2];
 		}
 
-		getTriangleNormal(faceVerts, normal);
+		normal = getTriangleNormal(faceVerts, normal);
 
 		for (unsigned int j = 0; j < 3; j++) {
-			this->normals[i + j * 3] = normal.x;
-			this->normals[i + j * 3 + 1] = normal.y;
-			this->normals[i + j * 3 + 2] = normal.z;
+			this->normals.push_back(normal.x);
+			this->normals.push_back(normal.y);
+			this->normals.push_back(normal.z);
 		}
 	}
+}
+
+void Geometry::computeTriangulations()
+{
+	if (this->hasVertexIndices() || this->hasVertices()) {
+		unsigned int N = (this->hasVertexIndices() && !this->hasVertices()) ? this->vertexIndices.size() : this->vertices.size() / 3;
+		for (unsigned int i = 0; i < N; i += 3) {
+			this->triangulations.push_back({ i / 3 });
+		}
+	}
+	// otherwise the geometry is just a point cloud and has to be triangulated separately
 }
 
 std::vector<unsigned int> Geometry::getPolygonIndicesFromTriangulation(BufferGeom::Triangulation t)
@@ -434,20 +450,21 @@ std::vector<StructGeom::Edge> Geometry::getEdges()
 	return this->edges;
 }
 
-Geometry mergeGeometries(std::vector<Geometry> geometries)
+Geometry mergeGeometries(std::vector<Geometry>& geometries)
 {
 	Geometry result = Geometry();
 	unsigned int vertexCount = 0;
 	unsigned int uniqueVertCount = 0;
 
 	for (unsigned int i = 0; i < geometries.size(); i++) {
-		auto g = geometries[i];
-
-		if (!g.hasNormals()) {
-			g.computeNormals();
+		if (!geometries[i].hasNormals()) {
+			geometries[i].computeNormals();
 		}
-		vertexCount += g.vertices.size() / 3;
-		uniqueVertCount += g.uniqueVertices.size();
+		if (!geometries[i].hasTriangulations()) {
+			geometries[i].computeTriangulations();
+		}
+		vertexCount += geometries[i].vertices.size() / 3;
+		uniqueVertCount += geometries[i].uniqueVertices.size();
 	};
 
 	result.uniqueVertices = {};

@@ -42,114 +42,21 @@ bool getTriangleBoundingBoxIntersection(Tri& vertices, Vector3& bboxCenter, Vect
 	Tri f = { verts[1] - verts[0], verts[2] - verts[1], verts[0] - verts[2] };
 	Tri axes = { Vector3(1, 0, 0), Vector3(0, 1, 0), Vector3(0, 0, 1) };
 
-	Vector3 axis_a0_f0 = cross(axes[0], f[0]);
-	Vector3 axis_a0_f1 = cross(axes[0], f[1]);
-	Vector3 axis_a0_f2 = cross(axes[0], f[2]);
+	for (uint i = 0; i < 3; ++i) {
+		for (uint j = 0; j < 3; ++j) {
+			Vector3 a = cross(axes[i], f[j]);
+			float p0 = a.dot(verts[0]);
+			float p1 = a.dot(verts[1]);
+			float p2 = a.dot(verts[2]);
+			float min = std::fminf(p0, std::fminf(p1, p2));
+			float max = std::fmaxf(p0, std::fmaxf(p1, p2));
 
-	Vector3 axis_a1_f0 = cross(axes[1], f[0]);
-	Vector3 axis_a1_f1 = cross(axes[1], f[1]);
-	Vector3 axis_a1_f2 = cross(axes[1], f[2]);
-
-	Vector3 axis_a2_f0 = cross(axes[2], f[0]);
-	Vector3 axis_a2_f1 = cross(axes[2], f[1]);
-	Vector3 axis_a2_f2 = cross(axes[2], f[2]);
-
-	auto testSeparationWithAxis = [&](Vector3& axis) -> bool {
-		float p0 = dot(verts[0], axis);
-		float p1 = dot(verts[1], axis);
-		float p2 = dot(verts[2], axis);
-
-		float r =
-			bboxHalfSize.x * fabs(dot(axes[0], axis)) +
-			bboxHalfSize.y * fabs(dot(axes[1], axis)) +
-			bboxHalfSize.z * fabs(dot(axes[2], axis));
-
-		if (std::fmaxf(-std::max({ p0, p1, p2 }), std::min({ p0, p1, p2 })) > r) {
-			return true;
+			float r = bboxHalfSize.dot(Vector3(fabs(a.x), fabs(a.y), fabs(a.z)));
+			if (min > r || max < -r) {
+				return false;
+			}
 		}
-
-		return false;
-	};
-
-	// test 0:
-
-	if (testSeparationWithAxis(axis_a0_f0)) {
-		return false;
 	}
-
-	// test 1:
-
-	if (testSeparationWithAxis(axis_a0_f1)) {
-		return false;
-	}
-
-	// test 2:
-
-	if (testSeparationWithAxis(axis_a0_f2)) {
-		return false;
-	}
-
-	// -----------
-
-	// test 3:
-
-	if (testSeparationWithAxis(axis_a1_f0)) {
-		return false;
-	}
-
-	// test 4:
-
-	if (testSeparationWithAxis(axis_a1_f1)) {
-		return false;
-	}
-
-	// test 5:
-
-	if (testSeparationWithAxis(axis_a1_f2)) {
-		return false;
-	}
-
-	// -----------
-
-	// test 6:
-
-	if (testSeparationWithAxis(axis_a2_f0)) {
-		return false;
-	}
-
-	// test 7:
-
-	if (testSeparationWithAxis(axis_a2_f1)) {
-		return false;
-	}
-
-	// test 8:
-
-	if (testSeparationWithAxis(axis_a2_f2)) {
-		return false;
-	}
-
-	// box normal tests:
-
-	if (testSeparationWithAxis(axes[0])) {
-		return false;
-	}
-
-	if (testSeparationWithAxis(axes[1])) {
-		return false;
-	}
-
-	if (testSeparationWithAxis(axes[2])) {
-		return false;
-	}
-
-	// triangle normal test:
-
-	if (testSeparationWithAxis(n)) {
-		return false;
-	}
-
-	// passed all 13 tests
 
 	return true;
 }
@@ -159,12 +66,13 @@ AABBTree::AABBTree()
 {
 }
 
-AABBTree::AABBTree(std::vector<Tri>& triangles, Box3 bbox, uint depthLeft)
+AABBTree::AABBTree(std::vector<Tri>& triangles, Box3 bbox, uint depthLeft, AABBTree* parent)
 {
 	this->bbox = bbox;
 	this->bbox.min.addScalar(-0.001);
 	this->bbox.max.addScalar(0.001);
-	this->depth = MAX_DEPTH - depthLeft;
+	this->parent = parent;
+
 	this->construct(triangles, depthLeft);
 }
 
@@ -175,6 +83,18 @@ AABBTree::~AABBTree()
 bool AABBTree::isLeaf()
 {
 	return (this->left == nullptr && this->right == nullptr);
+}
+
+bool AABBTree::isLeafWithTriangles()
+{
+	if (!this->isLeaf()) return false;
+
+	return this->triangles.size() > 0;
+}
+
+bool AABBTree::hasTriangles()
+{
+	return this->triangles.size() > 0;
 }
 
 void AABBTree::construct(std::vector<Tri>& triangles, uint depthLeft)
@@ -206,29 +126,28 @@ void AABBTree::construct(std::vector<Tri>& triangles, uint depthLeft)
 		this->filterTriangles();
 	}
 	else {
-		if (leftTriangles.size()) {
+		if (leftTriangles.size() > 0) {
 			Box3 bboxLeft = this->bbox;
 			bboxLeft.max.setCoordById(this->splitPosition, this->axis);
-			this->left = new AABBTree(leftTriangles, bboxLeft, depthLeft - 1);
-			if (!this->left->triangles.size() && this->left->left == nullptr && this->left->right == nullptr) {
+			this->left = new AABBTree(leftTriangles, bboxLeft, depthLeft - 1, this);
+			if (this->left->triangles.empty() && this->left->left == nullptr && this->left->right == nullptr) {
 				this->left = nullptr;
 			}
 		}
-		if (rightTriangles.size()) {
+		if (rightTriangles.size() > 0) {
 			Box3 bboxRight = this->bbox;
 			bboxRight.min.setCoordById(this->splitPosition, this->axis);
-			this->right = new AABBTree(rightTriangles, bboxRight, depthLeft - 1);
-			if (!this->right->triangles.size() && this->right->left == nullptr && this->right->right == nullptr) {
+			this->right = new AABBTree(rightTriangles, bboxRight, depthLeft - 1, this);
+			if (this->right->triangles.empty() && this->right->left == nullptr && this->right->right == nullptr) {
 				this->right = nullptr;
 			}
 		}
 	}
 }
 
-// crashes on depth >= 1, this->depth = NULL!
 std::vector<Geometry> AABBTree::getAABBGeomsOfDepth(uint depth)
 {
-	if (this->depth < depth) {
+	if (this->depth < depth && !this->isLeafWithTriangles()) {
 		std::vector<Geometry> boxesLeft = {};
 		std::vector<Geometry> boxesRight = {};
 		if (left != nullptr) {
@@ -278,12 +197,49 @@ std::vector<Geometry> AABBTree::getAABBLeafGeoms()
 	return { box };
 }
 
+std::vector<Geometry> AABBTree::getAABBTrianglesOfDepth(uint depth)
+{
+	if (this->depth < depth && !this->isLeafWithTriangles()) {
+		std::vector<Geometry> trianglesLeft = {};
+		std::vector<Geometry> trianglesRight = {};
+		if (left != nullptr) {
+			trianglesLeft = left->getAABBTrianglesOfDepth(depth - 1);
+		}
+		if (right != nullptr) {
+			trianglesRight = right->getAABBTrianglesOfDepth(depth - 1);
+		}
+		trianglesLeft.insert(trianglesLeft.end(), trianglesRight.begin(), trianglesRight.end());
+
+		return trianglesLeft;
+	}
+
+	std::vector<Geometry> triangles = {};
+	for (uint i = 0; i < this->triangles.size(); i++) {
+		Geometry triGeom = Geometry();
+		triGeom.uniqueVertices = this->triangles[i];
+		for (uint j = 0; j < 3; j++) {
+			triGeom.vertices.push_back(this->triangles[i][j].x);
+			triGeom.vertices.push_back(this->triangles[i][j].y);
+			triGeom.vertices.push_back(this->triangles[i][j].z);
+
+			// normals will be computed when merging geoms
+
+			triGeom.vertexIndices.push_back(j);
+		}
+
+		triangles.push_back(triGeom);
+	}
+
+	return triangles;
+
+}
+
 float AABBTree::getCostEstimate(float splitPos, uint nLeft, uint nRight)
 {
 	Box3 l_bbox = this->bbox;
-	l_bbox.max.setCoordById(this->axis, splitPos);
+	l_bbox.max.setCoordById(splitPos, this->axis);
 	Box3 r_bbox = this->bbox;
-	r_bbox.min.setCoordById(this->axis, splitPos);
+	r_bbox.min.setCoordById(splitPos, this->axis);
 	Vector3 ls = l_bbox.getSize() / 1000.0f;
 	Vector3 rs = r_bbox.getSize() / 1000.0f;
 	float leftArea = ls.x * ls.y * 2.0f + ls.y * ls.z * 2.0f + ls.z * ls.x * 2.0f;
@@ -303,6 +259,7 @@ void AABBTree::filterTriangles()
 	Vector3 bboxHalfSize = 0.5f * bbox.getSize();
 	std::vector<Tri> newTriangles = {};
 	for (uint i = 0; i < this->triangles.size(); i++) {
+		// TODO: Check if this evaluates correctly
 		if (getTriangleBoundingBoxIntersection(this->triangles[i], bboxCenter, bboxHalfSize)) {
 			newTriangles.push_back(this->triangles[i]);
 		}
@@ -364,4 +321,37 @@ float AABBTree::getSplitPosition(std::vector<Tri>& triangles, std::vector<Tri>* 
 	}
 
 	return bestSplitPosition;
+}
+
+uint depth(AABBTree* root)
+{
+	if (root == nullptr) {
+		return 0;
+	}
+
+	std::list<AABBTree*> queue;
+	queue.push_back(root);
+
+	AABBTree* front = nullptr;
+	uint depth = 0;
+
+	while (!queue.empty()) {
+		uint size = queue.size();
+
+		while (size--) {
+			front = queue.front();
+			queue.pop_front();
+
+			if (front->left != nullptr) {
+				queue.push_back(front->left);
+			}
+			if (front->right != nullptr) {
+				queue.push_back(front->right);
+			}
+		}
+
+		depth++;
+	}
+
+	return depth;
 }

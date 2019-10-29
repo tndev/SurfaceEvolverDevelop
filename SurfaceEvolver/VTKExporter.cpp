@@ -11,10 +11,16 @@ VTKExporter::~VTKExporter()
 
 void VTKExporter::initExport(Geometry object, std::string filename)
 {
-	// analyze input geometry
-	std::pair<std::vector<BufferGeom::Triangulation>, std::vector<size_t>> triangulationsAndSizes = object.getSortedPolygonTriangulationsAndSizes();
-	unsigned int NPolyTypes = triangulationsAndSizes.second.size();
-	this->outputType = NPolyTypes == 1 ? "POLYDATA" : "UNSTRUCTURED_GRID";
+	if (object.triangulations.size() > 0) {
+		// analyze input geometry
+		std::pair<std::vector<BufferGeom::Triangulation>, std::vector<size_t>> triangulationsAndSizes = object.getSortedPolygonTriangulationsAndSizes();
+		unsigned int NPolyTypes = triangulationsAndSizes.second.size();
+		this->outputType = NPolyTypes == 1 ? "POLYDATA" : "UNSTRUCTURED_GRID";
+	}
+	else {
+		std::cout << filename << ".vtk: attempting to write non-triangulated geometry" << std::endl;
+	}
+
 	// std::string suffix = this->outputType == "POLYDATA" ? ".vtk" : ".vtk";
 	std::string suffix = ".vtk";
 

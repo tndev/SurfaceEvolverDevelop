@@ -14,6 +14,7 @@ class AABBTree
 public:
 	Box3 bbox;
 
+	AABBTree* parent = nullptr;
 	AABBTree* left = nullptr;
 	AABBTree* right = nullptr;
 
@@ -26,14 +27,18 @@ public:
 	std::vector<Tri> triangles = {};
 
 	AABBTree();
-	AABBTree(std::vector<Tri>& triangles, Box3 bbox, uint depthLeft);
+	AABBTree(std::vector<Tri>& triangles, Box3 bbox, uint depthLeft = 100, AABBTree* parent = nullptr);
 	~AABBTree();
 
 	bool isLeaf();
+	bool isLeafWithTriangles();
+	bool hasTriangles();
 
 	void construct(std::vector<Tri>& triangles, uint depthLeft);
 	std::vector<Geometry> getAABBGeomsOfDepth(uint depth); // for visualisation
 	std::vector<Geometry> getAABBLeafGeoms(); // for visualisation
+	// std::vector<Geometry> getAABBLeafTriangles(); // for visualisation
+	std::vector<Geometry> getAABBTrianglesOfDepth(uint depth); // for visualisation
 private:
 	const uint MAX_DEPTH = 100;
 
@@ -42,5 +47,7 @@ private:
 	bool hasEnoughBranching(size_t nLeftTris, size_t nRightTris, size_t nTris);
 	void filterTriangles();
 };
+
+uint depth(AABBTree* root);
 
 #endif
