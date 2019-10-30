@@ -1,22 +1,7 @@
-﻿  AABBTree.cpp
+﻿  main.cpp
 D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\poly2tri\sweep\sweep_context.h(161,24): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\AABBTree.cpp(8,31): warning C4305: 'argument': truncation from 'double' to 'float'
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\AABBTree.cpp(33,73): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\AABBTree.cpp(33,53): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\AABBTree.cpp(33,33): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\AABBTree.cpp(36,20): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\AABBTree.cpp(37,19): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\AABBTree.cpp(72,33): warning C4305: 'argument': truncation from 'double' to 'float'
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\AABBTree.cpp(73,32): warning C4305: 'argument': truncation from 'double' to 'float'
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\AABBTree.cpp(303,79): warning C4244: 'argument': conversion from '_Ty' to 'unsigned int', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\AABBTree.cpp(303,79): warning C4244:         with
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\AABBTree.cpp(303,79): warning C4244:         [
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\AABBTree.cpp(303,79): warning C4244:             _Ty=float
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\AABBTree.cpp(303,79): warning C4244:         ]
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\AABBTree.cpp(303,63): warning C4244: 'argument': conversion from '_Ty' to 'unsigned int', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\AABBTree.cpp(303,63): warning C4244:         with
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\AABBTree.cpp(303,63): warning C4244:         [
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\AABBTree.cpp(303,63): warning C4244:             _Ty=float
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\AABBTree.cpp(303,63): warning C4244:         ]
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\AABBTree.cpp(339,27): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\main.cpp(28,10): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\main.cpp(37,65): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\main.cpp(37,56): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\main.cpp(37,47): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
   SurfaceEvolver.vcxproj -> D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\x64\Debug\SurfaceEvolver.exe

@@ -72,6 +72,7 @@ AABBTree::AABBTree(std::vector<Tri>& triangles, Box3 bbox, uint depthLeft, AABBT
 	this->bbox.min.addScalar(-0.001);
 	this->bbox.max.addScalar(0.001);
 	this->parent = parent;
+	this->depth = MAX_DEPTH - depthLeft;
 
 	this->construct(triangles, depthLeft);
 }
@@ -145,93 +146,122 @@ void AABBTree::construct(std::vector<Tri>& triangles, uint depthLeft)
 	}
 }
 
-std::vector<Geometry> AABBTree::getAABBGeomsOfDepth(uint depth)
+std::vector<AABBTree> AABBTree::flatten()
 {
-	if (this->depth < depth && !this->isLeafWithTriangles()) {
-		std::vector<Geometry> boxesLeft = {};
-		std::vector<Geometry> boxesRight = {};
-		if (left != nullptr) {
-			boxesLeft = left->getAABBGeomsOfDepth(depth - 1);
-		}
-		if (right != nullptr) {
-			boxesRight = right->getAABBGeomsOfDepth(depth - 1);
-		}
-		boxesLeft.insert(boxesLeft.end(), boxesRight.begin(), boxesRight.end());
+	std::vector<AABBTree> resultArray = {};
 
-		return boxesLeft;
+	std::stack<AABBTree> nodeStack;
+	nodeStack.push(*this);
+
+	while (nodeStack.size()) {
+		AABBTree item = nodeStack.top();
+		nodeStack.pop();
+
+		if (!item.left && !item.right) {// is leaf?
+			resultArray.push_back(item);
+		}
+		else {
+			if (item.left) {
+				nodeStack.push(*item.left);
+			}
+			if (item.right) {
+				nodeStack.push(*item.right);
+			}
+		}
 	}
 
-	float dimX = bbox.max.x - bbox.min.x;
-	float dimY = bbox.max.y - bbox.min.y;
-	float dimZ = bbox.max.z - bbox.min.z;
-	PrimitiveBox box = PrimitiveBox(dimX, dimY, dimZ, 1, 1, 1);
-	Vector3 t = bbox.min;
-	box.applyMatrix(Matrix4().makeTranslation(t.x, t.y, t.z));
+	return resultArray;
+}
 
-	return { box };
+std::vector<AABBTree> AABBTree::flattenToDepth(uint depth)
+{
+	std::vector<AABBTree> resultArray = {};
+
+	std::stack<AABBTree> nodeStack;
+	nodeStack.push(*this);
+
+	while (nodeStack.size()) {
+		AABBTree item = nodeStack.top();
+		nodeStack.pop();
+
+		if (!item.left && !item.right && item.depth == depth) {// is leaf?
+			resultArray.push_back(item);
+		}
+		else {
+			if (item.left) {
+				nodeStack.push(*item.left);
+			}
+			if (item.right) {
+				nodeStack.push(*item.right);
+			}
+		}
+	}
+
+	return resultArray;
+}
+
+std::vector<Geometry> AABBTree::getAABBGeomsOfDepth(uint depth)
+{
+	std::vector<AABBTree> leafNodes = this->flattenToDepth(depth);
+	std::vector<Geometry> boxGeoms = {};
+
+	for (auto&& leaf : leafNodes) {
+		float dimX = leaf.bbox.max.x - leaf.bbox.min.x;
+		float dimY = leaf.bbox.max.y - leaf.bbox.min.y;
+		float dimZ = leaf.bbox.max.z - leaf.bbox.min.z;
+		PrimitiveBox box = PrimitiveBox(dimX, dimY, dimZ, 1, 1, 1);
+		Vector3 t = leaf.bbox.min;
+		box.applyMatrix(Matrix4().makeTranslation(t.x, t.y, t.z));
+		boxGeoms.push_back(box);
+	}
+
+	return boxGeoms;
 }
 
 std::vector<Geometry> AABBTree::getAABBLeafGeoms()
 {
-	if (!this->isLeaf()) {
-		std::vector<Geometry> boxesLeft = {};
-		std::vector<Geometry> boxesRight = {};
-		if (left != nullptr) {
-			boxesLeft = left->getAABBLeafGeoms();
-		}
-		if (right != nullptr) {
-			boxesRight = right->getAABBLeafGeoms();
-		}
-		boxesLeft.insert(boxesLeft.end(), boxesRight.begin(), boxesRight.end());
+	std::vector<AABBTree> leafNodes = this->flatten();
+	std::vector<Geometry> boxGeoms = {};
 
-		return boxesLeft;
+	for (auto&& leaf : leafNodes) {
+		float dimX = leaf.bbox.max.x - leaf.bbox.min.x;
+		float dimY = leaf.bbox.max.y - leaf.bbox.min.y;
+		float dimZ = leaf.bbox.max.z - leaf.bbox.min.z;
+		PrimitiveBox box = PrimitiveBox(dimX, dimY, dimZ, 1, 1, 1);
+		Vector3 t = leaf.bbox.min;
+		box.applyMatrix(Matrix4().makeTranslation(t.x, t.y, t.z));
+		boxGeoms.push_back(box);
 	}
 
-	float dimX = bbox.max.x - bbox.min.x;
-	float dimY = bbox.max.y - bbox.min.y;
-	float dimZ = bbox.max.z - bbox.min.z;
-	PrimitiveBox box = PrimitiveBox(dimX, dimY, dimZ, 1, 1, 1);
-	Vector3 t = bbox.min;
-	box.applyMatrix(Matrix4().makeTranslation(t.x, t.y, t.z));
-
-	return { box };
+	return boxGeoms;
 }
 
 std::vector<Geometry> AABBTree::getAABBTrianglesOfDepth(uint depth)
 {
-	if (this->depth < depth && !this->isLeafWithTriangles()) {
-		std::vector<Geometry> trianglesLeft = {};
-		std::vector<Geometry> trianglesRight = {};
-		if (left != nullptr) {
-			trianglesLeft = left->getAABBTrianglesOfDepth(depth - 1);
-		}
-		if (right != nullptr) {
-			trianglesRight = right->getAABBTrianglesOfDepth(depth - 1);
-		}
-		trianglesLeft.insert(trianglesLeft.end(), trianglesRight.begin(), trianglesRight.end());
+	std::vector<AABBTree> leafNodes = this->flattenToDepth(depth);
+	std::vector<Geometry> triGeoms = {};
 
-		return trianglesLeft;
+	for (auto&& leaf : leafNodes) {
+		std::vector<Geometry> leafTriGeoms = {};
+
+		for (uint i = 0; i < leaf.triangles.size(); i++) {
+			Geometry triGeom = Geometry();
+			triGeom.uniqueVertices = leaf.triangles[i];
+
+			for (uint j = 0; j < 3; j++) {
+				triGeom.vertices.push_back(leaf.triangles[i][j].x);
+				triGeom.vertices.push_back(leaf.triangles[i][j].y);
+				triGeom.vertices.push_back(leaf.triangles[i][j].z);
+
+				// normals will be computed when merging geoms
+
+				triGeom.vertexIndices.push_back(j);
+			}
+			triGeoms.push_back(triGeom);
+		}
 	}
 
-	std::vector<Geometry> triangles = {};
-	for (uint i = 0; i < this->triangles.size(); i++) {
-		Geometry triGeom = Geometry();
-		triGeom.uniqueVertices = this->triangles[i];
-		for (uint j = 0; j < 3; j++) {
-			triGeom.vertices.push_back(this->triangles[i][j].x);
-			triGeom.vertices.push_back(this->triangles[i][j].y);
-			triGeom.vertices.push_back(this->triangles[i][j].z);
-
-			// normals will be computed when merging geoms
-
-			triGeom.vertexIndices.push_back(j);
-		}
-
-		triangles.push_back(triGeom);
-	}
-
-	return triangles;
-
+	return triGeoms;
 }
 
 float AABBTree::getCostEstimate(float splitPos, uint nLeft, uint nRight)

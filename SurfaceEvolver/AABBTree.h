@@ -1,8 +1,10 @@
 #ifndef AABBTREE_H_
 #define AABBTREE_H_
 
-#include <memory>
+#include <stack>
 #include "PrimitiveBox.h"
+
+#define MAX_DEPTH 100
 
 #define uint unsigned int
 #define uint32 uint32_t
@@ -27,7 +29,7 @@ public:
 	std::vector<Tri> triangles = {};
 
 	AABBTree();
-	AABBTree(std::vector<Tri>& triangles, Box3 bbox, uint depthLeft = 100, AABBTree* parent = nullptr);
+	AABBTree(std::vector<Tri>& triangles, Box3 bbox, uint depthLeft = MAX_DEPTH, AABBTree* parent = nullptr);
 	~AABBTree();
 
 	bool isLeaf();
@@ -35,13 +37,14 @@ public:
 	bool hasTriangles();
 
 	void construct(std::vector<Tri>& triangles, uint depthLeft);
+	std::vector<AABBTree> flatten();
+	std::vector<AABBTree> flattenToDepth(uint depth);
+
 	std::vector<Geometry> getAABBGeomsOfDepth(uint depth); // for visualisation
 	std::vector<Geometry> getAABBLeafGeoms(); // for visualisation
 	// std::vector<Geometry> getAABBLeafTriangles(); // for visualisation
 	std::vector<Geometry> getAABBTrianglesOfDepth(uint depth); // for visualisation
 private:
-	const uint MAX_DEPTH = 100;
-
 	float getSplitPosition(std::vector<Tri>& triangles, std::vector<Tri>* out_left, std::vector<Tri>* out_right);
 	float getCostEstimate(float splitPos, uint nLeft, uint nRight);
 	bool hasEnoughBranching(size_t nLeftTris, size_t nRightTris, size_t nTris);

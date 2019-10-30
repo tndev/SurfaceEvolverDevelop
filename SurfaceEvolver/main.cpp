@@ -12,7 +12,8 @@
 #include "AABBTree.h"
 
 //   TODO:
-// - Add an AABBTree structure (needs fixing & testing)
+// - Add an AABBTree structure (done)
+// - Add an Octree for activating intersected grid cells
 // - Make a fast cell intersection query
 // - Set intersected cell values to 0 and INFINITY everywhere else
 // - Apply Fast Sweeping Method
@@ -26,7 +27,7 @@ int main()
 	unsigned int d = 3;
 	IcoSphere ico = IcoSphere(d, r);
 	float a = 2 * r / sqrt(3.);
-	unsigned int ns = 2;
+	unsigned int ns = 10;
 	PrimitiveBox box = PrimitiveBox(a, a, a, ns, ns, ns);
 	CubeSphere cs = CubeSphere(ns, r);
 
