@@ -82,6 +82,9 @@
     <ClCompile Include="AABBTree.cpp">
       <Filter>BVH</Filter>
     </ClCompile>
+    <ClCompile Include="Octree.cpp">
+      <Filter>BVH</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Box3.h">
@@ -142,6 +145,9 @@
       <Filter>Poly2Tri</Filter>
     </ClInclude>
     <ClInclude Include="AABBTree.h">
+      <Filter>BVH</Filter>
+    </ClInclude>
+    <ClInclude Include="Octree.h">
       <Filter>BVH</Filter>
     </ClInclude>
   </ItemGroup>

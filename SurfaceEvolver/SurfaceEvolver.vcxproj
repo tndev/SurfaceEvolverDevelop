@@ -161,6 +161,7 @@
     <ClCompile Include="Matrix4.cpp" />
     <ClCompile Include="OBJExporter.cpp" />
     <ClCompile Include="OBJImporter.cpp" />
+    <ClCompile Include="Octree.cpp" />
     <ClCompile Include="poly2tri\common\shapes.cc" />
     <ClCompile Include="poly2tri\sweep\advancing_front.cc" />
     <ClCompile Include="poly2tri\sweep\cdt.cc" />
@@ -182,6 +183,7 @@
     <ClInclude Include="Matrix4.h" />
     <ClInclude Include="OBJExporter.h" />
     <ClInclude Include="OBJImporter.h" />
+    <ClInclude Include="Octree.h" />
     <ClInclude Include="poly2tri\common\shapes.h" />
     <ClInclude Include="poly2tri\common\utils.h" />
     <ClInclude Include="poly2tri\poly2tri.h" />

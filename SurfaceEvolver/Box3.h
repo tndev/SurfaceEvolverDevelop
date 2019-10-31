@@ -10,10 +10,12 @@ public:
 	Vector3 max = Vector3(-INFINITY, -INFINITY, -INFINITY);
 
 	Box3();
+	Box3(Vector3 min, Vector3 max);
 	~Box3();
 	Box3(const Box3& other);
 
 	bool isEmpty();
+	bool intersectsBox(Box3& other);
 
 	void expandByPoint(Vector3 p);
 	void expandByOffset(float offset);

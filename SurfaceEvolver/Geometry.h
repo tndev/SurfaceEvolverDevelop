@@ -74,5 +74,6 @@ private:
 // merges an array of geometries into one
 Geometry mergeGeometries(std::vector<Geometry>& geometries);
 Vector3 getTriangleNormal(StructGeom::Triangle triangle, Vector3 resultNormal);
+bool getTriangleBoundingBoxIntersection(StructGeom::Triangle& vertices, Vector3& bboxCenter, Vector3& bboxHalfSize, Vector3* optTriNormal = nullptr);
 
 #endif

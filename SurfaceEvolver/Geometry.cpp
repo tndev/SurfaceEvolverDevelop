@@ -517,3 +517,67 @@ Vector3 getTriangleNormal(StructGeom::Triangle triangle, Vector3 resultNormal)
 	);
 	return resultNormal;
 }
+
+using Tri = StructGeom::Triangle;
+using uint = unsigned int;
+template <typename T> int sgn(T val) {
+	return (T(0) < val) - (val < T(0));
+}
+
+bool getTriangleBoundingBoxIntersection(Tri& vertices, Vector3& bboxCenter, Vector3& bboxHalfSize, Vector3* optTriNormal)
+{
+	bboxHalfSize.addScalar(0.0001);
+
+	std::vector<Vector3> verts = { vertices[0] - bboxCenter, vertices[1] - bboxCenter, vertices[2] - bboxCenter };
+
+	Vector3 t_min = verts[0];
+	t_min.min(verts[1]);
+	t_min.min(verts[2]);
+
+	Vector3 t_max = verts[0];
+	t_max.max(verts[1]);
+	t_max.max(verts[2]);
+
+	bool aabb_overlap = (
+		!(t_max.x < -bboxHalfSize.x || t_min.x > bboxHalfSize.x) &&
+		!(t_max.y < -bboxHalfSize.y || t_min.y > bboxHalfSize.y) &&
+		!(t_max.z < -bboxHalfSize.z || t_min.z > bboxHalfSize.z)
+		);
+
+	if (!aabb_overlap) {
+		return false;
+	}
+
+	Vector3 n = optTriNormal != nullptr ? *optTriNormal : normalize(cross(verts[1] - verts[0], verts[2] - verts[0]));
+
+	// plane-bbox intersection
+	Vector3 nf_mask = Vector3((n.x > 0 ? 1 : -1), (n.y > 0 ? 1 : -1), (n.z > 0 ? 1 : -1));
+	Vector3 near_corner = multiply(bboxHalfSize, nf_mask);
+	Vector3 far_corner = -1.0f * multiply(bboxHalfSize, nf_mask);
+	float dist_near_s = sgn(dot(n, near_corner) - dot(n, verts[0]));
+	float dist_far_s = sgn(dot(n, far_corner) - dot(n, verts[0]));
+	if (fabs(dist_near_s - dist_far_s) < FLT_EPSILON) {
+		return false;
+	}
+
+	Tri f = { verts[1] - verts[0], verts[2] - verts[1], verts[0] - verts[2] };
+	Tri axes = { Vector3(1, 0, 0), Vector3(0, 1, 0), Vector3(0, 0, 1) };
+
+	for (uint i = 0; i < 3; ++i) {
+		for (uint j = 0; j < 3; ++j) {
+			Vector3 a = cross(axes[i], f[j]);
+			float p0 = a.dot(verts[0]);
+			float p1 = a.dot(verts[1]);
+			float p2 = a.dot(verts[2]);
+			float min = std::fminf(p0, std::fminf(p1, p2));
+			float max = std::fmaxf(p0, std::fmaxf(p1, p2));
+
+			float r = bboxHalfSize.dot(Vector3(fabs(a.x), fabs(a.y), fabs(a.z)));
+			if (min > r || max < -r) {
+				return false;
+			}
+		}
+	}
+
+	return true;
+}

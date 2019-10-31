@@ -4,6 +4,12 @@ Box3::Box3()
 {
 }
 
+Box3::Box3(Vector3 min, Vector3 max)
+{
+	this->min = min;
+	this->max = max;
+}
+
 Box3::~Box3()
 {
 }
@@ -19,6 +25,15 @@ bool Box3::isEmpty()
 	return (
 		this->min.equals(Vector3(INFINITY, INFINITY, INFINITY)) &&
 		this->max.equals(Vector3(-INFINITY, -INFINITY, -INFINITY))
+	);
+}
+
+bool Box3::intersectsBox(Box3& other)
+{
+	return !(
+		other.max.x < this->min.x || other.min.x > this->max.x ||
+		other.max.y < this->min.y || other.min.y > this->max.y ||
+		other.max.z < this->min.z || other.min.z > this->max.z
 	);
 }
 
