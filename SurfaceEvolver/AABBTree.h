@@ -4,7 +4,7 @@
 #include <stack>
 #include "PrimitiveBox.h"
 
-#define MAX_DEPTH 100
+#define MAX_DEPTH 20
 
 #define uint unsigned int
 #define uint32 uint32_t

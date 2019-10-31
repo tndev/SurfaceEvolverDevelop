@@ -10,6 +10,7 @@
 #include "VTKExporter.h"
 #include "OBJImporter.h"
 #include "AABBTree.h"
+#include "Octree.h"
 
 //   TODO:
 // - Add an AABBTree structure (done)
@@ -27,7 +28,7 @@ int main()
 	unsigned int d = 3;
 	IcoSphere ico = IcoSphere(d, r);
 	float a = 2 * r / sqrt(3.);
-	unsigned int ns = 10;
+	unsigned int ns = 2;
 	PrimitiveBox box = PrimitiveBox(a, a, a, ns, ns, ns);
 	CubeSphere cs = CubeSphere(ns, r);
 
@@ -41,6 +42,12 @@ int main()
 
 	std::vector<Tri> triangs = cs.getTriangles();
 	AABBTree T = AABBTree(triangs, cs.getBoundingBox());
+	Octree O = Octree(&T, T.bbox, 10.0f);
+	std::cout << "octree construction finished" << std::endl;
+
+	std::vector<Geometry> lboxes = O.getLeafBoxGeoms();
+	Geometry resultLboxGeom = mergeGeometries(lboxes);
+	e.initExport(resultLboxGeom, "leafBoxesOctree");
 
 	unsigned int maxDepth = depth(&T);
 

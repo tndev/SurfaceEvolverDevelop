@@ -1,21 +1,32 @@
 #include "Octree.h"
 
-Octree::OctreeNode::OctreeNode(Octree* tree, Box3 box, OctreeNode* parent)
+Octree::OctreeNode::OctreeNode()
+{
+}
+
+Octree::OctreeNode::OctreeNode(Octree* tree, Box3 box, OctreeNode* parent, uint depthLeft)
 {
 	this->tree = tree; // so it knows what tree it belongs to
 	this->parent = parent;
 	this->box = box;
 	Vector3 size = this->box.getSize();
+	this->tree->nodeCount++;
+	std::cout << "node count " << this->tree->nodeCount << std::endl;
 
-	if (shouldSubdivide() && isLargerThanLeaf(&size)) {
+	if (shouldSubdivide(&size) && depthLeft > 0) {
 		std::vector<Box3> boxes = getOctantBoxes(&size);
 		for (auto&& b : boxes) {
-			this->children.push_back(OctreeNode(this->tree, b, this));
+			this->children.push_back(new OctreeNode(this->tree, b, this, depthLeft - 1));
 		}
 	}
 }
 
-bool Octree::OctreeNode::shouldSubdivide()
+bool Octree::OctreeNode::shouldSubdivide(Vector3* size)
+{
+	return (this->intersectsTriangles() && this->isLargerThanLeaf(size));
+}
+
+bool Octree::OctreeNode::intersectsTriangles()
 {
 	Vector3 center = this->box.getCenter();
 	Vector3 halfSize = this->box.getSize();
@@ -33,11 +44,7 @@ bool Octree::OctreeNode::shouldSubdivide()
 
 bool Octree::OctreeNode::isLargerThanLeaf(Vector3* size)
 {
-	return (
-		size->x > this->tree->leafSize &&
-		size->y > this->tree->leafSize &&
-		size->z > this->tree->leafSize
-	);
+	return (size->x > this->tree->leafSize); // they're all cubes
 }
 
 bool Octree::OctreeNode::isALeaf()
@@ -51,8 +58,8 @@ std::vector<Box3> Octree::OctreeNode::getOctantBoxes(Vector3* size)
 	for (uint i = 0; i < 2; i++) {
 		for (uint j = 0; j < 2; j++) {
 			for (uint k = 0; k < 2; k++) {
-				Vector3 offset0 = multiply(Vector3(i / 2, j / 2, k / 2), *size);
-				Vector3 offset1 = multiply(Vector3((i + 1) / 2, (j + 1) / 2, (k + 1) / 2), *size);
+				Vector3 offset0 = multiply(Vector3((float)i / 2.0f, (float)j / 2.0f, (float)k / 2.0f), *size);
+				Vector3 offset1 = multiply(Vector3((float)(i + 1) / 2.0f, (float)(j + 1) / 2.0f, (float)(k + 1) / 2.0f), *size);
 				result.push_back(Box3(this->box.min + offset0, this->box.min + offset1));
 			}
 		}
@@ -65,11 +72,11 @@ std::vector<Leaf> Octree::OctreeNode::getLeafNodes()
 {
 	std::vector<Leaf> resultArray = {};
 
-	std::stack<Leaf> stack = {};
-	stack.push(*this);
+	std::stack<Leaf*> stack = {};
+	stack.push(this);
 
 	while (stack.size()) {
-		Leaf item = stack.top();
+		Leaf item = *stack.top();
 		stack.pop();
 
 		if (item.isALeaf()) {
@@ -94,9 +101,7 @@ Octree::Octree(AABBTree* aabbTree, Box3 bbox, float leafSize)
 	float maxDim = std::max({ size.x, size.y, size.z });
 
 	// this cube box will be subdivided
-	Box3 cubeBox = Box3();
-	cubeBox.min = bbox.min;
-	cubeBox.max = bbox.min + Vector3(maxDim, maxDim, maxDim);
+	Box3 cubeBox = Box3(bbox.min, bbox.min + Vector3(maxDim, maxDim, maxDim));
 
 	this->cubeBox = cubeBox;
 	this->aabbTree = aabbTree; // for fast lookup
@@ -108,14 +113,9 @@ Octree::~Octree()
 {
 }
 
-std::vector<Octree::OctreeNode> Octree::getLeafNodes()
-{
-	return this->root->getLeafNodes();
-}
-
 std::vector<Geometry> Octree::getLeafBoxGeoms()
 {
-	std::vector<Leaf> leaves = this->getLeafNodes();
+	std::vector<Leaf> leaves = this->root->getLeafNodes();
 	std::vector<Geometry> boxGeoms = {};
 
 	for (auto&& leaf : leaves) {
