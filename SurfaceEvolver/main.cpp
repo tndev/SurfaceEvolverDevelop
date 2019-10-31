@@ -40,10 +40,20 @@ int main()
 	e.initExport(box, "boxTranslated");
 	e.initExport(cs, "cubesphere");
 
+	OBJImporter obj = OBJImporter();
+	Geometry bunny = obj.importOBJGeometry("bunny.obj");
+	e.initExport(bunny, "sfBunny");
+
+	std::vector<Tri> triangs = bunny.getTriangles();
+	AABBTree T = AABBTree(triangs, bunny.getBoundingBox());
+	Octree O = Octree(&T, T.bbox, 2.5f);
+	std::cout << "octree construction finished" << std::endl;
+
+	/*
 	std::vector<Tri> triangs = cs.getTriangles();
 	AABBTree T = AABBTree(triangs, cs.getBoundingBox());
 	Octree O = Octree(&T, T.bbox, 2.5f);
-	std::cout << "octree construction finished" << std::endl;
+	std::cout << "octree construction finished" << std::endl;*/
 
 	/*
 	Box3 csBBox = cs.getBoundingBox();

@@ -104,30 +104,25 @@ Geometry OBJImporter::importOBJGeometry(std::string filename)
 				if (subTokens.size() > 0) {
 					vi = std::stoi(subTokens[0]);
 					vi = vi > 0 ? vi - 1 : (unsigned int)vertices.size() + vi;
-				}
-
-				if (subTokens.size() > 1) {
-					ui = std::stoi(subTokens[1]);
-					ui = ui > 0 ? ui - 1 : (unsigned int)uvVertices.size() + ui;
-				}
-
-				if (subTokens.size() > 2) {
-					ni = std::stoi(subTokens[2]);
-					ni = ni > 0 ? ni - 1 : (unsigned int)normals.size() + ni;
-				}
-
-				if (isNaN(vi) || (isNaN(ui) && subTokens.size() > 1) || (isNaN(ni) && subTokens.size() > 2)) {
-					std::cout << "Error: OBJImporter: Invalid index " << vi << ", " << ui << ", " << ni << std::endl;
-				} else {
+					_vertexIndices.push_back(vi);
 					if (vi < vertices.size()) {
-						_vertexIndices.push_back(vi);
-						_normalIndices.push_back(ni);
-						_uvIndices.push_back(ui);
 						nVertices++;
 					}
 					else {
 						std::cout << "Error: OBJImporter: Index out of range!" << std::endl;
 					}
+				}
+
+				if (subTokens.size() > 1) {
+					ui = std::stoi(subTokens[1]);
+					ui = ui > 0 ? ui - 1 : (unsigned int)uvVertices.size() + ui;
+					_uvIndices.push_back(ui);
+				}
+
+				if (subTokens.size() > 2) {
+					ni = std::stoi(subTokens[2]);
+					ni = ni > 0 ? ni - 1 : (unsigned int)normals.size() + ni;
+					_normalIndices.push_back(ni);
 				}
 			}
 			_faceVertexCounts.push_back(nVertices);
@@ -174,10 +169,7 @@ void OBJImporter::setGeometry(Geometry& geom,
 		BufferGeom::Face faceNorms = BufferGeom::Face();
 
 		// Some .obj files specify uvs or normals only for some of the vertices
-		bool faceHasNormals = true;
-		for (unsigned int k = totalVerts; k < vertCount + totalVerts; k++) {
-			faceHasNormals = faceHasNormals && !isNaN(normalIndices[k]);
-		}
+		bool faceHasNormals = normalIndices.size() > 0;
 
 		for (unsigned int k = totalVerts; k < vertCount + totalVerts; k++) {
 			faceVerts.push_back(vertices[vertexIndices[k]]);
