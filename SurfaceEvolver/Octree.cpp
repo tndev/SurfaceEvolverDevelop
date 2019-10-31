@@ -11,29 +11,23 @@ Octree::OctreeNode::OctreeNode(Octree* tree, Box3 box, OctreeNode* parent, uint 
 	this->box = box;
 	Vector3 size = this->box.getSize();
 	this->tree->nodeCount++;
-	// std::cout << "node count " << this->tree->nodeCount << std::endl;
 
-	if (shouldSubdivide(&size) && depthLeft > 0) {
+	if (this->isLargerThanLeaf(&size) && depthLeft > 0) {
 		std::vector<Box3> boxes = getOctantBoxes(&size);
-		for (uint i = 0; i < 8; i++) {
+		for (uint i = 0; i < boxes.size(); i++) {
 			this->children.push_back(new OctreeNode(this->tree, boxes[i], this, depthLeft - 1));
 		}
 	}
 }
 
-bool Octree::OctreeNode::shouldSubdivide(Vector3* size)
+bool Octree::OctreeNode::intersectsTriangles(Box3* box)
 {
-	return (this->intersectsTriangles() && this->isLargerThanLeaf(size));
-}
-
-bool Octree::OctreeNode::intersectsTriangles()
-{
-	Vector3 center = this->box.getCenter();
-	Vector3 halfSize = this->box.getSize();
+	Vector3 center = box->getCenter();
+	Vector3 halfSize = box->getSize();
 	halfSize = 0.5 * halfSize;
 
 	// this also filters out boxes that do not intersect with the root AABB
-	std::vector<Tri> triangles = this->tree->aabbTree->getTrianglesInABox(this->box);
+	std::vector<Tri> triangles = this->tree->aabbTree->getTrianglesInABox(*box);
 	for (auto&& t : triangles) {
 		if (getTriangleBoundingBoxIntersection(t, center, halfSize, 0.0f)) {
 			return true;
@@ -60,7 +54,14 @@ std::vector<Box3> Octree::OctreeNode::getOctantBoxes(Vector3* size)
 			for (uint k = 0; k < 2; k++) {
 				Vector3 offset0 = multiply(Vector3((float)i / 2.0f, (float)j / 2.0f, (float)k / 2.0f), *size);
 				Vector3 offset1 = multiply(Vector3((float)(i + 1) / 2.0f, (float)(j + 1) / 2.0f, (float)(k + 1) / 2.0f), *size);
-				result.push_back(Box3(this->box.min + offset0, this->box.min + offset1));
+				Box3 box = Box3(this->box.min + offset0, this->box.min + offset1);
+				if (intersectsTriangles(&box)) {
+					result.push_back(box);
+				}
+				else {
+					continue;
+				}
+				
 			}
 		}
 	}
@@ -95,7 +96,7 @@ Octree::Octree()
 {
 }
 
-Octree::Octree(AABBTree* aabbTree, Box3 bbox, float leafSize)
+Octree::Octree(AABBTree* aabbTree, Box3 bbox, uint resolution)
 {
 	Vector3 size = bbox.getSize();
 	float maxDim = std::max({ size.x, size.y, size.z });
@@ -103,7 +104,7 @@ Octree::Octree(AABBTree* aabbTree, Box3 bbox, float leafSize)
 	// this cube box will be subdivided
 	Box3 cubeBox = Box3(bbox.min, bbox.min + Vector3(maxDim, maxDim, maxDim));
 
-	this->leafSize = leafSize;
+	this->leafSize = maxDim / resolution;
 	this->cubeBox = cubeBox;
 	this->aabbTree = aabbTree; // for fast lookup
 

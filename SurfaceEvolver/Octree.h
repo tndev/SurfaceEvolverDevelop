@@ -26,9 +26,8 @@ public:
 
 		OctreeNode();
 		OctreeNode(Octree* tree, Box3 box, OctreeNode* parent = nullptr, uint depthLeft = MAX_OCTREE_DEPTH);
-		bool intersectsTriangles();
+		bool intersectsTriangles(Box3* box);
 		bool isLargerThanLeaf(Vector3* size);
-		bool shouldSubdivide(Vector3* size);
 		bool isALeaf();
 		std::vector<Box3> getOctantBoxes(Vector3* size);
 
@@ -46,7 +45,7 @@ public:
 
 	Octree();
 	// expecting a constructed AABBTree for fast lookup
-	Octree(AABBTree* aabbTree, Box3 bbox, float leafSize);
+	Octree(AABBTree* aabbTree, Box3 bbox, uint resolution);
 	~Octree();
 
 	std::vector<Geometry> getLeafBoxGeoms(); // for visualisation
