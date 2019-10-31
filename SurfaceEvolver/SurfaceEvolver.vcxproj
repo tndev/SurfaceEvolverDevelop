@@ -151,39 +151,42 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="AABBTree.cpp" />
-    <ClCompile Include="Box3.cpp" />
-    <ClCompile Include="CubeSphere.cpp" />
-    <ClCompile Include="Deform.cpp" />
-    <ClCompile Include="Geometry.cpp" />
-    <ClCompile Include="Icosphere.cpp" />
-    <ClCompile Include="Matrix3.cpp" />
-    <ClCompile Include="Matrix4.cpp" />
-    <ClCompile Include="OBJExporter.cpp" />
-    <ClCompile Include="OBJImporter.cpp" />
-    <ClCompile Include="Octree.cpp" />
+    <ClCompile Include="BVH\AABBTree.cpp" />
+    <ClCompile Include="BVH\Octree.cpp" />
+    <ClCompile Include="ExportImport\OBJExporter.cpp" />
+    <ClCompile Include="ExportImport\OBJImporter.cpp" />
+    <ClCompile Include="ExportImport\VTKExporter.cpp" />
+    <ClCompile Include="GeometryObject\CubeSphere.cpp" />
+    <ClCompile Include="GeometryObject\Deform.cpp" />
+    <ClCompile Include="GeometryObject\Icosphere.cpp" />
+    <ClCompile Include="GeometryObject\PrimitiveBox.cpp" />
+    <ClCompile Include="Geometry\Box3.cpp" />
+    <ClCompile Include="Geometry\Geometry.cpp" />
+    <ClCompile Include="Geometry\Matrix3.cpp" />
+    <ClCompile Include="Geometry\Matrix4.cpp" />
+    <ClCompile Include="Geometry\Vector3.cpp" />
+    <ClCompile Include="Main\main.cpp" />
     <ClCompile Include="poly2tri\common\shapes.cc" />
     <ClCompile Include="poly2tri\sweep\advancing_front.cc" />
     <ClCompile Include="poly2tri\sweep\cdt.cc" />
     <ClCompile Include="poly2tri\sweep\sweep.cc" />
     <ClCompile Include="poly2tri\sweep\sweep_context.cc" />
-    <ClCompile Include="PrimitiveBox.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="Vector3.cpp" />
-    <ClCompile Include="VTKExporter.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AABBTree.h" />
-    <ClInclude Include="Box3.h" />
-    <ClInclude Include="CubeSphere.h" />
-    <ClInclude Include="Deform.h" />
-    <ClInclude Include="Geometry.h" />
-    <ClInclude Include="Icosphere.h" />
-    <ClInclude Include="Matrix3.h" />
-    <ClInclude Include="Matrix4.h" />
-    <ClInclude Include="OBJExporter.h" />
-    <ClInclude Include="OBJImporter.h" />
-    <ClInclude Include="Octree.h" />
+    <ClInclude Include="BVH\AABBTree.h" />
+    <ClInclude Include="BVH\Octree.h" />
+    <ClInclude Include="ExportImport\OBJExporter.h" />
+    <ClInclude Include="ExportImport\OBJImporter.h" />
+    <ClInclude Include="ExportImport\VTKExporter.h" />
+    <ClInclude Include="GeometryObject\CubeSphere.h" />
+    <ClInclude Include="GeometryObject\Deform.h" />
+    <ClInclude Include="GeometryObject\Icosphere.h" />
+    <ClInclude Include="GeometryObject\PrimitiveBox.h" />
+    <ClInclude Include="Geometry\Box3.h" />
+    <ClInclude Include="Geometry\Geometry.h" />
+    <ClInclude Include="Geometry\Matrix3.h" />
+    <ClInclude Include="Geometry\Matrix4.h" />
+    <ClInclude Include="Geometry\Vector3.h" />
     <ClInclude Include="poly2tri\common\shapes.h" />
     <ClInclude Include="poly2tri\common\utils.h" />
     <ClInclude Include="poly2tri\poly2tri.h" />
@@ -191,9 +194,6 @@
     <ClInclude Include="poly2tri\sweep\cdt.h" />
     <ClInclude Include="poly2tri\sweep\sweep.h" />
     <ClInclude Include="poly2tri\sweep\sweep_context.h" />
-    <ClInclude Include="PrimitiveBox.h" />
-    <ClInclude Include="Vector3.h" />
-    <ClInclude Include="VTKExporter.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

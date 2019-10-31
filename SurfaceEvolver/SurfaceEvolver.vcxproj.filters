@@ -5,65 +5,26 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Main">
-      <UniqueIdentifier>{6c46a085-5a63-43b7-96cd-66aa4fb07c2a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Geometry">
-      <UniqueIdentifier>{7fcf110d-4db4-4f85-b334-d42fc0488cd8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GeometryObject">
-      <UniqueIdentifier>{2d3fd494-3370-4bc6-842d-9eca0365323c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ExportImport">
-      <UniqueIdentifier>{894459d2-2d8b-461e-9d27-2265c42746c7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Poly2Tri">
       <UniqueIdentifier>{cd07df16-3b3f-4a97-afc5-abe6607f7300}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Geometry">
+      <UniqueIdentifier>{06619c65-07b3-4b98-b246-8be1eff2984a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GeometryObject">
+      <UniqueIdentifier>{af48bad0-5656-425a-8090-fe81350bd8d4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main">
+      <UniqueIdentifier>{3d3408c6-6558-4440-965a-4536a11016e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ExportImport">
+      <UniqueIdentifier>{4c7ae03f-f490-4c47-bb75-eea14e265bc2}</UniqueIdentifier>
+    </Filter>
     <Filter Include="BVH">
-      <UniqueIdentifier>{b8014d69-6744-48fe-85ea-88e666dc65a0}</UniqueIdentifier>
+      <UniqueIdentifier>{ba309687-8839-4dcf-8f66-46091e99e110}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>Main</Filter>
-    </ClCompile>
-    <ClCompile Include="Box3.cpp">
-      <Filter>Geometry</Filter>
-    </ClCompile>
-    <ClCompile Include="Geometry.cpp">
-      <Filter>Geometry</Filter>
-    </ClCompile>
-    <ClCompile Include="Matrix3.cpp">
-      <Filter>Geometry</Filter>
-    </ClCompile>
-    <ClCompile Include="Matrix4.cpp">
-      <Filter>Geometry</Filter>
-    </ClCompile>
-    <ClCompile Include="Vector3.cpp">
-      <Filter>Geometry</Filter>
-    </ClCompile>
-    <ClCompile Include="CubeSphere.cpp">
-      <Filter>GeometryObject</Filter>
-    </ClCompile>
-    <ClCompile Include="Deform.cpp">
-      <Filter>GeometryObject</Filter>
-    </ClCompile>
-    <ClCompile Include="Icosphere.cpp">
-      <Filter>GeometryObject</Filter>
-    </ClCompile>
-    <ClCompile Include="PrimitiveBox.cpp">
-      <Filter>GeometryObject</Filter>
-    </ClCompile>
-    <ClCompile Include="VTKExporter.cpp">
-      <Filter>ExportImport</Filter>
-    </ClCompile>
-    <ClCompile Include="OBJExporter.cpp">
-      <Filter>ExportImport</Filter>
-    </ClCompile>
-    <ClCompile Include="OBJImporter.cpp">
-      <Filter>ExportImport</Filter>
-    </ClCompile>
     <ClCompile Include="poly2tri\common\shapes.cc">
       <Filter>Poly2Tri</Filter>
     </ClCompile>
@@ -79,50 +40,53 @@
     <ClCompile Include="poly2tri\sweep\sweep_context.cc">
       <Filter>Poly2Tri</Filter>
     </ClCompile>
-    <ClCompile Include="AABBTree.cpp">
+    <ClCompile Include="BVH\AABBTree.cpp">
       <Filter>BVH</Filter>
     </ClCompile>
-    <ClCompile Include="Octree.cpp">
+    <ClCompile Include="BVH\Octree.cpp">
       <Filter>BVH</Filter>
+    </ClCompile>
+    <ClCompile Include="Geometry\Box3.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="Geometry\Geometry.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="Geometry\Matrix3.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="Geometry\Matrix4.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="Geometry\Vector3.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="Main\main.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="ExportImport\OBJExporter.cpp">
+      <Filter>ExportImport</Filter>
+    </ClCompile>
+    <ClCompile Include="ExportImport\OBJImporter.cpp">
+      <Filter>ExportImport</Filter>
+    </ClCompile>
+    <ClCompile Include="ExportImport\VTKExporter.cpp">
+      <Filter>ExportImport</Filter>
+    </ClCompile>
+    <ClCompile Include="GeometryObject\CubeSphere.cpp">
+      <Filter>GeometryObject</Filter>
+    </ClCompile>
+    <ClCompile Include="GeometryObject\Deform.cpp">
+      <Filter>GeometryObject</Filter>
+    </ClCompile>
+    <ClCompile Include="GeometryObject\Icosphere.cpp">
+      <Filter>GeometryObject</Filter>
+    </ClCompile>
+    <ClCompile Include="GeometryObject\PrimitiveBox.cpp">
+      <Filter>GeometryObject</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Box3.h">
-      <Filter>Geometry</Filter>
-    </ClInclude>
-    <ClInclude Include="Geometry.h">
-      <Filter>Geometry</Filter>
-    </ClInclude>
-    <ClInclude Include="Matrix3.h">
-      <Filter>Geometry</Filter>
-    </ClInclude>
-    <ClInclude Include="Matrix4.h">
-      <Filter>Geometry</Filter>
-    </ClInclude>
-    <ClInclude Include="Vector3.h">
-      <Filter>Geometry</Filter>
-    </ClInclude>
-    <ClInclude Include="CubeSphere.h">
-      <Filter>GeometryObject</Filter>
-    </ClInclude>
-    <ClInclude Include="Deform.h">
-      <Filter>GeometryObject</Filter>
-    </ClInclude>
-    <ClInclude Include="Icosphere.h">
-      <Filter>GeometryObject</Filter>
-    </ClInclude>
-    <ClInclude Include="PrimitiveBox.h">
-      <Filter>GeometryObject</Filter>
-    </ClInclude>
-    <ClInclude Include="VTKExporter.h">
-      <Filter>ExportImport</Filter>
-    </ClInclude>
-    <ClInclude Include="OBJExporter.h">
-      <Filter>ExportImport</Filter>
-    </ClInclude>
-    <ClInclude Include="OBJImporter.h">
-      <Filter>ExportImport</Filter>
-    </ClInclude>
     <ClInclude Include="poly2tri\common\shapes.h">
       <Filter>Poly2Tri</Filter>
     </ClInclude>
@@ -144,11 +108,47 @@
     <ClInclude Include="poly2tri\poly2tri.h">
       <Filter>Poly2Tri</Filter>
     </ClInclude>
-    <ClInclude Include="AABBTree.h">
+    <ClInclude Include="BVH\AABBTree.h">
       <Filter>BVH</Filter>
     </ClInclude>
-    <ClInclude Include="Octree.h">
+    <ClInclude Include="BVH\Octree.h">
       <Filter>BVH</Filter>
+    </ClInclude>
+    <ClInclude Include="Geometry\Box3.h">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="Geometry\Geometry.h">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="Geometry\Matrix3.h">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="Geometry\Matrix4.h">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="Geometry\Vector3.h">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="ExportImport\OBJExporter.h">
+      <Filter>ExportImport</Filter>
+    </ClInclude>
+    <ClInclude Include="ExportImport\OBJImporter.h">
+      <Filter>ExportImport</Filter>
+    </ClInclude>
+    <ClInclude Include="ExportImport\VTKExporter.h">
+      <Filter>ExportImport</Filter>
+    </ClInclude>
+    <ClInclude Include="GeometryObject\CubeSphere.h">
+      <Filter>GeometryObject</Filter>
+    </ClInclude>
+    <ClInclude Include="GeometryObject\Deform.h">
+      <Filter>GeometryObject</Filter>
+    </ClInclude>
+    <ClInclude Include="GeometryObject\Icosphere.h">
+      <Filter>GeometryObject</Filter>
+    </ClInclude>
+    <ClInclude Include="GeometryObject\PrimitiveBox.h">
+      <Filter>GeometryObject</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
