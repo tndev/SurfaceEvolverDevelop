@@ -22,6 +22,8 @@ namespace BufferGeom {
 	using Triangulation = std::vector<unsigned int>;
 };
 
+using Tri = StructGeom::Triangle;
+
 class Geometry
 {
 private:
@@ -74,6 +76,6 @@ private:
 // merges an array of geometries into one
 Geometry mergeGeometries(std::vector<Geometry>& geometries);
 Vector3 getTriangleNormal(StructGeom::Triangle triangle, Vector3 resultNormal);
-bool getTriangleBoundingBoxIntersection(StructGeom::Triangle& vertices, Vector3& bboxCenter, Vector3& bboxHalfSize, Vector3* optTriNormal = nullptr);
+bool getTriangleBoundingBoxIntersection(Tri& vertices, Vector3& bboxCenter, Vector3& bboxHalfSize, float offset = 0.0001f, Vector3* optTriNormal = nullptr);
 
 #endif

@@ -11,12 +11,12 @@ Octree::OctreeNode::OctreeNode(Octree* tree, Box3 box, OctreeNode* parent, uint 
 	this->box = box;
 	Vector3 size = this->box.getSize();
 	this->tree->nodeCount++;
-	std::cout << "node count " << this->tree->nodeCount << std::endl;
+	// std::cout << "node count " << this->tree->nodeCount << std::endl;
 
 	if (shouldSubdivide(&size) && depthLeft > 0) {
 		std::vector<Box3> boxes = getOctantBoxes(&size);
-		for (auto&& b : boxes) {
-			this->children.push_back(new OctreeNode(this->tree, b, this, depthLeft - 1));
+		for (uint i = 0; i < 8; i++) {
+			this->children.push_back(new OctreeNode(this->tree, boxes[i], this, depthLeft - 1));
 		}
 	}
 }
@@ -35,7 +35,7 @@ bool Octree::OctreeNode::intersectsTriangles()
 	// this also filters out boxes that do not intersect with the root AABB
 	std::vector<Tri> triangles = this->tree->aabbTree->getTrianglesInABox(this->box);
 	for (auto&& t : triangles) {
-		if (getTriangleBoundingBoxIntersection(t, center, halfSize)) {
+		if (getTriangleBoundingBoxIntersection(t, center, halfSize, 0.0f)) {
 			return true;
 		}
 	}
@@ -103,6 +103,7 @@ Octree::Octree(AABBTree* aabbTree, Box3 bbox, float leafSize)
 	// this cube box will be subdivided
 	Box3 cubeBox = Box3(bbox.min, bbox.min + Vector3(maxDim, maxDim, maxDim));
 
+	this->leafSize = leafSize;
 	this->cubeBox = cubeBox;
 	this->aabbTree = aabbTree; // for fast lookup
 

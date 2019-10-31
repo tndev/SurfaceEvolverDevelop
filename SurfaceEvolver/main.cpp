@@ -28,7 +28,7 @@ int main()
 	unsigned int d = 3;
 	IcoSphere ico = IcoSphere(d, r);
 	float a = 2 * r / sqrt(3.);
-	unsigned int ns = 2;
+	unsigned int ns = 10;
 	PrimitiveBox box = PrimitiveBox(a, a, a, ns, ns, ns);
 	CubeSphere cs = CubeSphere(ns, r);
 
@@ -42,12 +42,39 @@ int main()
 
 	std::vector<Tri> triangs = cs.getTriangles();
 	AABBTree T = AABBTree(triangs, cs.getBoundingBox());
-	Octree O = Octree(&T, T.bbox, 10.0f);
+	Octree O = Octree(&T, T.bbox, 2.5f);
 	std::cout << "octree construction finished" << std::endl;
 
-	std::vector<Geometry> lboxes = O.getLeafBoxGeoms();
+	/*
+	Box3 csBBox = cs.getBoundingBox();
+	Vector3 csBBoxSize = csBBox.getSize();
+	std::vector<Geometry> lboxes = {};
+	uint N = 20;
+	for (uint i = 0; i < N; i++) {
+		for (uint j = 0; j < N; j++) {
+			for (uint k = 0; k < N; k++) {
+				Vector3 offset0 = multiply(Vector3((float)i / (float)N, (float)j / (float)N, (float)k / (float)N), csBBoxSize);
+				Vector3 offset1 = multiply(Vector3((float)(i + 1) / (float)N, (float)(j + 1) / (float)N, (float)(k + 1) / (float)N), csBBoxSize);
+				Box3 b = Box3(csBBox.min + offset0, csBBox.min + offset1);
+				std::vector<Tri> tris = T.getTrianglesInABox(b);
+				if (tris.size()) {
+					float dimX = b.max.x - b.min.x;
+					float dimY = b.max.y - b.min.y;
+					float dimZ = b.max.z - b.min.z;
+					PrimitiveBox box = PrimitiveBox(dimX, dimY, dimZ, 1, 1, 1);
+					Vector3 t = b.min;
+					box.applyMatrix(Matrix4().makeTranslation(t.x, t.y, t.z));
+					lboxes.push_back(box);
+				}
+			}
+		}
+	}
 	Geometry resultLboxGeom = mergeGeometries(lboxes);
-	e.initExport(resultLboxGeom, "leafBoxesOctree");
+	e.initExport(resultLboxGeom, "leafBoxesOctree");*/
+
+	std::vector<Geometry> otlBoxGeoms = O.getLeafBoxGeoms();
+	Geometry leafBoxGeom = mergeGeometries(otlBoxGeoms);
+	e.initExport(leafBoxGeom, "leafBoxesOctree");
 
 	unsigned int maxDepth = depth(&T);
 

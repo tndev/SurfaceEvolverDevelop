@@ -518,15 +518,14 @@ Vector3 getTriangleNormal(StructGeom::Triangle triangle, Vector3 resultNormal)
 	return resultNormal;
 }
 
-using Tri = StructGeom::Triangle;
 using uint = unsigned int;
 template <typename T> int sgn(T val) {
 	return (T(0) < val) - (val < T(0));
 }
 
-bool getTriangleBoundingBoxIntersection(Tri& vertices, Vector3& bboxCenter, Vector3& bboxHalfSize, Vector3* optTriNormal)
+bool getTriangleBoundingBoxIntersection(Tri& vertices, Vector3& bboxCenter, Vector3& bboxHalfSize, float offset, Vector3* optTriNormal)
 {
-	bboxHalfSize.addScalar(0.0001);
+	bboxHalfSize.addScalar(offset);
 
 	std::vector<Vector3> verts = { vertices[0] - bboxCenter, vertices[1] - bboxCenter, vertices[2] - bboxCenter };
 

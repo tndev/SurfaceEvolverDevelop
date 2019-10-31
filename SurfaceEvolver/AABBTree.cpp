@@ -138,6 +138,7 @@ std::vector<AABBTree> AABBTree::flattenToDepth(uint depth)
 	return resultArray;
 }
 
+// returns all triangles that are intersecting overlapping AABB leaves
 std::vector<Tri> AABBTree::getTrianglesInABox(Box3 box)
 {
 	std::vector<Tri> result = {};
@@ -254,7 +255,6 @@ void AABBTree::filterTriangles()
 	Vector3 bboxHalfSize = 0.5f * bbox.getSize();
 	std::vector<Tri> newTriangles = {};
 	for (uint i = 0; i < this->triangles.size(); i++) {
-		// TODO: Check if this evaluates correctly
 		if (getTriangleBoundingBoxIntersection(this->triangles[i], bboxCenter, bboxHalfSize)) {
 			newTriangles.push_back(this->triangles[i]);
 		}
