@@ -32,6 +32,7 @@ public:
 		std::vector<Box3> getOctantBoxes(Vector3* size);
 
 		void getLeafNodes(std::vector<OctreeNode>* leafBuffer);
+		void getLeafBoxes(std::vector<Box3>* boxBuffer);
 	};
 
 	OctreeNode* root = nullptr;

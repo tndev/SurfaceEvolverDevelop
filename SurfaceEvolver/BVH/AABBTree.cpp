@@ -46,7 +46,14 @@ bool AABBTree::boxIntersectsATriangle(Box3* box)
 		stack.pop();
 
 		if (!item.left && !item.right) { // is a leaf?
-			return true;
+			Vector3 center = box->getCenter();
+			Vector3 halfSize = box->getSize();
+			halfSize = 0.5 * halfSize;
+			for (auto&& t:item.triangles) {
+				if (getTriangleBoundingBoxIntersection(t, center, halfSize, 0.0f)) {
+					return true;
+				}
+			}
 		}
 		else {
 			if (item.left && box->intersectsBox(item.left->bbox)) {
