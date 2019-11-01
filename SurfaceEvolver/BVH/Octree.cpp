@@ -27,11 +27,8 @@ bool Octree::OctreeNode::intersectsTriangles(Box3* box)
 	halfSize = 0.5 * halfSize;
 
 	// this also filters out boxes that do not intersect with the root AABB
-	std::vector<Tri> triangles = this->tree->aabbTree->getTrianglesInABox(*box);
-	for (auto&& t : triangles) {
-		if (getTriangleBoundingBoxIntersection(t, center, halfSize, 0.0f)) {
-			return true;
-		}
+	if (this->tree->aabbTree->boxIntersectsATriangle(box)) {
+		return true;
 	}
 	return false;
 }
@@ -69,9 +66,9 @@ std::vector<Box3> Octree::OctreeNode::getOctantBoxes(Vector3* size)
 }
 
 using Leaf = Octree::OctreeNode;
-std::vector<Leaf> Octree::OctreeNode::getLeafNodes()
+std::vector<Leaf*> Octree::OctreeNode::getLeafNodes()
 {
-	std::vector<Leaf> resultArray = {};
+	std::vector<Leaf*> resultArray = {};
 
 	std::stack<Leaf*> stack = {};
 	stack.push(this);
@@ -81,7 +78,7 @@ std::vector<Leaf> Octree::OctreeNode::getLeafNodes()
 		stack.pop();
 
 		if (item.isALeaf()) {
-			resultArray.push_back(item);
+			resultArray.push_back(&item);
 		} else {
 			for (uint i = 0; i < item.children.size(); i++) {
 				stack.push(item.children[i]);
@@ -114,21 +111,23 @@ Octree::Octree(AABBTree* aabbTree, Box3 bbox, uint resolution)
 Octree::~Octree()
 {
 }
-
-std::vector<Geometry> Octree::getLeafBoxGeoms()
+void Octree::getLeafBoxGeoms(std::vector<Geometry>* geoms)
 {
-	std::vector<Leaf> leaves = this->root->getLeafNodes();
-	std::vector<Geometry> boxGeoms = {};
-
+	auto startGetLeaves = std::chrono::high_resolution_clock::now();
+	// === Timed code ============
+	std::vector<Leaf*> leaves = this->root->getLeafNodes();
+	// === Timed code ============
+	auto endGetLeaves = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<float> elapsedAABBLeaves = (endGetLeaves - startGetLeaves);
+	std::cout << "Octree leaf nodes retrieved after " << elapsedAABBLeaves.count() << " seconds" << std::endl;
+	
 	for (auto&& leaf : leaves) {
-		float dimX = leaf.box.max.x - leaf.box.min.x;
-		float dimY = leaf.box.max.y - leaf.box.min.y;
-		float dimZ = leaf.box.max.z - leaf.box.min.z;
+		float dimX = leaf->box.max.x - leaf->box.min.x;
+		float dimY = leaf->box.max.y - leaf->box.min.y;
+		float dimZ = leaf->box.max.z - leaf->box.min.z;
 		PrimitiveBox box = PrimitiveBox(dimX, dimY, dimZ, 1, 1, 1);
-		Vector3 t = leaf.box.min;
+		Vector3 t = leaf->box.min;
 		box.applyMatrix(Matrix4().makeTranslation(t.x, t.y, t.z));
-		boxGeoms.push_back(box);
+		geoms->push_back(box);
 	}
-
-	return boxGeoms;
 }

@@ -35,11 +35,12 @@ public:
 	bool isLeaf();
 	bool isLeafWithTriangles();
 	bool hasTriangles();
+	bool boxIntersectsATriangle(Box3* box);
 
 	void construct(std::vector<Tri>& triangles, uint depthLeft);
 	std::vector<AABBTree> flatten();
 	std::vector<AABBTree> flattenToDepth(uint depth);
-	std::vector<Tri> getTrianglesInABox(Box3 box);
+	std::vector<Tri> getTrianglesInABox(Box3* box);
 
 	std::vector<Geometry> getAABBGeomsOfDepth(uint depth); // for visualisation
 	std::vector<Geometry> getAABBLeafGeoms(); // for visualisation

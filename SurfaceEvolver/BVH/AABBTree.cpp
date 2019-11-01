@@ -36,6 +36,31 @@ bool AABBTree::hasTriangles()
 	return this->triangles.size() > 0;
 }
 
+bool AABBTree::boxIntersectsATriangle(Box3* box)
+{
+	std::stack<AABBTree*> stack = {};
+	stack.push(this);
+
+	while (stack.size()) {
+		AABBTree item = *stack.top();
+		stack.pop();
+
+		if (!item.left && !item.right) { // is a leaf?
+			return true;
+		}
+		else {
+			if (item.left && box->intersectsBox(item.left->bbox)) {
+				stack.push(item.left);
+			}
+			if (item.right && box->intersectsBox(item.right->bbox)) {
+				stack.push(item.right);
+			}
+		}
+	}
+
+	return false;
+}
+
 void AABBTree::construct(std::vector<Tri>& triangles, uint depthLeft)
 {
 	if (depthLeft == 0 || triangles.size() <= 2) {
@@ -139,7 +164,7 @@ std::vector<AABBTree> AABBTree::flattenToDepth(uint depth)
 }
 
 // returns all triangles that are intersecting overlapping AABB leaves
-std::vector<Tri> AABBTree::getTrianglesInABox(Box3 box)
+std::vector<Tri> AABBTree::getTrianglesInABox(Box3* box)
 {
 	std::vector<Tri> result = {};
 	std::stack<AABBTree*> stack = {};
@@ -154,10 +179,10 @@ std::vector<Tri> AABBTree::getTrianglesInABox(Box3 box)
 				result.push_back(item.triangles[i]);
 			}
 		} else {
-			if (item.left && box.intersectsBox(item.left->bbox)) {
+			if (item.left && box->intersectsBox(item.left->bbox)) {
 				stack.push(item.left);
 			}
-			if (item.right && box.intersectsBox(item.right->bbox)) {
+			if (item.right && box->intersectsBox(item.right->bbox)) {
 				stack.push(item.right);
 			}
 		}

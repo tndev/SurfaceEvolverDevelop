@@ -1,13 +1,13 @@
-
 #ifndef OCTREE_H_
 #define OCTREE_H_
 
 #include <iostream>
 #include <stack>
+#include <chrono>
 #include "AABBTree.h"
 #include "../GeometryObject/PrimitiveBox.h"
 
-#define MAX_OCTREE_DEPTH 10
+#define MAX_OCTREE_DEPTH 100
 
 #define uint unsigned int
 
@@ -31,7 +31,7 @@ public:
 		bool isALeaf();
 		std::vector<Box3> getOctantBoxes(Vector3* size);
 
-		std::vector<OctreeNode> getLeafNodes();
+		std::vector<OctreeNode*> getLeafNodes();
 	};
 
 	OctreeNode* root = nullptr;
@@ -48,7 +48,8 @@ public:
 	Octree(AABBTree* aabbTree, Box3 bbox, uint resolution);
 	~Octree();
 
-	std::vector<Geometry> getLeafBoxGeoms(); // for visualisation
+	// this takes very long:
+	void getLeafBoxGeoms(std::vector<Geometry>* geoms); // for visualisation
 };
 
 #endif

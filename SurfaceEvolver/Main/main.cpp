@@ -13,15 +13,25 @@
 #include "../BVH/AABBTree.h"
 #include "../BVH/Octree.h"
 
-//   TODO:
-// - Add an AABBTree structure (done)
+//   DONE:
+//
+// - Add an AABBTree structure
 // - Add an Octree for activating intersected grid cells
-// - Make a fast cell intersection query
-// - Set intersected cell values to 0 and INFINITY everywhere else
+// - Make a "fast" cell intersection query
+//
+
+//   WIP:
+//
+// - Set intersected cell values to 0 and INFINITY everywhere else (WIP)
+
+//   TODO:
+//
 // - Apply Fast Sweeping Method
 // - Alternatively: Make a fast distance query (CUDA?)
 // - Interior/Exterior sign
 // - SDF
+// - adaptive resampling for AABB Tree construction
+//
 
 int main()
 {
@@ -79,7 +89,8 @@ int main()
 	auto startOctreeBoxes = std::chrono::high_resolution_clock::now();
 	// === Timed code ============
 	std::cout << "Exporting octree leaf voxels..." << std::endl;
-	std::vector<Geometry> otlBoxGeoms = O.getLeafBoxGeoms();
+	std::vector<Geometry> otlBoxGeoms = {};
+	O.getLeafBoxGeoms(&otlBoxGeoms);
 	Geometry leafBoxGeom = mergeGeometries(otlBoxGeoms);
 	e.initExport(leafBoxGeom, "leafBoxesOctree");
 	// === Timed code ============

@@ -23,6 +23,9 @@
     <Filter Include="BVH">
       <UniqueIdentifier>{ba309687-8839-4dcf-8f66-46091e99e110}</UniqueIdentifier>
     </Filter>
+    <Filter Include="SDF">
+      <UniqueIdentifier>{48e0675c-e2e5-4bce-8297-d0c17141603e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="poly2tri\common\shapes.cc">
@@ -84,6 +87,9 @@
     </ClCompile>
     <ClCompile Include="GeometryObject\PrimitiveBox.cpp">
       <Filter>GeometryObject</Filter>
+    </ClCompile>
+    <ClCompile Include="SDF\Grid.cpp">
+      <Filter>SDF</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -149,6 +155,9 @@
     </ClInclude>
     <ClInclude Include="GeometryObject\PrimitiveBox.h">
       <Filter>GeometryObject</Filter>
+    </ClInclude>
+    <ClInclude Include="SDF\Grid.h">
+      <Filter>SDF</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
