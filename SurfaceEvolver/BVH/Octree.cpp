@@ -22,17 +22,6 @@ Octree::OctreeNode::OctreeNode(Octree* tree, Box3 box, OctreeNode* parent, uint 
 
 bool Octree::OctreeNode::intersectsTriangles(Box3* box)
 {
-	Vector3 center = box->getCenter();
-	Vector3 halfSize = box->getSize();
-	halfSize = 0.5 * halfSize;
-
-	// this also filters out boxes that do not intersect with the root AABB
-	/* std::vector<Tri> triangles = this->tree->aabbTree->getTrianglesInABox(box);
-	for (auto&& t : triangles) {
-		if (getTriangleBoundingBoxIntersection(t, center, halfSize, 0.0f)) {
-			return true;
-		}
-	} */
 	return this->tree->aabbTree->boxIntersectsATriangle(box);
 }
 
@@ -146,5 +135,32 @@ void Octree::getLeafBoxGeoms(std::vector<Geometry>* geoms)
 		Vector3 t = b.min;
 		box.applyMatrix(Matrix4().makeTranslation(t.x, t.y, t.z));
 		geoms->push_back(box);
+	}
+}
+
+void Octree::setLeafValueToScalarGrid(Grid* grid, float value)
+{
+	auto startGetLeaves = std::chrono::high_resolution_clock::now();
+	// === Timed code ============
+	std::vector<Box3> boxBuffer = {};
+	this->root->getLeafBoxes(&boxBuffer);
+	// === Timed code ============
+	auto endGetLeaves = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<float> elapsedAABBLeaves = (endGetLeaves - startGetLeaves);
+	std::cout << "Octree leaf nodes retrieved after " << elapsedAABBLeaves.count() << " seconds" << std::endl;
+
+	uint Nx = grid->Nx, Ny = grid->Ny, Nz = grid->Nz;
+	float scaleX = grid->scale.x, scaleY = grid->scale.y, scaleZ = grid->scale.z;
+	float gMinX = grid->bbox.min.x, gMinY = grid->bbox.min.y, gMinZ = grid->bbox.min.z;
+	float gMaxX = grid->bbox.max.x, gMaxY = grid->bbox.max.y, gMaxZ = grid->bbox.max.z;
+
+	for (auto&& b : boxBuffer) {
+		// transform from real space to grid index space
+		uint ix = (uint)std::round((b.min.x - gMinX) * Nx / scaleX);
+		uint iy = (uint)std::round((b.min.y - gMinY) * Ny / scaleY);
+		uint iz = (uint)std::round((b.min.z - gMinZ) * Nz / scaleZ);
+
+		uint gridPos = Nx * Ny * iz + Nx * iy + ix;
+		grid->field[gridPos] = value;
 	}
 }

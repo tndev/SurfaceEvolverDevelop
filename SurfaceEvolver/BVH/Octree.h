@@ -6,6 +6,7 @@
 #include <chrono>
 #include "AABBTree.h"
 #include "../GeometryObject/PrimitiveBox.h"
+#include "../SDF/Grid.h"
 
 #define MAX_OCTREE_DEPTH 100
 
@@ -49,8 +50,8 @@ public:
 	Octree(AABBTree* aabbTree, Box3 bbox, uint resolution);
 	~Octree();
 
-	// this takes very long:
 	void getLeafBoxGeoms(std::vector<Geometry>* geoms); // for visualisation
+	void setLeafValueToScalarGrid(Grid* grid, float value);
 };
 
 #endif

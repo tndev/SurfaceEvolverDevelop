@@ -12,6 +12,7 @@
 #include "../ExportImport/OBJImporter.h"
 #include "../BVH/AABBTree.h"
 #include "../BVH/Octree.h"
+#include "../SDF/Grid.h"
 
 //   DONE:
 //
@@ -86,18 +87,36 @@ int main()
 	std::chrono::duration<float> elapsedOctree = (endOctree - startOctree);
 	std::cout << "Octree construction finished after " << elapsedOctree.count() << " seconds" << std::endl;
 
+	bool OctreeLeafBoxes = false;
 
-	auto startOctreeBoxes = std::chrono::high_resolution_clock::now();
-	// === Timed code ============
-	std::cout << "Exporting octree leaf voxels..." << std::endl;
-	std::vector<Geometry> otlBoxGeoms = {};
-	O.getLeafBoxGeoms(&otlBoxGeoms);
-	Geometry leafBoxGeom = mergeGeometries(otlBoxGeoms);
-	e.initExport(leafBoxGeom, "leafBoxesOctree"); // this is a major bottleneck
-	// === Timed code ============
-	auto endOctreeBoxes = std::chrono::high_resolution_clock::now();
-	std::chrono::duration<float> elapsedOctreeBox = (endOctreeBoxes - startOctreeBoxes);
-	std::cout << "Octree voxel export finished after " << elapsedOctreeBox.count() << " seconds" << std::endl;
+	if (OctreeLeafBoxes) {
+		auto startOctreeBoxes = std::chrono::high_resolution_clock::now();
+		// === Timed code ============
+		std::cout << "Exporting octree leaf voxels..." << std::endl;
+		std::vector<Geometry> otlBoxGeoms = {};
+		O.getLeafBoxGeoms(&otlBoxGeoms);
+		Geometry leafBoxGeom = mergeGeometries(otlBoxGeoms);
+		e.initExport(leafBoxGeom, "leafBoxesOctree"); // this is a major bottleneck
+		// === Timed code ============
+		auto endOctreeBoxes = std::chrono::high_resolution_clock::now();
+		std::chrono::duration<float> elapsedOctreeBox = (endOctreeBoxes - startOctreeBoxes);
+		std::cout << "Octree voxel export finished after " << elapsedOctreeBox.count() << " seconds" << std::endl;
+	}
+
+	bool OctreeLeafGrid = true;
+
+	if (OctreeLeafGrid) {
+		auto startOctreeGrid = std::chrono::high_resolution_clock::now();
+		// === Timed code ============
+		std::cout << "Exporting octree leaf voxels into grid..." << std::endl;
+		Grid voxField = Grid(res, res, res, O.cubeBox);
+		O.setLeafValueToScalarGrid(&voxField, 100.0f);
+		voxField.exportToRawBinary("voxField");
+		// === Timed code ============
+		auto endOctreeGrid = std::chrono::high_resolution_clock::now();
+		std::chrono::duration<float> elapsedOctreeField = (endOctreeGrid - startOctreeGrid);
+		std::cout << "Octree voxel export finished after " << elapsedOctreeField.count() << " seconds" << std::endl;
+	}
 
 	auto startAABBdepth = std::chrono::high_resolution_clock::now();
 	// === Timed code ============
