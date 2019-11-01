@@ -56,6 +56,7 @@ int main()
 	// === Timed code ============
 	OBJImporter obj = OBJImporter();
 	Geometry bunny = obj.importOBJGeometry("bunny.obj");
+	// bunny.applyMatrix(Matrix4().setToScale(100.0f, 100.0f, 100.0f));
 	e.initExport(bunny, "sfBunny");
 	// === Timed code ============
 	auto endObjLoad = std::chrono::high_resolution_clock::now();
@@ -77,7 +78,7 @@ int main()
 
 	auto startOctree = std::chrono::high_resolution_clock::now();
 	// === Timed code ============
-	uint res = 50; // octree resolution
+	uint res = 60; // octree resolution
 	std::cout << "initializing Octree construction for " << triangs.size() << " triangles with resolution " << res << std::endl;
 	Octree O = Octree(&T, T.bbox, res);
 	// === Timed code ============
@@ -92,7 +93,7 @@ int main()
 	std::vector<Geometry> otlBoxGeoms = {};
 	O.getLeafBoxGeoms(&otlBoxGeoms);
 	Geometry leafBoxGeom = mergeGeometries(otlBoxGeoms);
-	e.initExport(leafBoxGeom, "leafBoxesOctree");
+	e.initExport(leafBoxGeom, "leafBoxesOctree"); // this is a major bottleneck
 	// === Timed code ============
 	auto endOctreeBoxes = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<float> elapsedOctreeBox = (endOctreeBoxes - startOctreeBoxes);

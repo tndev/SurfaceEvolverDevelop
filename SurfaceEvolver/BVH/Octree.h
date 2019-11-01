@@ -31,7 +31,7 @@ public:
 		bool isALeaf();
 		std::vector<Box3> getOctantBoxes(Vector3* size);
 
-		std::vector<OctreeNode*> getLeafNodes();
+		void getLeafNodes(std::vector<OctreeNode>* leafBuffer);
 	};
 
 	OctreeNode* root = nullptr;

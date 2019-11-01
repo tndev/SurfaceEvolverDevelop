@@ -27,8 +27,11 @@ bool Octree::OctreeNode::intersectsTriangles(Box3* box)
 	halfSize = 0.5 * halfSize;
 
 	// this also filters out boxes that do not intersect with the root AABB
-	if (this->tree->aabbTree->boxIntersectsATriangle(box)) {
-		return true;
+	std::vector<Tri> triangles = this->tree->aabbTree->getTrianglesInABox(box);
+	for (auto&& t : triangles) {
+		if (getTriangleBoundingBoxIntersection(t, center, halfSize, 0.0f)) {
+			return true;
+		}
 	}
 	return false;
 }
@@ -54,11 +57,7 @@ std::vector<Box3> Octree::OctreeNode::getOctantBoxes(Vector3* size)
 				Box3 box = Box3(this->box.min + offset0, this->box.min + offset1);
 				if (intersectsTriangles(&box)) {
 					result.push_back(box);
-				}
-				else {
-					continue;
-				}
-				
+				}				
 			}
 		}
 	}
@@ -66,10 +65,8 @@ std::vector<Box3> Octree::OctreeNode::getOctantBoxes(Vector3* size)
 }
 
 using Leaf = Octree::OctreeNode;
-std::vector<Leaf*> Octree::OctreeNode::getLeafNodes()
+void Octree::OctreeNode::getLeafNodes(std::vector<Leaf>* leafBuffer)
 {
-	std::vector<Leaf*> resultArray = {};
-
 	std::stack<Leaf*> stack = {};
 	stack.push(this);
 
@@ -78,15 +75,13 @@ std::vector<Leaf*> Octree::OctreeNode::getLeafNodes()
 		stack.pop();
 
 		if (item.isALeaf()) {
-			resultArray.push_back(&item);
+			leafBuffer->push_back(item);
 		} else {
 			for (uint i = 0; i < item.children.size(); i++) {
 				stack.push(item.children[i]);
 			}
 		}
 	}
-
-	return resultArray;
 }
 
 Octree::Octree()
@@ -115,18 +110,19 @@ void Octree::getLeafBoxGeoms(std::vector<Geometry>* geoms)
 {
 	auto startGetLeaves = std::chrono::high_resolution_clock::now();
 	// === Timed code ============
-	std::vector<Leaf*> leaves = this->root->getLeafNodes();
+	std::vector<Leaf> leavesBuffer = {};
+	this->root->getLeafNodes(&leavesBuffer);
 	// === Timed code ============
 	auto endGetLeaves = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<float> elapsedAABBLeaves = (endGetLeaves - startGetLeaves);
 	std::cout << "Octree leaf nodes retrieved after " << elapsedAABBLeaves.count() << " seconds" << std::endl;
 	
-	for (auto&& leaf : leaves) {
-		float dimX = leaf->box.max.x - leaf->box.min.x;
-		float dimY = leaf->box.max.y - leaf->box.min.y;
-		float dimZ = leaf->box.max.z - leaf->box.min.z;
+	for (auto&& leaf : leavesBuffer) {
+		float dimX = leaf.box.max.x - leaf.box.min.x;
+		float dimY = leaf.box.max.y - leaf.box.min.y;
+		float dimZ = leaf.box.max.z - leaf.box.min.z;
 		PrimitiveBox box = PrimitiveBox(dimX, dimY, dimZ, 1, 1, 1);
-		Vector3 t = leaf->box.min;
+		Vector3 t = leaf.box.min;
 		box.applyMatrix(Matrix4().makeTranslation(t.x, t.y, t.z));
 		geoms->push_back(box);
 	}
