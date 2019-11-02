@@ -51,7 +51,7 @@ public:
 	~Octree();
 
 	void getLeafBoxGeoms(std::vector<Geometry>* geoms); // for visualisation
-	void setLeafValueToScalarGrid(Grid* grid, float value);
+	void setLeafValueToScalarGrid(Grid* grid, float value, bool blurAfter = false);
 };
 
 #endif

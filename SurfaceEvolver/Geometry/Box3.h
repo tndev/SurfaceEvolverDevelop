@@ -19,6 +19,7 @@ public:
 
 	void expandByPoint(Vector3 p);
 	void expandByOffset(float offset);
+	void expandByFactor(float factor);
 	Vector3 getCenter();
 	Vector3 getSize();
 };

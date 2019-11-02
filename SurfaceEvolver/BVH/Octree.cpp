@@ -138,7 +138,7 @@ void Octree::getLeafBoxGeoms(std::vector<Geometry>* geoms)
 	}
 }
 
-void Octree::setLeafValueToScalarGrid(Grid* grid, float value)
+void Octree::setLeafValueToScalarGrid(Grid* grid, float value, bool blurAfter)
 {
 	auto startGetLeaves = std::chrono::high_resolution_clock::now();
 	// === Timed code ============
@@ -155,13 +155,49 @@ void Octree::setLeafValueToScalarGrid(Grid* grid, float value)
 	
 	grid->max = grid->max < value ? value + 1 : grid->max;
 
+	// std::vector<uint> boundaryCellIds = {};
+
+	uint ix, iy, iz, gridPos;
+
 	for (auto&& b : boxBuffer) {
 		// transform from real space to grid index space
-		uint ix = (uint)std::round((b.min.x - gMinX) * Nx / scaleX);
-		uint iy = (uint)std::round((b.min.y - gMinY) * Ny / scaleY);
-		uint iz = (uint)std::round((b.min.z - gMinZ) * Nz / scaleZ);
+		ix = (uint)std::round((b.min.x - gMinX) * Nx / scaleX);
+		iy = (uint)std::round((b.min.y - gMinY) * Ny / scaleY);
+		iz = (uint)std::round((b.min.z - gMinZ) * Nz / scaleZ);
 
-		uint gridPos = Nx * Ny * iz + Nx * iy + ix;
+		gridPos = Nx * Ny * iz + Nx * iy + ix;
 		grid->field[gridPos] = value;
+		// boundaryCellIds.push_back(gridPos);
+	}
+
+	auto applyGrid3x3Kernel = [&](std::vector<float>* bfield, uint ix, uint iy, uint iz) {
+		float kernelSum = 0.0f;
+		uint gridPos = 0;
+		for (int i = -1; i <= 1; i++) {
+			for (int j = -1; j <= 1; j++) {
+				for (int k = -1; k <= 1; k++) {
+					gridPos = 
+						Nx * Ny * std::min(std::max((int)iz + i, 0), (int)Nz - 1) +
+						Nx * std::min(std::max((int)iy + j, 0), (int)Ny - 1) +
+						std::min(std::max((int)ix + k, 0), (int)Nx - 1);
+					kernelSum += bfield->at(gridPos);
+				}
+			}
+		}
+		gridPos = Nx * Ny * iz + Nx * iy + ix;
+		float result = kernelSum / 27.0f;
+		grid->field[gridPos] = result;
+	};
+
+	// grid->frozenCellIds = boundaryCellIds;
+
+	// apply a simple 3x3x3 blur kernel for all changed voxels
+	if (blurAfter) {
+		std::vector<float> bfield = std::vector<float>(grid->field);
+		for (uint iz = 1; iz < Nz - 1; iz++) {
+			for (uint iy = 1; iy < Ny - 1; iy++) {
+				for (uint ix = 1; ix < Nx - 1; ix++) applyGrid3x3Kernel(&bfield, ix, iy, iz);
+			}
+		}
 	}
 }

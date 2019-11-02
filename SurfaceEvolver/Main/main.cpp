@@ -110,7 +110,7 @@ int main()
 		// === Timed code ============
 		std::cout << "Exporting octree leaf voxels into grid..." << std::endl;
 		Grid voxField = Grid(res, res, res, O.cubeBox);
-		O.setLeafValueToScalarGrid(&voxField, 100.0f);
+		O.setLeafValueToScalarGrid(&voxField, 100.0f, true);
 		voxField.exportToVTI("voxField");
 		// === Timed code ============
 		auto endOctreeGrid = std::chrono::high_resolution_clock::now();

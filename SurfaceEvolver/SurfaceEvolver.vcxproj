@@ -171,6 +171,7 @@
     <ClCompile Include="poly2tri\sweep\cdt.cc" />
     <ClCompile Include="poly2tri\sweep\sweep.cc" />
     <ClCompile Include="poly2tri\sweep\sweep_context.cc" />
+    <ClCompile Include="SDF\FastSweep3D.cpp" />
     <ClCompile Include="SDF\Grid.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -195,6 +196,7 @@
     <ClInclude Include="poly2tri\sweep\cdt.h" />
     <ClInclude Include="poly2tri\sweep\sweep.h" />
     <ClInclude Include="poly2tri\sweep\sweep_context.h" />
+    <ClInclude Include="SDF\FastSweep3D.h" />
     <ClInclude Include="SDF\Grid.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

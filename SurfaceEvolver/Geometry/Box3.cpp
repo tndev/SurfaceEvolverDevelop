@@ -49,6 +49,15 @@ void Box3::expandByOffset(float offset)
 	this->max.addScalar(offset);
 }
 
+void Box3::expandByFactor(float factor)
+{
+	Vector3 scale = this->getSize();
+	Vector3 scaled = factor * scale;
+	Vector3 offset = 0.5 * (scaled - scale);
+	this->min = this->min - offset;
+	this->max = this->max + offset;
+}
+
 Vector3 Box3::getCenter()
 {
 	if (isEmpty()) {

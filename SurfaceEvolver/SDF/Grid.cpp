@@ -4,30 +4,34 @@ Grid::Grid()
 {
 }
 
+Grid::Grid(const Grid& other)
+{
+	this->field = std::vector<float>(other.field);
+	this->Nx = other.Nx; this->Ny = other.Ny; this->Nz = other.Nz;
+	this->scale = other.scale;
+	this->bbox = other.bbox;
+
+	this->min = other.min;
+	this->max = other.max;
+}
+
 Grid::Grid(uint Nx, uint Ny, uint Nz, Box3 bbox)
 {
-	this->Nx = Nx; this->Ny = Ny; this->Nz = Nz;
+	// re-scale to fit the rest of the field
 	this->bbox = bbox;
-	this->scale = this->bbox.getSize();
+	Vector3 origScale = bbox.getSize();
+	float offset = max_offset_factor * std::fmaxf(origScale.x, std::fmaxf(origScale.y, origScale.z));
+	this->bbox.expandByOffset(offset);
+	Vector3 newScale = this->bbox.getSize();
+	this->Nx = (uint)std::floor(newScale.x / origScale.x * Nx); 
+	this->Ny = (uint)std::floor(newScale.y / origScale.y * Ny);
+	this->Nz = (uint)std::floor(newScale.z / origScale.z * Nz);
+	this->scale = newScale;
 	this->field = std::vector<float>((size_t)this->Nx * this->Ny * this->Nz); // init field
 }
 
 Grid::~Grid()
 {
-}
-
-void Grid::exportToRawBinary(std::string filename)
-{
-	size_t fieldSize = (size_t)Nx * Ny * Nz;
-	size_t bytes = sizeof(char) * fieldSize;
-	char* data = new char[fieldSize];
-	for (uint i = 0; i < fieldSize; i++) {
-		data[i] = (char)field[i];
-	}
-
-	auto raw = std::fstream(filename + ".raw", std::ios::out | std::ios::binary);
-	raw.write((char*)&data[0], bytes);
-	raw.close();
 }
 
 void Grid::exportToVTI(std::string filename)
@@ -65,4 +69,11 @@ void Grid::exportToVTI(std::string filename)
 	vti << "</VTKFile>";
 
 	vti.close();
+}
+
+void Grid::clean()
+{
+	Nx = 0, Ny = 0, Nz = 0;
+	scale = Vector3(1.0f, 1.0f, 1.0f);
+	field.clear();
 }

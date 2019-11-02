@@ -26,6 +26,7 @@ IcoSphere::~IcoSphere()
 }
 
 // ===============================================
+// https://schneide.blog/2016/07/15/generating-an-icosphere-in-c/
 // ======== Pre-requisites for Icosphere =========
 
 using TriangleList = std::vector<BufferGeom::Triangle>;

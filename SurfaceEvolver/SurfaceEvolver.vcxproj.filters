@@ -91,6 +91,9 @@
     <ClCompile Include="SDF\Grid.cpp">
       <Filter>SDF</Filter>
     </ClCompile>
+    <ClCompile Include="SDF\FastSweep3D.cpp">
+      <Filter>SDF</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="poly2tri\common\shapes.h">
@@ -157,6 +160,9 @@
       <Filter>GeometryObject</Filter>
     </ClInclude>
     <ClInclude Include="SDF\Grid.h">
+      <Filter>SDF</Filter>
+    </ClInclude>
+    <ClInclude Include="SDF\FastSweep3D.h">
       <Filter>SDF</Filter>
     </ClInclude>
   </ItemGroup>
