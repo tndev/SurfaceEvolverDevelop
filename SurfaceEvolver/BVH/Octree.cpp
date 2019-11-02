@@ -152,7 +152,8 @@ void Octree::setLeafValueToScalarGrid(Grid* grid, float value)
 	uint Nx = grid->Nx, Ny = grid->Ny, Nz = grid->Nz;
 	float scaleX = grid->scale.x, scaleY = grid->scale.y, scaleZ = grid->scale.z;
 	float gMinX = grid->bbox.min.x, gMinY = grid->bbox.min.y, gMinZ = grid->bbox.min.z;
-	float gMaxX = grid->bbox.max.x, gMaxY = grid->bbox.max.y, gMaxZ = grid->bbox.max.z;
+	
+	grid->max = grid->max < value ? value + 1 : grid->max;
 
 	for (auto&& b : boxBuffer) {
 		// transform from real space to grid index space

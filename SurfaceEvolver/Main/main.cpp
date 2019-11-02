@@ -79,7 +79,7 @@ int main()
 
 	auto startOctree = std::chrono::high_resolution_clock::now();
 	// === Timed code ============
-	uint res = 30; // octree resolution
+	uint res = 60; // octree resolution
 	std::cout << "initializing Octree construction for " << triangs.size() << " triangles with resolution " << res << std::endl;
 	Octree O = Octree(&T, T.bbox, res);
 	// === Timed code ============

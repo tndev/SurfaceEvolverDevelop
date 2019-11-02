@@ -16,6 +16,9 @@ public:
 	Vector3 scale = Vector3(1.0f, 1.0f, 1.0f);
 	Box3 bbox;
 
+	float min = 0.0f;
+	float max = 100.0f;
+
 	Grid();
 	Grid(uint Nx, uint Ny, uint Nz, Box3 bbox);
 	~Grid();
