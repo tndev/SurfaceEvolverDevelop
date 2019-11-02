@@ -21,6 +21,7 @@ public:
 	~Grid();
 
 	void exportToRawBinary(std::string filename);
+	void exportToVTI(std::string filename);
 };
 
 #endif

@@ -29,3 +29,40 @@ void Grid::exportToRawBinary(std::string filename)
 	raw.write((char*)&data[0], bytes);
 	raw.close();
 }
+
+void Grid::exportToVTI(std::string filename)
+{
+	std::fstream vti(filename + ".vti", std::fstream::out);
+
+	Vector3 o = bbox.min; // origin
+	float dx = scale.x / Nx;
+	float dy = scale.y / Ny;
+	float dz = scale.z / Nz;
+	uint nx = Nx - 1;
+	uint ny = Ny - 1;
+	uint nz = Nz - 1;
+
+	vti << "<VTKFile type=\"ImageData\" version=\"1.0\" byte_order=\"LittleEndian\" header_type=\"UInt64\">" << std::endl;
+	vti << "	<ImageData WholeExtent=\" 0 " << nx << " 0 " << ny << " 0 " << nz << "\" Origin=\"" << o.x << " " << o.y << " " << o.z << "\" Spacing=\"" << dx << " " << dy << " " << dz << "\">" << std::endl;
+	vti << "		<Piece Extent=\"0 " << nx << " 0 " << ny << " 0 " << nz << "\">" << std::endl;
+	vti << "			<PointData Scalars=\"Scalars_\">" << std::endl;
+	vti << "				<DataArray type=\"Float32\" Name=\"Scalars_\" format=\"ascii\" RangeMin=\"0\" RangeMax=\"4095\">" << std::endl;
+
+	for (uint i = 0; i < field.size(); i += 9) {
+		vti << "					";
+		for (uint j = 0; j < 9; j++) {
+			vti << this->field[(size_t)i + j] << " ";
+		}
+		vti << std::endl;
+	}
+
+	vti << "				</DataArray>" << std::endl;
+	vti << "			</PointData>" << std::endl;
+	vti << "		<CellData>" << std::endl;
+	vti << "		</CellData>" << std::endl;
+	vti << "	</Piece>" << std::endl;
+	vti << "	</ImageData>" << std::endl;
+	vti << "</VTKFile>";
+
+	vti.close();
+}

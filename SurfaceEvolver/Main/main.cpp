@@ -79,7 +79,7 @@ int main()
 
 	auto startOctree = std::chrono::high_resolution_clock::now();
 	// === Timed code ============
-	uint res = 60; // octree resolution
+	uint res = 30; // octree resolution
 	std::cout << "initializing Octree construction for " << triangs.size() << " triangles with resolution " << res << std::endl;
 	Octree O = Octree(&T, T.bbox, res);
 	// === Timed code ============
@@ -111,7 +111,7 @@ int main()
 		std::cout << "Exporting octree leaf voxels into grid..." << std::endl;
 		Grid voxField = Grid(res, res, res, O.cubeBox);
 		O.setLeafValueToScalarGrid(&voxField, 100.0f);
-		voxField.exportToRawBinary("voxField");
+		voxField.exportToVTI("voxField");
 		// === Timed code ============
 		auto endOctreeGrid = std::chrono::high_resolution_clock::now();
 		std::chrono::duration<float> elapsedOctreeField = (endOctreeGrid - startOctreeGrid);
