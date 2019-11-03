@@ -7,6 +7,7 @@ Grid::Grid()
 Grid::Grid(const Grid& other)
 {
 	this->field = std::vector<float>(other.field);
+	this->frozenCells = std::vector<bool>(other.frozenCells);
 	this->Nx = other.Nx; this->Ny = other.Ny; this->Nz = other.Nz;
 	this->scale = other.scale;
 	this->bbox = other.bbox;

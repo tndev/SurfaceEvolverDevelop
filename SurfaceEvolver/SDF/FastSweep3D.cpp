@@ -4,10 +4,11 @@ FastSweep3D::FastSweep3D()
 {
 }
 
-FastSweep3D::FastSweep3D(Grid* grid)
+FastSweep3D::FastSweep3D(Grid* grid, uint Nsweeps)
 {
 	this->grid = grid;
 	this->h = this->grid->scale.x / this->grid->Nx;
+	this->Nsweeps = Nsweeps;
 
 	auto startFastSweep = std::chrono::high_resolution_clock::now();
 	// === Timed code ============
@@ -52,14 +53,14 @@ void FastSweep3D::sweep(int dir[])
 {
 	uint Nx = this->grid->Nx; uint Ny = this->grid->Ny; uint Nz = this->grid->Nz;
 	
-	uint iXmin = dir[0] > 0 ? 0 : Nx;
-	uint iXmax = dir[0] > 0 ? Nx : 0;
+	int iXmin = dir[0] > 0 ? 0 : Nx - 1;
+	int iXmax = dir[0] > 0 ? Nx : -1;
 
-	uint iYmin = dir[1] > 0 ? 0 : Ny;
-	uint iYmax = dir[1] > 0 ? Ny : 0;
+	int iYmin = dir[1] > 0 ? 0 : Ny - 1;
+	int iYmax = dir[1] > 0 ? Ny : -1;
 
-	uint iZmin = dir[2] > 0 ? 0 : Nz;
-	uint iZmax = dir[2] > 0 ? Nz : 0;
+	int iZmin = dir[2] > 0 ? 0 : Nz - 1;
+	int iZmax = dir[2] > 0 ? Nz : -1;
 
 	std::cout << "sweep ranges: iX = [" << iXmin << ", " << iXmax << ", step = " << dir[0] << "]" << std::endl;
 	std::cout << "sweep ranges: iY = [" << iYmin << ", " << iYmax << ", step = " << dir[1] << "]" << std::endl;
@@ -73,6 +74,8 @@ void FastSweep3D::sweep(int dir[])
 
 	auto SolveEikonal = [&](uint ix, uint iy, uint iz) -> float {
 		adim = 3;
+
+		u = this->grid->field[gridPos];
 
 		gridPosXprev = Nx * Ny * iz + Nx * iy + std::max((int)ix - 1, 0);
 		gridPosXnext = Nx * Ny * iz + Nx * iy + std::min((int)ix + 1, (int)Nx - 1);
@@ -117,13 +120,13 @@ void FastSweep3D::sweep(int dir[])
 		return sol;
 	};
 
-	for (uint iz = iZmin; iz < iZmax; iz += dir[2]) {
-		for (uint iy = iYmin; iy < iYmax; iy += dir[1]) {
-			for (uint ix = iXmin; ix < iXmax; ix += dir[0]) {
+
+	for (int iz = iZmin; iz != iZmax; iz += dir[2]) {
+		for (int iy = iYmin; iy != iYmax; iy += dir[1]) {
+			for (int ix = iXmin; ix != iXmax; ix += dir[0]) {
 				gridPos = Nx * Ny * iz + Nx * iy + ix;
 				/* if (!this->grid->frozenCells[gridPos]) {
 				}*/
-				u = this->grid->field[gridPos];
 				uNew = SolveEikonal(ix, iy, iz);
 				if (uNew + 1e5 * FLT_EPSILON < u) {
 					this->grid->field[gridPos] = uNew;

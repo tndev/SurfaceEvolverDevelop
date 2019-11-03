@@ -112,8 +112,11 @@ int main()
 		std::cout << "Exporting octree leaf voxels into grid..." << std::endl;
 		Grid voxField = Grid(res, res, res, O.cubeBox);
 		O.setLeafValueToScalarGrid(&voxField, 0.0f);
-		FastSweep3D fs = FastSweep3D(&voxField); // computes distance field
-		voxField.exportToVTI("voxField");
+		voxField.exportToVTI("voxField"); // save initial cond
+		for (uint s = 0; s < 9; s++) {
+			FastSweep3D fs = FastSweep3D(&voxField, s); // computes distance field
+			voxField.exportToVTI("voxField" + std::to_string(s));
+		}		
 		// === Timed code ============
 		auto endOctreeGrid = std::chrono::high_resolution_clock::now();
 		std::chrono::duration<float> elapsedOctreeField = (endOctreeGrid - startOctreeGrid);
