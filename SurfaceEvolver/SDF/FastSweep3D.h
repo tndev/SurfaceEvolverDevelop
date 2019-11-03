@@ -25,7 +25,7 @@ public:
 	};
 
 	FastSweep3D();
-	FastSweep3D(Grid* grid, uint Nsweeps);
+	FastSweep3D(Grid* grid, uint Nsweeps, bool blur = false);
 	~FastSweep3D();
 
 	float EikonalSolveInDim(std::vector<float>& aValues, uint dim);

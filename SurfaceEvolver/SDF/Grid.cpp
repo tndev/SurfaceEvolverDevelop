@@ -78,6 +78,35 @@ void Grid::initToVal(float val)
 	this->field = std::vector<float>((size_t)Nx * Ny * Nz, val);
 }
 
+void Grid::blur()
+{
+	auto applyGrid3x3Kernel = [&](std::vector<float>* bfield, uint ix, uint iy, uint iz) {
+		float kernelSum = 0.0f;
+		uint gridPos = 0;
+		for (int i = -1; i <= 1; i++) {
+			for (int j = -1; j <= 1; j++) {
+				for (int k = -1; k <= 1; k++) {
+					gridPos =
+						Nx * Ny * std::min(std::max((int)iz + i, 0), (int)Nz - 1) +
+						Nx * std::min(std::max((int)iy + j, 0), (int)Ny - 1) +
+						std::min(std::max((int)ix + k, 0), (int)Nx - 1);
+					kernelSum += bfield->at(gridPos);
+				}
+			}
+		}
+		gridPos = Nx * Ny * iz + Nx * iy + ix;
+		float result = kernelSum / 27.0f;
+		field[gridPos] = result;
+	};
+
+	std::vector<float> bfield = std::vector<float>(field);
+	for (uint iz = 1; iz < Nz - 1; iz++) {
+		for (uint iy = 1; iy < Ny - 1; iy++) {
+			for (uint ix = 1; ix < Nx - 1; ix++) applyGrid3x3Kernel(&bfield, ix, iy, iz);
+		}
+	}
+}
+
 void Grid::clean()
 {
 	Nx = 0, Ny = 0, Nz = 0;

@@ -4,7 +4,7 @@ FastSweep3D::FastSweep3D()
 {
 }
 
-FastSweep3D::FastSweep3D(Grid* grid, uint Nsweeps)
+FastSweep3D::FastSweep3D(Grid* grid, uint Nsweeps, bool blur)
 {
 	this->grid = grid;
 	this->h = this->grid->scale.x / this->grid->Nx;
@@ -17,6 +17,7 @@ FastSweep3D::FastSweep3D(Grid* grid, uint Nsweeps)
 		std::cout << "sweep " << i << " ... " << std::endl;
 		this->sweep(this->sweepDir[i]);
 	}
+	if (blur) this->grid->blur();
 	// === Timed code ============
 	auto endFastSweep = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<float> elapsedFastSweep = (endFastSweep - startFastSweep);
@@ -75,8 +76,6 @@ void FastSweep3D::sweep(int dir[])
 	auto SolveEikonal = [&](uint ix, uint iy, uint iz) -> float {
 		adim = 3;
 
-		u = this->grid->field[gridPos];
-
 		gridPosXprev = Nx * Ny * iz + Nx * iy + std::max((int)ix - 1, 0);
 		gridPosXnext = Nx * Ny * iz + Nx * iy + std::min((int)ix + 1, (int)Nx - 1);
 
@@ -125,12 +124,13 @@ void FastSweep3D::sweep(int dir[])
 		for (int iy = iYmin; iy != iYmax; iy += dir[1]) {
 			for (int ix = iXmin; ix != iXmax; ix += dir[0]) {
 				gridPos = Nx * Ny * iz + Nx * iy + ix;
-				/* if (!this->grid->frozenCells[gridPos]) {
-				}*/
-				uNew = SolveEikonal(ix, iy, iz);
-				if (uNew + 1e5 * FLT_EPSILON < u) {
-					this->grid->field[gridPos] = uNew;
-					grid->max = (uNew < LARGE_VAL ? uNew : grid->max);
+				if (!this->grid->frozenCells[gridPos]) {
+					u = this->grid->field[gridPos];
+					uNew = SolveEikonal(ix, iy, iz);
+					if (uNew + 1e5 * FLT_EPSILON < u) {
+						this->grid->field[gridPos] = uNew;
+						grid->max = ((uNew < LARGE_VAL && uNew > u) ? uNew : grid->max);
+					}
 				}
 			}
 		}

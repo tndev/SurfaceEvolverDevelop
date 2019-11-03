@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <fstream>
+#include <algorithm>
 #include "../Geometry/Vector3.h"
 #include "../Geometry/Box3.h"
 
@@ -30,6 +31,7 @@ public:
 	void exportToVTI(std::string filename);
 
 	void initToVal(float val);
+	void blur();
 	void clean();
 private:
 	// fraction of the scale with which the grid should exceed the mesh bbox
