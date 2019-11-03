@@ -1,3 +1,5 @@
-﻿  Grid.cpp
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(22,15): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+﻿  FastSweep3D.cpp
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(82,16): warning C4101: 'xBar': unreferenced local variable
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(82,22): warning C4101: 'q': unreferenced local variable
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(82,8): warning C4101: 'xTilde': unreferenced local variable
   SurfaceEvolver.vcxproj -> D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\x64\Debug\SurfaceEvolver.exe

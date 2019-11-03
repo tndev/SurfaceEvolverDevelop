@@ -8,6 +8,8 @@
 
 #define uint unsigned int
 
+#define LARGE_VAL 1000000.0f
+
 class Grid
 {
 public:
@@ -22,11 +24,12 @@ public:
 
 	Grid();
 	Grid(const Grid& other);
-	Grid(uint Nx, uint Ny, uint Nz, Box3 bbox);
+	Grid(uint Nx, uint Ny, uint Nz, Box3 bbox, float initVal = LARGE_VAL);
 	~Grid();
 
 	void exportToVTI(std::string filename);
 
+	void initToVal(float val);
 	void clean();
 private:
 	// fraction of the scale with which the grid should exceed the mesh bbox

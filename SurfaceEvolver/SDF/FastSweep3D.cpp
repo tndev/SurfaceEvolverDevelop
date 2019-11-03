@@ -7,10 +7,60 @@ FastSweep3D::FastSweep3D()
 FastSweep3D::FastSweep3D(Grid* grid)
 {
 	this->grid = grid;
+	this->h = this->grid->scale.x / this->grid->Nx;
+
+	auto startFastSweep = std::chrono::high_resolution_clock::now();
+	// === Timed code ============
+	std::cout << "Initiating FastSweep3D..." << std::endl;
+	// 8 sweeps
+	for (uint i = 0; i < 8; i++) {
+		std::cout << "sweep " << i << " ... " << std::endl;
+		this->sweep(this->sweepDir[i]);
+	}
+	// === Timed code ============
+	auto endFastSweep = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<float> elapsedFastSweep = (endFastSweep - startFastSweep);
+	std::cout << "FastSweep3D finished after " << elapsedFastSweep.count() << " seconds" << std::endl;
 }
 
 FastSweep3D::~FastSweep3D()
 {
+}
+
+float FastSweep3D::EikonalSolve3D(float a, float b, float c)
+{
+	float q, xBar = LARGE_VAL, xTilde = a + f * h;
+
+	if (xTilde <= b) {
+		xBar = xTilde;
+	}
+	else {
+		q = 2 * f * f * h * h - (a - b) * (a - b);
+		if (q >= 0) {
+			xTilde = (a + b + sqrt(q)) / 2.0f;
+		}
+		else {
+			xBar = LARGE_VAL; // no solution
+			return xBar;
+		}
+		if (xTilde <= c) {
+			xBar = xTilde;
+		}
+		else {
+			q = (a + b + c) * (a + b + c) -
+				3 * (a * a + b * b + c * c - f * f * h * h);
+			if (q >= 0) {
+				xTilde = a + b + c + 1.0f / 3.0f * sqrt(q);
+				xBar = xTilde;
+			}
+			else {
+				xBar = LARGE_VAL; // no solution
+				return xBar;
+			}
+		}
+	}
+
+	return xBar;
 }
 
 void FastSweep3D::sweep(int dir[])
@@ -27,9 +77,12 @@ void FastSweep3D::sweep(int dir[])
 	uint iZmax = dir[2] ? Nz : 0;
 
 	uint gridPos, gridPosXprev, gridPosXnext, gridPosYprev, gridPosYnext, gridPosZprev, gridPosZnext;
-	float u, uXprev, uXnext, uYprev, uYnext, uZprev, uZnext;
+	float u, uNew, uXprev, uXnext, uYprev, uYnext, uZprev, uZnext;
 	float a, b, c;
+	float xTilde, xBar, q;
 	std::vector<float> uMins;
+
+	float minT = LARGE_VAL;
 
 	for (uint iz = iZmin; iz < iZmax; iz += dir[2]) {
 		for (uint iy = iYmin; iy < iYmax; iy += dir[1]) {
@@ -63,6 +116,12 @@ void FastSweep3D::sweep(int dir[])
 
 				uMins = { a, b, c };
 				std::sort_heap(uMins.begin(), uMins.end());
+
+				if (uMins[0] < minT) {
+					uNew = this->EikonalSolve3D(uMins[0], uMins[1], uMins[2]);
+					minT = std::fminf(uNew, minT);
+					this->grid->field[gridPos] = uNew;
+				}
 			}
 		}
 	}

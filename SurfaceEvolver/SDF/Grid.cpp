@@ -15,7 +15,7 @@ Grid::Grid(const Grid& other)
 	this->max = other.max;
 }
 
-Grid::Grid(uint Nx, uint Ny, uint Nz, Box3 bbox)
+Grid::Grid(uint Nx, uint Ny, uint Nz, Box3 bbox, float initVal)
 {
 	// re-scale to fit the rest of the field
 	this->bbox = bbox;
@@ -27,7 +27,7 @@ Grid::Grid(uint Nx, uint Ny, uint Nz, Box3 bbox)
 	this->Ny = (uint)std::floor(newScale.y / origScale.y * Ny);
 	this->Nz = (uint)std::floor(newScale.z / origScale.z * Nz);
 	this->scale = newScale;
-	this->field = std::vector<float>((size_t)this->Nx * this->Ny * this->Nz); // init field
+	this->field = std::vector<float>((size_t)this->Nx * this->Ny * this->Nz, initVal); // init field
 }
 
 Grid::~Grid()
@@ -69,6 +69,11 @@ void Grid::exportToVTI(std::string filename)
 	vti << "</VTKFile>";
 
 	vti.close();
+}
+
+void Grid::initToVal(float val)
+{
+	this->field = std::vector<float>((size_t)Nx * Ny * Nz, val);
 }
 
 void Grid::clean()

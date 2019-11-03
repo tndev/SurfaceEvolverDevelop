@@ -13,6 +13,7 @@
 #include "../BVH/AABBTree.h"
 #include "../BVH/Octree.h"
 #include "../SDF/Grid.h"
+#include "../SDF/FastSweep3D.h"
 
 //   DONE:
 //
@@ -110,7 +111,8 @@ int main()
 		// === Timed code ============
 		std::cout << "Exporting octree leaf voxels into grid..." << std::endl;
 		Grid voxField = Grid(res, res, res, O.cubeBox);
-		O.setLeafValueToScalarGrid(&voxField, 100.0f, true);
+		O.setLeafValueToScalarGrid(&voxField, 0.0f, true);
+		FastSweep3D fs = FastSweep3D(&voxField); // computes distance field
 		voxField.exportToVTI("voxField");
 		// === Timed code ============
 		auto endOctreeGrid = std::chrono::high_resolution_clock::now();
