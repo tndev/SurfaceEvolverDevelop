@@ -8,13 +8,13 @@
 
 #define uint unsigned int
 
-#define LARGE_VAL 1000000.0f
+#define LARGE_VAL 100000.0f
 
 class Grid
 {
 public:
 	std::vector<float> field;
-	// std::vector<uint> frozenCellIds = {}; // ids of cells that are not to be manipulated with
+	std::vector<bool> frozenCells;
 	uint Nx = 0, Ny = 0, Nz = 0; // index dims
 	Vector3 scale = Vector3(1.0f, 1.0f, 1.0f);
 	Box3 bbox;

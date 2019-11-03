@@ -155,8 +155,6 @@ void Octree::setLeafValueToScalarGrid(Grid* grid, float value, bool blurAfter)
 	
 	grid->max = grid->max < value ? value + 1 : grid->max;
 
-	// std::vector<uint> boundaryCellIds = {};
-
 	uint ix, iy, iz, gridPos;
 
 	for (auto&& b : boxBuffer) {
@@ -167,7 +165,7 @@ void Octree::setLeafValueToScalarGrid(Grid* grid, float value, bool blurAfter)
 
 		gridPos = Nx * Ny * iz + Nx * iy + ix;
 		grid->field[gridPos] = value;
-		// boundaryCellIds.push_back(gridPos);
+		grid->frozenCells[gridPos] = true; // freeze cell;
 	}
 
 	auto applyGrid3x3Kernel = [&](std::vector<float>* bfield, uint ix, uint iy, uint iz) {
@@ -188,8 +186,6 @@ void Octree::setLeafValueToScalarGrid(Grid* grid, float value, bool blurAfter)
 		float result = kernelSum / 27.0f;
 		grid->field[gridPos] = result;
 	};
-
-	// grid->frozenCellIds = boundaryCellIds;
 
 	// apply a simple 3x3x3 blur kernel for all changed voxels
 	if (blurAfter) {

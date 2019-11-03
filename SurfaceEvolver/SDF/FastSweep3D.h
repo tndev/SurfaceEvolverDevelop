@@ -16,6 +16,8 @@ public:
 	float f = 1.0f; // rhs
 	float h = 1.0f; // dx, dy, dz
 
+	const uint Nsweeps = 8;
+
 	// 8 sweeping directions
 	int sweepDir[8][3] = {
 		{-1, -1, 1}, {1, -1, 1}, {1, 1, 1}, {-1, 1, 1},
@@ -26,8 +28,8 @@ public:
 	FastSweep3D(Grid* grid);
 	~FastSweep3D();
 
-	float EikonalSolve3D(float a, float b, float c);
-	void sweep(int dir[]);
+	float EikonalSolveInDim(std::vector<float>& aValues, uint dim);
+	void sweep(uint dirId);
 };
 
 #endif
