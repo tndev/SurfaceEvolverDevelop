@@ -29,7 +29,7 @@ public:
 	~FastSweep3D();
 
 	float EikonalSolveInDim(std::vector<float>& aValues, uint dim);
-	void sweep(uint dirId);
+	void sweep(int dir[]);
 };
 
 #endif

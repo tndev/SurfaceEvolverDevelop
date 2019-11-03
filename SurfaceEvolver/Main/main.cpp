@@ -111,7 +111,7 @@ int main()
 		// === Timed code ============
 		std::cout << "Exporting octree leaf voxels into grid..." << std::endl;
 		Grid voxField = Grid(res, res, res, O.cubeBox);
-		O.setLeafValueToScalarGrid(&voxField, 0.0f, true);
+		O.setLeafValueToScalarGrid(&voxField, 0.0f);
 		FastSweep3D fs = FastSweep3D(&voxField); // computes distance field
 		voxField.exportToVTI("voxField");
 		// === Timed code ============
