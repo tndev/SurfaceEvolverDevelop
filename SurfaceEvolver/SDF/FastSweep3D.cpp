@@ -119,7 +119,6 @@ void FastSweep3D::sweep(int dir[])
 		return sol;
 	};
 
-
 	for (int iz = iZmin; iz != iZmax; iz += dir[2]) {
 		for (int iy = iYmin; iy != iYmax; iy += dir[1]) {
 			for (int ix = iXmin; ix != iXmax; ix += dir[0]) {
@@ -136,3 +135,4 @@ void FastSweep3D::sweep(int dir[])
 		}
 	}
 }
+

@@ -1,7 +1,9 @@
-﻿  FastSweep3D.cpp
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(41,10): warning C4244: 'initializing': conversion from 'unsigned int' to 'float', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(72,28): warning C4101: 'uMinZ': unreferenced local variable
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(72,8): warning C4101: 'uMin': unreferenced local variable
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(72,21): warning C4101: 'uMinY': unreferenced local variable
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(72,14): warning C4101: 'uMinX': unreferenced local variable
+﻿  main.cpp
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\poly2tri\sweep\sweep_context.h(161,24): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\main.cpp(43,10): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\main.cpp(52,65): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\main.cpp(52,56): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+  Grid.cpp
+  Generating Code...
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\main.cpp(52,47): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
   SurfaceEvolver.vcxproj -> D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\x64\Debug\SurfaceEvolver.exe

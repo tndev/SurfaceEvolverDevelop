@@ -20,20 +20,20 @@
 // - Add an AABBTree structure
 // - Add an Octree for activating intersected grid cells
 // - Make a "fast" cell intersection query
-//
-
-//   WIP:
-//
 // - Set intersected cell values to 0 and INFINITY everywhere else (WIP)
-
-//   TODO:
-//
 // - Apply Fast Sweeping Method
 // - Alternatively: Make a fast distance query (CUDA?)
 // - Interior/Exterior sign
 // - SDF
-// - adaptive resampling for AABB Tree construction
+
+//   WIP:
 //
+// - Optimize initial condition for FastSweep3D by actual distance computation for Octree leaves
+
+
+//   TODO:
+//
+// - adaptive resampling for AABB Tree construction
 
 int main()
 {
@@ -52,6 +52,55 @@ int main()
 	box.applyMatrix(Matrix4().makeTranslation(-a / 2., -a / 2., -a / 2.));
 	e.initExport(box, "boxTranslated");
 	e.initExport(cs, "cubesphere");
+
+	bool iterateCubeSphereTest = false;
+
+	if (iterateCubeSphereTest) {
+		std::fstream timing("timing.txt", std::fstream::out);
+
+		for (unsigned int res = 10; res < 100; res += 20) {
+			for (unsigned int n = 1; n < 10; n++) {
+				std::cout << "cubeSphere(" << n << "), grid_res = " << res << std::endl;
+				timing << "cubeSphere(" << n << "), grid_res = " << res << std::endl;
+				CubeSphere c = CubeSphere(n, r);
+				e.initExport(c, "cubeSphere" + std::to_string(res) + "-" + std::to_string(n));
+				auto startSDF = std::chrono::high_resolution_clock::now();
+				// === Timed code ============
+				std::vector<Tri> tris = c.getTriangles();
+
+				auto startSDF_AABB = std::chrono::high_resolution_clock::now();
+				AABBTree cT = AABBTree(tris, c.getBoundingBox());
+				auto endSDF_AABB = std::chrono::high_resolution_clock::now();
+				std::chrono::duration<float> elapsedSDF_AABB = (endSDF_AABB - startSDF_AABB);
+
+				auto startSDF_Octree = std::chrono::high_resolution_clock::now();
+				Octree O = Octree(&cT, cT.bbox, res);
+				auto endSDF_Octree = std::chrono::high_resolution_clock::now();
+				std::chrono::duration<float> elapsedSDF_Octree = (endSDF_Octree - startSDF_Octree);
+
+				auto startSDF_FS = std::chrono::high_resolution_clock::now();
+				Grid voxField_SDF = Grid(res, res, res, O.cubeBox);
+				O.setLeafValueToScalarGrid(&voxField_SDF, 0.0f);
+				FastSweep3D fs = FastSweep3D(&voxField_SDF, 8, true); // computes distance field
+				auto endSDF_FS = std::chrono::high_resolution_clock::now();
+				std::chrono::duration<float> elapsedSDF_FS = (endSDF_FS - startSDF_FS);
+
+				auto endSDF = std::chrono::high_resolution_clock::now();
+				std::chrono::duration<float> elapsedSDF = (endSDF - startSDF);
+
+				std::cout << "computation times:  AABB: " << elapsedSDF_AABB.count() <<
+					" s , Octree: " << elapsedSDF_Octree.count() << " s, FastSweep3D: " << elapsedSDF_FS.count() <<
+					", TOTAL: " << elapsedSDF.count() << " s" << std::endl;
+				timing << "computation times:  AABB: " << elapsedSDF_AABB.count() <<
+					" s , Octree: " << elapsedSDF_Octree.count() << " s, FastSweep3D: " << elapsedSDF_FS.count() <<
+					", TOTAL: " << elapsedSDF.count() << " s" << std::endl;
+			
+				// === Timed code ============
+				voxField_SDF.exportToVTI("voxFieldSDF" + std::to_string(res) + "-" + std::to_string(n)); // save to vti		
+			}
+		}
+		timing.close();
+	}
 
 
 	auto startObjLoad = std::chrono::high_resolution_clock::now();
@@ -113,13 +162,14 @@ int main()
 		Grid voxField = Grid(res, res, res, O.cubeBox);
 		O.setLeafValueToScalarGrid(&voxField, 0.0f, true);
 		voxField.exportToVTI("voxField"); // save initial cond
-		Grid g;
+		/*Grid g;
 		for (uint s = 0; s < 9; s++) {
 			g = voxField;
 			FastSweep3D fs = FastSweep3D(&g, s, s == 8); // computes distance field
 			g.exportToVTI("voxField" + std::to_string(s));
 		}
-		voxField = g;
+		voxField = g;*/
+		FastSweep3D fs = FastSweep3D(&voxField, 8, true); // computes distance field
 		voxField.exportToVTI("voxFieldSDF"); // save final SDF
 		// === Timed code ============
 		auto endOctreeGrid = std::chrono::high_resolution_clock::now();

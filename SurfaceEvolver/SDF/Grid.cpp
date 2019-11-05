@@ -54,12 +54,8 @@ void Grid::exportToVTI(std::string filename)
 	vti << "			<PointData Scalars=\"Scalars_\">" << std::endl;
 	vti << "				<DataArray type=\"Float32\" Name=\"Scalars_\" format=\"ascii\" RangeMin=\"" << min << "\" RangeMax=\"" << max << "\">" << std::endl;
 
-	for (uint i = 0; i < field.size(); i += 9) {
-		vti << "					";
-		for (uint j = 0; j < 9; j++) {
-			vti << this->field[(size_t)i + j] << " ";
-		}
-		vti << std::endl;
+	for (uint i = 0; i < field.size(); i ++) {
+		vti << this->field[i] << std::endl;
 	}
 
 	vti << "				</DataArray>" << std::endl;

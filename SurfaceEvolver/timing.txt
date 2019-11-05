@@ -1,0 +1,90 @@
+cubeSphere(1), grid_res = 10
+computation times:  AABB: 0.0010433 s , Octree: 0.374903 s, FastSweep3D: 2.40837, TOTAL: 2.78454 s
+cubeSphere(2), grid_res = 10
+computation times:  AABB: 0.0259368 s , Octree: 0.346324 s, FastSweep3D: 1.341, TOTAL: 1.71403 s
+cubeSphere(3), grid_res = 10
+computation times:  AABB: 0.0752336 s , Octree: 0.486468 s, FastSweep3D: 0.961475, TOTAL: 1.52488 s
+cubeSphere(4), grid_res = 10
+computation times:  AABB: 0.171789 s , Octree: 0.451429 s, FastSweep3D: 0.542235, TOTAL: 1.1685 s
+cubeSphere(5), grid_res = 10
+computation times:  AABB: 0.297727 s , Octree: 0.475729 s, FastSweep3D: 0.327409, TOTAL: 1.10695 s
+cubeSphere(6), grid_res = 10
+computation times:  AABB: 0.419469 s , Octree: 0.488019 s, FastSweep3D: 0.528, TOTAL: 1.44158 s
+cubeSphere(7), grid_res = 10
+computation times:  AABB: 0.60981 s , Octree: 0.472214 s, FastSweep3D: 0.371668, TOTAL: 1.46779 s
+cubeSphere(8), grid_res = 10
+computation times:  AABB: 0.746956 s , Octree: 0.474189 s, FastSweep3D: 0.313922, TOTAL: 1.54826 s
+cubeSphere(9), grid_res = 10
+computation times:  AABB: 0.882459 s , Octree: 0.557577 s, FastSweep3D: 0.392125, TOTAL: 1.84573 s
+cubeSphere(1), grid_res = 30
+computation times:  AABB: 0.0009089 s , Octree: 1.79043 s, FastSweep3D: 5.65902, TOTAL: 7.45061 s
+cubeSphere(2), grid_res = 30
+computation times:  AABB: 0.03287 s , Octree: 1.48486 s, FastSweep3D: 6.18173, TOTAL: 7.70017 s
+cubeSphere(3), grid_res = 30
+computation times:  AABB: 0.0623303 s , Octree: 1.91947 s, FastSweep3D: 6.65446, TOTAL: 8.63782 s
+cubeSphere(4), grid_res = 30
+computation times:  AABB: 0.12747 s , Octree: 2.04975 s, FastSweep3D: 6.24709, TOTAL: 8.42694 s
+cubeSphere(5), grid_res = 30
+computation times:  AABB: 0.256201 s , Octree: 2.24784 s, FastSweep3D: 6.38181, TOTAL: 8.89059 s
+cubeSphere(6), grid_res = 30
+computation times:  AABB: 0.377825 s , Octree: 2.17742 s, FastSweep3D: 6.21004, TOTAL: 8.77138 s
+cubeSphere(7), grid_res = 30
+computation times:  AABB: 0.598821 s , Octree: 2.31581 s, FastSweep3D: 6.51502, TOTAL: 9.43857 s
+cubeSphere(8), grid_res = 30
+computation times:  AABB: 0.799082 s , Octree: 2.25729 s, FastSweep3D: 6.08823, TOTAL: 9.15572 s
+cubeSphere(9), grid_res = 30
+computation times:  AABB: 0.889326 s , Octree: 2.21131 s, FastSweep3D: 6.63204, TOTAL: 9.74584 s
+cubeSphere(1), grid_res = 50
+computation times:  AABB: 0.0007559 s , Octree: 8.25871 s, FastSweep3D: 25.633, TOTAL: 33.8927 s
+cubeSphere(2), grid_res = 50
+computation times:  AABB: 0.0322204 s , Octree: 5.65268 s, FastSweep3D: 29.4455, TOTAL: 35.1312 s
+cubeSphere(3), grid_res = 50
+computation times:  AABB: 0.0657292 s , Octree: 7.06145 s, FastSweep3D: 29.2374, TOTAL: 36.3662 s
+cubeSphere(4), grid_res = 50
+computation times:  AABB: 0.140482 s , Octree: 7.29598 s, FastSweep3D: 29.0663, TOTAL: 36.5068 s
+cubeSphere(5), grid_res = 50
+computation times:  AABB: 0.24413 s , Octree: 8.28671 s, FastSweep3D: 38.779, TOTAL: 47.3149 s
+cubeSphere(6), grid_res = 50
+computation times:  AABB: 0.399905 s , Octree: 8.94803 s, FastSweep3D: 31.2451, TOTAL: 40.599 s
+cubeSphere(7), grid_res = 50
+computation times:  AABB: 0.552035 s , Octree: 8.83955 s, FastSweep3D: 32.271, TOTAL: 41.671 s
+cubeSphere(8), grid_res = 50
+computation times:  AABB: 0.702191 s , Octree: 9.61369 s, FastSweep3D: 31.108, TOTAL: 41.4354 s
+cubeSphere(9), grid_res = 50
+computation times:  AABB: 0.855011 s , Octree: 9.43101 s, FastSweep3D: 32.2613, TOTAL: 42.5607 s
+cubeSphere(1), grid_res = 70
+computation times:  AABB: 0.001142 s , Octree: 37.301 s, FastSweep3D: 78.4585, TOTAL: 115.761 s
+cubeSphere(2), grid_res = 70
+computation times:  AABB: 0.0274737 s , Octree: 25.3933 s, FastSweep3D: 90.323, TOTAL: 115.745 s
+cubeSphere(3), grid_res = 70
+computation times:  AABB: 0.0941363 s , Octree: 37.6904 s, FastSweep3D: 90.6847, TOTAL: 128.472 s
+cubeSphere(4), grid_res = 70
+computation times:  AABB: 0.208134 s , Octree: 32.1382 s, FastSweep3D: 87.4545, TOTAL: 119.805 s
+cubeSphere(5), grid_res = 70
+computation times:  AABB: 0.232574 s , Octree: 32.7699 s, FastSweep3D: 105.71, TOTAL: 138.716 s
+cubeSphere(6), grid_res = 70
+computation times:  AABB: 0.576761 s , Octree: 46.3548 s, FastSweep3D: 116.376, TOTAL: 163.316 s
+cubeSphere(7), grid_res = 70
+computation times:  AABB: 0.78362 s , Octree: 47.1499 s, FastSweep3D: 118.404, TOTAL: 166.349 s
+cubeSphere(8), grid_res = 70
+computation times:  AABB: 1.03396 s , Octree: 47.9438 s, FastSweep3D: 116.913, TOTAL: 165.91 s
+cubeSphere(9), grid_res = 70
+computation times:  AABB: 1.12929 s , Octree: 44.0686 s, FastSweep3D: 117.953, TOTAL: 163.166 s
+cubeSphere(1), grid_res = 90
+computation times:  AABB: 0.0008534 s , Octree: 49.5685 s, FastSweep3D: 216.627, TOTAL: 266.201 s
+cubeSphere(2), grid_res = 90
+computation times:  AABB: 0.0445785 s , Octree: 32.8487 s, FastSweep3D: 249.464, TOTAL: 282.359 s
+cubeSphere(3), grid_res = 90
+computation times:  AABB: 0.0894742 s , Octree: 41.696 s, FastSweep3D: 247.461, TOTAL: 289.25 s
+cubeSphere(4), grid_res = 90
+computation times:  AABB: 0.174432 s , Octree: 42.2388 s, FastSweep3D: 248.451, TOTAL: 290.869 s
+cubeSphere(5), grid_res = 90
+computation times:  AABB: 0.38502 s , Octree: 37.8335 s, FastSweep3D: 528.303, TOTAL: 566.528 s
+cubeSphere(6), grid_res = 90
+computation times:  AABB: 0.35949 s , Octree: 34.3402 s, FastSweep3D: 230.01, TOTAL: 264.716 s
+cubeSphere(7), grid_res = 90
+computation times:  AABB: 0.524994 s , Octree: 34.607 s, FastSweep3D: 186.843, TOTAL: 221.983 s
+cubeSphere(8), grid_res = 90
+computation times:  AABB: 0.690153 s , Octree: 36.0363 s, FastSweep3D: 185.731, TOTAL: 222.469 s
+cubeSphere(9), grid_res = 90
+computation times:  AABB: 0.883975 s , Octree: 38.4136 s, FastSweep3D: 194.063, TOTAL: 233.376 s
