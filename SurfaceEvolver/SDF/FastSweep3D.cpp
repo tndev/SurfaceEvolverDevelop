@@ -123,13 +123,11 @@ void FastSweep3D::sweep(int dir[])
 		for (int iy = iYmin; iy != iYmax; iy += dir[1]) {
 			for (int ix = iXmin; ix != iXmax; ix += dir[0]) {
 				gridPos = Nx * Ny * iz + Nx * iy + ix;
-				if (!this->grid->frozenCells[gridPos]) {
-					u = this->grid->field[gridPos];
-					uNew = SolveEikonal(ix, iy, iz);
-					if (uNew + 1e5 * FLT_EPSILON < u) {
-						this->grid->field[gridPos] = uNew;
-						grid->max = ((uNew < LARGE_VAL && uNew > u) ? uNew : grid->max);
-					}
+				u = this->grid->field[gridPos];
+				uNew = SolveEikonal(ix, iy, iz);
+				if (uNew + 1e5 * FLT_EPSILON < u) {
+					this->grid->field[gridPos] = uNew;
+					grid->max = ((uNew < LARGE_VAL && uNew > u) ? uNew : grid->max);
 				}
 			}
 		}
