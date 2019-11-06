@@ -30,10 +30,9 @@ public:
 		bool intersectsTriangles(Box3* box);
 		bool isLargerThanLeaf(Vector3* size);
 		bool isALeaf();
-		std::vector<Box3> getOctantBoxes(Vector3* size);
 
-		void getLeafNodes(std::vector<OctreeNode>* leafBuffer);
-		void getLeafBoxes(std::vector<Box3>* boxBuffer);
+		void getLeafNodes(std::vector<OctreeNode*>* leafBuffer);
+		void getLeafBoxes(std::vector<Box3*>* boxBuffer);
 	};
 
 	OctreeNode* root = nullptr;
@@ -51,7 +50,7 @@ public:
 	~Octree();
 
 	void getLeafBoxGeoms(std::vector<Geometry>* geoms); // for visualisation
-	void setLeafValueToScalarGrid(Grid* grid, float value, bool blurAfter = false);
+	void setLeafValueToScalarGrid(Grid* grid, float value);
 };
 
 #endif

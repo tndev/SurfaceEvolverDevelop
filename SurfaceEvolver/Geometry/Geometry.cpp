@@ -562,16 +562,19 @@ bool getTriangleBoundingBoxIntersection(Tri& vertices, Vector3& bboxCenter, Vect
 	Tri f = { verts[1] - verts[0], verts[2] - verts[1], verts[0] - verts[2] };
 	Tri axes = { Vector3(1, 0, 0), Vector3(0, 1, 0), Vector3(0, 0, 1) };
 
+	Vector3 a;
+	float p0, p1, p2, min, max, r;
+
 	for (uint i = 0; i < 3; ++i) {
 		for (uint j = 0; j < 3; ++j) {
-			Vector3 a = cross(axes[i], f[j]);
-			float p0 = a.dot(verts[0]);
-			float p1 = a.dot(verts[1]);
-			float p2 = a.dot(verts[2]);
-			float min = std::fminf(p0, std::fminf(p1, p2));
-			float max = std::fmaxf(p0, std::fmaxf(p1, p2));
+			a = cross(axes[i], f[j]);
+			p0 = a.dot(verts[0]);
+			p1 = a.dot(verts[1]);
+			p2 = a.dot(verts[2]);
+			min = std::fminf(p0, std::fminf(p1, p2));
+			max = std::fmaxf(p0, std::fmaxf(p1, p2));
 
-			float r = bboxHalfSize.dot(Vector3(fabs(a.x), fabs(a.y), fabs(a.z)));
+			r = bboxHalfSize.dot(Vector3(fabs(a.x), fabs(a.y), fabs(a.z)));
 			if (min > r || max < -r) {
 				return false;
 			}

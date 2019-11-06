@@ -69,9 +69,8 @@ void FastSweep3D::sweep(int dir[])
 
 	uint adim, gridPos, gridPosXprev, gridPosXnext, gridPosYprev, gridPosYnext, gridPosZprev, gridPosZnext;
 	float u, uNew, uXprev, uXnext, uYprev, uYnext, uZprev, uZnext;
-	float uMin, uMinX, uMinY, uMinZ;
-	std::vector<float> neighborVals;
-	std::vector<float> uMins;
+	std::vector<float> neighborVals = { LARGE_VAL, LARGE_VAL, LARGE_VAL };
+	std::vector<float> uMins = {};
 
 	auto SolveEikonal = [&](uint ix, uint iy, uint iz) -> float {
 		adim = 3;
@@ -94,11 +93,9 @@ void FastSweep3D::sweep(int dir[])
 		uZprev = this->grid->field[gridPosZprev];
 		uZnext = this->grid->field[gridPosZnext];
 
-		neighborVals.clear();
-
-		neighborVals.push_back(std::min(uXprev, uXnext));
-		neighborVals.push_back(std::min(uYprev, uYnext));
-		neighborVals.push_back(std::min(uZprev, uZnext));
+		neighborVals[0] = std::min(uXprev, uXnext);
+		neighborVals[1] = std::min(uYprev, uYnext);
+		neighborVals[2] = std::min(uZprev, uZnext);
 
 		uMins.clear();
 		for (uint d = 0; d < 3; d++) {
