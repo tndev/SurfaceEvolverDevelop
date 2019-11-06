@@ -28,7 +28,7 @@ Octree::OctreeNode::OctreeNode(Octree* tree, Box3 box, OctreeNode* parent, uint 
 	}
 	else {
 		// complete leaf construction by computing the mesh distance
-		this->centroidDistance = this->tree->aabbTree->boxIntersectsATriangleAtDistance(&this->box);
+		this->centroidDistance = sqrt(this->tree->aabbTree->boxIntersectsATriangleAtDistance(&this->box));
 	}
 }
 

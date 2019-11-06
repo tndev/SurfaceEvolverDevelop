@@ -164,7 +164,7 @@ int main()
 		O.setLeafValueToScalarGrid(&voxField);
 		voxField.exportToVTI("voxField"); // save initial cond
 
-		FastSweep3D fs = FastSweep3D(&voxField, 8); // computes distance field
+		FastSweep3D fs = FastSweep3D(&voxField, 8, true); // computes distance field
 		voxField.exportToVTI("voxFieldSDF"); // save final SDF
 		// === Timed code ============
 		auto endOctreeGrid = std::chrono::high_resolution_clock::now();
