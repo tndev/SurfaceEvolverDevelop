@@ -523,11 +523,11 @@ template <typename T> int sgn(T val) {
 	return (T(0) < val) - (val < T(0));
 }
 
-bool getTriangleBoundingBoxIntersection(Tri& vertices, Vector3& bboxCenter, Vector3& bboxHalfSize, float offset, Vector3* optTriNormal)
+bool getTriangleBoundingBoxIntersection(Tri* vertices, Vector3& bboxCenter, Vector3& bboxHalfSize, float offset, Vector3* optTriNormal)
 {
 	bboxHalfSize.addScalar(offset);
 
-	std::vector<Vector3> verts = { vertices[0] - bboxCenter, vertices[1] - bboxCenter, vertices[2] - bboxCenter };
+	std::vector<Vector3> verts = { vertices->at(0) - bboxCenter, vertices->at(1) - bboxCenter, vertices->at(2) - bboxCenter };
 
 	Vector3 t_min = verts[0];
 	t_min.min(verts[1]);

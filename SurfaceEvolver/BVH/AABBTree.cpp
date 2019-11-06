@@ -50,7 +50,7 @@ bool AABBTree::boxIntersectsATriangle(Box3* box)
 			Vector3 halfSize = box->getSize();
 			halfSize = 0.5 * halfSize;
 			for (auto&& t:item->triangles) {
-				if (getTriangleBoundingBoxIntersection(t, center, halfSize, 0.0f)) {
+				if (getTriangleBoundingBoxIntersection(&t, center, halfSize, 0.0f)) {
 					return true;
 				}
 			}
@@ -287,7 +287,7 @@ void AABBTree::filterTriangles()
 	Vector3 bboxHalfSize = 0.5f * bbox.getSize();
 	std::vector<Tri> newTriangles = {};
 	for (uint i = 0; i < this->triangles.size(); i++) {
-		if (getTriangleBoundingBoxIntersection(this->triangles[i], bboxCenter, bboxHalfSize)) {
+		if (getTriangleBoundingBoxIntersection(&this->triangles[i], bboxCenter, bboxHalfSize)) {
 			newTriangles.push_back(this->triangles[i]);
 		}
 	}
