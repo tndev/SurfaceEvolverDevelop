@@ -36,6 +36,7 @@ public:
 	bool isLeafWithTriangles();
 	bool hasTriangles();
 	bool boxIntersectsATriangle(Box3* box);
+	float boxIntersectsATriangleAtDistance(Box3* box);
 
 	void construct(std::vector<Tri>& triangles, uint depthLeft);
 	std::vector<AABBTree> flatten();
@@ -44,7 +45,6 @@ public:
 
 	std::vector<Geometry> getAABBGeomsOfDepth(uint depth); // for visualisation
 	std::vector<Geometry> getAABBLeafGeoms(); // for visualisation
-	// std::vector<Geometry> getAABBLeafTriangles(); // this would just return all triangles
 	std::vector<Geometry> getAABBTrianglesOfDepth(uint depth); // for visualisation
 private:
 	float getSplitPosition(std::vector<Tri>& triangles, std::vector<Tri>* out_left, std::vector<Tri>* out_right);

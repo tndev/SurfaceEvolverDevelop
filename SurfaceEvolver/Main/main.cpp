@@ -20,9 +20,8 @@
 // - Add an AABBTree structure
 // - Add an Octree for activating intersected grid cells
 // - Make a "fast" cell intersection query
-// - Set intersected cell values to 0 and INFINITY everywhere else (WIP)
+// - Set intersected cell values to 0 and INFINITY everywhere else
 // - Apply Fast Sweeping Method
-// - Interior/Exterior sign
 // - SDF
 
 //   WIP:
@@ -32,6 +31,7 @@
 
 //   TODO:
 //
+// - Interior/Exterior sign
 // - adaptive resampling for AABB Tree construction
 // - Alternatively: Make a fast distance query (CUDA?)
 
@@ -80,7 +80,7 @@ int main()
 
 				auto startSDF_FS = std::chrono::high_resolution_clock::now();
 				Grid voxField_SDF = Grid(res, res, res, O.cubeBox);
-				O.setLeafValueToScalarGrid(&voxField_SDF, 0.0f);
+				O.setLeafValueToScalarGrid(&voxField_SDF);
 				FastSweep3D fs = FastSweep3D(&voxField_SDF, 8, true); // computes distance field
 				auto endSDF_FS = std::chrono::high_resolution_clock::now();
 				std::chrono::duration<float> elapsedSDF_FS = (endSDF_FS - startSDF_FS);
@@ -161,7 +161,7 @@ int main()
 		// === Timed code ============
 		std::cout << "Exporting octree leaf voxels into grid..." << std::endl;
 		Grid voxField = Grid(res, res, res, O.cubeBox);
-		O.setLeafValueToScalarGrid(&voxField, 0.0f);
+		O.setLeafValueToScalarGrid(&voxField);
 		voxField.exportToVTI("voxField"); // save initial cond
 
 		FastSweep3D fs = FastSweep3D(&voxField, 8); // computes distance field

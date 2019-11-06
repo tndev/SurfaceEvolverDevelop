@@ -68,6 +68,38 @@ bool AABBTree::boxIntersectsATriangle(Box3* box)
 	return false;
 }
 
+float AABBTree::boxIntersectsATriangleAtDistance(Box3* box)
+{
+	std::stack<AABBTree*> stack = {};
+	stack.push(this);
+
+	while (stack.size()) {
+		AABBTree* item = stack.top();
+		stack.pop();
+
+		if (!item->left && !item->right) { // is a leaf?
+			Vector3 center = box->getCenter();
+			Vector3 halfSize = box->getSize();
+			halfSize = 0.5 * halfSize;
+			for (auto&& t : item->triangles) {
+				if (getTriangleBoundingBoxIntersection(&t, center, halfSize, 0.0f)) {
+					return getDistanceToATriangleSq(&t, item->bbox.min);
+				}
+			}
+		}
+		else {
+			if (item->left && box->intersectsBox(item->left->bbox)) {
+				stack.push(item->left);
+			}
+			if (item->right && box->intersectsBox(item->right->bbox)) {
+				stack.push(item->right);
+			}
+		}
+	}
+
+	return INFINITY;
+}
+
 void AABBTree::construct(std::vector<Tri>& triangles, uint depthLeft)
 {
 	if (depthLeft == 0 || triangles.size() <= 2) {

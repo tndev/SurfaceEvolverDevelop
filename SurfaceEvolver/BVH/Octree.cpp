@@ -26,6 +26,10 @@ Octree::OctreeNode::OctreeNode(Octree* tree, Box3 box, OctreeNode* parent, uint 
 			}
 		}
 	}
+	else {
+		// complete leaf construction by computing the mesh distance
+		this->centroidDistance = this->tree->aabbTree->boxIntersectsATriangleAtDistance(&this->box);
+	}
 }
 
 bool Octree::OctreeNode::intersectsTriangles(Box3* box)
@@ -83,6 +87,27 @@ void Octree::OctreeNode::getLeafBoxes(std::vector<Box3*>* boxBuffer)
 	}
 }
 
+void Octree::OctreeNode::getLeafBoxesAndValues(std::vector<Box3*>* boxBuffer, std::vector<float>* valueBuffer)
+{
+	std::stack<Leaf*> stack = {};
+	stack.push(this);
+
+	while (stack.size()) {
+		Leaf* item = stack.top();
+		stack.pop();
+
+		if (item->isALeaf()) {
+			boxBuffer->push_back(&item->box);
+			valueBuffer->push_back(item->centroidDistance);
+		}
+		else {
+			for (uint i = 0; i < item->children.size(); i++) {
+				stack.push(item->children[i]);
+			}
+		}
+	}
+}
+
 Octree::Octree()
 {
 }
@@ -111,6 +136,7 @@ void Octree::getLeafBoxGeoms(std::vector<Geometry>* geoms)
 	auto startGetLeaves = std::chrono::high_resolution_clock::now();
 	// === Timed code ============
 	std::vector<Box3*> boxBuffer = {};
+	std::vector<float> valueBuffer = {};
 	this->root->getLeafBoxes(&boxBuffer);
 	// === Timed code ============
 	auto endGetLeaves = std::chrono::high_resolution_clock::now();
@@ -128,7 +154,37 @@ void Octree::getLeafBoxGeoms(std::vector<Geometry>* geoms)
 	}
 }
 
-void Octree::setLeafValueToScalarGrid(Grid* grid, float value)
+void Octree::setLeafValueToScalarGrid(Grid* grid)
+{
+	auto startGetLeaves = std::chrono::high_resolution_clock::now();
+	// === Timed code ============
+	std::vector<Box3*> boxBuffer = {};
+	std::vector<float> valueBuffer = {};
+	this->root->getLeafBoxesAndValues(&boxBuffer, &valueBuffer);
+	// === Timed code ============
+	auto endGetLeaves = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<float> elapsedAABBLeaves = (endGetLeaves - startGetLeaves);
+	std::cout << "Octree leaf nodes retrieved after " << elapsedAABBLeaves.count() << " seconds" << std::endl;
+
+	size_t NLeaves = boxBuffer.size();
+	uint Nx = grid->Nx, Ny = grid->Ny, Nz = grid->Nz;
+	float scaleX = grid->scale.x, scaleY = grid->scale.y, scaleZ = grid->scale.z;
+	float gMinX = grid->bbox.min.x, gMinY = grid->bbox.min.y, gMinZ = grid->bbox.min.z;
+	
+	uint ix, iy, iz, gridPos;
+
+	for (uint i = 0; i < NLeaves; i++) {
+		// transform from real space to grid index space
+		ix = (uint)std::round((boxBuffer[i]->min.x - gMinX) * Nx / scaleX);
+		iy = (uint)std::round((boxBuffer[i]->min.y - gMinY) * Ny / scaleY);
+		iz = (uint)std::round((boxBuffer[i]->min.z - gMinZ) * Nz / scaleZ);
+
+		gridPos = Nx * Ny * iz + Nx * iy + ix;
+		grid->field[gridPos] = valueBuffer[i];
+	}
+}
+
+void Octree::setConstantValueToScalarGrid(Grid* grid, float value)
 {
 	auto startGetLeaves = std::chrono::high_resolution_clock::now();
 	// === Timed code ============
@@ -142,7 +198,7 @@ void Octree::setLeafValueToScalarGrid(Grid* grid, float value)
 	uint Nx = grid->Nx, Ny = grid->Ny, Nz = grid->Nz;
 	float scaleX = grid->scale.x, scaleY = grid->scale.y, scaleZ = grid->scale.z;
 	float gMinX = grid->bbox.min.x, gMinY = grid->bbox.min.y, gMinZ = grid->bbox.min.z;
-	
+
 	grid->max = grid->max < value ? value + 1 : grid->max;
 
 	uint ix, iy, iz, gridPos;

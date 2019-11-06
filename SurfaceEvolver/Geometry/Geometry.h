@@ -77,5 +77,6 @@ private:
 Geometry mergeGeometries(std::vector<Geometry>& geometries);
 Vector3 getTriangleNormal(StructGeom::Triangle triangle, Vector3 resultNormal);
 bool getTriangleBoundingBoxIntersection(Tri* vertices, Vector3& bboxCenter, Vector3& bboxHalfSize, float offset = 0.0001f, Vector3* optTriNormal = nullptr);
+float getDistanceToATriangleSq(Tri* vertices, Vector3& point);
 
 #endif

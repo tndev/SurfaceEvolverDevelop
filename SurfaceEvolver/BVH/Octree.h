@@ -25,6 +25,8 @@ public:
 
 		Box3 box;
 
+		float centroidDistance = INFINITY; // infinity unless it's a leaf
+
 		OctreeNode();
 		OctreeNode(Octree* tree, Box3 box, OctreeNode* parent = nullptr, uint depthLeft = MAX_OCTREE_DEPTH);
 		bool intersectsTriangles(Box3* box);
@@ -33,6 +35,7 @@ public:
 
 		void getLeafNodes(std::vector<OctreeNode*>* leafBuffer);
 		void getLeafBoxes(std::vector<Box3*>* boxBuffer);
+		void getLeafBoxesAndValues(std::vector<Box3*>* boxBuffer, std::vector<float>* valueBuffer);
 	};
 
 	OctreeNode* root = nullptr;
@@ -50,7 +53,8 @@ public:
 	~Octree();
 
 	void getLeafBoxGeoms(std::vector<Geometry>* geoms); // for visualisation
-	void setLeafValueToScalarGrid(Grid* grid, float value);
+	void setLeafValueToScalarGrid(Grid* grid);
+	void setConstantValueToScalarGrid(Grid* grid, float value);
 };
 
 #endif
