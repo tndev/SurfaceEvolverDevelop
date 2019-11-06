@@ -23,15 +23,15 @@
 // - Set intersected cell values to 0 and INFINITY everywhere else
 // - Apply Fast Sweeping Method
 // - SDF
+// - Optimize initial condition for FastSweep3D by actual distance computation for Octree leaves
 
 //   WIP:
 //
-// - Optimize initial condition for FastSweep3D by actual distance computation for Octree leaves
+// - Interior/Exterior sign
 
 
 //   TODO:
 //
-// - Interior/Exterior sign
 // - adaptive resampling for AABB Tree construction
 // - Alternatively: Make a fast distance query (CUDA?)
 
