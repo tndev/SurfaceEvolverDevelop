@@ -26,12 +26,13 @@
 // - Optimize initial condition for FastSweep3D by actual distance computation for Octree leaves
 
 //   WIP:
-//
-// - Interior/Exterior sign
+// 
+// - AABB and Octree have to take as little space as possible
 
 
 //   TODO:
 //
+// - Interior/Exterior sign
 // - adaptive resampling for AABB Tree construction
 // - Alternatively: Make a fast distance query (CUDA?)
 
@@ -129,7 +130,7 @@ int main()
 
 	auto startOctree = std::chrono::high_resolution_clock::now();
 	// === Timed code ============
-	uint res = 60; // octree resolution
+	uint res = 30; // octree resolution
 	std::cout << "initializing Octree construction for " << triangs.size() << " triangles with resolution " << res << std::endl;
 
 	Octree O = Octree(&T, T.bbox, res);
