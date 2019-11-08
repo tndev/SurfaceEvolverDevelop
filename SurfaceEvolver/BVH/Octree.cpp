@@ -175,9 +175,9 @@ void Octree::setLeafValueToScalarGrid(Grid* grid)
 
 	for (uint i = 0; i < NLeaves; i++) {
 		// transform from real space to grid index space
-		ix = (uint)std::floor((boxBuffer[i]->min.x - gMinX) * Nx / scaleX);
-		iy = (uint)std::floor((boxBuffer[i]->min.y - gMinY) * Ny / scaleY);
-		iz = (uint)std::floor((boxBuffer[i]->min.z - gMinZ) * Nz / scaleZ);
+		ix = (uint)std::floor((0.5 * (boxBuffer[i]->min.x + boxBuffer[i]->max.x) - gMinX) * Nx / scaleX);
+		iy = (uint)std::floor((0.5 * (boxBuffer[i]->min.y + boxBuffer[i]->max.y) - gMinY) * Ny / scaleY);
+		iz = (uint)std::floor((0.5 * (boxBuffer[i]->min.z + boxBuffer[i]->max.z) - gMinZ) * Nz / scaleZ);
 
 		gridPos = Nx * Ny * iz + Nx * iy + ix;
 		grid->field[gridPos] = valueBuffer[i];

@@ -780,3 +780,35 @@ float getDistanceToATriangleSq(Tri* vertices, Vector3& point)
 	diff = point - closest;
 	return dot(diff, diff);
 }
+
+float clamp(float v, float lo, float hi)
+{
+	assert(!(hi < lo));
+	return (v < lo) ? lo : (hi < v) ? hi : v;
+}
+
+int const sign(float x)
+{
+	return (x > 0 ? 1 : -1);
+}
+
+float dot2(Vector3 v) { return dot(v, v); }
+
+float getDistanceToATriangleSq2(Tri* vertices, Vector3& point)
+{
+	Vector3 ba = vertices->at(1) - vertices->at(0); Vector3 pa = point - vertices->at(0);
+	Vector3 cb = vertices->at(2) - vertices->at(1); Vector3 pb = point - vertices->at(1);
+	Vector3 ac = vertices->at(0) - vertices->at(2); Vector3 pc = point - vertices->at(2);
+	Vector3 nor = cross(ba, ac);
+
+	return ((sign(dot(cross(ba, nor), pa)) +
+			 sign(dot(cross(cb, nor), pb)) +
+			 sign(dot(cross(ac, nor), pc)) < 2.0) ?		
+		std::fminf(
+			std::fminf(
+				dot2(ba * clamp( dot(ba, pa) / dot2(ba), 0.0f, 1.0f) - pa),
+				dot2(cb * clamp( dot(cb, pb) / dot2(cb), 0.0f, 1.0f) - pb)
+			),
+		dot2(ac * clamp( dot(ac, pc) / dot2(ac), 0.0f, 1.0f) - pc)
+		) : dot(nor, pa) * dot(nor, pa) / dot2(nor));
+}

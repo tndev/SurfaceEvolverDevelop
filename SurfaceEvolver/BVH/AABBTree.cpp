@@ -83,7 +83,7 @@ float AABBTree::boxIntersectsATriangleAtDistance(Box3* box)
 			halfSize = 0.5 * halfSize;
 			for (auto&& t : item->triangles) {
 				if (getTriangleBoundingBoxIntersection(&t, center, halfSize, 0.0f)) {
-					return getDistanceToATriangleSq(&t, item->bbox.min);
+					return getDistanceToATriangleSq2(&t, center);
 				}
 			}
 		}

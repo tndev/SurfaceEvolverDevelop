@@ -130,7 +130,7 @@ int main()
 
 	auto startOctree = std::chrono::high_resolution_clock::now();
 	// === Timed code ============
-	uint res = 30; // octree resolution
+	uint res = 40; // octree resolution
 	std::cout << "initializing Octree construction for " << triangs.size() << " triangles with resolution " << res << std::endl;
 
 	Octree O = Octree(&T, T.bbox, res);
@@ -165,7 +165,7 @@ int main()
 		O.setLeafValueToScalarGrid(&voxField);
 		voxField.exportToVTI("voxField"); // save initial cond
 
-		FastSweep3D fs = FastSweep3D(&voxField, 8, true); // computes distance field
+		FastSweep3D fs = FastSweep3D(&voxField, 8); // computes distance field
 		voxField.exportToVTI("voxFieldSDF"); // save final SDF
 		// === Timed code ============
 		auto endOctreeGrid = std::chrono::high_resolution_clock::now();
