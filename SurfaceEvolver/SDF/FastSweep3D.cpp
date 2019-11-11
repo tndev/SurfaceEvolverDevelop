@@ -107,7 +107,13 @@ void FastSweep3D::sweep(int dir[])
 			}
 		}
 		if (adim == 0) return LARGE_VAL;
-		std::sort(uMins.begin(), uMins.end());
+		if (uMins.size() > 2) {
+			std::sort(uMins.begin(), uMins.end());
+		}
+		else if (uMins.size() == 2) {
+			uMins = { std::fminf(uMins[0], uMins[1]), std::fmaxf(uMins[0], uMins[1]) };
+		}
+		
 		float sol;
 		for (uint i = 1; i <= adim; i++) {
 			sol = this->EikonalSolveInDim(uMins, i);

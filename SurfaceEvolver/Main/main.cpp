@@ -25,14 +25,17 @@
 // - SDF
 // - Optimize initial condition for FastSweep3D by actual distance computation for Octree leaves
 
+//   DONE, BUT MIGHT BE IMPROVED:
+//
+// - AABB and Octree have to take as little space as possible
+
 //   WIP:
 // 
-// - AABB and Octree have to take as little space as possible
+// - Interior/Exterior mesh Sign
 
 
 //   TODO:
 //
-// - Interior/Exterior sign
 // - adaptive resampling for AABB Tree construction
 // - Alternatively: Make a fast distance query (CUDA?)
 

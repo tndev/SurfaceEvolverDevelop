@@ -21,7 +21,7 @@ public:
 
 		AABBTree* tree = nullptr;
 
-		Box3 bbox = Box3();
+		Box3 bbox;
 		uint axis = 2;
 		uint depth = 0;
 		float splitPosition = 0.0f;
