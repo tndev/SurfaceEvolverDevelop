@@ -63,6 +63,9 @@ public:
 	std::vector<Vector3> getVertices();
 	std::vector<Vector3> getUniqueVertices();
 
+	void getVertexToTriangleMap(std::multimap<Vector3, BufferGeom::Triangle>* buffer, std::vector<unsigned int>* vIdxBuffer);
+	std::vector<Vector3> getAngleWeightedVertexPseudoNormals();
+
 	void applyMatrix(Matrix4 m);
 	Vector3 getNormal(BufferGeom::Face f);
 

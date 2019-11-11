@@ -157,6 +157,60 @@ std::vector<Vector3> Geometry::getUniqueVertices()
 	return this->uniqueVertices;
 }
 
+void Geometry::getVertexToTriangleMap(std::multimap<Vector3, BufferGeom::Triangle>* buffer, std::vector<unsigned int>* vIdxBuffer)
+{
+	std::multimap<Vector3, BufferGeom::Triangle>::iterator it;
+	for (uint i = 0; i < this->vertexIndices.size(); i += 3) {
+		BufferGeom::Triangle face = { this->vertexIndices[i] , this->vertexIndices[i + 1], this->vertexIndices[i + 2] };
+
+		it = buffer->insert(std::pair<Vector3, BufferGeom::Triangle>(this->uniqueVertices[this->vertexIndices[i]], face));
+		if (it != buffer->end()) {
+			vIdxBuffer->push_back(this->vertexIndices[i]);
+		}
+
+		it = buffer->insert(std::pair<Vector3, BufferGeom::Triangle>(this->uniqueVertices[this->vertexIndices[i + 1]], face));
+		if (it != buffer->end()) {
+			vIdxBuffer->push_back(this->vertexIndices[i + 1]);
+		}
+
+		it = buffer->insert(std::pair<Vector3, BufferGeom::Triangle>(this->uniqueVertices[this->vertexIndices[i + 2]], face));
+		if (it != buffer->end()) {
+			vIdxBuffer->push_back(this->vertexIndices[i + 2]);
+		}
+	}
+}
+
+std::vector<Vector3> Geometry::getAngleWeightedVertexPseudoNormals()
+{
+	std::vector<Vector3> result = {};
+
+	std::multimap<Vector3, BufferGeom::Triangle> vertexToTriangles = {};
+	std::vector<uint> vIdxBuffer = {};
+	this->getVertexToTriangleMap(&vertexToTriangles, &vIdxBuffer);
+	std::multimap<Vector3, BufferGeom::Triangle>::iterator it;
+	Vector3* v; Vector3 v1 = Vector3(); Vector3 v2 = Vector3();
+
+	for (uint i = 0; i < this->uniqueVertices.size(); i++) {
+		v = &this->uniqueVertices[i];
+		it = vertexToTriangles.find(*v);
+		while (it != vertexToTriangles.end()) {
+			BufferGeom::Triangle ti = it->second;
+			Tri T = { this->uniqueVertices[ti[0]], this->uniqueVertices[ti[1]], this->uniqueVertices[ti[2]] };
+			uint j0 = 0;
+			for (uint j = 0; j < 3; j++) {
+				if (T[j].equals(*v)) {
+					j0 = j;
+					break;
+				}
+			}
+
+			
+		}
+	}
+
+	return result;
+}
+
 std::vector<Vector3> Geometry::getProjectionsAlongNormal(BufferGeom::Face& vertices)
 {
 	Vector3 normal = getNormal(vertices); // directions
