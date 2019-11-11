@@ -14,43 +14,56 @@ using Tri = StructGeom::Triangle;
 class AABBTree
 {
 public:
+	struct AABBNode {
+		AABBNode* parent = nullptr;
+		AABBNode* left = nullptr;
+		AABBNode* right = nullptr;
+
+		AABBTree* tree = nullptr;
+
+		Box3 bbox = Box3();
+		uint axis = 2;
+		uint depth = 0;
+		float splitPosition = 0.0f;
+
+		std::vector<uint> triangles = {};
+
+		AABBNode();
+		AABBNode(std::vector<uint>* triangles, Box3& bbox, AABBTree* tree, uint depthLeft = MAX_DEPTH, AABBNode* parent = nullptr);
+		~AABBNode();
+
+		void construct(std::vector<uint>* triangles, uint depthLeft);
+		bool isALeaf();
+		bool isALeafWithTriangles();
+
+		float getSplitPosition(std::vector<uint>& triangles, std::vector<uint>* out_left, std::vector<uint>* out_right);
+		float getCostEstimate(float splitPos, uint nLeft, uint nRight);
+		bool hasEnoughBranching(size_t nLeftTris, size_t nRightTris, size_t nTris);
+		void filterTriangles();
+	};
+
 	Box3 bbox;
 
-	AABBTree* parent = nullptr;
-	AABBTree* left = nullptr;
-	AABBTree* right = nullptr;
-
-	// split axis
-	// x = 0, y = 1, z = 2
-	uint axis = 2;
-	float splitPosition = 0.0f;
 	uint depth = 0;
 
 	std::vector<Tri> triangles = {};
+	AABBNode* root;
 
 	AABBTree();
-	AABBTree(std::vector<Tri>& triangles, Box3 bbox, uint depthLeft = MAX_DEPTH, AABBTree* parent = nullptr);
+	AABBTree(Geometry* geom);
 	~AABBTree();
 
-	bool isLeaf();
-	bool isLeafWithTriangles();
 	bool hasTriangles();
 	bool boxIntersectsATriangle(Box3* box);
 	float boxIntersectsATriangleAtDistance(Box3* box);
 
-	void construct(std::vector<Tri>& triangles, uint depthLeft);
-	std::vector<AABBTree> flatten();
-	std::vector<AABBTree> flattenToDepth(uint depth);
+	std::vector<AABBNode> flatten();
+	std::vector<AABBNode> flattenToDepth(uint depth);
 	std::vector<Tri> getTrianglesInABox(Box3* box);
 
 	std::vector<Geometry> getAABBGeomsOfDepth(uint depth); // for visualisation
 	std::vector<Geometry> getAABBLeafGeoms(); // for visualisation
 	std::vector<Geometry> getAABBTrianglesOfDepth(uint depth); // for visualisation
-private:
-	float getSplitPosition(std::vector<Tri>& triangles, std::vector<Tri>* out_left, std::vector<Tri>* out_right);
-	float getCostEstimate(float splitPos, uint nLeft, uint nRight);
-	bool hasEnoughBranching(size_t nLeftTris, size_t nRightTris, size_t nTris);
-	void filterTriangles();
 };
 
 uint depth(AABBTree* root);

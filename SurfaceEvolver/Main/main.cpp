@@ -67,10 +67,9 @@ int main()
 				e.initExport(c, "cubeSphere" + std::to_string(res) + "-" + std::to_string(n));
 				auto startSDF = std::chrono::high_resolution_clock::now();
 				// === Timed code ============
-				std::vector<Tri> tris = c.getTriangles();
 
 				auto startSDF_AABB = std::chrono::high_resolution_clock::now();
-				AABBTree cT = AABBTree(tris, c.getBoundingBox());
+				AABBTree cT = AABBTree(&c);
 				auto endSDF_AABB = std::chrono::high_resolution_clock::now();
 				std::chrono::duration<float> elapsedSDF_AABB = (endSDF_AABB - startSDF_AABB);
 
@@ -118,10 +117,8 @@ int main()
 
 	auto startAABBtree = std::chrono::high_resolution_clock::now();
 	// === Timed code ============
-	std::cout << "fetching triangles..." << std::endl;
-	std::vector<Tri> triangs = bunny.getTriangles();
-	std::cout << "initializing AABB construction for " << triangs.size() << " triangles..." << std::endl;
-	AABBTree T = AABBTree(triangs, bunny.getBoundingBox());
+	std::cout << "initializing AABB construction ..." << std::endl;
+	AABBTree T = AABBTree(&bunny);
 	// === Timed code ============
 	auto endAABBtree = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<float> elapsedAABB = (endAABBtree - startAABBtree);
@@ -130,8 +127,8 @@ int main()
 
 	auto startOctree = std::chrono::high_resolution_clock::now();
 	// === Timed code ============
-	uint res = 40; // octree resolution
-	std::cout << "initializing Octree construction for " << triangs.size() << " triangles with resolution " << res << std::endl;
+	uint res = 60; // octree resolution
+	std::cout << "initializing Octree construction for " << T.triangles.size() << " triangles with resolution " << res << std::endl;
 
 	Octree O = Octree(&T, T.bbox, res);
 	// === Timed code ============
