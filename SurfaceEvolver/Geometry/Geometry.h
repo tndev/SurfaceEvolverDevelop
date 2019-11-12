@@ -10,6 +10,8 @@
 #include "Vector3.h"
 #include "../poly2tri/poly2tri.h"
 
+#define uint unsigned int
+
 // TODO: types in this namespace should be classes containing all necessary topological info
 namespace StructGeom {
 	using Triangle = std::vector<Vector3>;
@@ -18,6 +20,7 @@ namespace StructGeom {
 
 namespace BufferGeom {
 	using Triangle = std::vector<unsigned int>;
+	using TriWithMarkedVertex = std::pair<Triangle, unsigned int>;
 	using Face = std::vector<Vector3>;
 	using Triangulation = std::vector<unsigned int>;
 };
@@ -63,7 +66,7 @@ public:
 	std::vector<Vector3> getVertices();
 	std::vector<Vector3> getUniqueVertices();
 
-	void getVertexToTriangleMap(std::multimap<Vector3, BufferGeom::Triangle>* buffer, std::vector<unsigned int>* vIdxBuffer);
+	void getVertexToTriangleMap(std::multimap<Vector3, BufferGeom::TriWithMarkedVertex>* buffer);
 	std::vector<Vector3> getAngleWeightedVertexPseudoNormals();
 
 	void applyMatrix(Matrix4 m);
@@ -76,11 +79,12 @@ private:
 	std::vector<unsigned int> getPolygonIndicesFromTriangles(std::vector<BufferGeom::Triangle> triangles);
 };
 
-// merges an array of geometries into one
+
 Geometry mergeGeometries(std::vector<Geometry>& geometries);
 Vector3 getTriangleNormal(StructGeom::Triangle triangle, Vector3 resultNormal);
 bool getTriangleBoundingBoxIntersection(Tri* vertices, Vector3& bboxCenter, Vector3& bboxHalfSize, float offset = 0.0001f, Vector3* optTriNormal = nullptr);
 float getDistanceToATriangleSq(Tri* vertices, Vector3& point);
 float getDistanceToATriangleSq2(Tri* vertices, Vector3& point);
+float getRayTriangleIntersection(Vector3& rayStart, Vector3& rayDirection, Tri* tri, float minParam, float maxParam);
 
 #endif

@@ -211,6 +211,5 @@ void Octree::setConstantValueToScalarGrid(Grid* grid, float value)
 
 		gridPos = Nx * Ny * iz + Nx * iy + ix;
 		grid->field[gridPos] = value;
-		grid->frozenCells[gridPos] = true; // freeze cell;
 	}
 }

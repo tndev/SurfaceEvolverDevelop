@@ -157,25 +157,13 @@ std::vector<Vector3> Geometry::getUniqueVertices()
 	return this->uniqueVertices;
 }
 
-void Geometry::getVertexToTriangleMap(std::multimap<Vector3, BufferGeom::Triangle>* buffer, std::vector<unsigned int>* vIdxBuffer)
+void Geometry::getVertexToTriangleMap(std::multimap<Vector3, BufferGeom::TriWithMarkedVertex>* buffer)
 {
-	std::multimap<Vector3, BufferGeom::Triangle>::iterator it;
+	std::multimap<Vector3, BufferGeom::TriWithMarkedVertex>::iterator it;
 	for (uint i = 0; i < this->vertexIndices.size(); i += 3) {
 		BufferGeom::Triangle face = { this->vertexIndices[i] , this->vertexIndices[i + 1], this->vertexIndices[i + 2] };
-
-		it = buffer->insert(std::pair<Vector3, BufferGeom::Triangle>(this->uniqueVertices[this->vertexIndices[i]], face));
-		if (it != buffer->end()) {
-			vIdxBuffer->push_back(this->vertexIndices[i]);
-		}
-
-		it = buffer->insert(std::pair<Vector3, BufferGeom::Triangle>(this->uniqueVertices[this->vertexIndices[i + 1]], face));
-		if (it != buffer->end()) {
-			vIdxBuffer->push_back(this->vertexIndices[i + 1]);
-		}
-
-		it = buffer->insert(std::pair<Vector3, BufferGeom::Triangle>(this->uniqueVertices[this->vertexIndices[i + 2]], face));
-		if (it != buffer->end()) {
-			vIdxBuffer->push_back(this->vertexIndices[i + 2]);
+		for (uint j = 0; j < 3; j++) {
+			it = buffer->insert(std::pair<Vector3, BufferGeom::TriWithMarkedVertex>(this->uniqueVertices[this->vertexIndices[i + j]], BufferGeom::TriWithMarkedVertex(face, j)));
 		}
 	}
 }
@@ -184,28 +172,37 @@ std::vector<Vector3> Geometry::getAngleWeightedVertexPseudoNormals()
 {
 	std::vector<Vector3> result = {};
 
-	std::multimap<Vector3, BufferGeom::Triangle> vertexToTriangles = {};
+	std::multimap<Vector3, BufferGeom::TriWithMarkedVertex> vertexToTriangles = {};
 	std::vector<uint> vIdxBuffer = {};
-	this->getVertexToTriangleMap(&vertexToTriangles, &vIdxBuffer);
-	std::multimap<Vector3, BufferGeom::Triangle>::iterator it;
-	Vector3* v; Vector3 v1 = Vector3(); Vector3 v2 = Vector3();
+	this->getVertexToTriangleMap(&vertexToTriangles);
+	std::multimap<Vector3, BufferGeom::TriWithMarkedVertex>::iterator it;
+	Vector3* v; std::vector<Vector3*> verts = {};
+	float alpha; Vector3 triNormal = Vector3();
 
 	for (uint i = 0; i < this->uniqueVertices.size(); i++) {
 		v = &this->uniqueVertices[i];
 		it = vertexToTriangles.find(*v);
+		Vector3 pseudoNormal = Vector3();
 		while (it != vertexToTriangles.end()) {
-			BufferGeom::Triangle ti = it->second;
-			Tri T = { this->uniqueVertices[ti[0]], this->uniqueVertices[ti[1]], this->uniqueVertices[ti[2]] };
-			uint j0 = 0;
-			for (uint j = 0; j < 3; j++) {
-				if (T[j].equals(*v)) {
-					j0 = j;
-					break;
+			BufferGeom::TriWithMarkedVertex ti = it->second;
+			StructGeom::Triangle T = { uniqueVertices[ti.first[0]], uniqueVertices[ti.first[1]], uniqueVertices[ti.first[2]] };
+			// compute normal
+			getTriangleNormal(T, triNormal);
+			for (auto&& vi : ti.first) {
+				if (vi != ti.second) { // ignore the marked vertex because its v
+					verts.push_back(&this->uniqueVertices[vi]);
 				}
 			}
+			// compute angle
+			alpha = acos(dot(normalize(*verts[0] - *v), normalize(*verts[1] - *v)));
 
-			
+			pseudoNormal = pseudoNormal + alpha * triNormal;
+
+			verts.clear();
+			vertexToTriangles.erase(it);
+			it = vertexToTriangles.find(*v);
 		}
+		result.push_back(pseudoNormal);
 	}
 
 	return result;
@@ -572,7 +569,6 @@ Vector3 getTriangleNormal(StructGeom::Triangle triangle, Vector3 resultNormal)
 	return resultNormal;
 }
 
-using uint = unsigned int;
 template <typename T> int sgn(T val) {
 	return (T(0) < val) - (val < T(0));
 }
@@ -865,4 +861,42 @@ float getDistanceToATriangleSq2(Tri* vertices, Vector3& point)
 			),
 		dot2(ac * clamp( dot(ac, pc) / dot2(ac), 0.0f, 1.0f) - pc)
 		) : dot(nor, pa) * dot(nor, pa) / dot2(nor));
+}
+
+// https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
+float getRayTriangleIntersection(Vector3& rayStart, Vector3& rayDirection, Tri* tri, float minParam, float maxParam)
+{
+	const float EPSILON = 0.0000001;
+	Vector3 edge1, edge2, h, s, q;
+	float a, f, u, v;
+	edge1 = tri->at(1) - tri->at(0);
+	edge2 = tri->at(2) - tri->at(0);
+	h = cross(rayDirection, edge2);
+	a = dot(edge1, h);
+	if (a > -EPSILON && a < EPSILON) {
+		return -1.0f;    // This ray is parallel to this triangle.
+	}
+		
+	f = 1.0 / a;
+	s = rayStart - tri->at(0);
+	u = f * dot(s, h);
+	if (u < 0.0 || u > 1.0) {
+		return -1.0f;
+	}
+	q = cross(s, edge1);
+	v = f * dot(rayDirection, q);
+	if (v < 0.0 || u + v > 1.0) {
+		return -1.0f;
+	}
+		
+	// At this stage we can compute t to find out where the intersection point is on the line.
+	float t = f * dot(edge2, q);
+	bool inOrNoRange = t < minParam;
+	bool outOrNoRange = t > maxParam;
+	if (t > EPSILON && t < 1 / EPSILON && !inOrNoRange && !outOrNoRange) {
+		return t;
+	}
+	else {	// This means that there is a line intersection but not a ray intersection.
+		return -1.0f;
+	}
 }

@@ -11,6 +11,8 @@ AABBTree::AABBTree(Geometry* geom)
 	this->bbox.min.addScalar(-0.001);
 	this->bbox.max.addScalar(0.001);
 
+	this->geom = geom;
+
 	// generate index array to triangles
 	std::vector<uint> triIds;
 	triIds.reserve(this->triangles.size());
@@ -173,6 +175,121 @@ std::vector<Tri> AABBTree::getTrianglesInABox(Box3* box)
 	}
 
 	return result;
+}
+
+std::pair<bool, std::vector<float>> AABBTree::getRayBoxIntersection(AABBRay* ray, Box3* bbox)
+{
+	std::pair<bool, std::vector<float>> result = { false, {-FLT_MAX, FLT_MAX} }; // { hit , { tmin, tmax } }
+
+	for (uint i = 0; i < 3; ++i) {
+		if (fabs(ray->direction.getCoordById(i)) > FLT_EPSILON) {
+			float t1 = (bbox->min.getCoordById(i) - ray->start.getCoordById(i)) * ray->invDirection.getCoordById(i);
+			float t2 = (bbox->max.getCoordById(i) - ray->start.getCoordById(i)) * ray->invDirection.getCoordById(i);
+			result.second[0] = fmaxf(result.second[0], fminf(t1, t2));
+			result.second[1] = fminf(result.second[1], fmaxf(t1, t2));
+		}
+		else if (ray->start.getCoordById(i) < bbox->min.getCoordById(i) || ray->start.getCoordById(i) > bbox->max.getCoordById(i)) {
+			return result;
+		}
+	}
+	result.first = result.second[1] >= result.second[0] && result.second[1] >= 0.0f && result.second[0] <= ray->maxParam;
+	return result;
+}
+
+AABBTree::AABBRay AABBTree::rayIntersect(Vector3& rayStart, Vector3& rayDirection, float minParam, float maxParam)
+{
+	AABBTree::AABBRay ray = AABBRay(rayStart, rayDirection, minParam, maxParam);
+
+	std::pair<bool, std::vector<float>> boxInt = this->getRayBoxIntersection(&ray, &this->bbox);
+	if (!boxInt.first) { // root not hit
+		return ray;
+	}
+
+	std::stack<AABBNode*> stack = {};
+	stack.push(this->root);
+	bool hitTri = false;
+	std::stack<std::vector<float>> paramStack = {};
+	paramStack.push({ ray.minParam, ray.maxParam });
+
+	while (stack.size()) {
+		AABBNode* item = stack.top();
+		stack.pop();
+		std::vector<float> params = paramStack.top();
+		paramStack.pop();
+
+		if (item->isALeaf()) {
+			for (auto&& ti : item->triangles) {
+				float intersectParam = getRayTriangleIntersection(
+					ray.start,
+					ray.direction,
+					&this->triangles[ti],
+					fmaxf(params[0], ray.minParam),
+					fmaxf(params[1], ray.maxParam)
+				);
+
+				if (intersectParam) {
+					ray.hitFace = ti;
+					ray.maxParam = intersectParam;
+					ray.hitNode = item;
+					hitTri = true;
+				}
+			}
+
+			if (hitTri) {
+				break;
+			}
+		}
+		else {
+			bool leftIsNear = ray.direction.getCoordById(item->axis) >= 0.0f;
+			AABBNode* nearNode = item->left;
+			AABBNode* farNode = item->right;
+			if (!leftIsNear) {
+				nearNode = item->right;
+				farNode = item->left;
+			}
+
+			float t_at_split = (item->splitPosition - ray.start.getCoordById(item->axis)) * ray.invDirection.getCoordById(item->axis);
+			bool force_near = false, force_far = false;
+			bool infinity = t_at_split > FLT_MAX || t_at_split < -FLT_MAX;
+			if (infinity) {
+				if (ray.start.getCoordById(item->axis) <= item->splitPosition && ray.start.getCoordById(item->axis) >= item->bbox.min.getCoordById(item->axis)) {
+					if (leftIsNear) {
+						force_near = true;
+					}
+					else {
+						force_far = true;
+					}
+				}
+				if (ray.start.getCoordById(item->axis) >= item->splitPosition && ray.start.getCoordById(item->axis) <= item->bbox.max.getCoordById(item->axis)) {
+					if (leftIsNear) {
+						force_near = true;
+					}
+					else {
+						force_far = true;
+					}
+				}
+			}
+
+			if (farNode && ((!infinity && params[1] >= t_at_split) || force_far)) {
+				stack.push(farNode);
+				float new_min = params[0];
+				if (!infinity) {
+					new_min = fmaxf(new_min, t_at_split);
+				}
+				paramStack.push({ new_min, params[1] });
+			}
+			if (nearNode && ((!infinity && params[0] <= t_at_split) || force_near)) {
+				stack.push(nearNode);
+				float new_max = params[1];
+				if (!infinity) {
+					new_max = fminf(new_max, t_at_split);
+				}
+				paramStack.push({ params[0], new_max });
+			}
+		}
+	}
+
+	return ray;
 }
 
 std::vector<Geometry> AABBTree::getAABBGeomsOfDepth(uint depth)
@@ -461,4 +578,17 @@ void AABBTree::AABBNode::filterTriangles()
 		}
 	}
 	this->triangles = newTriangles;
+}
+
+AABBTree::AABBRay::AABBRay(Vector3& rayStart, Vector3& rayDirection, float minParam, float maxParam)
+{
+	this->start = rayStart;
+	this->direction = rayDirection;
+	this->invDirection = Vector3(1.0f / rayDirection.x, 1.0f / rayDirection.y, 1.0f / rayDirection.z);
+	this->minParam = minParam;
+	this->maxParam = maxParam;
+}
+
+AABBTree::AABBRay::~AABBRay()
+{
 }

@@ -7,7 +7,7 @@ Grid::Grid()
 Grid::Grid(const Grid& other)
 {
 	this->field = std::vector<float>(other.field);
-	this->frozenCells = std::vector<bool>(other.frozenCells);
+	this->signField = std::vector<bool>(other.signField);
 	this->Nx = other.Nx; this->Ny = other.Ny; this->Nz = other.Nz;
 	this->scale = other.scale;
 	this->bbox = other.bbox;
@@ -29,7 +29,7 @@ Grid::Grid(uint Nx, uint Ny, uint Nz, Box3 bbox, float initVal)
 	this->Nz = (uint)std::floor(newScale.z / origScale.z * Nz);
 	this->scale = newScale;
 	this->field = std::vector<float>((size_t)this->Nx * this->Ny * this->Nz, initVal); // init field
-	this->frozenCells = std::vector<bool>((size_t)this->Nx * this->Ny * this->Nz, false); // unfreeze all
+	this->signField = std::vector<bool>((size_t)this->Nx * this->Ny * this->Nz, false); // all outside of mesh
 }
 
 Grid::~Grid()

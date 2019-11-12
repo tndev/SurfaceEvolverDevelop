@@ -42,12 +42,28 @@ public:
 		void filterTriangles();
 	};
 
+	struct AABBRay {
+		Vector3 start;
+		Vector3 direction;
+		Vector3 invDirection;
+
+		float minParam = 0.0f;
+		float maxParam = 0.0f;
+
+		AABBNode* hitNode = nullptr;
+		uint hitFace;
+
+		AABBRay(Vector3& rayStart, Vector3& rayDirection, float minParam, float maxParam);
+		~AABBRay();
+	};
+
 	Box3 bbox;
 
 	uint depth = 0;
 
 	std::vector<Tri> triangles = {};
-	AABBNode* root;
+	AABBNode* root = nullptr;
+	Geometry* geom = nullptr;
 
 	AABBTree();
 	AABBTree(Geometry* geom);
@@ -60,6 +76,9 @@ public:
 	std::vector<AABBNode> flatten();
 	std::vector<AABBNode> flattenToDepth(uint depth);
 	std::vector<Tri> getTrianglesInABox(Box3* box);
+
+	std::pair<bool, std::vector<float>> getRayBoxIntersection(AABBRay* ray, Box3* bbox);
+	AABBRay rayIntersect(Vector3& rayStart, Vector3& rayDirection, float minParam, float maxParam);
 
 	std::vector<Geometry> getAABBGeomsOfDepth(uint depth); // for visualisation
 	std::vector<Geometry> getAABBLeafGeoms(); // for visualisation
