@@ -4,6 +4,7 @@
 #include <vector>
 #include <fstream>
 #include <algorithm>
+#include "../BVH/AABBTree.h"
 #include "../Geometry/Vector3.h"
 #include "../Geometry/Box3.h"
 
@@ -32,6 +33,7 @@ public:
 
 	void initToVal(float val);
 	void blur();
+	void computeSignField(AABBTree* aabb);
 	void clean();
 private:
 	// fraction of the scale with which the grid should exceed the mesh bbox

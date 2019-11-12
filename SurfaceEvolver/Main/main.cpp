@@ -87,15 +87,21 @@ int main()
 				FastSweep3D fs = FastSweep3D(&voxField_SDF, 8, true); // computes distance field
 				auto endSDF_FS = std::chrono::high_resolution_clock::now();
 				std::chrono::duration<float> elapsedSDF_FS = (endSDF_FS - startSDF_FS);
+				auto startSDF_Sign = std::chrono::high_resolution_clock::now();
+				voxField_SDF.computeSignField(&cT);
+				auto endSDF_Sign = std::chrono::high_resolution_clock::now();
+				std::chrono::duration<float> elapsedSDF_Sign = (endSDF_Sign - startSDF_Sign);
 
 				auto endSDF = std::chrono::high_resolution_clock::now();
 				std::chrono::duration<float> elapsedSDF = (endSDF - startSDF);
 
 				std::cout << "computation times:  AABB: " << elapsedSDF_AABB.count() <<
 					" s , Octree: " << elapsedSDF_Octree.count() << " s, FastSweep3D: " << elapsedSDF_FS.count() <<
+					", Sign: " << elapsedSDF_Sign.count() <<
 					", TOTAL: " << elapsedSDF.count() << " s" << std::endl;
 				timing << "computation times:  AABB: " << elapsedSDF_AABB.count() <<
 					" s , Octree: " << elapsedSDF_Octree.count() << " s, FastSweep3D: " << elapsedSDF_FS.count() <<
+					", Sign: " << elapsedSDF_Sign.count() <<
 					", TOTAL: " << elapsedSDF.count() << " s" << std::endl;
 			
 				// === Timed code ============
@@ -130,7 +136,7 @@ int main()
 
 	auto startOctree = std::chrono::high_resolution_clock::now();
 	// === Timed code ============
-	uint res = 60; // octree resolution
+	uint res = 40; // octree resolution
 	std::cout << "initializing Octree construction for " << T.triangles.size() << " triangles with resolution " << res << std::endl;
 
 	Octree O = Octree(&T, T.bbox, res);
@@ -166,6 +172,14 @@ int main()
 		voxField.exportToVTI("voxField"); // save initial cond
 
 		FastSweep3D fs = FastSweep3D(&voxField, 8); // computes distance field
+
+		std::cout << "computing signs for " << voxField.field.size() << " grid pts ..." << std::endl;
+		auto startSDF_Sign = std::chrono::high_resolution_clock::now();
+		voxField.computeSignField(&T);
+		auto endSDF_Sign = std::chrono::high_resolution_clock::now();
+		std::chrono::duration<float> elapsedSDF_Sign = (endSDF_Sign - startSDF_Sign);
+		std::cout << "sign computation finished after " << elapsedSDF_Sign.count() << " seconds" << std::endl;
+
 		voxField.exportToVTI("voxFieldSDF"); // save final SDF
 		// === Timed code ============
 		auto endOctreeGrid = std::chrono::high_resolution_clock::now();

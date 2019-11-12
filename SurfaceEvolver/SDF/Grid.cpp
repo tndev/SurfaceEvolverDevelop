@@ -103,6 +103,27 @@ void Grid::blur()
 	}
 }
 
+void Grid::computeSignField(AABBTree* aabb)
+{
+	Vector3 p = Vector3();
+	Vector3 rayDir = normalize(Vector3(1, 1, 1));
+	int sign = 1; uint gridPos;
+	for (uint iz = 1; iz < Nz - 1; iz++) {
+		for (uint iy = 1; iy < Ny - 1; iy++) {
+			for (uint ix = 1; ix < Nx - 1; ix++) {
+				p.set(
+					this->bbox.min.x + ix * this->scale.x,
+					this->bbox.min.y + iy * this->scale.y,
+					this->bbox.min.z + iz * this->scale.z
+				);
+				sign = (aabb->rayIntersectCount(p, rayDir, 0.0f, LARGE_VAL) % 2 == 1) ? -1 : 1;
+				gridPos = Nx * Ny * iz + Nx * iy + ix;
+				this->field[gridPos] *= sign;
+			}
+		}
+	}
+}
+
 void Grid::clean()
 {
 	Nx = 0, Ny = 0, Nz = 0;

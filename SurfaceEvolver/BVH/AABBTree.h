@@ -78,7 +78,7 @@ public:
 	std::vector<Tri> getTrianglesInABox(Box3* box);
 
 	std::pair<bool, std::vector<float>> getRayBoxIntersection(AABBRay* ray, Box3* bbox);
-	AABBRay rayIntersect(Vector3& rayStart, Vector3& rayDirection, float minParam, float maxParam);
+	uint rayIntersectCount(Vector3& rayStart, Vector3& rayDirection, float minParam, float maxParam);
 
 	std::vector<Geometry> getAABBGeomsOfDepth(uint depth); // for visualisation
 	std::vector<Geometry> getAABBLeafGeoms(); // for visualisation

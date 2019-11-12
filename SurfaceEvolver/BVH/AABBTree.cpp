@@ -192,22 +192,24 @@ std::pair<bool, std::vector<float>> AABBTree::getRayBoxIntersection(AABBRay* ray
 			return result;
 		}
 	}
-	result.first = result.second[1] >= result.second[0] && result.second[1] >= 0.0f && result.second[0] <= ray->maxParam;
+	if (result.second[1] >= result.second[0] && result.second[1] >= 0.0f && result.second[0] <= ray->maxParam) {
+		result.first = true;
+	}
 	return result;
 }
 
-AABBTree::AABBRay AABBTree::rayIntersect(Vector3& rayStart, Vector3& rayDirection, float minParam, float maxParam)
+uint AABBTree::rayIntersectCount(Vector3& rayStart, Vector3& rayDirection, float minParam, float maxParam)
 {
 	AABBTree::AABBRay ray = AABBRay(rayStart, rayDirection, minParam, maxParam);
 
-	std::pair<bool, std::vector<float>> boxInt = this->getRayBoxIntersection(&ray, &this->bbox);
+	std::pair<bool, std::vector<float>> boxInt = this->getRayBoxIntersection(&ray, &this->root->bbox);
 	if (!boxInt.first) { // root not hit
-		return ray;
+		return 0;
 	}
 
 	std::stack<AABBNode*> stack = {};
 	stack.push(this->root);
-	bool hitTri = false;
+	uint hitCount = 0;
 	std::stack<std::vector<float>> paramStack = {};
 	paramStack.push({ ray.minParam, ray.maxParam });
 
@@ -231,12 +233,8 @@ AABBTree::AABBRay AABBTree::rayIntersect(Vector3& rayStart, Vector3& rayDirectio
 					ray.hitFace = ti;
 					ray.maxParam = intersectParam;
 					ray.hitNode = item;
-					hitTri = true;
+					hitCount++;
 				}
-			}
-
-			if (hitTri) {
-				break;
 			}
 		}
 		else {
@@ -289,7 +287,7 @@ AABBTree::AABBRay AABBTree::rayIntersect(Vector3& rayStart, Vector3& rayDirectio
 		}
 	}
 
-	return ray;
+	return hitCount;
 }
 
 std::vector<Geometry> AABBTree::getAABBGeomsOfDepth(uint depth)
