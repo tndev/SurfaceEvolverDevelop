@@ -68,6 +68,7 @@ public:
 
 	void getVertexToTriangleMap(std::multimap<Vector3, BufferGeom::TriWithMarkedVertex>* buffer);
 	std::vector<Vector3> getAngleWeightedVertexPseudoNormals();
+	Vector3 getAngleWeightedPseudonormalToVertex(uint vId);
 
 	void applyMatrix(Matrix4 m);
 	Vector3 getNormal(BufferGeom::Face f);

@@ -208,6 +208,11 @@ std::vector<Vector3> Geometry::getAngleWeightedVertexPseudoNormals()
 	return result;
 }
 
+Vector3 Geometry::getAngleWeightedPseudonormalToVertex(uint vId)
+{
+	return Vector3();
+}
+
 std::vector<Vector3> Geometry::getProjectionsAlongNormal(BufferGeom::Face& vertices)
 {
 	Vector3 normal = getNormal(vertices); // directions

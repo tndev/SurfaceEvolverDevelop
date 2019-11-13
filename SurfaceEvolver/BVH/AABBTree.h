@@ -75,7 +75,10 @@ public:
 
 	std::vector<AABBNode> flatten();
 	std::vector<AABBNode> flattenToDepth(uint depth);
-	std::vector<Tri> getTrianglesInABox(Box3* box);
+	void getTrianglesInABox(Box3* box, std::vector<uint>* triIdBuffer);
+
+	AABBNode* getClosestNode(Vector3& point);
+	int getClosestTriangleId(Vector3& point);
 
 	std::pair<bool, std::vector<float>> getRayBoxIntersection(AABBRay* ray, Box3* bbox);
 	uint rayIntersectCount(Vector3& rayStart, Vector3& rayDirection, float minParam, float maxParam);

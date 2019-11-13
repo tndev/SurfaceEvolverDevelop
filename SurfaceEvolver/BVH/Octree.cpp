@@ -28,7 +28,17 @@ Octree::OctreeNode::OctreeNode(Octree* tree, Box3 box, OctreeNode* parent, uint 
 	}
 	else {
 		// complete leaf construction by computing the mesh distance
-		this->centroidDistance = sqrt(this->tree->aabbTree->boxIntersectsATriangleAtDistance(&this->box));
+		std::vector<uint> intersectedTriangleIds = {};
+		this->tree->aabbTree->getTrianglesInABox(&this->box, &intersectedTriangleIds);
+		float distSq, resultDistSq = FLT_MAX;
+		Vector3 center = this->box.getCenter();
+
+		for (auto&& ti : intersectedTriangleIds) {
+			distSq = getDistanceToATriangleSq2(&this->tree->aabbTree->triangles[ti], center);
+			resultDistSq = distSq < resultDistSq ? distSq : resultDistSq;
+		}
+
+		this->centroidDistance = sqrt(resultDistSq);
 	}
 }
 

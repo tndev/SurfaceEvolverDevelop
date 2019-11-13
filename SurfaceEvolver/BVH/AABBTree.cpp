@@ -74,8 +74,8 @@ float AABBTree::boxIntersectsATriangleAtDistance(Box3* box)
 
 		if (item->isALeaf()) {
 			Vector3 center = box->getCenter();
-			Vector3 halfSize = box->getSize();
-			halfSize = 0.5 * halfSize;
+			Vector3 halfSize = 0.5 * box->getSize();
+
 			for (auto&& t : item->triangles) {
 				if (getTriangleBoundingBoxIntersection(&this->triangles.at(t), center, halfSize, 0.0f)) {
 					return getDistanceToATriangleSq2(&this->triangles.at(t), center);
@@ -150,9 +150,10 @@ std::vector<AABBTree::AABBNode> AABBTree::flattenToDepth(uint depth)
 }
 
 // returns all triangles that are intersecting overlapping AABB leaves
-std::vector<Tri> AABBTree::getTrianglesInABox(Box3* box)
+void AABBTree::getTrianglesInABox(Box3* box, std::vector<uint>* triIdBuffer)
 {
-	std::vector<Tri> result = {};
+	if (!triIdBuffer->empty()) triIdBuffer->clear();
+
 	std::stack<AABBNode*> stack = {};
 	stack.push(this->root);
 
@@ -162,7 +163,7 @@ std::vector<Tri> AABBTree::getTrianglesInABox(Box3* box)
 
 		if (item->isALeaf()) {
 			for (uint i = 0; i < item->triangles.size(); i++) {
-				result.push_back(this->triangles[item->triangles[i]]);
+				triIdBuffer->push_back(item->triangles[i]);
 			}
 		} else {
 			if (item->left && box->intersectsBox(item->left->bbox)) {
@@ -173,8 +174,57 @@ std::vector<Tri> AABBTree::getTrianglesInABox(Box3* box)
 			}
 		}
 	}
+}
 
-	return result;
+AABBTree::AABBNode* AABBTree::getClosestNode(Vector3& point)
+{
+	float t_left, t_right;
+	Vector3 leftCenter, rightCenter, leftSize, rightSize;
+	Vector3 invLeftCenter = Vector3(), invRightCenter = Vector3();
+
+	std::stack<AABBNode*> stack = {};
+	stack.push(this->root);
+
+	while (stack.size()) {
+		AABBNode* item = stack.top();
+		stack.pop();
+
+		if (item->left || item->right) {
+			leftCenter = item->left->bbox.getCenter() - point;
+			invLeftCenter.set(1.0f / leftCenter.x, 1.0f / leftCenter.y, 1.0f / leftCenter.z);
+			leftSize = 0.5 * item->left->bbox.getSize();
+
+			rightCenter = item->right->bbox.getCenter() - point;
+			invLeftCenter.set(1.0f / rightCenter.x, 1.0f / rightCenter.y, 1.0f / rightCenter.z);
+			rightSize = 0.5 * item->right->bbox.getSize();
+
+			t_left = fminf(dot((item->left->bbox.min - point), invLeftCenter), dot((item->left->bbox.max - point), invLeftCenter));
+			t_right = fminf(dot((item->right->bbox.min - point), invRightCenter), dot((item->right->bbox.max - point), invRightCenter));
+
+			bool leftIsNear = leftCenter.lengthSq() < rightCenter.lengthSq() && t_left < t_right;
+
+			if (leftIsNear) {
+				stack.push(item->left);
+			}
+			else {
+				stack.push(item->right);
+			}
+		}
+		else {
+			return item;
+		}
+	}
+
+	return nullptr;
+}
+
+int AABBTree::getClosestTriangleId(Vector3& point)
+{
+	AABBNode* closestNode = this->getClosestNode(point);
+	if (!closestNode) {
+		return -1;
+	}
+	return closestNode->triangles[0];
 }
 
 std::pair<bool, std::vector<float>> AABBTree::getRayBoxIntersection(AABBRay* ray, Box3* bbox)

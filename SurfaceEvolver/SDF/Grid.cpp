@@ -7,7 +7,6 @@ Grid::Grid()
 Grid::Grid(const Grid& other)
 {
 	this->field = std::vector<float>(other.field);
-	this->signField = std::vector<bool>(other.signField);
 	this->Nx = other.Nx; this->Ny = other.Ny; this->Nz = other.Nz;
 	this->scale = other.scale;
 	this->bbox = other.bbox;
@@ -29,7 +28,6 @@ Grid::Grid(uint Nx, uint Ny, uint Nz, Box3 bbox, float initVal)
 	this->Nz = (uint)std::floor(newScale.z / origScale.z * Nz);
 	this->scale = newScale;
 	this->field = std::vector<float>((size_t)this->Nx * this->Ny * this->Nz, initVal); // init field
-	this->signField = std::vector<bool>((size_t)this->Nx * this->Ny * this->Nz, false); // all outside of mesh
 }
 
 Grid::~Grid()
@@ -108,14 +106,31 @@ void Grid::computeSignField(AABBTree* aabb)
 	Vector3 p = Vector3();
 	Vector3 rayDir = normalize(Vector3(1, 1, 1));
 	int sign = 1; uint gridPos;
+	int triId;
+
+	Vector3 o = bbox.min; // origin
+	uint nx = Nx - 1;
+	uint ny = Ny - 1;
+	uint nz = Nz - 1;
+	float dx = scale.x / nx;
+	float dy = scale.y / ny;
+	float dz = scale.z / nz;
+
 	for (uint iz = 1; iz < Nz - 1; iz++) {
 		for (uint iy = 1; iy < Ny - 1; iy++) {
 			for (uint ix = 1; ix < Nx - 1; ix++) {
 				p.set(
-					this->bbox.min.x + ix * this->scale.x,
-					this->bbox.min.y + iy * this->scale.y,
-					this->bbox.min.z + iz * this->scale.z
+					o.x + ix * dx,
+					o.y + iy * dy,
+					o.z + iz * dz
 				);
+				triId = aabb->getClosestTriangleId(p);
+				if (triId < 0) {
+					continue;
+				}
+
+
+
 				sign = (aabb->rayIntersectCount(p, rayDir, 0.0f, LARGE_VAL) % 2 == 1) ? -1 : 1;
 				gridPos = Nx * Ny * iz + Nx * iy + ix;
 				this->field[gridPos] *= sign;

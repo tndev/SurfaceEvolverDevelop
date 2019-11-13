@@ -16,7 +16,6 @@ class Grid
 {
 public:
 	std::vector<float> field;
-	std::vector<bool> signField;
 	uint Nx = 0, Ny = 0, Nz = 0; // index dims
 	Vector3 scale = Vector3(1.0f, 1.0f, 1.0f);
 	Box3 bbox;

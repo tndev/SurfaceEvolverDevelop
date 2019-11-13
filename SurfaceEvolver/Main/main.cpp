@@ -31,13 +31,13 @@
 
 //   WIP:
 // 
-// - Interior/Exterior mesh Sign
+// - Get exact octree centroid to closest triangle dist
 
 
 //   TODO:
 //
-// - adaptive resampling for AABB Tree construction
-// - Alternatively: Make a fast distance query (CUDA?)
+// - cleanup main
+// - Interior/Exterior mesh Sign
 
 int main()
 {
@@ -136,7 +136,7 @@ int main()
 
 	auto startOctree = std::chrono::high_resolution_clock::now();
 	// === Timed code ============
-	uint res = 40; // octree resolution
+	uint res = 50; // octree resolution
 	std::cout << "initializing Octree construction for " << T.triangles.size() << " triangles with resolution " << res << std::endl;
 
 	Octree O = Octree(&T, T.bbox, res);
@@ -173,12 +173,15 @@ int main()
 
 		FastSweep3D fs = FastSweep3D(&voxField, 8); // computes distance field
 
-		std::cout << "computing signs for " << voxField.field.size() << " grid pts ..." << std::endl;
-		auto startSDF_Sign = std::chrono::high_resolution_clock::now();
-		voxField.computeSignField(&T);
-		auto endSDF_Sign = std::chrono::high_resolution_clock::now();
-		std::chrono::duration<float> elapsedSDF_Sign = (endSDF_Sign - startSDF_Sign);
-		std::cout << "sign computation finished after " << elapsedSDF_Sign.count() << " seconds" << std::endl;
+		bool signCompute = false;
+		if (signCompute) {
+			std::cout << "computing signs for " << voxField.field.size() << " grid pts ..." << std::endl;
+			auto startSDF_Sign = std::chrono::high_resolution_clock::now();
+			voxField.computeSignField(&T);
+			auto endSDF_Sign = std::chrono::high_resolution_clock::now();
+			std::chrono::duration<float> elapsedSDF_Sign = (endSDF_Sign - startSDF_Sign);
+			std::cout << "sign computation finished after " << elapsedSDF_Sign.count() << " seconds" << std::endl;
+		}
 
 		voxField.exportToVTI("voxFieldSDF"); // save final SDF
 		// === Timed code ============
