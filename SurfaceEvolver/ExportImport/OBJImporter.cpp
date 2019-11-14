@@ -172,10 +172,10 @@ void OBJImporter::setGeometry(Geometry& geom,
 		bool faceHasNormals = normalIndices.size() > 0;
 
 		for (unsigned int k = totalVerts; k < vertCount + totalVerts; k++) {
-			faceVerts.push_back(vertices[vertexIndices[k]]);
+			faceVerts.push_back(&vertices[vertexIndices[k]]);
 
 			if (faceHasNormals) {
-				faceNorms.push_back(normals[normalIndices[k]]);
+				faceNorms.push_back(&normals[normalIndices[k]]);
 			}
 		}
 
@@ -183,7 +183,7 @@ void OBJImporter::setGeometry(Geometry& geom,
 			helperFace = faceVerts;
 			Vector3 defaultNormal = geom.getNormal(helperFace);
 			for (unsigned int k = 0; k < vertCount; k++) {
-				faceNorms.push_back(defaultNormal);
+				faceNorms.push_back(&defaultNormal);
 			}
 		}
 
@@ -193,16 +193,16 @@ void OBJImporter::setGeometry(Geometry& geom,
 
 		if (faces.size() > 0) {
 			for (unsigned int k = 0; k < vertCount; k++) {
-				auto found = vertexToIdx.find(faceVerts[k]);
+				auto found = vertexToIdx.find(*faceVerts[k]);
 				if (found == vertexToIdx.end()) {
-					vertexToIdx.insert({ faceVerts[k], vertexToIdx.size() });
+					vertexToIdx.insert({ *faceVerts[k], vertexToIdx.size() });
 				}
 			}
 
 			BufferGeom::Triangulation triang = {};
 			for (auto&& f:faces) {
 				for (auto&& i:f) {
-					Vector3 v = faceVerts[i];
+					Vector3 v = *faceVerts[i];
 					geom.vertices[idxV++] = v.x;
 					geom.vertices[idxV++] = v.y;
 					geom.vertices[idxV++] = v.z;
@@ -211,7 +211,7 @@ void OBJImporter::setGeometry(Geometry& geom,
 					geom.vertexIndices[idxI++] = vId;
 					geom.uniqueVertices[vId] = v;
 
-					Vector3 norm = faceNorms[i];
+					Vector3 norm = *faceNorms[i];
 					geom.normals[idxN++] = norm.x;
 					geom.normals[idxN++] = norm.y;
 					geom.normals[idxN++] = norm.z;

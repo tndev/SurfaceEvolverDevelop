@@ -14,15 +14,15 @@
 
 // TODO: types in this namespace should be classes containing all necessary topological info
 namespace StructGeom {
-	using Triangle = std::vector<Vector3>;
-	using Edge = std::pair<Vector3, Vector3>;
+	using Triangle = std::vector<Vector3*>;
+	using Edge = std::pair<Vector3*, Vector3*>;
 };
 
 namespace BufferGeom {
-	using Triangle = std::vector<unsigned int>;
-	using TriWithMarkedVertex = std::pair<Triangle, unsigned int>;
-	using Face = std::vector<Vector3>;
-	using Triangulation = std::vector<unsigned int>;
+	using Triangle = std::vector<uint>;
+	using TriWithMarkedVertex = std::pair<Triangle, uint>;
+	using Face = std::vector<Vector3*>;
+	using Triangulation = std::vector<uint>;
 };
 
 using Tri = StructGeom::Triangle;
@@ -59,9 +59,9 @@ public:
 	void computeNormals();
 	void computeTriangulations();
 
-	std::vector<unsigned int> getPolygonIndicesFromTriangulation(BufferGeom::Triangulation t);
+	std::vector<uint> getPolygonIndicesFromTriangulation(BufferGeom::Triangulation t);
 	std::vector<Vector3> getProjectionsAlongNormal(BufferGeom::Face& vertices); // TODO: use Vector2
-	std::vector<std::vector<unsigned int>> getTriangulatedIndices(BufferGeom::Face& vertices);
+	std::vector<std::vector<uint>> getTriangulatedIndices(BufferGeom::Face& vertices);
 	std::pair<std::vector<BufferGeom::Triangulation>, std::vector<size_t>> getSortedPolygonTriangulationsAndSizes();
 	std::vector<StructGeom::Triangle> getTriangles();
 	std::vector<StructGeom::Edge> getEdges();
@@ -79,7 +79,7 @@ protected:
 	void clear();
 private:
 	void flipFaceOrientation();
-	std::vector<unsigned int> getPolygonIndicesFromTriangles(std::vector<BufferGeom::Triangle> triangles);
+	std::vector<uint> getPolygonIndicesFromTriangles(std::vector<BufferGeom::Triangle> triangles);
 };
 
 

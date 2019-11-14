@@ -62,13 +62,15 @@ int main()
 	e.initExport(box, "boxTranslated");
 	e.initExport(cs, "cubesphere");
 
-	bool iterateCubeSphereTest = false;
+	bool iterateCubeSphereTest = true;
 
 	if (iterateCubeSphereTest) {
+		size_t min_Res = 40, max_Res = 50;
+		size_t min_Ns = 3, max_Ns = 4;
 		std::fstream timing("timing.txt", std::fstream::out);
 
-		for (unsigned int res = 10; res < 90; res += 20) {
-			for (unsigned int n = 1; n < 10; n++) {
+		for (unsigned int res = min_Res; res < max_Res; res += 20) {
+			for (unsigned int n = min_Ns; n < max_Ns; n++) {
 				std::cout << "cubeSphere(" << n << "), grid_res = " << res << std::endl;
 				timing << "cubeSphere(" << n << "), grid_res = " << res << std::endl;
 				CubeSphere c = CubeSphere(n, r);
@@ -89,24 +91,24 @@ int main()
 				auto startSDF_FS = std::chrono::high_resolution_clock::now();
 				Grid voxField_SDF = Grid(res, res, res, O.cubeBox);
 				O.setLeafValueToScalarGrid(&voxField_SDF);
-				FastSweep3D fs = FastSweep3D(&voxField_SDF, 8, true); // computes distance field
+				FastSweep3D fs = FastSweep3D(&voxField_SDF, 8); // computes distance field
 				auto endSDF_FS = std::chrono::high_resolution_clock::now();
 				std::chrono::duration<float> elapsedSDF_FS = (endSDF_FS - startSDF_FS);
-				auto startSDF_Sign = std::chrono::high_resolution_clock::now();
-				voxField_SDF.computeSignField(&cT);
-				auto endSDF_Sign = std::chrono::high_resolution_clock::now();
-				std::chrono::duration<float> elapsedSDF_Sign = (endSDF_Sign - startSDF_Sign);
+				// auto startSDF_Sign = std::chrono::high_resolution_clock::now();
+				// voxField_SDF.computeSignField(&cT);
+				// auto endSDF_Sign = std::chrono::high_resolution_clock::now();
+				// std::chrono::duration<float> elapsedSDF_Sign = (endSDF_Sign - startSDF_Sign);
 
 				auto endSDF = std::chrono::high_resolution_clock::now();
 				std::chrono::duration<float> elapsedSDF = (endSDF - startSDF);
 
 				std::cout << "computation times:  AABB: " << elapsedSDF_AABB.count() <<
 					" s , Octree: " << elapsedSDF_Octree.count() << " s, FastSweep3D: " << elapsedSDF_FS.count() <<
-					", Sign: " << elapsedSDF_Sign.count() <<
+					// ", Sign: " << elapsedSDF_Sign.count() <<
 					", TOTAL: " << elapsedSDF.count() << " s" << std::endl;
 				timing << "computation times:  AABB: " << elapsedSDF_AABB.count() <<
 					" s , Octree: " << elapsedSDF_Octree.count() << " s, FastSweep3D: " << elapsedSDF_FS.count() <<
-					", Sign: " << elapsedSDF_Sign.count() <<
+					// ", Sign: " << elapsedSDF_Sign.count() <<
 					", TOTAL: " << elapsedSDF.count() << " s" << std::endl;
 			
 				// === Timed code ============
@@ -141,7 +143,7 @@ int main()
 
 	auto startOctree = std::chrono::high_resolution_clock::now();
 	// === Timed code ============
-	uint res = 50; // octree resolution
+	uint res = 30; // octree resolution
 	std::cout << "initializing Octree construction for " << T.triangles.size() << " triangles with resolution " << res << std::endl;
 
 	Octree O = Octree(&T, T.bbox, res);

@@ -58,15 +58,15 @@ Box3 Geometry::getBoundingBox(Box3 bbox, Matrix4 matrix)
 
 void Geometry::computeNormals()
 {
-	StructGeom::Triangle faceVerts = { Vector3(), Vector3(), Vector3() };
+	StructGeom::Triangle faceVerts = { &Vector3(), &Vector3(), &Vector3() };
 
 	Vector3 normal = Vector3();
 	for (unsigned int i = 0; i < this->vertices.size(); i += 9) {
 
 		for (unsigned int j = 0; j < 3; j++) {
-			faceVerts[j].x = this->vertices[i + j * 3];
-			faceVerts[j].y = this->vertices[i + j * 3 + 1];
-			faceVerts[j].z = this->vertices[i + j * 3 + 2];
+			faceVerts[j]->x = this->vertices[i + j * 3];
+			faceVerts[j]->y = this->vertices[i + j * 3 + 1];
+			faceVerts[j]->z = this->vertices[i + j * 3 + 2];
 		}
 
 		normal = getTriangleNormal(faceVerts, normal);
@@ -189,7 +189,7 @@ std::vector<Vector3> Geometry::getAngleWeightedVertexPseudoNormals()
 		Vector3 pseudoNormal = Vector3();
 		while (it != vertexToTriangles.end()) {
 			BufferGeom::TriWithMarkedVertex ti = it->second;
-			StructGeom::Triangle T = { uniqueVertices[ti.first[0]], uniqueVertices[ti.first[1]], uniqueVertices[ti.first[2]] };
+			StructGeom::Triangle T = { &uniqueVertices[ti.first[0]], &uniqueVertices[ti.first[1]], &uniqueVertices[ti.first[2]] };
 			// compute normal
 			getTriangleNormal(T, triNormal);
 			for (auto&& vi : ti.first) {
@@ -221,14 +221,14 @@ Vector3 Geometry::getAngleWeightedPseudonormalToVertex(uint vId)
 	}
 
 	std::multimap<Vector3, BufferGeom::TriWithMarkedVertex>::iterator it;
-	Vector3* v; std::vector<Vector3*> verts = {};
+    std::vector<Vector3*> verts = {};
 	float alpha; Vector3 triNormal = Vector3();
 
 	it = vertexToTriangles.find(*v);
 	Vector3 pseudoNormal = Vector3();
 	while (it != vertexToTriangles.end()) {
 		BufferGeom::TriWithMarkedVertex ti = it->second;
-		StructGeom::Triangle T = { uniqueVertices[ti.first[0]], uniqueVertices[ti.first[1]], uniqueVertices[ti.first[2]] };
+		StructGeom::Triangle T = { &uniqueVertices[ti.first[0]], &uniqueVertices[ti.first[1]], &uniqueVertices[ti.first[2]] };
 		// compute normal
 		getTriangleNormal(T, triNormal);
 		for (auto&& vi : ti.first) {
@@ -252,7 +252,7 @@ Vector3 Geometry::getAngleWeightedPseudonormalToVertex(uint vId)
 std::vector<Vector3> Geometry::getProjectionsAlongNormal(BufferGeom::Face& vertices)
 {
 	Vector3 normal = getNormal(vertices); // directions
-	Vector3 referencePoint = vertices[0];
+	Vector3 referencePoint = *vertices[0];
 	Vector3 up = Vector3(0, 0, 1);
 
 	// ------ -----------
@@ -286,7 +286,7 @@ std::vector<Vector3> Geometry::getProjectionsAlongNormal(BufferGeom::Face& verti
 
 	std::vector<Vector3> projections = std::vector<Vector3>();
 	for (unsigned int k = 0; k < vertices.size(); k++) {
-		Vector3 vec = vertices[k] - referencePoint;
+		Vector3 vec = *vertices[k] - referencePoint;
 		float px = dot(vec, projX);
 		float py = dot(vec, projY);
 		projections.push_back(Vector3(px, py, 0.0f));
@@ -305,9 +305,9 @@ std::vector<std::vector<unsigned int>> Geometry::getTriangulatedIndices(BufferGe
 	}
 	else if (vertices.size() == 4) {
 		faces = { {0, 1, 2}, {0, 2, 3} };
-		Vector3 e2 = vertices[2] - vertices[0];
-		Vector3 e1 = vertices[1] - vertices[0];
-		Vector3 e3 = vertices[3] - vertices[0];
+		Vector3 e2 = *vertices[2] - *vertices[0];
+		Vector3 e1 = *vertices[1] - *vertices[0];
+		Vector3 e3 = *vertices[3] - *vertices[0];
 		Vector3 c21 = cross(e2, e1);
 		Vector3 c23 = cross(e2, e3);
 		if (dot(c21, c23) > 0.0) {
@@ -459,8 +459,8 @@ Vector3 Geometry::getNormal(BufferGeom::Face f)
 {
 	Vector3 normal = Vector3();
 	for (unsigned int i = 0; i < f.size(); i++) {
-		Vector3 fromNext = f[i] - f[(i + 1) % f.size()];
-		Vector3 plusNext = f[i] + f[(i + 1) % f.size()];
+		Vector3 fromNext = *f[i] - *f[(i + 1) % f.size()];
+		Vector3 plusNext = *f[i] + *f[(i + 1) % f.size()];
 		normal.x = normal.x + fromNext.y * plusNext.z;
 		normal.y = normal.y + fromNext.z * plusNext.x;
 		normal.z = normal.z + fromNext.x * plusNext.y;
@@ -507,9 +507,9 @@ std::vector<StructGeom::Triangle> Geometry::getTriangles()
 {
 	if (this->triangles.empty()) {
 		for (unsigned int i = 0; i < this->vertexIndices.size(); i += 3) {
-			Vector3 v0 = this->uniqueVertices[this->vertexIndices[i]];
-			Vector3 v1 = this->uniqueVertices[this->vertexIndices[i + 1]];
-			Vector3 v2 = this->uniqueVertices[this->vertexIndices[i + 2]];
+			Vector3* v0 = &this->uniqueVertices[this->vertexIndices[i]];
+			Vector3* v1 = &this->uniqueVertices[this->vertexIndices[i + 1]];
+			Vector3* v2 = &this->uniqueVertices[this->vertexIndices[i + 2]];
 
 			StructGeom::Triangle T = { v0, v1, v2 };
 
@@ -525,9 +525,9 @@ std::vector<StructGeom::Edge> Geometry::getEdges()
 {
 	if (this->edges.empty()) {
 		for (unsigned int i = 0; i < this->vertexIndices.size(); i += 3) {
-			Vector3 v0 = this->uniqueVertices[this->vertexIndices[i]];
-			Vector3 v1 = this->uniqueVertices[this->vertexIndices[i + 1]];
-			Vector3 v2 = this->uniqueVertices[this->vertexIndices[i + 2]];
+			Vector3* v0 = &this->uniqueVertices[this->vertexIndices[i]];
+			Vector3* v1 = &this->uniqueVertices[this->vertexIndices[i + 1]];
+			Vector3* v2 = &this->uniqueVertices[this->vertexIndices[i + 2]];
 
 			StructGeom::Edge e0 = { v0, v1 };
 			StructGeom::Edge e1 = { v1, v2 };
@@ -599,8 +599,8 @@ Geometry mergeGeometries(std::vector<Geometry>& geometries)
 
 Vector3 getTriangleNormal(StructGeom::Triangle triangle, Vector3 resultNormal)
 {
-	Vector3 u = triangle[1] - triangle[0];
-	Vector3 v = triangle[2] - triangle[0];
+	Vector3 u = *triangle[1] - *triangle[0];
+	Vector3 v = *triangle[2] - *triangle[0];
 
 	resultNormal.set(
 		(u.y * v.z) - (u.z * v.y),
@@ -618,7 +618,7 @@ bool getTriangleBoundingBoxIntersection(Tri* vertices, Vector3& bboxCenter, Vect
 {
 	bboxHalfSize.addScalar(offset);
 
-	std::vector<Vector3> verts = { vertices->at(0) - bboxCenter, vertices->at(1) - bboxCenter, vertices->at(2) - bboxCenter };
+	std::vector<Vector3> verts = { *vertices->at(0) - bboxCenter, *vertices->at(1) - bboxCenter, *vertices->at(2) - bboxCenter };
 
 	Vector3 t_min = verts[0];
 	t_min.min(verts[1]);
@@ -650,8 +650,8 @@ bool getTriangleBoundingBoxIntersection(Tri* vertices, Vector3& bboxCenter, Vect
 		return false;
 	}
 
-	Tri f = { verts[1] - verts[0], verts[2] - verts[1], verts[0] - verts[2] };
-	Tri axes = { Vector3(1, 0, 0), Vector3(0, 1, 0), Vector3(0, 0, 1) };
+	std::vector<Vector3> f = { (verts[1] - verts[0]), (verts[2] - verts[1]), (verts[0] - verts[2]) };
+	std::vector<Vector3> axes = { Vector3(1, 0, 0), Vector3(0, 1, 0), Vector3(0, 0, 1) };
 
 	Vector3 a;
 	float p0, p1, p2, min, max, r;
@@ -677,9 +677,9 @@ bool getTriangleBoundingBoxIntersection(Tri* vertices, Vector3& bboxCenter, Vect
 
 float getDistanceToATriangleSq(Tri* vertices, Vector3& point)
 {
-	Vector3 diff = point - vertices->at(0);
-	Vector3 edge0 = vertices->at(1) - vertices->at(0);
-	Vector3 edge1 = vertices->at(2) - vertices->at(0);
+	Vector3 diff = point - *vertices->at(0);
+	Vector3 edge0 = *vertices->at(1) - *vertices->at(0);
+	Vector3 edge1 = *vertices->at(2) - *vertices->at(0);
 	float a00 = dot(edge0, edge0);
 	float a01 = dot(edge0, edge1);
 	float a11 = dot(edge1, edge1);
@@ -867,7 +867,7 @@ float getDistanceToATriangleSq(Tri* vertices, Vector3& point)
 		}
 	}
 
-	Vector3 closest = vertices->at(0) + t0 * edge0 + t1 * edge1;
+	Vector3 closest = *vertices->at(0) + t0 * edge0 + t1 * edge1;
 	diff = point - closest;
 	return dot(diff, diff);
 }
@@ -887,9 +887,9 @@ float dot2(Vector3 v) { return dot(v, v); }
 
 float getDistanceToATriangleSq2(Tri* vertices, Vector3& point)
 {
-	Vector3 ba = vertices->at(1) - vertices->at(0); Vector3 pa = point - vertices->at(0);
-	Vector3 cb = vertices->at(2) - vertices->at(1); Vector3 pb = point - vertices->at(1);
-	Vector3 ac = vertices->at(0) - vertices->at(2); Vector3 pc = point - vertices->at(2);
+	Vector3 ba = *vertices->at(1) - *vertices->at(0); Vector3 pa = point - *vertices->at(0);
+	Vector3 cb = *vertices->at(2) - *vertices->at(1); Vector3 pb = point - *vertices->at(1);
+	Vector3 ac = *vertices->at(0) - *vertices->at(2); Vector3 pc = point - *vertices->at(2);
 	Vector3 nor = cross(ba, ac);
 
 	return ((sign(dot(cross(ba, nor), pa)) +
@@ -910,8 +910,8 @@ float getRayTriangleIntersection(Vector3& rayStart, Vector3& rayDirection, Tri* 
 	const float EPSILON = 0.0000001;
 	Vector3 edge1, edge2, h, s, q;
 	float a, f, u, v;
-	edge1 = tri->at(1) - tri->at(0);
-	edge2 = tri->at(2) - tri->at(0);
+	edge1 = *tri->at(1) - *tri->at(0);
+	edge2 = *tri->at(2) - *tri->at(0);
 	h = cross(rayDirection, edge2);
 	a = dot(edge1, h);
 	if (a > -EPSILON && a < EPSILON) {
@@ -919,7 +919,7 @@ float getRayTriangleIntersection(Vector3& rayStart, Vector3& rayDirection, Tri* 
 	}
 		
 	f = 1.0 / a;
-	s = rayStart - tri->at(0);
+	s = rayStart - *tri->at(0);
 	u = f * dot(s, h);
 	if (u < 0.0 || u > 1.0) {
 		return -1.0f;

@@ -386,12 +386,12 @@ std::vector<Geometry> AABBTree::getAABBTrianglesOfDepth(uint depth)
 
 		for (uint i = 0; i < leaf.triangles.size(); i++) {
 			Geometry triGeom = Geometry();
-			triGeom.uniqueVertices = this->triangles[leaf.triangles[i]];
+			triGeom.uniqueVertices = std::vector<Vector3>(*this->triangles[leaf.triangles[i]].begin(), *this->triangles[leaf.triangles[i]].end());
 
 			for (uint j = 0; j < 3; j++) {
-				triGeom.vertices.push_back(this->triangles[leaf.triangles[i]][j].x);
-				triGeom.vertices.push_back(this->triangles[leaf.triangles[i]][j].y);
-				triGeom.vertices.push_back(this->triangles[leaf.triangles[i]][j].z);
+				triGeom.vertices.push_back(this->triangles[leaf.triangles[i]][j]->x);
+				triGeom.vertices.push_back(this->triangles[leaf.triangles[i]][j]->y);
+				triGeom.vertices.push_back(this->triangles[leaf.triangles[i]][j]->z);
 
 				// normals will be computed when merging geoms
 
@@ -533,17 +533,17 @@ float AABBTree::AABBNode::getSplitPosition(std::vector<uint>& triangles, std::ve
 	// count triangles for each split, we don't want to fill arrays here (lot of wasted cycles and memory ops)
 	for (uint i = 0; i < triangles.size(); i++) {
 		float min = std::fminf(
-			this->tree->triangles[triangles[i]][0].getCoordById(axis), 
+			this->tree->triangles[triangles[i]][0]->getCoordById(axis), 
 			std::fminf(
-				this->tree->triangles[triangles[i]][1].getCoordById(axis), 
-				this->tree->triangles[triangles[i]][2].getCoordById(axis)
+				this->tree->triangles[triangles[i]][1]->getCoordById(axis),
+				this->tree->triangles[triangles[i]][2]->getCoordById(axis)
 			)
 		);		
 		float max = std::fmaxf(
-			this->tree->triangles[triangles[i]][0].getCoordById(axis),
+			this->tree->triangles[triangles[i]][0]->getCoordById(axis),
 			std::fmaxf(
-				this->tree->triangles[triangles[i]][1].getCoordById(axis),
-				this->tree->triangles[triangles[i]][2].getCoordById(axis)
+				this->tree->triangles[triangles[i]][1]->getCoordById(axis),
+				this->tree->triangles[triangles[i]][2]->getCoordById(axis)
 			)
 		);
 
@@ -571,17 +571,17 @@ float AABBTree::AABBNode::getSplitPosition(std::vector<uint>& triangles, std::ve
 	// fill left and right arrays now that best split position is known
 	for (uint i = 0; i < triangles.size(); i++) {
 		float min = std::fminf(
-			this->tree->triangles[triangles[i]][0].getCoordById(axis),
+			this->tree->triangles[triangles[i]][0]->getCoordById(axis),
 			std::fminf(
-				this->tree->triangles[triangles[i]][1].getCoordById(axis),
-				this->tree->triangles[triangles[i]][2].getCoordById(axis)
+				this->tree->triangles[triangles[i]][1]->getCoordById(axis),
+				this->tree->triangles[triangles[i]][2]->getCoordById(axis)
 			)
 		);
 		float max = std::fmaxf(
-			this->tree->triangles[triangles[i]][0].getCoordById(axis),
+			this->tree->triangles[triangles[i]][0]->getCoordById(axis),
 			std::fmaxf(
-				this->tree->triangles[triangles[i]][1].getCoordById(axis),
-				this->tree->triangles[triangles[i]][2].getCoordById(axis)
+				this->tree->triangles[triangles[i]][1]->getCoordById(axis),
+				this->tree->triangles[triangles[i]][2]->getCoordById(axis)
 			)
 		);
 
