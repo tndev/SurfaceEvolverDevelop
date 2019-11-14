@@ -71,10 +71,10 @@ int main()
 
 		for (unsigned int res = min_Res; res < max_Res; res += 20) {
 			for (unsigned int n = min_Ns; n < max_Ns; n++) {
-				std::cout << "cubeSphere(" << n << "), grid_res = " << res << std::endl;
-				timing << "cubeSphere(" << n << "), grid_res = " << res << std::endl;
-				CubeSphere c = CubeSphere(n, r);
-				e.initExport(c, "cubeSphere" + std::to_string(res) + "-" + std::to_string(n));
+				std::cout << "cube(" << n << "), grid_res = " << res << std::endl;
+				timing << "cube(" << n << "), grid_res = " << res << std::endl;
+				PrimitiveBox c = PrimitiveBox(a, a, a, n, n, n);
+				e.initExport(c, "cube" + std::to_string(res) + "-" + std::to_string(n));
 				auto startSDF = std::chrono::high_resolution_clock::now();
 				// === Timed code ============
 
@@ -180,7 +180,7 @@ int main()
 
 		FastSweep3D fs = FastSweep3D(&voxField, 8); // computes distance field
 
-		bool signCompute = false;
+		/* bool signCompute = false;
 		if (signCompute) {
 			std::cout << "computing signs for " << voxField.field.size() << " grid pts ..." << std::endl;
 			auto startSDF_Sign = std::chrono::high_resolution_clock::now();
@@ -188,7 +188,7 @@ int main()
 			auto endSDF_Sign = std::chrono::high_resolution_clock::now();
 			std::chrono::duration<float> elapsedSDF_Sign = (endSDF_Sign - startSDF_Sign);
 			std::cout << "sign computation finished after " << elapsedSDF_Sign.count() << " seconds" << std::endl;
-		}
+		}*/
 
 		voxField.exportToVTI("voxFieldSDF"); // save final SDF
 		// === Timed code ============

@@ -1,2 +1,2 @@
-cubeSphere(3), grid_res = 40
-computation times:  AABB: 0.0418527 s , Octree: 5.48112 s, FastSweep3D: 6.33975, TOTAL: 11.8627 s
+cube(3), grid_res = 40
+computation times:  AABB: 0.0231238 s , Octree: 5.65721 s, FastSweep3D: 3.75689, TOTAL: 9.43723 s
