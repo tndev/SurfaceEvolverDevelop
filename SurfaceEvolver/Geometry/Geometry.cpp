@@ -40,6 +40,11 @@ bool Geometry::hasTriangulations()
 	return this->triangulations.size() > 0;
 }
 
+bool Geometry::hasVertexToTrianglesMap()
+{
+	return !this->vertexToTriangles.empty();
+}
+
 Box3 Geometry::getBoundingBox(Box3 bbox, Matrix4 matrix)
 {
 	Vector3 helperVector = Vector3();
@@ -173,7 +178,6 @@ std::vector<Vector3> Geometry::getAngleWeightedVertexPseudoNormals()
 	std::vector<Vector3> result = {};
 
 	std::multimap<Vector3, BufferGeom::TriWithMarkedVertex> vertexToTriangles = {};
-	std::vector<uint> vIdxBuffer = {};
 	this->getVertexToTriangleMap(&vertexToTriangles);
 	std::multimap<Vector3, BufferGeom::TriWithMarkedVertex>::iterator it;
 	Vector3* v; std::vector<Vector3*> verts = {};
@@ -210,7 +214,39 @@ std::vector<Vector3> Geometry::getAngleWeightedVertexPseudoNormals()
 
 Vector3 Geometry::getAngleWeightedPseudonormalToVertex(uint vId)
 {
-	return Vector3();
+	Vector3* v = &this->uniqueVertices.at(vId);
+
+	if (!this->hasVertexToTrianglesMap()) {
+		this->getVertexToTriangleMap(&this->vertexToTriangles);
+	}
+
+	std::multimap<Vector3, BufferGeom::TriWithMarkedVertex>::iterator it;
+	Vector3* v; std::vector<Vector3*> verts = {};
+	float alpha; Vector3 triNormal = Vector3();
+
+	it = vertexToTriangles.find(*v);
+	Vector3 pseudoNormal = Vector3();
+	while (it != vertexToTriangles.end()) {
+		BufferGeom::TriWithMarkedVertex ti = it->second;
+		StructGeom::Triangle T = { uniqueVertices[ti.first[0]], uniqueVertices[ti.first[1]], uniqueVertices[ti.first[2]] };
+		// compute normal
+		getTriangleNormal(T, triNormal);
+		for (auto&& vi : ti.first) {
+			if (vi != ti.second) { // ignore the marked vertex because its v
+				verts.push_back(&this->uniqueVertices[vi]);
+			}
+		}
+		// compute angle
+		alpha = acos(dot(normalize(*verts[0] - *v), normalize(*verts[1] - *v)));
+
+		pseudoNormal = pseudoNormal + alpha * triNormal;
+
+		verts.clear();
+		vertexToTriangles.erase(it);
+		it = vertexToTriangles.find(*v);
+	}
+
+	return pseudoNormal;
 }
 
 std::vector<Vector3> Geometry::getProjectionsAlongNormal(BufferGeom::Face& vertices)

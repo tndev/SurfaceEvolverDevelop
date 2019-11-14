@@ -32,6 +32,7 @@ class Geometry
 private:
 	std::vector<StructGeom::Triangle> triangles = {};
 	std::vector<StructGeom::Edge> edges = {};
+	std::multimap<Vector3, BufferGeom::TriWithMarkedVertex> vertexToTriangles;
 public:
 	// every time a geometry is created, it is preferrable to keep an additional array of vertices to, which
 	// vertexIndices actually point
@@ -52,6 +53,7 @@ public:
 	bool hasVertexIndices();
 	bool hasNormals();
 	bool hasTriangulations();
+	bool hasVertexToTrianglesMap();
 
 	Box3 getBoundingBox(Box3 bbox = Box3(), Matrix4 matrix = Matrix4());
 	void computeNormals();

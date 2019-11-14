@@ -36,7 +36,9 @@
 
 //   TODO (weekend Nov.15th - Nov.17th):
 //
+// - generalize AABB for points, edges, and triangles as generic sufrace features
 // - Unite AABB, Octree and FastSweep3D into a single class
+// - flat AABB
 // - debug and optimize FastSweep3D
 // - perform simple DF tests for geom primitives like sphere, icosphere, cubesphere
 // - cleanup main & prep for VTK window form
