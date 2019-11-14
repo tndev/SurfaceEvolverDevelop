@@ -1,6 +1,8 @@
+#define _USE_MATH_DEFINES
 
 #include <iostream>
 #include <chrono>
+#include <math.h>
 #include "../Geometry/Geometry.h"
 #include "../Geometry/Matrix4.h"
 #include "../Geometry/Matrix3.h"
@@ -74,6 +76,8 @@ int main()
 				std::cout << "cube(" << n << "), grid_res = " << res << std::endl;
 				timing << "cube(" << n << "), grid_res = " << res << std::endl;
 				PrimitiveBox c = PrimitiveBox(a, a, a, n, n, n);
+				Vector3 axis = normalize(Vector3(1, 1, 1));
+				c.applyMatrix(Matrix4().makeRotationAxis(axis.x, axis.y, axis.z, M_PI / 6.));
 				e.initExport(c, "cube" + std::to_string(res) + "-" + std::to_string(n));
 				auto startSDF = std::chrono::high_resolution_clock::now();
 				// === Timed code ============
