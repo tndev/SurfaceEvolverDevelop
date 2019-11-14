@@ -24,6 +24,7 @@
 // - Apply Fast Sweeping Method
 // - SDF
 // - Optimize initial condition for FastSweep3D by actual distance computation for Octree leaves
+// - Get exact octree centroid to closest triangle dist
 
 //   DONE, BUT MIGHT BE IMPROVED:
 //
@@ -31,12 +32,14 @@
 
 //   WIP:
 // 
-// - Get exact octree centroid to closest triangle dist
 
 
-//   TODO:
+//   TODO (weekend Nov.15th - Nov.17th):
 //
-// - cleanup main
+// - Unite AABB, Octree and FastSweep3D into a single class
+// - debug and optimize FastSweep3D
+// - perform simple DF tests for geom primitives like sphere, icosphere, cubesphere
+// - cleanup main & prep for VTK window form
 // - Interior/Exterior mesh Sign
 
 int main()
