@@ -64,13 +64,14 @@ SDF::SDF(Geometry* geom, uint resolution)
 	auto endSDF = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<float> elapsedSDF = (endSDF - startSDF);
 
-	this->geom_properties = this->geom->name + "\n" + "verts: " + std::to_string(this->geom->uniqueVertices.size()) + ", triangles: " + std::to_string(this->aabb->triangles.size());
+	this->geom_properties = "=== " + this->geom->name + " === \n" + "verts: " + std::to_string(this->geom->uniqueVertices.size()) +
+		", triangles: " + std::to_string(this->aabb->triangles.size()) + ", grid resolution: " + std::to_string(resolution) + "^3 \n";
 	this->time_log = 
 		"computation times:  AABB: " + std::to_string(elapsedSDF_AABB.count()) +
 		" s, Octree: (build: " + std::to_string(elapsedSDF_Octree.count()) + " s, get_leaves: " + std::to_string(this->octree->leaf_retrieve_time) + 
-		"), FastSweep3D: " + std::to_string(elapsedSDF_FS.count()) +
+		" s), FastSweep3D: " + std::to_string(elapsedSDF_FS.count()) +
 		// ", Sign: " + std::to_string(elapsedSDF_Sign.count()) +
-		" s, TOTAL: " + std::to_string(elapsedSDF.count()) + " s" + "\n";
+		" s, TOTAL: " + std::to_string(elapsedSDF.count()) + " s" + "\n\n";
 }
 
 void SDF::exportGrid(VTKExporter* e, std::string export_name)
@@ -85,5 +86,5 @@ void SDF::exportGrid(VTKExporter* e, std::string export_name)
 
 std::string SDF::getComputationProperties()
 {
-	return this->geom_properties + "\n" + this->time_log;
+	return this->geom_properties + this->time_log;
 }

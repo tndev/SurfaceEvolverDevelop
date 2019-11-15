@@ -1,4 +1,5 @@
 cube(3), grid_res = 30
-PrimitiveBox, dimensions: (57.735027, 57.735027, 57.735027), segments: (3, 3, 3)
-verts: 56, triangles: 108
-computation times:  AABB: 0.061662 s, Octree: (build: 1.485393 s, get_leaves: 0.016884), FastSweep3D: 1.142585 s, TOTAL: 2.689646 s
+=== PrimitiveBox, dimensions: (57.735027, 57.735027, 57.735027), segments: (3, 3, 3) === 
+verts: 56, triangles: 108, grid resolution: 30^3 
+computation times:  AABB: 0.060112 s, Octree: (build: 1.593278 s, get_leaves: 0.018345 s), FastSweep3D: 1.168913 s, TOTAL: 2.822309 s
+
