@@ -1,2 +1,2 @@
-cube(3), grid_res = 40
-computation times:  AABB: 0.0809567 s , Octree: 4.87806 s, FastSweep3D: 5.06538, TOTAL: 10.0244 s
+cube(3), grid_res = 30
+computation times:  AABB: 0.064503 s , Octree: 1.66321 s, FastSweep3D: 1.27526, TOTAL: 3.00298 s

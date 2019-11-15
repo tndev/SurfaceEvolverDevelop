@@ -67,7 +67,7 @@ int main()
 	bool iterateCubeSphereTest = true;
 
 	if (iterateCubeSphereTest) {
-		size_t min_Res = 40, max_Res = 50;
+		size_t min_Res = 30, max_Res = 40;
 		size_t min_Ns = 3, max_Ns = 4;
 		std::fstream timing("timing.txt", std::fstream::out);
 

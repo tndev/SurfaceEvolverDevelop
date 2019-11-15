@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <chrono>
+#include <cstdlib>
 #include "Grid.h"
 
 // This is a solver for Eikonal equation |grad(u(x))| = 1 (i.e. the distance function)

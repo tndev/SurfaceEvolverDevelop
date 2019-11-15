@@ -18,7 +18,6 @@ FastSweep3D::~FastSweep3D()
 {
 }
 
-
 void FastSweep3D::sweep()
 {
 	uint Nx = grid->Nx; uint Ny = grid->Ny; uint Nz = grid->Nz;
@@ -26,7 +25,7 @@ void FastSweep3D::sweep()
 	float aa[3], tmp, eps = 1e-6;
 	float d_curr, d_new, a, b, c, D;
 
-	// sweep directions
+	// sweep directions { start, end, step }
 	const int dirX[8][3] = { { 0, Nx - 1, 1 }, { Nx - 1, 0, -1 }, { Nx - 1, 0, -1 }, { Nx - 1, 0, -1 }, { Nx - 1, 0, -1 }, { 0, Nx - 1, 1 }, { 0, Nx - 1, 1 }, { 0, Nx - 1, 1 } };
 	const int dirY[8][3] = { { 0, Ny - 1, 1 }, { 0, Ny - 1, 1 }, { Ny - 1, 0, -1 }, { Ny - 1, 0, -1 }, { 0, Ny - 1, 1 }, { 0, Ny - 1, 1 }, { Ny - 1, 0, -1 }, { Ny - 1, 0, -1 } };
 	const int dirZ[8][3] = { { 0, Nz - 1, 1 }, { 0, Nz - 1, 1 }, { 0, Nz - 1, 1 }, { Nz - 1, 0, -1 }, { Nz - 1, 0, -1 }, { Nz - 1, 0, -1 }, { Nz - 1, 0, -1 }, { 0, Nz - 1, 1 } };
@@ -43,47 +42,59 @@ void FastSweep3D::sweep()
 					gridPos = ((i * Ny + j) * Nz + k);
 					if (!grid->frozenCells[gridPos]) {
 
-						// === checking for boundary cells ===
+						// === neighboring cells (Upwind Godunov) ===
+						// using ternary operator ( ? : ) is faster most of the time
 						if (i == 0 || i == (Nx - 1)) {
 							if (i == 0) {
 								aa[0] = grid->field[gridPos] < grid->field[(((i + 1) * Ny + j) * Nz + k)] ? grid->field[gridPos] : grid->field[(((i + 1) * Ny + j) * Nz + k)];
+								// aa[0] = std::min(grid->field[gridPos], grid->field[(((i + 1) * Ny + j) * Nz + k)]);
 							}
 							if (i == (Nx - 1)) {
 								aa[0] = grid->field[(((i - 1) * Ny + j) * Nz + k)] < grid->field[gridPos] ? grid->field[(((i - 1) * Ny + j) * Nz + k)] : grid->field[gridPos];
+								// aa[0] = std::min(grid->field[(((i - 1) * Ny + j) * Nz + k)], grid->field[gridPos]);
 							}
 						}
 						else {
 							aa[0] = grid->field[(((i - 1) * Ny + j) * Nz + k)] < grid->field[(((i + 1) * Ny + j) * Nz + k)] ? grid->field[(((i - 1) * Ny + j) * Nz + k)] : grid->field[(((i + 1) * Ny + j) * Nz + k)];
+							// aa[0] = std::min(grid->field[(((i - 1) * Ny + j) * Nz + k)], grid->field[(((i + 1) * Ny + j) * Nz + k)]);
 						}
 
 						if (j == 0 || j == (Ny - 1)) {
 							if (j == 0) {
 								aa[1] = grid->field[gridPos] < grid->field[((i * Ny + (j + 1)) * Nz + k)] ? grid->field[gridPos] : grid->field[((i * Ny + (j + 1)) * Nz + k)];
+								// aa[1] = std::min(grid->field[gridPos], grid->field[((i * Ny + (j + 1)) * Nz + k)]);
 							}
 							if (j == (Ny - 1)) {
 								aa[1] = grid->field[((i * Ny + (j - 1)) * Nz + k)] < grid->field[gridPos] ? grid->field[((i * Ny + (j - 1)) * Nz + k)] : grid->field[gridPos];
+								// aa[1] = std::min(grid->field[((i * Ny + (j - 1)) * Nz + k)], grid->field[gridPos]);
 							}
 						}
 						else {
 							aa[1] = grid->field[((i * Ny + (j - 1)) * Nz + k)] < grid->field[((i * Ny + (j + 1)) * Nz + k)] ? grid->field[((i * Ny + (j - 1)) * Nz + k)] : grid->field[((i * Ny + (j + 1)) * Nz + k)];
+							// aa[1] = std::min(grid->field[((i * Ny + (j - 1)) * Nz + k)], grid->field[((i * Ny + (j + 1)) * Nz + k)]);
 						}
 
 						if (k == 0 || k == (Nz - 1)) {
 							if (k == 0) {
 								aa[2] = grid->field[gridPos] < grid->field[((i * Ny + j) * Nz + (k + 1))] ? grid->field[gridPos] : grid->field[((i * Ny + j) * Nz + (k + 1))];
+								// aa[2] = std::min(grid->field[gridPos], grid->field[((i * Ny + j) * Nz + (k + 1))]);
 							}
 							if (k == (Nz - 1)) {
 								aa[2] = grid->field[((i * Ny + j) * Nz + (k - 1))] < grid->field[gridPos] ? grid->field[((i * Ny + j) * Nz + (k - 1))] : grid->field[gridPos];
+								// aa[2] = std::min(grid->field[((i * Ny + j) * Nz + (k - 1))], grid->field[gridPos]);
 							}
 						}
 						else {
 							aa[2] = grid->field[((i * Ny + j) * Nz + (k - 1))] < grid->field[((i * Ny + j) * Nz + (k + 1))] ? grid->field[((i * Ny + j) * Nz + (k - 1))] : grid->field[((i * Ny + j) * Nz + (k + 1))];
+							// aa[2] = std::min(grid->field[((i * Ny + j) * Nz + (k - 1))], grid->field[((i * Ny + j) * Nz + (k + 1))]);
 						}
 
 						// simple bubble sort
 						if (aa[0] > aa[1]) { tmp = aa[0]; aa[0] = aa[1]; aa[1] = tmp; }
 						if (aa[1] > aa[2]) { tmp = aa[1]; aa[1] = aa[2]; aa[2] = tmp; }
 						if (aa[0] > aa[1]) { tmp = aa[0]; aa[0] = aa[1]; aa[1] = tmp; }
+						// qsort increases the computation time by a factor of ~ 1.2
+						// qsort(aa, 3, sizeof(float), floatcomp);
 
 						d_curr = aa[0] + h * f;
 						if (d_curr <= (aa[1] + eps)) {

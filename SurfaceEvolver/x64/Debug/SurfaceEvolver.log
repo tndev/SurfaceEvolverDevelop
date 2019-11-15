@@ -1,38 +1,28 @@
-﻿  main.cpp
+﻿  FastSweep3D.cpp
 D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\poly2tri\sweep\sweep_context.h(161,24): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\main.cpp(54,10): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\main.cpp(63,65): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\main.cpp(63,56): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\main.cpp(63,47): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\main.cpp(74,34): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\main.cpp(75,32): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
-  FastSweep3D.cpp
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\main.cpp(80,79): warning C4305: 'argument': truncation from 'double' to 'float'
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\poly2tri\sweep\sweep_context.h(161,24): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(26,30): warning C4305: 'initializing': truncation from 'double' to 'float'
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(25,30): warning C4305: 'initializing': truncation from 'double' to 'float'
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(29,35): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(29,50): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(29,69): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(29,88): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(29,107): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(29,129): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(29,147): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(29,165): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
 D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(30,35): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(30,50): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(30,69): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(30,88): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(30,107): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(30,129): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(30,147): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(30,165): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(30,53): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(30,68): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(30,87): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(30,109): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(30,127): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(30,142): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(30,161): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
 D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(31,35): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
 D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(31,53): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(31,68): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(31,87): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(31,109): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(31,127): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(31,142): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(31,161): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(32,35): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(32,53): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(32,71): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(32,86): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(32,105): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(32,124): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(32,143): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
-  Generating Code...
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(32,165): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(31,71): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(31,86): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(31,105): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(31,124): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(31,143): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(31,165): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
   SurfaceEvolver.vcxproj -> D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\x64\Debug\SurfaceEvolver.exe
