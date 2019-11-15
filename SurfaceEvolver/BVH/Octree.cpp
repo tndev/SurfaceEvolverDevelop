@@ -191,6 +191,7 @@ void Octree::setLeafValueToScalarGrid(Grid* grid)
 
 		gridPos = Nx * Ny * iz + Nx * iy + ix;
 		grid->field[gridPos] = valueBuffer[i];
+		grid->frozenCells[gridPos] = true; // freeze initial condition
 	}
 }
 
@@ -221,5 +222,6 @@ void Octree::setConstantValueToScalarGrid(Grid* grid, float value)
 
 		gridPos = Nx * Ny * iz + Nx * iy + ix;
 		grid->field[gridPos] = value;
+		grid->frozenCells[gridPos] = true; // freeze initial condition
 	}
 }

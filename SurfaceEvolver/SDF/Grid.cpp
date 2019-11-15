@@ -28,6 +28,7 @@ Grid::Grid(uint Nx, uint Ny, uint Nz, Box3 bbox, float initVal)
 	this->Nz = (uint)std::floor(newScale.z / origScale.z * Nz);
 	this->scale = newScale;
 	this->field = std::vector<float>((size_t)this->Nx * this->Ny * this->Nz, initVal); // init field
+	this->frozenCells = std::vector<bool>((size_t)this->Nx * this->Ny * this->Nz, false); // unfreeze all
 }
 
 Grid::~Grid()

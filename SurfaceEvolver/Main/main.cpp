@@ -106,6 +106,11 @@ int main()
 				auto endSDF = std::chrono::high_resolution_clock::now();
 				std::chrono::duration<float> elapsedSDF = (endSDF - startSDF);
 
+				/*std::vector<Geometry> otlBoxGeoms = {};
+				O.getLeafBoxGeoms(&otlBoxGeoms);
+				Geometry leafBoxGeom = mergeGeometries(otlBoxGeoms);
+				e.initExport(leafBoxGeom, "leafBoxesOctree" + std::to_string(res) + "-" + std::to_string(n)); // this is a major bottleneck*/
+
 				std::cout << "computation times:  AABB: " << elapsedSDF_AABB.count() <<
 					" s , Octree: " << elapsedSDF_Octree.count() << " s, FastSweep3D: " << elapsedSDF_FS.count() <<
 					// ", Sign: " << elapsedSDF_Sign.count() <<

@@ -10,130 +10,114 @@ FastSweep3D::FastSweep3D(Grid* grid, uint Nsweeps, bool blur)
 	this->h = this->grid->scale.x / this->grid->Nx;
 	this->Nsweeps = Nsweeps;
 
-	auto startFastSweep = std::chrono::high_resolution_clock::now();
-	// === Timed code ============
-	std::cout << "Initiating FastSweep3D..." << std::endl;
-	for (uint i = 0; i < this->Nsweeps; i++) {
-		std::cout << "sweep " << i << " ... " << std::endl;
-		this->sweep(this->sweepDir[i]);
-	}
+	this->sweep();
 	if (blur) this->grid->blur();
-	// === Timed code ============
-	auto endFastSweep = std::chrono::high_resolution_clock::now();
-	std::chrono::duration<float> elapsedFastSweep = (endFastSweep - startFastSweep);
-	std::cout << "FastSweep3D finished after " << elapsedFastSweep.count() << " seconds" << std::endl;
 }
 
 FastSweep3D::~FastSweep3D()
 {
 }
 
-float FastSweep3D::EikonalSolveInDim(std::vector<float>& aValues, uint dim)
+
+void FastSweep3D::sweep()
 {
-	if (dim == 1) return aValues[0] + h * f;
+	uint Nx = grid->Nx; uint Ny = grid->Ny; uint Nz = grid->Nz;
+	int i, j, k, gridPos;
+	float aa[3], tmp, eps = 1e-6;
+	float d_curr, d_new, a, b, c, D;
 
-	float sumA = 0.0f, sumASq = 0.0f;
-	for (uint i = 0; i < dim; i++) {
-		sumA += aValues[i];
-		sumASq += aValues[i] * aValues[i];
-	}
+	// sweep directions
+	const int dirX[8][3] = { { 0, Nx - 1, 1 }, { Nx - 1, 0, -1 }, { Nx - 1, 0, -1 }, { Nx - 1, 0, -1 }, { Nx - 1, 0, -1 }, { 0, Nx - 1, 1 }, { 0, Nx - 1, 1 }, { 0, Nx - 1, 1 } };
+	const int dirY[8][3] = { { 0, Ny - 1, 1 }, { 0, Ny - 1, 1 }, { Ny - 1, 0, -1 }, { Ny - 1, 0, -1 }, { 0, Ny - 1, 1 }, { 0, Ny - 1, 1 }, { Ny - 1, 0, -1 }, { Ny - 1, 0, -1 } };
+	const int dirZ[8][3] = { { 0, Nz - 1, 1 }, { 0, Nz - 1, 1 }, { 0, Nz - 1, 1 }, { Nz - 1, 0, -1 }, { Nz - 1, 0, -1 }, { Nz - 1, 0, -1 }, { Nz - 1, 0, -1 }, { 0, Nz - 1, 1 } };
 
-	float a = dim;
-	float b = -2.0f * sumA;
-	float c = sumASq - h * h * f * f;
-	float discriminant = b * b - 4.0f * a * c;
-	if (discriminant < 0.0f) {
-		return LARGE_VAL;
-	}
-	else {
-		return (-b + sqrt(discriminant)) / (2.0f * a);
-	}
-}
+	auto startFastSweep = std::chrono::high_resolution_clock::now();
+	// === Timed code ============
+	std::cout << "Initiating FastSweep3D..." << std::endl;
 
-void FastSweep3D::sweep(int dir[])
-{
-	uint Nx = this->grid->Nx; uint Ny = this->grid->Ny; uint Nz = this->grid->Nz;
-	
-	int iXmin = dir[0] > 0 ? 0 : Nx - 1;
-	int iXmax = dir[0] > 0 ? Nx : -1;
+	for (uint s = 0; s < Nsweeps; s++) {
+		std::cout << "sweep " << s << " ... " << std::endl;
+		for (i = dirX[s][0]; dirX[s][2] * i <= dirX[s][1]; i += dirX[s][2]) {
+			for (j = dirY[s][0]; dirY[s][2] * j <= dirY[s][1]; j += dirY[s][2]) {
+				for (k = dirZ[s][0]; dirZ[s][2] * k <= dirZ[s][1]; k += dirZ[s][2]) {
+					gridPos = ((i * Ny + j) * Nz + k);
+					if (!grid->frozenCells[gridPos]) {
 
-	int iYmin = dir[1] > 0 ? 0 : Ny - 1;
-	int iYmax = dir[1] > 0 ? Ny : -1;
+						// === checking for boundary cells ===
+						if (i == 0 || i == (Nx - 1)) {
+							if (i == 0) {
+								aa[0] = grid->field[gridPos] < grid->field[(((i + 1) * Ny + j) * Nz + k)] ? grid->field[gridPos] : grid->field[(((i + 1) * Ny + j) * Nz + k)];
+							}
+							if (i == (Nx - 1)) {
+								aa[0] = grid->field[(((i - 1) * Ny + j) * Nz + k)] < grid->field[gridPos] ? grid->field[(((i - 1) * Ny + j) * Nz + k)] : grid->field[gridPos];
+							}
+						}
+						else {
+							aa[0] = grid->field[(((i - 1) * Ny + j) * Nz + k)] < grid->field[(((i + 1) * Ny + j) * Nz + k)] ? grid->field[(((i - 1) * Ny + j) * Nz + k)] : grid->field[(((i + 1) * Ny + j) * Nz + k)];
+						}
 
-	int iZmin = dir[2] > 0 ? 0 : Nz - 1;
-	int iZmax = dir[2] > 0 ? Nz : -1;
+						if (j == 0 || j == (Ny - 1)) {
+							if (j == 0) {
+								aa[1] = grid->field[gridPos] < grid->field[((i * Ny + (j + 1)) * Nz + k)] ? grid->field[gridPos] : grid->field[((i * Ny + (j + 1)) * Nz + k)];
+							}
+							if (j == (Ny - 1)) {
+								aa[1] = grid->field[((i * Ny + (j - 1)) * Nz + k)] < grid->field[gridPos] ? grid->field[((i * Ny + (j - 1)) * Nz + k)] : grid->field[gridPos];
+							}
+						}
+						else {
+							aa[1] = grid->field[((i * Ny + (j - 1)) * Nz + k)] < grid->field[((i * Ny + (j + 1)) * Nz + k)] ? grid->field[((i * Ny + (j - 1)) * Nz + k)] : grid->field[((i * Ny + (j + 1)) * Nz + k)];
+						}
 
-	std::cout << "sweep ranges: iX = [" << iXmin << ", " << iXmax << ", step = " << dir[0] << "]" << std::endl;
-	std::cout << "sweep ranges: iY = [" << iYmin << ", " << iYmax << ", step = " << dir[1] << "]" << std::endl;
-	std::cout << "sweep ranges: iZ = [" << iZmin << ", " << iZmax << ", step = " << dir[2] << "]" << std::endl;
+						if (k == 0 || k == (Nz - 1)) {
+							if (k == 0) {
+								aa[2] = grid->field[gridPos] < grid->field[((i * Ny + j) * Nz + (k + 1))] ? grid->field[gridPos] : grid->field[((i * Ny + j) * Nz + (k + 1))];
+							}
+							if (k == (Nz - 1)) {
+								aa[2] = grid->field[((i * Ny + j) * Nz + (k - 1))] < grid->field[gridPos] ? grid->field[((i * Ny + j) * Nz + (k - 1))] : grid->field[gridPos];
+							}
+						}
+						else {
+							aa[2] = grid->field[((i * Ny + j) * Nz + (k - 1))] < grid->field[((i * Ny + j) * Nz + (k + 1))] ? grid->field[((i * Ny + j) * Nz + (k - 1))] : grid->field[((i * Ny + j) * Nz + (k + 1))];
+						}
 
-	uint adim, gridPos, gridPosXprev, gridPosXnext, gridPosYprev, gridPosYnext, gridPosZprev, gridPosZnext;
-	float u, uNew, uXprev, uXnext, uYprev, uYnext, uZprev, uZnext;
-	std::vector<float> neighborVals = { LARGE_VAL, LARGE_VAL, LARGE_VAL };
-	std::vector<float> uMins = {};
+						// simple bubble sort
+						if (aa[0] > aa[1]) { tmp = aa[0]; aa[0] = aa[1]; aa[1] = tmp; }
+						if (aa[1] > aa[2]) { tmp = aa[1]; aa[1] = aa[2]; aa[2] = tmp; }
+						if (aa[0] > aa[1]) { tmp = aa[0]; aa[0] = aa[1]; aa[1] = tmp; }
 
-	auto SolveEikonal = [&](uint ix, uint iy, uint iz) -> float {
-		adim = 3;
+						d_curr = aa[0] + h * f;
+						if (d_curr <= (aa[1] + eps)) {
+							d_new = d_curr;
+						}
+						else {
+							a = 2.0f; b = -2.0f * (aa[0] + aa[1]);
+							c = aa[0] * aa[0] + aa[1] * aa[1] - h * h * f * f;
+							D = sqrt(b * b - 4.0f * a * c);
 
-		gridPosXprev = Nx * Ny * iz + Nx * iy + std::max((int)ix - 1, 0);
-		gridPosXnext = Nx * Ny * iz + Nx * iy + std::min((int)ix + 1, (int)Nx - 1);
+							d_curr = ((-b + D) > (-b - D) ? (-b + D) : (-b - D)) / (2.0f * a);
 
-		gridPosYprev = Nx * Ny * iz + Nx * std::max((int)iy - 1, 0) + ix;
-		gridPosYnext = Nx * Ny * iz + Nx * std::min((int)iy + 1, (int)Ny - 1) + ix;
+							if (d_curr <= (aa[2] + eps))
+								d_new = d_curr;
+							else {
+								a = 3.0f;
+								b = -2.0f * (aa[0] + aa[1] + aa[2]);
+								c = aa[0] * aa[0] + aa[1] * aa[1] + aa[2] * aa[2] - h * h * f * f;
+								D = sqrt(b * b - 4.0f * a * c);
 
-		gridPosZprev = Nx * Ny * std::max((int)iz - 1, 0) + Nx * iy + ix;
-		gridPosZnext = Nx * Ny * std::min((int)iz + 1, (int)Nz - 1) + Nx * iy + ix;
+								d_new = ((-b + D) > (-b - D) ? (-b + D) : (-b - D)) / (2.0f * a);
+							}
+						}
 
-		uXprev = this->grid->field[gridPosXprev];
-		uXnext = this->grid->field[gridPosXnext];
-
-		uYprev = this->grid->field[gridPosYprev];
-		uYnext = this->grid->field[gridPosYnext];
-
-		uZprev = this->grid->field[gridPosZprev];
-		uZnext = this->grid->field[gridPosZnext];
-
-		neighborVals[0] = std::min(uXprev, uXnext);
-		neighborVals[1] = std::min(uYprev, uYnext);
-		neighborVals[2] = std::min(uZprev, uZnext);
-
-		uMins.clear();
-		for (uint d = 0; d < 3; d++) {
-			if (neighborVals[d] < LARGE_VAL && neighborVals[d] < this->grid->field[gridPos]) {
-				uMins.push_back(neighborVals[d]);
-			}
-			else {
-				adim--;
-			}
-		}
-		if (adim == 0) return LARGE_VAL;
-		if (uMins.size() > 2) {
-			std::sort(uMins.begin(), uMins.end());
-		}
-		else if (uMins.size() == 2) {
-			uMins = { std::fminf(uMins[0], uMins[1]), std::fmaxf(uMins[0], uMins[1]) };
-		}
-		
-		float sol;
-		for (uint i = 1; i <= adim; i++) {
-			sol = this->EikonalSolveInDim(uMins, i);
-			if (i == adim || fabs(sol - uMins[i]) < 1e5 * FLT_EPSILON) break;
-		}
-		return sol;
-	};
-
-	for (int iz = iZmin; iz != iZmax; iz += dir[2]) {
-		for (int iy = iYmin; iy != iYmax; iy += dir[1]) {
-			for (int ix = iXmin; ix != iXmax; ix += dir[0]) {
-				gridPos = Nx * Ny * iz + Nx * iy + ix;
-				u = this->grid->field[gridPos];
-				uNew = SolveEikonal(ix, iy, iz);
-				if (uNew + 1e5 * FLT_EPSILON < u) {
-					this->grid->field[gridPos] = uNew;
-					grid->max = ((uNew < LARGE_VAL && uNew > u) ? uNew : grid->max);
+						grid->field[gridPos] = grid->field[gridPos] < d_new ? grid->field[gridPos] : d_new;
+					}
 				}
 			}
 		}
 	}
+
+	// === Timed code ============
+	auto endFastSweep = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<float> elapsedFastSweep = (endFastSweep - startFastSweep);
+	std::cout << "FastSweep3D finished after " << elapsedFastSweep.count() << " seconds" << std::endl;
 }
 
