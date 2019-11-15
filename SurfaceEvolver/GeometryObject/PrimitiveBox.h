@@ -12,7 +12,7 @@ public:
 
 	PrimitiveBox();
 	PrimitiveBox(const PrimitiveBox& other);
-	PrimitiveBox(float x, float y, float z, unsigned int sx, unsigned int sy, unsigned int sz);
+	PrimitiveBox(float x, float y, float z, unsigned int sx, unsigned int sy, unsigned int sz, std::string name = "");
 	~PrimitiveBox();
 
 	void build();

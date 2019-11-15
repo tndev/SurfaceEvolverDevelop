@@ -16,6 +16,7 @@
 #include "../BVH/Octree.h"
 #include "../SDF/Grid.h"
 #include "../SDF/FastSweep3D.h"
+#include "../SDF/SDF.h"
 
 //   DONE:
 //
@@ -50,19 +51,10 @@ int main()
 {
 	float r = 50.0f;
 	unsigned int d = 3;
-	IcoSphere ico = IcoSphere(d, r);
 	float a = 2 * r / sqrt(3.);
 	unsigned int ns = 10;
-	PrimitiveBox box = PrimitiveBox(a, a, a, ns, ns, ns);
-	CubeSphere cs = CubeSphere(ns, r);
 
 	VTKExporter e = VTKExporter();
-	e.initExport(ico, "icosphere");
-	e.initExport(box, "box");
-
-	box.applyMatrix(Matrix4().makeTranslation(-a / 2., -a / 2., -a / 2.));
-	e.initExport(box, "boxTranslated");
-	e.initExport(cs, "cubesphere");
 
 	bool iterateCubeSphereTest = true;
 
@@ -79,49 +71,13 @@ int main()
 				Vector3 axis = normalize(Vector3(1, 1, 1));
 				c.applyMatrix(Matrix4().makeRotationAxis(axis.x, axis.y, axis.z, M_PI / 6.));
 				e.initExport(c, "cube" + std::to_string(res) + "-" + std::to_string(n));
-				auto startSDF = std::chrono::high_resolution_clock::now();
-				// === Timed code ============
+				
+				SDF sdf = SDF(&c, res);
 
-				auto startSDF_AABB = std::chrono::high_resolution_clock::now();
-				AABBTree cT = AABBTree(&c);
-				auto endSDF_AABB = std::chrono::high_resolution_clock::now();
-				std::chrono::duration<float> elapsedSDF_AABB = (endSDF_AABB - startSDF_AABB);
-
-				auto startSDF_Octree = std::chrono::high_resolution_clock::now();
-				Octree O = Octree(&cT, cT.bbox, res);
-				auto endSDF_Octree = std::chrono::high_resolution_clock::now();
-				std::chrono::duration<float> elapsedSDF_Octree = (endSDF_Octree - startSDF_Octree);
-
-				auto startSDF_FS = std::chrono::high_resolution_clock::now();
-				Grid voxField_SDF = Grid(res, res, res, O.cubeBox);
-				O.setLeafValueToScalarGrid(&voxField_SDF);
-				FastSweep3D fs = FastSweep3D(&voxField_SDF, 8); // computes distance field
-				auto endSDF_FS = std::chrono::high_resolution_clock::now();
-				std::chrono::duration<float> elapsedSDF_FS = (endSDF_FS - startSDF_FS);
-				// auto startSDF_Sign = std::chrono::high_resolution_clock::now();
-				// voxField_SDF.computeSignField(&cT);
-				// auto endSDF_Sign = std::chrono::high_resolution_clock::now();
-				// std::chrono::duration<float> elapsedSDF_Sign = (endSDF_Sign - startSDF_Sign);
-
-				auto endSDF = std::chrono::high_resolution_clock::now();
-				std::chrono::duration<float> elapsedSDF = (endSDF - startSDF);
-
-				/*std::vector<Geometry> otlBoxGeoms = {};
-				O.getLeafBoxGeoms(&otlBoxGeoms);
-				Geometry leafBoxGeom = mergeGeometries(otlBoxGeoms);
-				e.initExport(leafBoxGeom, "leafBoxesOctree" + std::to_string(res) + "-" + std::to_string(n)); // this is a major bottleneck*/
-
-				std::cout << "computation times:  AABB: " << elapsedSDF_AABB.count() <<
-					" s , Octree: " << elapsedSDF_Octree.count() << " s, FastSweep3D: " << elapsedSDF_FS.count() <<
-					// ", Sign: " << elapsedSDF_Sign.count() <<
-					", TOTAL: " << elapsedSDF.count() << " s" << std::endl;
-				timing << "computation times:  AABB: " << elapsedSDF_AABB.count() <<
-					" s , Octree: " << elapsedSDF_Octree.count() << " s, FastSweep3D: " << elapsedSDF_FS.count() <<
-					// ", Sign: " << elapsedSDF_Sign.count() <<
-					", TOTAL: " << elapsedSDF.count() << " s" << std::endl;
-			
-				// === Timed code ============
-				voxField_SDF.exportToVTI("voxFieldSDF" + std::to_string(res) + "-" + std::to_string(n)); // save to vti		
+				std::cout << sdf.getComputationProperties();
+				timing << sdf.getComputationProperties();
+				
+				sdf.exportGrid(&e, "voxFieldSDF" + std::to_string(res) + "-" + std::to_string(n)); // save to vti		
 			}
 		}
 		timing.close();
@@ -140,106 +96,12 @@ int main()
 	std::cout << "Model loaded after " << elapsedObj.count() << " seconds" << std::endl;
 
 
-	auto startAABBtree = std::chrono::high_resolution_clock::now();
-	// === Timed code ============
-	std::cout << "initializing AABB construction ..." << std::endl;
-	AABBTree T = AABBTree(&bunny);
-	// === Timed code ============
-	auto endAABBtree = std::chrono::high_resolution_clock::now();
-	std::chrono::duration<float> elapsedAABB = (endAABBtree - startAABBtree);
-	std::cout << "AABBTree construction finished after " << elapsedAABB.count() << " seconds" << std::endl;
+	uint res = 30; // octree resolution	
+	SDF bunny_sdf = SDF(&bunny, res);
 
+	std::cout << bunny_sdf.getComputationProperties();
 
-	auto startOctree = std::chrono::high_resolution_clock::now();
-	// === Timed code ============
-	uint res = 30; // octree resolution
-	std::cout << "initializing Octree construction for " << T.triangles.size() << " triangles with resolution " << res << std::endl;
-
-	Octree O = Octree(&T, T.bbox, res);
-	// === Timed code ============
-	auto endOctree = std::chrono::high_resolution_clock::now();
-	std::chrono::duration<float> elapsedOctree = (endOctree - startOctree);
-	std::cout << "Octree construction finished after " << elapsedOctree.count() << " seconds" << std::endl;
-
-	bool OctreeLeafBoxes = false;
-
-	if (OctreeLeafBoxes) {
-		auto startOctreeBoxes = std::chrono::high_resolution_clock::now();
-		// === Timed code ============
-		std::cout << "Exporting octree leaf voxels..." << std::endl;
-		std::vector<Geometry> otlBoxGeoms = {};
-		O.getLeafBoxGeoms(&otlBoxGeoms);
-		Geometry leafBoxGeom = mergeGeometries(otlBoxGeoms);
-		e.initExport(leafBoxGeom, "leafBoxesOctree"); // this is a major bottleneck
-		// === Timed code ============
-		auto endOctreeBoxes = std::chrono::high_resolution_clock::now();
-		std::chrono::duration<float> elapsedOctreeBox = (endOctreeBoxes - startOctreeBoxes);
-		std::cout << "Octree voxel export finished after " << elapsedOctreeBox.count() << " seconds" << std::endl;
-	}
-
-	bool OctreeLeafGrid = true;
-
-	if (OctreeLeafGrid) {
-		auto startOctreeGrid = std::chrono::high_resolution_clock::now();
-		// === Timed code ============
-		std::cout << "Exporting octree leaf voxels into grid..." << std::endl;
-		Grid voxField = Grid(res, res, res, O.cubeBox);
-		O.setLeafValueToScalarGrid(&voxField);
-		voxField.exportToVTI("voxField"); // save initial cond
-
-		FastSweep3D fs = FastSweep3D(&voxField, 8); // computes distance field
-
-		/* bool signCompute = false;
-		if (signCompute) {
-			std::cout << "computing signs for " << voxField.field.size() << " grid pts ..." << std::endl;
-			auto startSDF_Sign = std::chrono::high_resolution_clock::now();
-			voxField.computeSignField(&T);
-			auto endSDF_Sign = std::chrono::high_resolution_clock::now();
-			std::chrono::duration<float> elapsedSDF_Sign = (endSDF_Sign - startSDF_Sign);
-			std::cout << "sign computation finished after " << elapsedSDF_Sign.count() << " seconds" << std::endl;
-		}*/
-
-		voxField.exportToVTI("voxFieldSDF"); // save final SDF
-		// === Timed code ============
-		auto endOctreeGrid = std::chrono::high_resolution_clock::now();
-		std::chrono::duration<float> elapsedOctreeField = (endOctreeGrid - startOctreeGrid);
-		std::cout << "Octree voxel export finished after " << elapsedOctreeField.count() << " seconds" << std::endl;
-	}
-
-	auto startAABBdepth = std::chrono::high_resolution_clock::now();
-	// === Timed code ============
-	std::cout << "calculating AABB depth..." << std::endl;
-	unsigned int maxDepth = depth(&T);
-	// === Timed code ============
-	auto endAABBdepth = std::chrono::high_resolution_clock::now();
-	std::chrono::duration<float> elapsedAABBdepth = (endAABBdepth - startAABBdepth);
-	std::cout << "AABB depth calculation finished after " << elapsedAABBdepth.count() << " seconds" << std::endl;
-
-	bool AABBleafExport = false;
-
-	if (AABBleafExport) {
-		auto startAABBleafExport = std::chrono::high_resolution_clock::now();
-		// === Timed code ============
-		std::cout << "exporting AABB leaf geoms of depth = 0, ... " << maxDepth << "." << std::endl;
-		for (unsigned int d = 0; d < maxDepth; d++) {
-			std::vector<Geometry> boxes = T.getAABBGeomsOfDepth(d);
-			std::vector<Geometry> triangles = T.getAABBTrianglesOfDepth(d);
-			Geometry resultGeom = mergeGeometries(boxes);
-			Geometry resultTriGeom = mergeGeometries(triangles);
-			e.initExport(resultGeom, "boxes" + std::to_string(d) + "AABB");
-			std::cout << "boxes" << d << "AABB saved" << std::endl;
-			e.initExport(resultTriGeom, "triangles" + std::to_string(d) + "AABB");
-			std::cout << "triangles" << d << "AABB saved" << std::endl;
-		}
-
-		std::vector<Geometry> leafBoxes = T.getAABBLeafGeoms();
-		Geometry leafBoxesGeom = mergeGeometries(leafBoxes);
-		e.initExport(leafBoxesGeom, "leafBoxesAABB");
-		// === Timed code ============
-		auto endAABBleafExport = std::chrono::high_resolution_clock::now();
-		std::chrono::duration<float> elapsedLeafExport = (endAABBleafExport - startAABBleafExport);
-		std::cout << "AABB voxel export finished after " << elapsedLeafExport.count() << " seconds" << std::endl;
-	}
+	bunny_sdf.exportGrid(&e, "bunnySDF");
 
 	return 1;
 }

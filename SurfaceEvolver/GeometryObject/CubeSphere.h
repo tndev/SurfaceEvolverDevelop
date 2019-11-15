@@ -12,7 +12,7 @@ public:
 	unsigned int detail = 0;
 	float radius = 1.;
 	CubeSphere();
-	CubeSphere(unsigned int detail, float radius);
+	CubeSphere(unsigned int detail, float radius, std::string name = "");
 	~CubeSphere();
 
 	void build();

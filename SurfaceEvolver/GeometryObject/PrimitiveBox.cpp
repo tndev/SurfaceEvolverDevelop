@@ -16,7 +16,7 @@ PrimitiveBox::PrimitiveBox(const PrimitiveBox& other)
 	this->segments[1] = other.segments[2];
 }
 
-PrimitiveBox::PrimitiveBox(float x, float y, float z, unsigned int sx, unsigned int sy, unsigned int sz)
+PrimitiveBox::PrimitiveBox(float x, float y, float z, unsigned int sx, unsigned int sy, unsigned int sz, std::string name)
 {
 	this->dimensions[0] = x;
 	this->dimensions[2] = y;
@@ -25,6 +25,11 @@ PrimitiveBox::PrimitiveBox(float x, float y, float z, unsigned int sx, unsigned 
 	this->segments[0] = sx;
 	this->segments[2] = sy;
 	this->segments[1] = sz;
+
+	if (name.empty()) {
+		this->name = "PrimitiveBox, dimensions: (" + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) +
+			"), segments: (" + std::to_string(sx) + ", " + std::to_string(sy) + ", " + std::to_string(sz) + ")";
+	}
 	build();
 }
 

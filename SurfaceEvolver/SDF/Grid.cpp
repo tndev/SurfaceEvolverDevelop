@@ -129,10 +129,6 @@ void Grid::computeSignField(AABBTree* aabb)
 				if (triId < 0) {
 					continue;
 				}
-
-
-
-				sign = (aabb->rayIntersectCount(p, rayDir, 0.0f, LARGE_VAL) % 2 == 1) ? -1 : 1;
 				gridPos = Nx * Ny * iz + Nx * iy + ix;
 				this->field[gridPos] *= sign;
 			}

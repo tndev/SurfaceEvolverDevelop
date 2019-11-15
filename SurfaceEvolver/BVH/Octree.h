@@ -28,6 +28,7 @@ public:
 		float centroidDistance = INFINITY; // infinity unless it's a leaf
 
 		OctreeNode();
+		OctreeNode(const OctreeNode& other);
 		OctreeNode(Octree* tree, Box3 box, OctreeNode* parent = nullptr, uint depthLeft = MAX_OCTREE_DEPTH);
 		bool intersectsTriangles(Box3* box);
 		bool isLargerThanLeaf(Vector3* size);
@@ -45,10 +46,13 @@ public:
 	uint depth = 0;
 	float leafSize = 1.0f;
 
+	float leaf_retrieve_time;
+
 	uint nodeCount = 0;
 
 	Octree();
 	// expecting a constructed AABBTree for fast lookup
+	Octree(const Octree& other);
 	Octree(AABBTree* aabbTree, Box3 bbox, uint resolution);
 	~Octree();
 

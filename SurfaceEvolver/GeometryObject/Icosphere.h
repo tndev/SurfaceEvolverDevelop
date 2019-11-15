@@ -11,7 +11,7 @@ public:
 	float radius = 50.0f;
 	IcoSphere();
 	IcoSphere(const IcoSphere& other);
-	IcoSphere(unsigned int detail, float radius);
+	IcoSphere(unsigned int detail, float radius, std::string name = "");
 	~IcoSphere();
 
 	void build();

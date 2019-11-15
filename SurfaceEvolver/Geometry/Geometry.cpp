@@ -2,8 +2,9 @@
 
 #define failedTriang 0
 
-Geometry::Geometry()
+Geometry::Geometry(std::string name)
 {
+	this->name = name;
 }
 
 Geometry::~Geometry()
@@ -13,6 +14,7 @@ Geometry::~Geometry()
 
 Geometry::Geometry(const Geometry& other)
 {
+	name = std::string(other.name);
 	normals = std::vector<float>(other.normals);
 	uniqueVertices = std::vector<Vector3>(other.uniqueVertices);
 	vertices = std::vector<float>(other.vertices);

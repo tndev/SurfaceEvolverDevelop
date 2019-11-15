@@ -1,2 +1,4 @@
 cube(3), grid_res = 30
-computation times:  AABB: 0.064503 s , Octree: 1.66321 s, FastSweep3D: 1.27526, TOTAL: 3.00298 s
+PrimitiveBox, dimensions: (57.735027, 57.735027, 57.735027), segments: (3, 3, 3)
+verts: 56, triangles: 108
+computation times:  AABB: 0.061662 s, Octree: (build: 1.485393 s, get_leaves: 0.016884), FastSweep3D: 1.142585 s, TOTAL: 2.689646 s

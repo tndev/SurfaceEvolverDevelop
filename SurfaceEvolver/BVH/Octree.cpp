@@ -4,6 +4,14 @@ Octree::OctreeNode::OctreeNode()
 {
 }
 
+Octree::OctreeNode::OctreeNode(const OctreeNode& other)
+{
+	parent = other.parent;
+	tree = other.tree;
+	box = other.box;
+	centroidDistance = other.centroidDistance;
+}
+
 Octree::OctreeNode::OctreeNode(Octree* tree, Box3 box, OctreeNode* parent, uint depthLeft)
 {
 	this->tree = tree; // so it knows what tree it belongs to
@@ -122,6 +130,18 @@ Octree::Octree()
 {
 }
 
+Octree::Octree(const Octree& other)
+{
+	root = other.root;
+	aabbTree = other.aabbTree;
+	cubeBox = other.cubeBox;
+	depth = other.depth;
+	leafSize = other.leafSize;
+
+	leaf_retrieve_time = other.leaf_retrieve_time;
+	nodeCount = other.nodeCount;
+}
+
 Octree::Octree(AABBTree* aabbTree, Box3 bbox, uint resolution)
 {
 	Vector3 size = bbox.getSize();
@@ -174,7 +194,7 @@ void Octree::setLeafValueToScalarGrid(Grid* grid)
 	// === Timed code ============
 	auto endGetLeaves = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<float> elapsedAABBLeaves = (endGetLeaves - startGetLeaves);
-	std::cout << "Octree leaf nodes retrieved after " << elapsedAABBLeaves.count() << " seconds" << std::endl;
+	this->leaf_retrieve_time = elapsedAABBLeaves.count();
 
 	size_t NLeaves = boxBuffer.size();
 	uint Nx = grid->Nx, Ny = grid->Ny, Nz = grid->Nz;
@@ -204,7 +224,7 @@ void Octree::setConstantValueToScalarGrid(Grid* grid, float value)
 	// === Timed code ============
 	auto endGetLeaves = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<float> elapsedAABBLeaves = (endGetLeaves - startGetLeaves);
-	std::cout << "Octree leaf nodes retrieved after " << elapsedAABBLeaves.count() << " seconds" << std::endl;
+	this->leaf_retrieve_time = elapsedAABBLeaves.count();
 
 	uint Nx = grid->Nx, Ny = grid->Ny, Nz = grid->Nz;
 	float scaleX = grid->scale.x, scaleY = grid->scale.y, scaleZ = grid->scale.z;

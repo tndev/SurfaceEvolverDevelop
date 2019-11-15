@@ -14,21 +14,23 @@ OBJImporter::~OBJImporter()
 
 Geometry OBJImporter::importOBJGeometry(std::string filename)
 {
-	Geometry result = Geometry();
-
 	if (filename.compare(".obj") == 0) {
 		std::cout << "File " << filename << " has invalid suffix!" << std::endl;
-		return result;
+		return Geometry();
 	}
 
 	std::fstream obj(pathPrefix + filename, std::fstream::in);
 
 	if (!obj.is_open()) {
 		std::cout << "File " << filename << " was not found!" << std::endl;
-		return result;
+		return Geometry();
 	}
 
 	std::cout << filename << " opened successfully" << std::endl;
+
+	int suffix_pos = filename.find(".obj");
+	filename = filename.erase(suffix_pos, filename.size() - 1);
+	Geometry result = Geometry(filename);
 
 	std::string line;
 

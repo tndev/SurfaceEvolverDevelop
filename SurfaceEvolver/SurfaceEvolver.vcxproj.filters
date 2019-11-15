@@ -94,6 +94,9 @@
     <ClCompile Include="SDF\FastSweep3D.cpp">
       <Filter>SDF</Filter>
     </ClCompile>
+    <ClCompile Include="SDF\SDF.cpp">
+      <Filter>SDF</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="poly2tri\common\shapes.h">
@@ -163,6 +166,9 @@
       <Filter>SDF</Filter>
     </ClInclude>
     <ClInclude Include="SDF\FastSweep3D.h">
+      <Filter>SDF</Filter>
+    </ClInclude>
+    <ClInclude Include="SDF\SDF.h">
       <Filter>SDF</Filter>
     </ClInclude>
   </ItemGroup>

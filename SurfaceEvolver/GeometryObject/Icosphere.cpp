@@ -15,9 +15,12 @@ IcoSphere::IcoSphere(const IcoSphere& other)
 	radius = other.radius;
 }
 
-IcoSphere::IcoSphere(unsigned int detail, float radius)
+IcoSphere::IcoSphere(unsigned int detail, float radius, std::string name)
 {
 	this->detail = detail; this->radius = radius;
+	if (name.empty()) {
+		this->name = "IcoSphere, detail: " + std::to_string(this->detail) + ", radius: " + std::to_string(this->radius);
+	}
 	build();
 }
 

@@ -4,6 +4,14 @@ FastSweep3D::FastSweep3D()
 {
 }
 
+FastSweep3D::FastSweep3D(const FastSweep3D& other)
+{
+	grid = other.grid;
+	f = other.f;
+	h = other.h;
+	Nsweeps = other.Nsweeps;
+}
+
 FastSweep3D::FastSweep3D(Grid* grid, uint Nsweeps, bool blur)
 {
 	this->grid = grid;
@@ -30,12 +38,12 @@ void FastSweep3D::sweep()
 	const int dirY[8][3] = { { 0, Ny - 1, 1 }, { 0, Ny - 1, 1 }, { Ny - 1, 0, -1 }, { Ny - 1, 0, -1 }, { 0, Ny - 1, 1 }, { 0, Ny - 1, 1 }, { Ny - 1, 0, -1 }, { Ny - 1, 0, -1 } };
 	const int dirZ[8][3] = { { 0, Nz - 1, 1 }, { 0, Nz - 1, 1 }, { 0, Nz - 1, 1 }, { Nz - 1, 0, -1 }, { Nz - 1, 0, -1 }, { Nz - 1, 0, -1 }, { Nz - 1, 0, -1 }, { 0, Nz - 1, 1 } };
 
-	auto startFastSweep = std::chrono::high_resolution_clock::now();
+	// auto startFastSweep = std::chrono::high_resolution_clock::now();
 	// === Timed code ============
-	std::cout << "Initiating FastSweep3D..." << std::endl;
+	// std::cout << "Initiating FastSweep3D..." << std::endl;
 
 	for (uint s = 0; s < Nsweeps; s++) {
-		std::cout << "sweep " << s << " ... " << std::endl;
+		// std::cout << "sweep " << s << " ... " << std::endl;
 		for (i = dirX[s][0]; dirX[s][2] * i <= dirX[s][1]; i += dirX[s][2]) {
 			for (j = dirY[s][0]; dirY[s][2] * j <= dirY[s][1]; j += dirY[s][2]) {
 				for (k = dirZ[s][0]; dirZ[s][2] * k <= dirZ[s][1]; k += dirZ[s][2]) {
@@ -127,8 +135,8 @@ void FastSweep3D::sweep()
 	}
 
 	// === Timed code ============
-	auto endFastSweep = std::chrono::high_resolution_clock::now();
-	std::chrono::duration<float> elapsedFastSweep = (endFastSweep - startFastSweep);
-	std::cout << "FastSweep3D finished after " << elapsedFastSweep.count() << " seconds" << std::endl;
+	// auto endFastSweep = std::chrono::high_resolution_clock::now();
+	// std::chrono::duration<float> elapsedFastSweep = (endFastSweep - startFastSweep);
+	//std::cout << "FastSweep3D finished after " << elapsedFastSweep.count() << " seconds" << std::endl;
 }
 

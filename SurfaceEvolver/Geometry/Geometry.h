@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <algorithm>
+#include <string>
 #include <map>
 #include <time.h>
 #include "Box3.h"
@@ -34,6 +35,8 @@ private:
 	std::vector<StructGeom::Edge> edges = {};
 	std::multimap<Vector3, BufferGeom::TriWithMarkedVertex> vertexToTriangles;
 public:
+	std::string name = "Geometry - Object";
+
 	// every time a geometry is created, it is preferrable to keep an additional array of vertices to, which
 	// vertexIndices actually point
 	std::vector<Vector3> uniqueVertices;
@@ -45,7 +48,7 @@ public:
 
 	// TODO: tangents and uvs
 
-	Geometry();
+	Geometry(std::string name = "Geometry - Object");
 	~Geometry();
 	Geometry(const Geometry& other);
 

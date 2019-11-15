@@ -4,9 +4,12 @@ CubeSphere::CubeSphere()
 {
 }
 
-CubeSphere::CubeSphere(unsigned int detail, float radius)
+CubeSphere::CubeSphere(unsigned int detail, float radius, std::string name)
 {
 	this->detail = detail; this->radius = radius;
+	if (name.empty()) {
+		this->name = "CubeSphere, detail: " + std::to_string(this->detail) + ", radius: " + std::to_string(this->radius);
+	}
 	build();
 }
 
