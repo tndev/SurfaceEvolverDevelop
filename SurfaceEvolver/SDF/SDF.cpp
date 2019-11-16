@@ -45,7 +45,7 @@ SDF::SDF(Geometry* geom, uint resolution)
 
 	auto startSDF_FS = std::chrono::high_resolution_clock::now();
 
-	this->grid = new Grid(resolution, resolution, resolution, this->aabb->bbox);
+	this->grid = new Grid(resolution, resolution, resolution, this->octree->cubeBox);
 	this->octree->setLeafValueToScalarGrid(this->grid);
 	this->fastSweep = new FastSweep3D(this->grid, 8);
 
@@ -65,7 +65,7 @@ SDF::SDF(Geometry* geom, uint resolution)
 	std::chrono::duration<float> elapsedSDF = (endSDF - startSDF);
 
 	this->geom_properties = "=== " + this->geom->name + " === \n" + "verts: " + std::to_string(this->geom->uniqueVertices.size()) +
-		", triangles: " + std::to_string(this->aabb->triangles.size()) + ", grid resolution: " + std::to_string(resolution) + "^3 \n";
+		", triangles: " + std::to_string(this->aabb->primitives.size()) + ", grid resolution: " + std::to_string(resolution) + "^3 \n";
 	this->time_log = 
 		"computation times:  AABB: " + std::to_string(elapsedSDF_AABB.count()) +
 		" s, Octree: (build: " + std::to_string(elapsedSDF_Octree.count()) + " s, get_leaves: " + std::to_string(this->octree->leaf_retrieve_time) + 

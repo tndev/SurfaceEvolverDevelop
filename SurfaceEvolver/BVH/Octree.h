@@ -30,7 +30,7 @@ public:
 		OctreeNode();
 		OctreeNode(const OctreeNode& other);
 		OctreeNode(Octree* tree, Box3 box, OctreeNode* parent = nullptr, uint depthLeft = MAX_OCTREE_DEPTH);
-		bool intersectsTriangles(Box3* box);
+		bool intersectsPrimitives(Box3* box);
 		bool isLargerThanLeaf(Vector3* size);
 		bool isALeaf();
 

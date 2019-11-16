@@ -13,10 +13,10 @@
 
 #define uint unsigned int
 
-// TODO: types in this namespace should be classes containing all necessary topological info
 namespace StructGeom {
+	using Vertex = Vector3*;
 	using Triangle = std::vector<Vector3*>;
-	using Edge = std::pair<Vector3*, Vector3*>;
+	using Edge = std::vector<Vector3*>;
 };
 
 namespace BufferGeom {
@@ -26,7 +26,26 @@ namespace BufferGeom {
 	using Triangulation = std::vector<uint>;
 };
 
+using Vertex = StructGeom::Vertex;
 using Tri = StructGeom::Triangle;
+using Edge = StructGeom::Edge;
+
+enum class PrimitiveType {
+	vert = 1,
+	edge = 2,
+	tri = 3
+};
+
+struct Primitive {
+	// TODO: Test if all methods comparing size of vertices array get faster by using PrimitiveType enum
+	std::vector<Vector3*> vertices = {};
+
+	Primitive(std::vector<Vector3*> verts);
+	~Primitive();
+
+	float getMinById(uint id); // returns coord of the lowest feature vertex
+	float getMaxById(uint id); // returns coord of the highest feature vertex
+};
 
 class Geometry
 {
@@ -66,10 +85,11 @@ public:
 	std::vector<Vector3> getProjectionsAlongNormal(BufferGeom::Face& vertices); // TODO: use Vector2
 	std::vector<std::vector<uint>> getTriangulatedIndices(BufferGeom::Face& vertices);
 	std::pair<std::vector<BufferGeom::Triangulation>, std::vector<size_t>> getSortedPolygonTriangulationsAndSizes();
-	std::vector<StructGeom::Triangle> getTriangles();
-	std::vector<StructGeom::Edge> getEdges();
+	std::vector<Tri> getTriangles();
+	std::vector<Edge> getEdges();
 	std::vector<Vector3> getVertices();
 	std::vector<Vector3> getUniqueVertices();
+	std::vector<Primitive> getPrimitives(PrimitiveType type);
 
 	void getVertexToTriangleMap(std::multimap<Vector3, BufferGeom::TriWithMarkedVertex>* buffer);
 	std::vector<Vector3> getAngleWeightedVertexPseudoNormals();
@@ -85,12 +105,24 @@ private:
 	std::vector<uint> getPolygonIndicesFromTriangles(std::vector<BufferGeom::Triangle> triangles);
 };
 
-
+// ==== External Methods ============
+// geom:
 Geometry mergeGeometries(std::vector<Geometry>& geometries);
 Vector3 getTriangleNormal(StructGeom::Triangle triangle, Vector3 resultNormal);
-bool getTriangleBoundingBoxIntersection(Tri* vertices, Vector3& bboxCenter, Vector3& bboxHalfSize, float offset = 0.0001f, Vector3* optTriNormal = nullptr);
+
+// intersections:
+bool getTriangleBoxIntersection(Tri& vertices, Vector3* bboxCenter, Vector3 bboxHalfSize, float offset = 0.0001f, Vector3* optTriNormal = nullptr);
+bool getEdgeBoxIntersection(Edge& vertices, Vector3* boxMin, Vector3* boxMax);
+bool getPrimitiveBoxIntersection(Primitive& primitive, Vector3* boxCenter, Vector3* boxMin, Vector3* boxMax, Vector3* boxHalfSize, float offset = 0.0001f);
+
+float getRayTriangleIntersection(Vector3& rayStart, Vector3& rayDirection, Tri* tri, float minParam, float maxParam);
+
+// distances:
 float getDistanceToATriangleSq(Tri* vertices, Vector3& point);
 float getDistanceToATriangleSq2(Tri* vertices, Vector3& point);
-float getRayTriangleIntersection(Vector3& rayStart, Vector3& rayDirection, Tri* tri, float minParam, float maxParam);
+// it's hard to say which one of the previous two is faster
+float getDistanceToAnEdgeSq(Edge* vertices, Vector3& point);
+float getDistanceToAPrimitiveSq(Primitive& primitive, Vector3& point);
+
 
 #endif

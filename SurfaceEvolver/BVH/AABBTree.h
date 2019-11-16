@@ -9,7 +9,11 @@
 #define uint unsigned int
 #define uint32 uint32_t
 
-using Tri = StructGeom::Triangle;
+/*
+	An AABB (Axis-Aligned Bounding Box) tree is a binary space partitioning structure which accelerates
+	intersection and distance queries of the source geometry primitives (vertices, edges, triangles) to 
+	O(log(N)) time
+*/
 
 class AABBTree
 {
@@ -26,50 +30,51 @@ public:
 		uint depth = 0;
 		float splitPosition = 0.0f;
 
-		std::vector<uint> triangles = {};
+		std::vector<uint> primitiveIds = {};
 
 		AABBNode();
 		AABBNode(const AABBNode& other);
-		AABBNode(std::vector<uint>* triangles, Box3& bbox, AABBTree* tree, uint depthLeft = MAX_DEPTH, AABBNode* parent = nullptr);
+		AABBNode(std::vector<uint>* primitiveIds, Box3& bbox, AABBTree* tree, uint depthLeft = MAX_DEPTH, AABBNode* parent = nullptr);
 		~AABBNode();
 
-		void construct(std::vector<uint>* triangles, uint depthLeft);
+		void construct(std::vector<uint>* primitiveIds, uint depthLeft);
 		bool isALeaf();
-		bool isALeafWithTriangles();
+		bool isALeafWithPrimitives();
 
-		float getSplitPosition(std::vector<uint>& triangles, std::vector<uint>* out_left, std::vector<uint>* out_right);
+		float getSplitPosition(std::vector<uint>& primitiveIds, std::vector<uint>* out_left, std::vector<uint>* out_right);
 		float getCostEstimate(float splitPos, uint nLeft, uint nRight);
-		bool hasEnoughBranching(size_t nLeftTris, size_t nRightTris, size_t nTris);
-		void filterTriangles();
+		bool hasEnoughBranching(size_t nLeftPrims, size_t nRightPrims, size_t nPrims);
+		void filterPrimitives();  // returns only primitives which actually intersect leaf box
 	};
 
 	Box3 bbox;
 
 	uint depth = 0;
+	PrimitiveType type = PrimitiveType::tri;
 
-	std::vector<Tri> triangles = {};
+	std::vector<Primitive> primitives = {};
 	AABBNode* root = nullptr;
 	Geometry* geom = nullptr;
 
 	AABBTree();
 	AABBTree(const AABBTree& other);
-	AABBTree(Geometry* geom);
+	AABBTree(Geometry* geom, PrimitiveType type = PrimitiveType::tri);
 	~AABBTree();
 
-	bool hasTriangles();
-	bool boxIntersectsATriangle(Box3* box);
-	float boxIntersectsATriangleAtDistance(Box3* box);
+	bool hasPrimitives();
+	bool boxIntersectsAPrimitive(Box3* box);
+	float boxIntersectsAPrimitiveAtDistance(Box3* box);
 
 	std::vector<AABBNode> flatten();
 	std::vector<AABBNode> flattenToDepth(uint depth);
-	void getTrianglesInABox(Box3* box, std::vector<uint>* triIdBuffer);
+	void getPrimitivesInABox(Box3* box, std::vector<uint>* primIdBuffer);
 
 	AABBNode* getClosestNode(Vector3& point);
-	int getClosestTriangleId(Vector3& point);
+	int getClosestPrimitiveId(Vector3& point);
 
 	std::vector<Geometry> getAABBGeomsOfDepth(uint depth); // for visualisation
 	std::vector<Geometry> getAABBLeafGeoms(); // for visualisation
-	std::vector<Geometry> getAABBTrianglesOfDepth(uint depth); // for visualisation
+	std::vector<Geometry> getAABBPrimitivesOfDepth(uint depth); // for visualisation
 };
 
 uint depth(AABBTree* root);

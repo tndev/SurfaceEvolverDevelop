@@ -1,3 +1,7 @@
-﻿  SDF.cpp
+﻿  main.cpp
 D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\poly2tri\sweep\sweep_context.h(161,24): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\main.cpp(54,10): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\main.cpp(66,34): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\main.cpp(67,32): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\main.cpp(72,79): warning C4305: 'argument': truncation from 'double' to 'float'
   SurfaceEvolver.vcxproj -> D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\x64\Debug\SurfaceEvolver.exe

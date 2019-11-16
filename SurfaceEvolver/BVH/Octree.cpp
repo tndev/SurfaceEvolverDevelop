@@ -27,7 +27,7 @@ Octree::OctreeNode::OctreeNode(Octree* tree, Box3 box, OctreeNode* parent, uint 
 					Vector3 offset0 = multiply(Vector3((float)i / 2.0f, (float)j / 2.0f, (float)k / 2.0f), size);
 					Vector3 offset1 = multiply(Vector3((float)(i + 1) / 2.0f, (float)(j + 1) / 2.0f, (float)(k + 1) / 2.0f), size);
 					Box3 box = Box3(this->box.min + offset0, this->box.min + offset1);
-					if (intersectsTriangles(&box)) {
+					if (intersectsPrimitives(&box)) {
 						this->children.push_back(new OctreeNode(this->tree, box, this, depthLeft - 1));
 					}
 				}
@@ -37,12 +37,12 @@ Octree::OctreeNode::OctreeNode(Octree* tree, Box3 box, OctreeNode* parent, uint 
 	else {
 		// complete leaf construction by computing the mesh distance
 		std::vector<uint> intersectedTriangleIds = {};
-		this->tree->aabbTree->getTrianglesInABox(&this->box, &intersectedTriangleIds);
+		this->tree->aabbTree->getPrimitivesInABox(&this->box, &intersectedTriangleIds);
 		float distSq, resultDistSq = FLT_MAX;
 		Vector3 center = this->box.getCenter();
 
 		for (auto&& ti : intersectedTriangleIds) {
-			distSq = getDistanceToATriangleSq2(&this->tree->aabbTree->triangles[ti], center);
+			distSq = getDistanceToAPrimitiveSq(this->tree->aabbTree->primitives[ti], center);
 			resultDistSq = distSq < resultDistSq ? distSq : resultDistSq;
 		}
 
@@ -50,9 +50,9 @@ Octree::OctreeNode::OctreeNode(Octree* tree, Box3 box, OctreeNode* parent, uint 
 	}
 }
 
-bool Octree::OctreeNode::intersectsTriangles(Box3* box)
+bool Octree::OctreeNode::intersectsPrimitives(Box3* box)
 {
-	return this->tree->aabbTree->boxIntersectsATriangle(box);
+	return this->tree->aabbTree->boxIntersectsAPrimitive(box);
 }
 
 bool Octree::OctreeNode::isLargerThanLeaf(Vector3* size)

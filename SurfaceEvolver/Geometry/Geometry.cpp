@@ -164,6 +164,44 @@ std::vector<Vector3> Geometry::getUniqueVertices()
 	return this->uniqueVertices;
 }
 
+std::vector<Primitive> Geometry::getPrimitives(PrimitiveType type)
+{
+	std::vector<Primitive> result = {};
+	if (type == PrimitiveType::vert) {
+		for (uint i = 0; i < this->uniqueVertices.size(); i ++) {
+			std::vector<Vector3*> v = { &this->uniqueVertices[i] };
+			result.push_back(v);
+		}
+	}
+	else if (type == PrimitiveType::edge) {
+		for (uint i = 0; i < this->vertexIndices.size(); i += 3) {
+			Vector3* v0 = &this->uniqueVertices[this->vertexIndices[i]];
+			Vector3* v1 = &this->uniqueVertices[this->vertexIndices[i + 1]];
+			Vector3* v2 = &this->uniqueVertices[this->vertexIndices[i + 2]];
+
+			Edge e0 = { v0, v1 };
+			Edge e1 = { v1, v2 };
+			Edge e2 = { v2, v0 };
+
+			this->edges.push_back(e0);
+			this->edges.push_back(e1);
+			this->edges.push_back(e2);
+		}
+	}
+	else if (type == PrimitiveType::tri) {
+		for (uint i = 0; i < this->vertexIndices.size(); i += 3) {
+			Vector3* v0 = &this->uniqueVertices[this->vertexIndices[i]];
+			Vector3* v1 = &this->uniqueVertices[this->vertexIndices[i + 1]];
+			Vector3* v2 = &this->uniqueVertices[this->vertexIndices[i + 2]];
+
+			Tri T = { v0, v1, v2 };
+
+			result.push_back(T);
+		}
+	}
+	return result;
+}
+
 void Geometry::getVertexToTriangleMap(std::multimap<Vector3, BufferGeom::TriWithMarkedVertex>* buffer)
 {
 	std::multimap<Vector3, BufferGeom::TriWithMarkedVertex>::iterator it;
@@ -616,11 +654,11 @@ template <typename T> int sgn(T val) {
 	return (T(0) < val) - (val < T(0));
 }
 
-bool getTriangleBoundingBoxIntersection(Tri* vertices, Vector3& bboxCenter, Vector3& bboxHalfSize, float offset, Vector3* optTriNormal)
+bool getTriangleBoxIntersection(Tri& vertices, Vector3* bboxCenter, Vector3 bboxHalfSize, float offset, Vector3* optTriNormal)
 {
 	bboxHalfSize.addScalar(offset);
 
-	std::vector<Vector3> verts = { *vertices->at(0) - bboxCenter, *vertices->at(1) - bboxCenter, *vertices->at(2) - bboxCenter };
+	std::vector<Vector3> verts = { *vertices[0] - *bboxCenter, *vertices[1] - *bboxCenter, *vertices[2] - *bboxCenter };
 
 	Vector3 t_min = verts[0];
 	t_min.min(verts[1]);
@@ -675,6 +713,54 @@ bool getTriangleBoundingBoxIntersection(Tri* vertices, Vector3& bboxCenter, Vect
 	}
 
 	return true;
+}
+
+bool getEdgeBoxIntersection(Edge& vertices, Vector3* boxMin, Vector3* boxMax)
+{
+	Vector3 edge_direction = *vertices[1] - *vertices[0];
+	float edge_param = edge_direction.length();
+	edge_direction = edge_direction / edge_param;
+
+	float t_min = -FLT_MAX;
+	float t_max = FLT_MAX;
+
+	uint i; float t1, t2;
+
+	for (i = 0; i < 3; i++) {
+		if (edge_direction.getCoordById(i) > FLT_EPSILON) {
+			t1 = (boxMin->getCoordById(i) - vertices[0]->getCoordById(i)) * (1.0f / edge_direction.getCoordById(i));
+			t2 = (boxMax->getCoordById(i) - vertices[0]->getCoordById(i)) * (1.0f / edge_direction.getCoordById(i));
+
+			t_min = std::max(t_min, std::min(t1, t2));
+			t_max = std::min(t_max, std::max(t1, t2));
+		} else if (
+			vertices[0]->getCoordById(i) < boxMin->getCoordById(i) ||
+			vertices[0]->getCoordById(i) > boxMax->getCoordById(i)
+		) {
+			return false;
+		}
+	}
+
+	return (t_max >= t_min && t_max >= 0.0f && t_min <= edge_param);
+}
+
+bool getPrimitiveBoxIntersection(Primitive& primitive, Vector3* boxCenter, Vector3* boxMin, Vector3* boxMax, Vector3* boxHalfSize, float offset)
+{
+	if (primitive.vertices.size() == 1) {
+		return (
+			(primitive.vertices[0]->x >= boxMin->x && primitive.vertices[0]->x <= boxMax->x) &&
+			(primitive.vertices[0]->y >= boxMin->y && primitive.vertices[0]->y <= boxMax->y) &&
+			(primitive.vertices[0]->z >= boxMin->z && primitive.vertices[0]->z <= boxMax->z)
+			);
+	}
+	else if (primitive.vertices.size() == 2) {
+		return getEdgeBoxIntersection(primitive.vertices, boxMin, boxMax);
+	}
+	else if (primitive.vertices.size() == 3) {
+		return getTriangleBoxIntersection(primitive.vertices, boxCenter, *boxHalfSize, offset);
+	}
+
+	return false;
 }
 
 float getDistanceToATriangleSq(Tri* vertices, Vector3& point)
@@ -906,6 +992,31 @@ float getDistanceToATriangleSq2(Tri* vertices, Vector3& point)
 		) : dot(nor, pa) * dot(nor, pa) / dot2(nor));
 }
 
+float getDistanceToAnEdgeSq(Edge* vertices, Vector3& point)
+{
+	float h = (*vertices->at(1) - *vertices->at(0)).length();
+	Vector3 p = point;
+	p.y -= clamp(p.y, 0.0f, h);
+	return p.length();
+}
+
+float getDistanceToAPrimitiveSq(Primitive& primitive, Vector3& point)
+{
+	if (primitive.vertices.size() == 1) {
+		return (point - *primitive.vertices[0]).lengthSq();
+	}
+	else if (primitive.vertices.size() == 2) {
+		return getDistanceToAnEdgeSq(&primitive.vertices, point);
+	}
+	else if (primitive.vertices.size() == 3) {
+		return getDistanceToATriangleSq(&primitive.vertices, point);
+	}
+
+	std::cout << "invalid primitive vert count!" << std::endl;
+	return -1.0f;
+}
+
+
 // https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
 float getRayTriangleIntersection(Vector3& rayStart, Vector3& rayDirection, Tri* tri, float minParam, float maxParam)
 {
@@ -943,3 +1054,57 @@ float getRayTriangleIntersection(Vector3& rayStart, Vector3& rayDirection, Tri* 
 		return -1.0f;
 	}
 }
+
+Primitive::Primitive(std::vector<Vector3*> verts)
+{
+	this->vertices = verts;
+}
+
+Primitive::~Primitive()
+{
+}
+
+float Primitive::getMinById(uint id)
+{
+	if (vertices.size() == 1) {
+		return vertices[0]->getCoordById(id);
+	}
+	else if (vertices.size() == 2) {
+		return std::fminf(vertices[0]->getCoordById(id), vertices[1]->getCoordById(id));
+	}
+	else if (vertices.size() == 3) {
+		return std::fminf(
+			vertices[0]->getCoordById(id),
+			std::fminf(
+				vertices[1]->getCoordById(id),
+				vertices[2]->getCoordById(id)
+			)
+		);
+	}
+
+	std::cout << "invalid primitive vertex count!" << std::endl;
+	return 0.0f;
+}
+
+float Primitive::getMaxById(uint id)
+{
+	if (vertices.size() == 1) {
+		return vertices[0]->getCoordById(id);
+	}
+	else if (vertices.size() == 2) {
+		return std::fmaxf(vertices[0]->getCoordById(id), vertices[1]->getCoordById(id));
+	}
+	else if (vertices.size() == 3) {
+		return std::fmaxf(
+			vertices[0]->getCoordById(id),
+			std::fmaxf(
+				vertices[1]->getCoordById(id),
+				vertices[2]->getCoordById(id)
+			)
+		);
+	}
+
+	std::cout << "invalid primitive vertex count!" << std::endl;
+	return 0.0f;
+}
+

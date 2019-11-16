@@ -125,7 +125,7 @@ void Grid::computeSignField(AABBTree* aabb)
 					o.y + iy * dy,
 					o.z + iz * dz
 				);
-				triId = aabb->getClosestTriangleId(p);
+				triId = aabb->getClosestPrimitiveId(p);
 				if (triId < 0) {
 					continue;
 				}

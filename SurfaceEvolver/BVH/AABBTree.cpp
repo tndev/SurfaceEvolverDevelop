@@ -6,41 +6,42 @@ AABBTree::AABBTree()
 
 AABBTree::AABBTree(const AABBTree& other)
 {
-	triangles = std::vector<Tri>(other.triangles);
+	primitives = std::vector<Primitive>(other.primitives);
 	bbox = other.bbox;
 	geom = other.geom;
 	depth = other.depth;
 	root = other.root;
 }
 
-AABBTree::AABBTree(Geometry* geom)
+AABBTree::AABBTree(Geometry* geom, PrimitiveType type)
 {
-	this->triangles = geom->getTriangles();
+	this->type = type;
+	this->primitives = geom->getPrimitives(type);
 	this->bbox = geom->getBoundingBox();
 	this->bbox.min.addScalar(-0.001);
 	this->bbox.max.addScalar(0.001);
 
 	this->geom = geom;
 
-	// generate index array to triangles
-	std::vector<uint> triIds;
-	triIds.reserve(this->triangles.size());
-	uint n(0); std::generate_n(std::back_inserter(triIds), this->triangles.size(), [n]() mutable { return n++;  });
+	// generate index array to primitives
+	std::vector<uint> primitiveIds;
+	primitiveIds.reserve(this->primitives.size());
+	uint n(0); std::generate_n(std::back_inserter(primitiveIds), this->primitives.size(), [n]() mutable { return n++;  });
 
 	// generate root and all that follow
-	this->root = new AABBNode(&triIds, this->bbox, this);
+	this->root = new AABBNode(&primitiveIds, this->bbox, this);
 }
 
 AABBTree::~AABBTree()
 {
 }
 
-bool AABBTree::hasTriangles()
+bool AABBTree::hasPrimitives()
 {
-	return this->triangles.size() > 0;
+	return this->primitives.size() > 0;
 }
 
-bool AABBTree::boxIntersectsATriangle(Box3* box)
+bool AABBTree::boxIntersectsAPrimitive(Box3* box)
 {
 	std::stack<AABBNode*> stack = {};
 	stack.push(this->root);
@@ -53,8 +54,8 @@ bool AABBTree::boxIntersectsATriangle(Box3* box)
 			Vector3 center = box->getCenter();
 			Vector3 halfSize = box->getSize();
 			halfSize = 0.5 * halfSize;
-			for (auto&& t:item->triangles) {
-				if (getTriangleBoundingBoxIntersection(&this->triangles.at(t), center, halfSize, 0.0f)) {
+			for (auto&& pId:item->primitiveIds) {
+				if (getPrimitiveBoxIntersection(this->primitives.at(pId), &center, &box->min, &box->max, &halfSize, 0.0f)) {
 					return true;
 				}
 			}
@@ -72,7 +73,7 @@ bool AABBTree::boxIntersectsATriangle(Box3* box)
 	return false;
 }
 
-float AABBTree::boxIntersectsATriangleAtDistance(Box3* box)
+float AABBTree::boxIntersectsAPrimitiveAtDistance(Box3* box)
 {
 	std::stack<AABBNode*> stack = {};
 	stack.push(this->root);
@@ -85,9 +86,9 @@ float AABBTree::boxIntersectsATriangleAtDistance(Box3* box)
 			Vector3 center = box->getCenter();
 			Vector3 halfSize = 0.5 * box->getSize();
 
-			for (auto&& t : item->triangles) {
-				if (getTriangleBoundingBoxIntersection(&this->triangles.at(t), center, halfSize, 0.0f)) {
-					return getDistanceToATriangleSq2(&this->triangles.at(t), center);
+			for (auto&& pId : item->primitiveIds) {
+				if (getPrimitiveBoxIntersection(this->primitives.at(pId), &center, &box->min, &box->max, &halfSize, 0.0f)) {
+					return getDistanceToAPrimitiveSq(this->primitives.at(pId), center);
 				}
 			}
 		}
@@ -158,10 +159,10 @@ std::vector<AABBTree::AABBNode> AABBTree::flattenToDepth(uint depth)
 	return resultArray;
 }
 
-// returns all triangles that are intersecting overlapping AABB leaves
-void AABBTree::getTrianglesInABox(Box3* box, std::vector<uint>* triIdBuffer)
+// returns all primitives that are intersecting overlapping AABB leaves
+void AABBTree::getPrimitivesInABox(Box3* box, std::vector<uint>* primIdBuffer)
 {
-	if (!triIdBuffer->empty()) triIdBuffer->clear();
+	if (!primIdBuffer->empty()) primIdBuffer->clear();
 
 	std::stack<AABBNode*> stack = {};
 	stack.push(this->root);
@@ -171,8 +172,8 @@ void AABBTree::getTrianglesInABox(Box3* box, std::vector<uint>* triIdBuffer)
 		stack.pop();
 
 		if (item->isALeaf()) {
-			for (uint i = 0; i < item->triangles.size(); i++) {
-				triIdBuffer->push_back(item->triangles[i]);
+			for (uint i = 0; i < item->primitiveIds.size(); i++) {
+				primIdBuffer->push_back(item->primitiveIds[i]);
 			}
 		} else {
 			if (item->left && box->intersectsBox(item->left->bbox)) {
@@ -227,13 +228,13 @@ AABBTree::AABBNode* AABBTree::getClosestNode(Vector3& point)
 	return nullptr;
 }
 
-int AABBTree::getClosestTriangleId(Vector3& point)
+int AABBTree::getClosestPrimitiveId(Vector3& point)
 {
 	AABBNode* closestNode = this->getClosestNode(point);
 	if (!closestNode) {
 		return -1;
 	}
-	return closestNode->triangles[0];
+	return closestNode->primitiveIds[0];
 }
 
 std::vector<Geometry> AABBTree::getAABBGeomsOfDepth(uint depth)
@@ -272,32 +273,35 @@ std::vector<Geometry> AABBTree::getAABBLeafGeoms()
 	return boxGeoms;
 }
 
-std::vector<Geometry> AABBTree::getAABBTrianglesOfDepth(uint depth)
+std::vector<Geometry> AABBTree::getAABBPrimitivesOfDepth(uint depth)
 {
 	std::vector<AABBNode> leafNodes = this->flattenToDepth(depth);
-	std::vector<Geometry> triGeoms = {};
+	std::vector<Geometry> primGeoms = {};
 
 	for (auto&& leaf : leafNodes) {
 		std::vector<Geometry> leafTriGeoms = {};
 
-		for (uint i = 0; i < leaf.triangles.size(); i++) {
-			Geometry triGeom = Geometry();
-			triGeom.uniqueVertices = std::vector<Vector3>(*this->triangles[leaf.triangles[i]].begin(), *this->triangles[leaf.triangles[i]].end());
+		for (uint i = 0; i < leaf.primitiveIds.size(); i++) {
+			Geometry primGeom = Geometry();
+			primGeom.uniqueVertices = std::vector<Vector3>(
+				*this->primitives[leaf.primitiveIds[i]].vertices.begin(),
+				*this->primitives[leaf.primitiveIds[i]].vertices.end()
+			);
 
 			for (uint j = 0; j < 3; j++) {
-				triGeom.vertices.push_back(this->triangles[leaf.triangles[i]][j]->x);
-				triGeom.vertices.push_back(this->triangles[leaf.triangles[i]][j]->y);
-				triGeom.vertices.push_back(this->triangles[leaf.triangles[i]][j]->z);
+				primGeom.vertices.push_back(this->primitives[leaf.primitiveIds[i]].vertices[j]->x);
+				primGeom.vertices.push_back(this->primitives[leaf.primitiveIds[i]].vertices[j]->y);
+				primGeom.vertices.push_back(this->primitives[leaf.primitiveIds[i]].vertices[j]->z);
 
 				// normals will be computed when merging geoms
 
-				triGeom.vertexIndices.push_back(j);
+				primGeom.vertexIndices.push_back(j);
 			}
-			triGeoms.push_back(triGeom);
+			primGeoms.push_back(primGeom);
 		}
 	}
 
-	return triGeoms;
+	return primGeoms;
 }
 
 uint depth(AABBTree* tree)
@@ -347,17 +351,17 @@ AABBTree::AABBNode::AABBNode(const AABBNode& other)
 	axis = other.axis;
 	depth = other.depth;
 	splitPosition = other.splitPosition;
-	triangles = std::vector<uint>(other.triangles);
+	primitiveIds = std::vector<uint>(other.primitiveIds);
 }
 
-AABBTree::AABBNode::AABBNode(std::vector<uint>* triangles, Box3& bbox, AABBTree* tree, uint depthLeft, AABBNode* parent)
+AABBTree::AABBNode::AABBNode(std::vector<uint>* primitiveIds, Box3& bbox, AABBTree* tree, uint depthLeft, AABBNode* parent)
 {
 	this->tree = tree;
 	this->parent = parent;
 	this->bbox = bbox;
 	this->depth = MAX_DEPTH - depthLeft;
 
-	this->construct(triangles, depthLeft);
+	this->construct(primitiveIds, depthLeft);
 }
 
 AABBTree::AABBNode::~AABBNode()
@@ -369,16 +373,16 @@ bool AABBTree::AABBNode::isALeaf()
 	return (!this->left && !this->right);
 }
 
-bool AABBTree::AABBNode::isALeafWithTriangles()
+bool AABBTree::AABBNode::isALeafWithPrimitives()
 {
-	return this->isALeaf() && !this->triangles.empty();
+	return this->isALeaf() && !this->primitiveIds.empty();
 }
 
-void AABBTree::AABBNode::construct(std::vector<uint>* triangles, uint depthLeft)
+void AABBTree::AABBNode::construct(std::vector<uint>* primitiveIds, uint depthLeft)
 {
-	if (depthLeft == 0 || triangles->size() <= 2) {
-		this->triangles = *triangles;
-		this->filterTriangles();
+	if (depthLeft == 0 || primitiveIds->size() <= 2) {
+		this->primitiveIds = *primitiveIds;
+		this->filterPrimitives();
 		return;
 	}
 
@@ -394,39 +398,39 @@ void AABBTree::AABBNode::construct(std::vector<uint>* triangles, uint depthLeft)
 		this->axis = 2;
 	}
 
-	std::vector<uint> leftTriangles = {};
-	std::vector<uint> rightTriangles = {};
+	std::vector<uint> leftPrimitiveIds = {};
+	std::vector<uint> rightPrimitiveIds = {};
 
-	this->splitPosition = this->getSplitPosition(*triangles, &leftTriangles, &rightTriangles); // classify triangles
+	this->splitPosition = this->getSplitPosition(*primitiveIds, &leftPrimitiveIds, &rightPrimitiveIds); // classify primitives
 
-	const bool stopBranching = !this->hasEnoughBranching(leftTriangles.size(), rightTriangles.size(), triangles->size());
+	const bool stopBranching = !this->hasEnoughBranching(leftPrimitiveIds.size(), rightPrimitiveIds.size(), primitiveIds->size());
 	if (stopBranching) {
-		this->triangles = *triangles;
-		this->filterTriangles();
+		this->primitiveIds = *primitiveIds;
+		this->filterPrimitives();
 	}
 	else {
-		if (leftTriangles.size() > 0) {
+		if (leftPrimitiveIds.size() > 0) {
 			Box3 bboxLeft = this->bbox;
 			bboxLeft.max.setCoordById(this->splitPosition, this->axis);
-			this->left = new AABBNode(&leftTriangles, bboxLeft, this->tree, depthLeft - 1, this);
+			this->left = new AABBNode(&leftPrimitiveIds, bboxLeft, this->tree, depthLeft - 1, this);
 
-			if (this->left->triangles.empty() && this->left->left == nullptr && this->left->right == nullptr) {
+			if (this->left->primitiveIds.empty() && this->left->left == nullptr && this->left->right == nullptr) {
 				this->left = nullptr;
 			}
 		}
-		if (rightTriangles.size() > 0) {
+		if (rightPrimitiveIds.size() > 0) {
 			Box3 bboxRight = this->bbox;
 			bboxRight.min.setCoordById(this->splitPosition, this->axis);
-			this->right = new AABBNode(&rightTriangles, bboxRight, this->tree, depthLeft - 1, this);
+			this->right = new AABBNode(&rightPrimitiveIds, bboxRight, this->tree, depthLeft - 1, this);
 
-			if (this->right->triangles.empty() && this->right->left == nullptr && this->right->right == nullptr) {
+			if (this->right->primitiveIds.empty() && this->right->left == nullptr && this->right->right == nullptr) {
 				this->right = nullptr;
 			}
 		}
 	}
 }
 
-float AABBTree::AABBNode::getSplitPosition(std::vector<uint>& triangles, std::vector<uint>* out_left, std::vector<uint>* out_right)
+float AABBTree::AABBNode::getSplitPosition(std::vector<uint>& primitiveIds, std::vector<uint>* out_left, std::vector<uint>* out_right)
 {
 	std::vector<float> splitPositions = {};
 	std::vector<float> splitsLeft = {};
@@ -440,21 +444,9 @@ float AABBTree::AABBNode::getSplitPosition(std::vector<uint>& triangles, std::ve
 	}
 
 	// count triangles for each split, we don't want to fill arrays here (lot of wasted cycles and memory ops)
-	for (uint i = 0; i < triangles.size(); i++) {
-		float min = std::fminf(
-			this->tree->triangles[triangles[i]][0]->getCoordById(axis), 
-			std::fminf(
-				this->tree->triangles[triangles[i]][1]->getCoordById(axis),
-				this->tree->triangles[triangles[i]][2]->getCoordById(axis)
-			)
-		);		
-		float max = std::fmaxf(
-			this->tree->triangles[triangles[i]][0]->getCoordById(axis),
-			std::fmaxf(
-				this->tree->triangles[triangles[i]][1]->getCoordById(axis),
-				this->tree->triangles[triangles[i]][2]->getCoordById(axis)
-			)
-		);
+	for (uint i = 0; i < primitiveIds.size(); i++) {
+		float min = this->tree->primitives[primitiveIds[i]].getMinById(axis);
+		float max = this->tree->primitives[primitiveIds[i]].getMaxById(axis);
 
 		for (uint j = 0; j < splitPositions.size(); j++) {
 			if (min <= splitPositions[j]) {
@@ -478,27 +470,15 @@ float AABBTree::AABBNode::getSplitPosition(std::vector<uint>& triangles, std::ve
 	}
 
 	// fill left and right arrays now that best split position is known
-	for (uint i = 0; i < triangles.size(); i++) {
-		float min = std::fminf(
-			this->tree->triangles[triangles[i]][0]->getCoordById(axis),
-			std::fminf(
-				this->tree->triangles[triangles[i]][1]->getCoordById(axis),
-				this->tree->triangles[triangles[i]][2]->getCoordById(axis)
-			)
-		);
-		float max = std::fmaxf(
-			this->tree->triangles[triangles[i]][0]->getCoordById(axis),
-			std::fmaxf(
-				this->tree->triangles[triangles[i]][1]->getCoordById(axis),
-				this->tree->triangles[triangles[i]][2]->getCoordById(axis)
-			)
-		);
+	for (uint i = 0; i < primitiveIds.size(); i++) {
+		float min = this->tree->primitives[primitiveIds[i]].getMinById(axis);
+		float max = this->tree->primitives[primitiveIds[i]].getMaxById(axis);
 
 		if (min <= bestSplitPosition) {
-			out_left->push_back(triangles[i]);
+			out_left->push_back(primitiveIds[i]);
 		}
 		if (max >= bestSplitPosition) {
-			out_right->push_back(triangles[i]);
+			out_right->push_back(primitiveIds[i]);
 		}
 	}
 
@@ -519,20 +499,20 @@ float AABBTree::AABBNode::getCostEstimate(float splitPos, uint nLeft, uint nRigh
 	return leftArea * nLeft + rightArea * nRight;
 }
 
-bool AABBTree::AABBNode::hasEnoughBranching(size_t nLeftTris, size_t nRightTris, size_t nTris)
+bool AABBTree::AABBNode::hasEnoughBranching(size_t nLeftPrims, size_t nRightPrims, size_t nPrims)
 {
-	return nLeftTris + nRightTris < 1.5f * nTris;
+	return nLeftPrims + nRightPrims < 1.5f * nPrims;
 }
 
-void AABBTree::AABBNode::filterTriangles()
+void AABBTree::AABBNode::filterPrimitives()
 {
 	Vector3 bboxCenter = bbox.getCenter();
 	Vector3 bboxHalfSize = 0.5f * bbox.getSize();
-	std::vector<uint> newTriangles = {};
-	for (uint i = 0; i < this->triangles.size(); i++) {
-		if (getTriangleBoundingBoxIntersection(&this->tree->triangles.at(this->triangles[i]), bboxCenter, bboxHalfSize)) {
-			newTriangles.push_back(this->triangles[i]);
+	std::vector<uint> newPrimitiveIds = {};
+	for (uint i = 0; i < this->primitiveIds.size(); i++) {
+		if (getPrimitiveBoxIntersection(this->tree->primitives.at(this->primitiveIds[i]), &bboxCenter, &bbox.min, &bbox.max, &bboxHalfSize)) {
+			newPrimitiveIds.push_back(this->primitiveIds[i]);
 		}
 	}
-	this->triangles = newTriangles;
+	this->primitiveIds = newPrimitiveIds;
 }
