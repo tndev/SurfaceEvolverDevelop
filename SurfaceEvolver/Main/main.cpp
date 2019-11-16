@@ -30,7 +30,11 @@
 // - Get exact octree centroid to closest triangle dist
 // - Unite AABB, Octree and FastSweep3D into a single class
 // - debug and optimize FastSweep3D
-// - generalize AABB for points, edges, and triangles as generic sufrace features
+
+//  POSTPONED:
+//
+// - Interior/Exterior mesh Sign (Needs to build on top of FastSweep3D)
+
 
 //   DONE, BUT MIGHT BE IMPROVED:
 //
@@ -45,7 +49,6 @@
 //
 // - flat AABB
 // - perform simple DF tests for geom primitives like sphere, icosphere, cubesphere
-// - Interior/Exterior mesh Sign
 
 int main()
 {
@@ -60,19 +63,20 @@ int main()
 
 	if (iterateCubeSphereTest) {
 		size_t min_Res = 30, max_Res = 40;
-		size_t min_Ns = 3, max_Ns = 4;
+		size_t min_Ns = 1, max_Ns = 2;
 		std::fstream timing("timing.txt", std::fstream::out);
 
 		for (unsigned int res = min_Res; res < max_Res; res += 20) {
 			for (unsigned int n = min_Ns; n < max_Ns; n++) {
-				std::cout << "cube(" << n << "), grid_res = " << res << std::endl;
-				timing << "cube(" << n << "), grid_res = " << res << std::endl;
-				PrimitiveBox c = PrimitiveBox(a, a, a, n, n, n);
+				std::cout << "icosphere(" << n << "), grid_res = " << res << std::endl;
+				IcoSphere g = IcoSphere(n, r);
 				Vector3 axis = normalize(Vector3(1, 1, 1));
-				c.applyMatrix(Matrix4().makeRotationAxis(axis.x, axis.y, axis.z, M_PI / 6.));
-				e.initExport(c, "cube" + std::to_string(res) + "-" + std::to_string(n));
+				g.applyMatrix(Matrix4().makeRotationAxis(axis.x, axis.y, axis.z, M_PI / 6.));
+				e.initExport(g, "icosphere" + std::to_string(res) + "-" + std::to_string(n));
 				
-				SDF sdf = SDF(&c, res);
+				std::cout << "init SDF..." << std::endl;
+
+				SDF sdf = SDF(&g, res);
 
 				std::cout << sdf.getComputationProperties();
 				timing << sdf.getComputationProperties();

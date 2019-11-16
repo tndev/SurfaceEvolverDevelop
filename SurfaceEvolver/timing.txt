@@ -1,5 +1,5 @@
-cube(3), grid_res = 30
-=== PrimitiveBox, dimensions: (57.735027, 57.735027, 57.735027), segments: (3, 3, 3) === 
-verts: 56, triangles: 108, grid resolution: 30^3 
-computation times:  AABB: 0.065239 s, Octree: (build: 1.209350 s, get_leaves: 0.016224 s), FastSweep3D: 1.048456 s, TOTAL: 2.323053 s
+=== IcoSphere, detail: 1, radius: 50.000000 === 
+verts: 42, triangles: 80, grid resolution: 30^3 
+computation times:  AABBTree: 0.029823 s, Octree: (build: 1.226245 s, get_leaves: 0.022961 s), FastSweep3D: 1.106055 s, 
+====> TOTAL: 2.362146 s
 

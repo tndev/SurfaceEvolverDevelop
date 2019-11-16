@@ -33,7 +33,7 @@ public:
 
 	void initToVal(float val);
 	void blur();
-	void computeSignField(AABBTree* aabb);
+	void computeSignField(AABBTree* v_aabb, AABBTree* e_aabb, AABBTree* t_aabb);
 	void clean();
 private:
 	// fraction of the scale with which the grid should exceed the mesh bbox

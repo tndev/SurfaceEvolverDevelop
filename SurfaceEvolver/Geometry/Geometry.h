@@ -1,10 +1,13 @@
 #ifndef GEOMETRY_H_
 #define GEOMETRY_H_
 
+#define _USE_MATH_DEFINES
+
 #include <vector>
 #include <algorithm>
 #include <string>
 #include <map>
+#include <set>
 #include <time.h>
 #include "Box3.h"
 #include "Matrix4.h"
@@ -17,6 +20,7 @@ namespace StructGeom {
 	using Vertex = Vector3*;
 	using Triangle = std::vector<Vector3*>;
 	using Edge = std::vector<Vector3*>;
+
 };
 
 namespace BufferGeom {
@@ -29,6 +33,11 @@ namespace BufferGeom {
 using Vertex = StructGeom::Vertex;
 using Tri = StructGeom::Triangle;
 using Edge = StructGeom::Edge;
+
+/*
+bool operator<(const Edge& left, const Edge& right) {
+	return (*left[0] < *right[0] && *left[1] < *right[1]);
+}*/
 
 enum class PrimitiveType {
 	vert = 1,
@@ -49,10 +58,6 @@ struct Primitive {
 
 class Geometry
 {
-private:
-	std::vector<StructGeom::Triangle> triangles = {};
-	std::vector<StructGeom::Edge> edges = {};
-	std::multimap<Vector3, BufferGeom::TriWithMarkedVertex> vertexToTriangles;
 public:
 	std::string name = "Geometry - Object";
 
@@ -75,7 +80,6 @@ public:
 	bool hasVertexIndices();
 	bool hasNormals();
 	bool hasTriangulations();
-	bool hasVertexToTrianglesMap();
 
 	Box3 getBoundingBox(Box3 bbox = Box3(), Matrix4 matrix = Matrix4());
 	void computeNormals();
@@ -85,15 +89,17 @@ public:
 	std::vector<Vector3> getProjectionsAlongNormal(BufferGeom::Face& vertices); // TODO: use Vector2
 	std::vector<std::vector<uint>> getTriangulatedIndices(BufferGeom::Face& vertices);
 	std::pair<std::vector<BufferGeom::Triangulation>, std::vector<size_t>> getSortedPolygonTriangulationsAndSizes();
-	std::vector<Tri> getTriangles();
-	std::vector<Edge> getEdges();
+	void getTriangles(std::vector<Tri>* trianglesBuffer);
+	void getEdgesSet(std::set<Edge>* edgesSet);  // TODO: "<" operator for an edge
 	std::vector<Vector3> getVertices();
 	std::vector<Vector3> getUniqueVertices();
 	std::vector<Primitive> getPrimitives(PrimitiveType type);
 
 	void getVertexToTriangleMap(std::multimap<Vector3, BufferGeom::TriWithMarkedVertex>* buffer);
+	void getEdgeToTriangleMap(std::multimap<Edge, BufferGeom::Triangle>* buffer);
 	std::vector<Vector3> getAngleWeightedVertexPseudoNormals();
-	Vector3 getAngleWeightedPseudonormalToVertex(uint vId);
+	std::vector<Vector3> getAngleWeightedEdgePseudoNormals();
+	std::vector<Vector3> getTriangleNormals();
 
 	void applyMatrix(Matrix4 m);
 	Vector3 getNormal(BufferGeom::Face f);
@@ -108,7 +114,7 @@ private:
 // ==== External Methods ============
 // geom:
 Geometry mergeGeometries(std::vector<Geometry>& geometries);
-Vector3 getTriangleNormal(StructGeom::Triangle triangle, Vector3 resultNormal);
+Vector3 getTriangleNormal(StructGeom::Triangle triangle, Vector3& resultNormal);
 
 // intersections:
 bool getTriangleBoxIntersection(Tri& vertices, Vector3* bboxCenter, Vector3 bboxHalfSize, float offset = 0.0001f, Vector3* optTriNormal = nullptr);
@@ -124,5 +130,7 @@ float getDistanceToATriangleSq2(Tri* vertices, Vector3& point);
 float getDistanceToAnEdgeSq(Edge* vertices, Vector3& point);
 float getDistanceToAPrimitiveSq(Primitive& primitive, Vector3& point);
 
+Vector3 getClosestPtOnATriangle(Tri* vertices, Vector3& point);
+Vector3 getClosestPtOnAnEdge(Edge* vertices, Vector3& point);
 
 #endif

@@ -10,7 +10,9 @@ class SDF
 {
 public:
 	Geometry* geom;
-	AABBTree* aabb;
+	AABBTree* tri_aabb;
+	AABBTree* edge_aabb;
+	AABBTree* vert_aabb;
 	Octree* octree;
 	Grid* grid;
 	FastSweep3D* fastSweep;

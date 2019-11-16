@@ -23,8 +23,8 @@ Box3::Box3(const Box3& other)
 bool Box3::isEmpty()
 {
 	return (
-		this->min.equals(Vector3(INFINITY, INFINITY, INFINITY)) &&
-		this->max.equals(Vector3(-INFINITY, -INFINITY, -INFINITY))
+		(this->min.x > FLT_MAX && this->min.y > FLT_MAX && this->min.z > FLT_MAX) && 
+		(this->max.x < -FLT_MAX && this->max.y < -FLT_MAX && this->max.z < -FLT_MAX)
 	);
 }
 

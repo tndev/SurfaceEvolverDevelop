@@ -102,20 +102,24 @@ void Grid::blur()
 	}
 }
 
-void Grid::computeSignField(AABBTree* aabb)
+void Grid::computeSignField(AABBTree* v_aabb, AABBTree* e_aabb, AABBTree* t_aabb)
 {
 	Vector3 p = Vector3();
-	Vector3 rayDir = normalize(Vector3(1, 1, 1));
 	int sign = 1; uint gridPos;
-	int triId;
+	int vId, eId, tId;
 
 	Vector3 o = bbox.min; // origin
+	Vector3 pn; float rv, re, rt;
 	uint nx = Nx - 1;
 	uint ny = Ny - 1;
 	uint nz = Nz - 1;
 	float dx = scale.x / nx;
 	float dy = scale.y / ny;
 	float dz = scale.z / nz;
+
+	std::vector<Vector3> v_awpn = v_aabb->geom->getAngleWeightedVertexPseudoNormals();
+	std::vector<Vector3> e_awpn = e_aabb->geom->getAngleWeightedEdgePseudoNormals();
+	std::vector<Vector3> t_n = t_aabb->geom->getTriangleNormals();
 
 	for (uint iz = 1; iz < Nz - 1; iz++) {
 		for (uint iy = 1; iy < Ny - 1; iy++) {
@@ -125,12 +129,46 @@ void Grid::computeSignField(AABBTree* aabb)
 					o.y + iy * dy,
 					o.z + iz * dz
 				);
-				triId = aabb->getClosestPrimitiveId(p);
-				if (triId < 0) {
+				vId = v_aabb->getClosestPrimitiveId(p);
+				if (vId < 0) {
 					continue;
 				}
-				gridPos = Nx * Ny * iz + Nx * iy + ix;
-				this->field[gridPos] *= sign;
+
+				rv = (p - v_aabb->geom->uniqueVertices[vId]).lengthSq();
+
+				eId = e_aabb->getClosestPrimitiveId(p);
+				if (eId < 0) {
+					continue;
+				}
+
+				re = getDistanceToAnEdgeSq(&e_aabb->primitives[eId].vertices, p);
+				
+				if (rv < re) {
+					sign = (dot((p - v_aabb->geom->uniqueVertices[vId]), v_awpn[vId]) < 0.0f ? -1 : 1);
+					gridPos = Nx * Ny * iz + Nx * iy + ix;
+					this->field[gridPos] *= sign;
+					continue;
+				}
+				else {
+					tId = t_aabb->getClosestPrimitiveId(p);
+					if (tId < 0) {
+						continue;
+					}
+
+					rt = getDistanceToATriangleSq(&t_aabb->primitives[tId].vertices, p);
+
+					if (re < rt) {
+						sign = (dot((p - getClosestPtOnAnEdge(&e_aabb->primitives[eId].vertices, p)), e_awpn[eId]) < 0.0f ? -1 : 1);
+						gridPos = Nx * Ny * iz + Nx * iy + ix;
+						this->field[gridPos] *= sign;
+						continue;
+					}
+					else {
+						sign = (dot((p - getClosestPtOnATriangle(&t_aabb->primitives[tId].vertices, p)), t_n[tId]) < 0.0f ? -1 : 1);
+						gridPos = Nx * Ny * iz + Nx * iy + ix;
+						this->field[gridPos] *= sign;
+					}
+				}
 			}
 		}
 	}

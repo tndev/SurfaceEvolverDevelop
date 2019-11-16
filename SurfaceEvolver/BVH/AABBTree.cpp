@@ -200,25 +200,17 @@ AABBTree::AABBNode* AABBTree::getClosestNode(Vector3& point)
 		stack.pop();
 
 		if (item->left || item->right) {
-			leftCenter = item->left->bbox.getCenter() - point;
-			invLeftCenter.set(1.0f / leftCenter.x, 1.0f / leftCenter.y, 1.0f / leftCenter.z);
-			leftSize = 0.5 * item->left->bbox.getSize();
-
-			rightCenter = item->right->bbox.getCenter() - point;
-			invLeftCenter.set(1.0f / rightCenter.x, 1.0f / rightCenter.y, 1.0f / rightCenter.z);
-			rightSize = 0.5 * item->right->bbox.getSize();
-
-			t_left = fminf(dot((item->left->bbox.min - point), invLeftCenter), dot((item->left->bbox.max - point), invLeftCenter));
-			t_right = fminf(dot((item->right->bbox.min - point), invRightCenter), dot((item->right->bbox.max - point), invRightCenter));
-
-			bool leftIsNear = leftCenter.lengthSq() < rightCenter.lengthSq() && t_left < t_right;
-
-			if (leftIsNear) {
-				stack.push(item->left);
+			bool leftIsNear = point.getCoordById(item->axis) < item->splitPosition;
+			AABBNode* nearNode = item->left;
+			AABBNode* farNode = item->right;
+			if (!leftIsNear) {
+				nearNode = item->right;
+				farNode = item->left;
 			}
-			else {
-				stack.push(item->right);
-			}
+
+			if (nearNode) {
+				stack.push(nearNode);
+			}			
 		}
 		else {
 			return item;
@@ -234,7 +226,17 @@ int AABBTree::getClosestPrimitiveId(Vector3& point)
 	if (!closestNode) {
 		return -1;
 	}
-	return closestNode->primitiveIds[0];
+
+	int id; float distSq; float result_distSq = FLT_MAX;
+	for (auto&& i : closestNode->primitiveIds) {
+		distSq = getDistanceToAPrimitiveSq(this->primitives[i], point);
+
+		if (distSq < result_distSq) {
+			result_distSq = distSq;
+			id = i;
+		}
+	}
+	return id;
 }
 
 std::vector<Geometry> AABBTree::getAABBGeomsOfDepth(uint depth)

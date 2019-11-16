@@ -42,11 +42,6 @@ bool Geometry::hasTriangulations()
 	return this->triangulations.size() > 0;
 }
 
-bool Geometry::hasVertexToTrianglesMap()
-{
-	return !this->vertexToTriangles.empty();
-}
-
 Box3 Geometry::getBoundingBox(Box3 bbox, Matrix4 matrix)
 {
 	Vector3 helperVector = Vector3();
@@ -174,18 +169,12 @@ std::vector<Primitive> Geometry::getPrimitives(PrimitiveType type)
 		}
 	}
 	else if (type == PrimitiveType::edge) {
-		for (uint i = 0; i < this->vertexIndices.size(); i += 3) {
-			Vector3* v0 = &this->uniqueVertices[this->vertexIndices[i]];
-			Vector3* v1 = &this->uniqueVertices[this->vertexIndices[i + 1]];
-			Vector3* v2 = &this->uniqueVertices[this->vertexIndices[i + 2]];
-
-			Edge e0 = { v0, v1 };
-			Edge e1 = { v1, v2 };
-			Edge e2 = { v2, v0 };
-
-			this->edges.push_back(e0);
-			this->edges.push_back(e1);
-			this->edges.push_back(e2);
+		std::set<Edge> edgesSet = {};
+		this->getEdgesSet(&edgesSet);
+		std::set<Edge>::iterator it;
+		for (it = edgesSet.begin(); it != edgesSet.end(); ++it) {
+			Edge e = *it;
+			result.push_back(Primitive({ e[0], e[1] }));
 		}
 	}
 	else if (type == PrimitiveType::tri) {
@@ -208,7 +197,27 @@ void Geometry::getVertexToTriangleMap(std::multimap<Vector3, BufferGeom::TriWith
 	for (uint i = 0; i < this->vertexIndices.size(); i += 3) {
 		BufferGeom::Triangle face = { this->vertexIndices[i] , this->vertexIndices[i + 1], this->vertexIndices[i + 2] };
 		for (uint j = 0; j < 3; j++) {
-			it = buffer->insert(std::pair<Vector3, BufferGeom::TriWithMarkedVertex>(this->uniqueVertices[this->vertexIndices[i + j]], BufferGeom::TriWithMarkedVertex(face, j)));
+			it = buffer->insert(
+				std::pair<Vector3, BufferGeom::TriWithMarkedVertex>(
+					this->uniqueVertices[this->vertexIndices[i + j]],
+					BufferGeom::TriWithMarkedVertex(face, this->vertexIndices[i + j])
+				)
+			);
+		}
+	}
+}
+
+void Geometry::getEdgeToTriangleMap(std::multimap<Edge, BufferGeom::Triangle>* buffer)
+{
+	std::multimap<Edge, BufferGeom::Triangle>::iterator it;
+	for (uint i = 0; i < this->vertexIndices.size(); i += 3) {
+		BufferGeom::Triangle T = { this->vertexIndices[i],	this->vertexIndices[i + 1],	this->vertexIndices[i + 2] };
+		for (uint j = 0; j < 3; j++) {
+			Edge e = {
+				&this->uniqueVertices[this->vertexIndices[i + j]],
+				&this->uniqueVertices[this->vertexIndices[i + (j + 1) % 3]]
+			};
+			it = buffer->insert(std::pair<Edge, BufferGeom::Triangle>(e, T));
 		}
 	}
 }
@@ -229,9 +238,10 @@ std::vector<Vector3> Geometry::getAngleWeightedVertexPseudoNormals()
 		Vector3 pseudoNormal = Vector3();
 		while (it != vertexToTriangles.end()) {
 			BufferGeom::TriWithMarkedVertex ti = it->second;
-			StructGeom::Triangle T = { &uniqueVertices[ti.first[0]], &uniqueVertices[ti.first[1]], &uniqueVertices[ti.first[2]] };
+			Tri T = { &uniqueVertices[ti.first[0]], &uniqueVertices[ti.first[1]], &uniqueVertices[ti.first[2]] };
 			// compute normal
 			getTriangleNormal(T, triNormal);
+			triNormal.normalize();
 			for (auto&& vi : ti.first) {
 				if (vi != ti.second) { // ignore the marked vertex because its v
 					verts.push_back(&this->uniqueVertices[vi]);
@@ -246,47 +256,63 @@ std::vector<Vector3> Geometry::getAngleWeightedVertexPseudoNormals()
 			vertexToTriangles.erase(it);
 			it = vertexToTriangles.find(*v);
 		}
-		result.push_back(pseudoNormal);
+		result.push_back(pseudoNormal / (2 * M_PI));
 	}
 
 	return result;
 }
 
-Vector3 Geometry::getAngleWeightedPseudonormalToVertex(uint vId)
+std::vector<Vector3> Geometry::getAngleWeightedEdgePseudoNormals()
 {
-	Vector3* v = &this->uniqueVertices.at(vId);
+	std::vector<Vector3> result = {};
 
-	if (!this->hasVertexToTrianglesMap()) {
-		this->getVertexToTriangleMap(&this->vertexToTriangles);
-	}
+	std::set<Edge> edgesSet = {};
+	this->getEdgesSet(&edgesSet);
+	std::multimap<Edge, BufferGeom::Triangle> edgeToTriangles = {};
+	this->getEdgeToTriangleMap(&edgeToTriangles);
+	std::set<Edge>::iterator set_it;
+	std::multimap<Edge, BufferGeom::Triangle>::iterator map_it;
 
-	std::multimap<Vector3, BufferGeom::TriWithMarkedVertex>::iterator it;
-    std::vector<Vector3*> verts = {};
-	float alpha; Vector3 triNormal = Vector3();
+	Vector3 triNormal = Vector3();
 
-	it = vertexToTriangles.find(*v);
-	Vector3 pseudoNormal = Vector3();
-	while (it != vertexToTriangles.end()) {
-		BufferGeom::TriWithMarkedVertex ti = it->second;
-		StructGeom::Triangle T = { &uniqueVertices[ti.first[0]], &uniqueVertices[ti.first[1]], &uniqueVertices[ti.first[2]] };
-		// compute normal
-		getTriangleNormal(T, triNormal);
-		for (auto&& vi : ti.first) {
-			if (vi != ti.second) { // ignore the marked vertex because its v
-				verts.push_back(&this->uniqueVertices[vi]);
-			}
+	for (set_it = edgesSet.begin(); set_it != edgesSet.end(); ++set_it) {
+		Edge e = *set_it;
+		map_it = edgeToTriangles.find(e);
+		Vector3 pseudoNormal = Vector3();
+		while (map_it != edgeToTriangles.end()) {
+			BufferGeom::Triangle ti = map_it->second;
+			Tri T = { &uniqueVertices[ti[0]], &uniqueVertices[ti[1]], &uniqueVertices[ti[2]] };
+			getTriangleNormal(T, triNormal);
+			triNormal.normalize();
+			pseudoNormal = pseudoNormal + M_PI * triNormal;
+
+			edgeToTriangles.erase(map_it);
+			map_it = edgeToTriangles.find(e);
 		}
-		// compute angle
-		alpha = acos(dot(normalize(*verts[0] - *v), normalize(*verts[1] - *v)));
 
-		pseudoNormal = pseudoNormal + alpha * triNormal;
-
-		verts.clear();
-		vertexToTriangles.erase(it);
-		it = vertexToTriangles.find(*v);
+		result.push_back(pseudoNormal / (2 * M_PI));
 	}
 
-	return pseudoNormal;
+	return result;
+}
+
+std::vector<Vector3> Geometry::getTriangleNormals()
+{
+	std::vector<Vector3> result = {};
+	Vector3 triNorm = Vector3();
+
+	for (uint i = 0; i < vertexIndices.size(); i += 3) {
+		Tri T = { 
+			&uniqueVertices[vertexIndices[i]],
+			&uniqueVertices[vertexIndices[i + 1]],
+			&uniqueVertices[vertexIndices[i + 2]]
+		};
+		getTriangleNormal(T, triNorm);
+		Vector3 n = normalize(triNorm);
+		result.push_back(n);
+	}
+
+	return result;
 }
 
 std::vector<Vector3> Geometry::getProjectionsAlongNormal(BufferGeom::Face& vertices)
@@ -515,9 +541,6 @@ void Geometry::clear()
 	normals.clear();
 	vertexIndices.clear();
 	triangulations.clear();
-
-	triangles.clear();
-	edges.clear();
 }
 
 std::pair<std::vector<BufferGeom::Triangulation>, std::vector<size_t>> Geometry::getSortedPolygonTriangulationsAndSizes()
@@ -543,43 +566,33 @@ std::pair<std::vector<BufferGeom::Triangulation>, std::vector<size_t>> Geometry:
 	return result;
 }
 
-std::vector<StructGeom::Triangle> Geometry::getTriangles()
+void Geometry::getTriangles(std::vector<Tri>* trianglesBuffer)
 {
-	if (this->triangles.empty()) {
-		for (unsigned int i = 0; i < this->vertexIndices.size(); i += 3) {
-			Vector3* v0 = &this->uniqueVertices[this->vertexIndices[i]];
-			Vector3* v1 = &this->uniqueVertices[this->vertexIndices[i + 1]];
-			Vector3* v2 = &this->uniqueVertices[this->vertexIndices[i + 2]];
+	for (unsigned int i = 0; i < this->vertexIndices.size(); i += 3) {
+		Vector3* v0 = &this->uniqueVertices[this->vertexIndices[i]];
+		Vector3* v1 = &this->uniqueVertices[this->vertexIndices[i + 1]];
+		Vector3* v2 = &this->uniqueVertices[this->vertexIndices[i + 2]];
 
-			StructGeom::Triangle T = { v0, v1, v2 };
+		Tri T = { v0, v1, v2 };
 
-			this->triangles.push_back(T);
-		}
+		trianglesBuffer->push_back(T);
 	}
-
-	return this->triangles;
 }
 
-// TODO: Use sets to get unique edges
-std::vector<StructGeom::Edge> Geometry::getEdges()
+// TODO: "<" operator for an edge
+void Geometry::getEdgesSet(std::set<Edge>* edgesSet)
 {
-	if (this->edges.empty()) {
-		for (unsigned int i = 0; i < this->vertexIndices.size(); i += 3) {
-			Vector3* v0 = &this->uniqueVertices[this->vertexIndices[i]];
-			Vector3* v1 = &this->uniqueVertices[this->vertexIndices[i + 1]];
-			Vector3* v2 = &this->uniqueVertices[this->vertexIndices[i + 2]];
-
-			StructGeom::Edge e0 = { v0, v1 };
-			StructGeom::Edge e1 = { v1, v2 };
-			StructGeom::Edge e2 = { v2, v0 };
-
-			this->edges.push_back(e0);
-			this->edges.push_back(e1);
-			this->edges.push_back(e2);
+	std::pair<std::set<Edge>::iterator, bool> it;
+	for (uint i = 0; i < this->vertexIndices.size(); i += 3) {
+		BufferGeom::Triangle T = { this->vertexIndices[i],	this->vertexIndices[i + 1],	this->vertexIndices[i + 2] };
+		for (uint j = 0; j < 3; j++) {
+			Edge e = {
+				&this->uniqueVertices[this->vertexIndices[i + j]],
+				&this->uniqueVertices[this->vertexIndices[i + (j + 1) % 3]]
+			};
+			it = edgesSet->insert(e);
 		}
 	}
-
-	return this->edges;
 }
 
 Geometry mergeGeometries(std::vector<Geometry>& geometries)
@@ -637,7 +650,7 @@ Geometry mergeGeometries(std::vector<Geometry>& geometries)
 	return result;
 }
 
-Vector3 getTriangleNormal(StructGeom::Triangle triangle, Vector3 resultNormal)
+Vector3 getTriangleNormal(StructGeom::Triangle triangle, Vector3& resultNormal)
 {
 	Vector3 u = *triangle[1] - *triangle[0];
 	Vector3 v = *triangle[2] - *triangle[0];
@@ -1014,6 +1027,210 @@ float getDistanceToAPrimitiveSq(Primitive& primitive, Vector3& point)
 
 	std::cout << "invalid primitive vert count!" << std::endl;
 	return -1.0f;
+}
+
+Vector3 getClosestPtOnATriangle(Tri* vertices, Vector3& point)
+{
+	Vector3 diff = point - *vertices->at(0);
+	Vector3 edge0 = *vertices->at(1) - *vertices->at(0);
+	Vector3 edge1 = *vertices->at(2) - *vertices->at(0);
+	float a00 = dot(edge0, edge0);
+	float a01 = dot(edge0, edge1);
+	float a11 = dot(edge1, edge1);
+	float b0 = -dot(diff, edge0);
+	float b1 = -dot(diff, edge1);
+	float const zero = (float)0;
+	float const one = (float)1;
+	float det = a00 * a11 - a01 * a01;
+	float t0 = a01 * b1 - a11 * b0;
+	float t1 = a01 * b0 - a00 * b1;
+
+	if (t0 + t1 <= det)
+	{
+		if (t0 < zero)
+		{
+			if (t1 < zero)  // region 4
+			{
+				if (b0 < zero)
+				{
+					t1 = zero;
+					if (-b0 >= a00)  // V1
+					{
+						t0 = one;
+					}
+					else  // E01
+					{
+						t0 = -b0 / a00;
+					}
+				}
+				else
+				{
+					t0 = zero;
+					if (b1 >= zero)  // V0
+					{
+						t1 = zero;
+					}
+					else if (-b1 >= a11)  // V2
+					{
+						t1 = one;
+					}
+					else  // E20
+					{
+						t1 = -b1 / a11;
+					}
+				}
+			}
+			else  // region 3
+			{
+				t0 = zero;
+				if (b1 >= zero)  // V0
+				{
+					t1 = zero;
+				}
+				else if (-b1 >= a11)  // V2
+				{
+					t1 = one;
+				}
+				else  // E20
+				{
+					t1 = -b1 / a11;
+				}
+			}
+		}
+		else if (t1 < zero)  // region 5
+		{
+			t1 = zero;
+			if (b0 >= zero)  // V0
+			{
+				t0 = zero;
+			}
+			else if (-b0 >= a00)  // V1
+			{
+				t0 = one;
+			}
+			else  // E01
+			{
+				t0 = -b0 / a00;
+			}
+		}
+		else  // region 0, interior
+		{
+			float invDet = one / det;
+			t0 *= invDet;
+			t1 *= invDet;
+		}
+	}
+	else
+	{
+		float tmp0, tmp1, numer, denom;
+
+		if (t0 < zero)  // region 2
+		{
+			tmp0 = a01 + b0;
+			tmp1 = a11 + b1;
+			if (tmp1 > tmp0)
+			{
+				numer = tmp1 - tmp0;
+				denom = a00 - ((float)2) * a01 + a11;
+				if (numer >= denom)  // V1
+				{
+					t0 = one;
+					t1 = zero;
+				}
+				else  // E12
+				{
+					t0 = numer / denom;
+					t1 = one - t0;
+				}
+			}
+			else
+			{
+				t0 = zero;
+				if (tmp1 <= zero)  // V2
+				{
+					t1 = one;
+				}
+				else if (b1 >= zero)  // V0
+				{
+					t1 = zero;
+				}
+				else  // E20
+				{
+					t1 = -b1 / a11;
+				}
+			}
+		}
+		else if (t1 < zero)  // region 6
+		{
+			tmp0 = a01 + b1;
+			tmp1 = a00 + b0;
+			if (tmp1 > tmp0)
+			{
+				numer = tmp1 - tmp0;
+				denom = a00 - ((float)2) * a01 + a11;
+				if (numer >= denom)  // V2
+				{
+					t1 = one;
+					t0 = zero;
+				}
+				else  // E12
+				{
+					t1 = numer / denom;
+					t0 = one - t1;
+				}
+			}
+			else
+			{
+				t1 = zero;
+				if (tmp1 <= zero)  // V1
+				{
+					t0 = one;
+				}
+				else if (b0 >= zero)  // V0
+				{
+					t0 = zero;
+				}
+				else  // E01
+				{
+					t0 = -b0 / a00;
+				}
+			}
+		}
+		else  // region 1
+		{
+			numer = a11 + b1 - a01 - b0;
+			if (numer <= zero)  // V2
+			{
+				t0 = zero;
+				t1 = one;
+			}
+			else
+			{
+				denom = a00 - ((float)2) * a01 + a11;
+				if (numer >= denom)  // V1
+				{
+					t0 = one;
+					t1 = zero;
+				}
+				else  // 12
+				{
+					t0 = numer / denom;
+					t1 = one - t0;
+				}
+			}
+		}
+	}
+
+	return *vertices->at(0) + t0 * edge0 + t1 * edge1;
+}
+
+Vector3 getClosestPtOnAnEdge(Edge* vertices, Vector3& point)
+{
+	float h = (*vertices->at(1) - *vertices->at(0)).length();
+	Vector3 p = point;
+	p.y -= clamp(p.y, 0.0f, h);
+
+	return p;
 }
 
 
