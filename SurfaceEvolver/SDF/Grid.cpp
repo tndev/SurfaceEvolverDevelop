@@ -302,6 +302,15 @@ void Grid::clean()
 	field.clear();
 }
 
+void Grid::scaleBy(Vector3& scale)
+{
+	uint oldNx = Nx, oldNy = Ny, oldNz = Nz;
+	this->Nx = (uint)std::floor(scale.x * Nx);
+	this->Ny = (uint)std::floor(scale.y * Ny);
+	this->Nz = (uint)std::floor(scale.z * Nz);
+	std::vector<float> oldField = this->field;
+}
+
 Grid subGrids(Grid g0, Grid g1)
 {
 	Grid result = g0;
@@ -313,4 +322,51 @@ Grid absGrid(Grid g)
 {
 	g.absField();
 	return g;
+}
+
+float trilinearInterpolate(Vector3& P, std::vector<Vector3>& X, std::vector<float>& f)
+{
+	float x = P.x, y = P.y, z = P.z;
+	float x0 = X[0].x, y0 = X[0].y, z0 = X[0].z; // cell min
+	float x1 = X[1].x, y1 = X[1].y, z1 = X[1].z; // cell max
+
+	// cell values
+	float c000 = f[0], c100 = f[1], c010 = f[2], c110 = f[3];
+	float c001 = f[4], c101 = f[5], c011 = f[6], c111 = f[7];
+
+	float det = (x0 - x1) * (y0 - y1) * (z0 - z1);
+
+	float a0 =
+		(c111 * x0 * y0 * z0 - c011 * x1 * y0 * z0 - c101 * x0 * y1 * z0 + c001 * x1 * y1 * z0 -
+		 c110 * x0 * y0 * z1 + c010 * x1 * y0 * z1 + c100 * x0 * y1 * z1 - c000 * x1 * y1 * z1) / det;
+
+	float a1 =
+		(c011 * y0 * z0 - c111 * y0 * z0 - c001 * y1 * z0 + c101 * y1 * z0 - c010 * y0 * z1 +
+		 c110 * y0 * z1 + c000 * y1 * z1 - c100 * y1 * z1) / det;
+
+	float a2 =
+		(c101 * x0 * z0 - c111 * x0 * z0 - c001 * x1 * z0 + c011 * x1 * z0 - c100 * x0 * z1 +
+		 c110 * x0 * z1 + c000 * x1 * z1 - c010 * x1 * z1) / det;
+
+	float a3 =
+		(c110 * x0 * y0 - c111 * x0 * y0 - c010 * x1 * y0 + c011 * x1 * y0 - c100 * x0 * y1 +
+		 c101 * x0 * y1 + c000 * x1 * y1 - c001 * x1 * y1) / det;
+
+	float a4 =
+		(c001 * z0 - c011 * z0 - c101 * z0 + c111 * z0 - c000 * z1 + c010 * z1 + c100 * z1 -
+		 c110 * z1) / det;
+
+	float a5 =
+		(c010 * y0 - c011 * y0 - c110 * y0 + c111 * y0 - c000 * y1 + c001 * y1 + c100 * y1 -
+		 c101 * y1) / det;
+
+	float a6 =
+		(c100 * x0 - c101 * x0 - c110 * x0 + c111 * x0 - c000 * x1 + c001 * x1 + c010 * x1 -
+		 c011 * x1) / det;
+
+	float a7 =
+		(c000 - c001 - c010 + c011 - c100 + c101 + c110 - c111) / det;
+
+
+	return a0 + a1 * x + a2 * y + a3 * z + a4 * x * y + a5 * x * z + a6 * y * z + a7 * x * y * z;
 }

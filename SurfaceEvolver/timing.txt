@@ -1,0 +1,14 @@
+=== IcoSphere, detail: 0, radius: 50.000000 === 
+verts: 12, triangles: 20, grid resolution: 30^3 
+computation times:  AABBTree: 0.001041 s, Octree: (build: 1.467973 s, get_leaves: 0.014889 s), FastSweep3D: 1.053489 s, 
+====> TOTAL: 2.522511 s
+
+=== IcoSphere, detail: 0, radius: 50.000000 === 
+verts: 12, triangles: 20, grid resolution: 30^3 
+computation times:  AABBTree build: 0.000954 s, DF w AABBTree query: 7.153530 s
+====> TOTAL: 7.171696 s
+
+=== IcoSphere, detail: 0, radius: 50.000000 === 
+verts: 12, triangles: 20, grid resolution: 30^3 
+BRUTE FORCE ::: computation times: ====> TOTAL: 5.256455 s
+

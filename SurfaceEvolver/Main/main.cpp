@@ -43,7 +43,6 @@
 //   WIP:
 // 
 // - perform simple DF tests for geom primitives like sphere, icosphere, cubesphere
-// - debug AABB closest primitive lookup
 
 
 //   TODO (weekend Nov.15th - Nov.17th):
@@ -52,6 +51,7 @@
 // - flat AABB
 // - Inverse transform grid upon transforming mesh
 // - interpolate distance field for higher resolutions
+// - debug AABB closest primitive lookup
 
 int main()
 {

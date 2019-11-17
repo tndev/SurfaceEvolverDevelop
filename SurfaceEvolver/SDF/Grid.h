@@ -41,6 +41,7 @@ public:
 	void bruteForceDistanceField(Geometry* geom);
 	void aabbDistanceField(AABBTree* aabb);
 	void clean();
+	void scaleBy(Vector3& scale);
 private:
 	// fraction of the scale with which the grid should exceed the mesh bbox
 	float max_offset_factor = 0.25;
@@ -48,5 +49,7 @@ private:
 
 Grid subGrids(Grid g0, Grid g1);
 Grid absGrid(Grid g);
+
+float trilinearInterpolate(Vector3& P, std::vector<Vector3>& X, std::vector<float>& f);
 
 #endif

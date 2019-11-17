@@ -118,6 +118,6 @@ void FastSweep3D::sweep()
 			}
 		}
 	}
-
+	grid->frozenCells.clear();
 }
 

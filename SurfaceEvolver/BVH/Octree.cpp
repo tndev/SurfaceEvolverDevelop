@@ -12,6 +12,10 @@ Octree::OctreeNode::OctreeNode(const OctreeNode& other)
 	centroidDistance = other.centroidDistance;
 }
 
+template <typename T> int sgn(T val) {
+	return (T(0) < val) - (val < T(0));
+}
+
 Octree::OctreeNode::OctreeNode(Octree* tree, Box3 box, OctreeNode* parent, uint depthLeft)
 {
 	this->tree = tree; // so it knows what tree it belongs to
@@ -40,12 +44,29 @@ Octree::OctreeNode::OctreeNode(Octree* tree, Box3 box, OctreeNode* parent, uint 
 		this->tree->aabbTree->getPrimitivesInABox(&this->box, &intersectedTriangleIds);
 		float distSq, resultDistSq = FLT_MAX;
 		Vector3 center = this->box.getCenter();
+		uint id = 0;
 
 		for (auto&& ti : intersectedTriangleIds) {
 			distSq = getDistanceToAPrimitiveSq(this->tree->aabbTree->primitives[ti], center);
+
+			/*if (distSq < resultDistSq) {
+				resultDistSq = distSq;
+				id = ti;
+			}*/
 			resultDistSq = distSq < resultDistSq ? distSq : resultDistSq;
 		}
 
+		/* Vector3 triNormal = Vector3();
+		Tri T = {
+			this->tree->aabbTree->primitives[id].vertices[0],
+			this->tree->aabbTree->primitives[id].vertices[1],
+			this->tree->aabbTree->primitives[id].vertices[2]
+		};
+		getTriangleNormal(T, triNormal);
+		Vector3 triCentroid = (*T[0] + *T[1] + *T[2]) / 3.0f;
+		triNormal.normalize();
+		float sign = sgn(dot(center - triCentroid, triNormal));
+		this->centroidDistance = sign * sqrt(resultDistSq); */
 		this->centroidDistance = sqrt(resultDistSq);
 	}
 }
