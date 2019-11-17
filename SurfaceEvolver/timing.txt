@@ -1,5 +1,0 @@
-=== IcoSphere, detail: 0, radius: 50.000000 === 
-verts: 12, triangles: 20, grid resolution: 30^3 
-computation times:  AABBTree: 0.001351 s, Octree: (build: 1.598891 s, get_leaves: 0.016451 s), FastSweep3D: 1.146087 s, 
-====> TOTAL: 2.746342 s
-

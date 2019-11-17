@@ -42,13 +42,16 @@
 
 //   WIP:
 // 
-// - cleanup main & prep for VTK window form
+// - perform simple DF tests for geom primitives like sphere, icosphere, cubesphere
+// - debug AABB closest primitive lookup
 
 
 //   TODO (weekend Nov.15th - Nov.17th):
 //
+// - cleanup main & prep for VTK window form
 // - flat AABB
-// - perform simple DF tests for geom primitives like sphere, icosphere, cubesphere
+// - Inverse transform grid upon transforming mesh
+// - interpolate distance field for higher resolutions
 
 int main()
 {
@@ -83,7 +86,7 @@ int main()
 				
 				sdf_FS.exportGrid(&e); // save to vti	
 
-				/*
+
 				SDF sdf_AABB = SDF(&g, res, SDF_Method::aabb_dist);
 
 				std::cout << sdf_AABB.getComputationProperties();
@@ -103,7 +106,7 @@ int main()
 
 				FSerror.exportToVTI("voxField_" + std::to_string(res) + "FS_ERROR");
 				AABBerror.exportToVTI("voxField_" + std::to_string(res) + "AABB_ERROR");
-				*/
+
 			}
 		}
 		timing.close();

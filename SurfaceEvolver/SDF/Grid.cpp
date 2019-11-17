@@ -7,6 +7,7 @@ Grid::Grid()
 Grid::Grid(const Grid& other)
 {
 	this->field = std::vector<float>(other.field);
+	this->frozenCells = std::vector<bool>(other.frozenCells);
 	this->Nx = other.Nx; this->Ny = other.Ny; this->Nz = other.Nz;
 	this->scale = other.scale;
 	this->bbox = other.bbox;
@@ -105,8 +106,8 @@ void Grid::blur()
 bool Grid::equalInDimTo(Grid& other)
 {
 	return (
-		(this->Nx == other.Nx && this->Ny == other.Ny && this->Nz == other.Nz) &&
-		this->bbox.equals(other.bbox)
+		(this->Nx == other.Nx && this->Ny == other.Ny && this->Nz == other.Nz) // &&
+		// this->bbox.equals(other.bbox) // this seems like an unnecessary criterion
 	);
 }
 
@@ -117,6 +118,9 @@ void Grid::add(Grid& other)
 			this->field[i] += other.field[i];
 		}
 	}
+	else {
+		std::cout << "invalid grid dimensions" << std::endl;
+	}
 }
 
 void Grid::sub(Grid& other)
@@ -125,6 +129,9 @@ void Grid::sub(Grid& other)
 		for (uint i = 0; i < this->field.size(); i++) {
 			this->field[i] -= other.field[i];
 		}
+	}
+	else {
+		std::cout << "invalid grid dimensions" << std::endl;
 	}
 }
 
