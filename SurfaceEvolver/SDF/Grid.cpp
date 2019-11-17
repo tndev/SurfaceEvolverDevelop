@@ -102,6 +102,39 @@ void Grid::blur()
 	}
 }
 
+bool Grid::equalInDimTo(Grid& other)
+{
+	return (
+		(this->Nx == other.Nx && this->Ny == other.Ny && this->Nz == other.Nz) &&
+		this->bbox.equals(other.bbox)
+	);
+}
+
+void Grid::add(Grid& other)
+{
+	if (this->equalInDimTo(other)) {
+		for (uint i = 0; i < this->field.size(); i++) {
+			this->field[i] += other.field[i];
+		}
+	}
+}
+
+void Grid::sub(Grid& other)
+{
+	if (this->equalInDimTo(other)) {
+		for (uint i = 0; i < this->field.size(); i++) {
+			this->field[i] -= other.field[i];
+		}
+	}
+}
+
+void Grid::absField()
+{
+	for (uint i = 0; i < this->field.size(); i++) {
+		this->field[i] = fabs(this->field[i]);
+	}
+}
+
 void Grid::computeSignField(AABBTree* v_aabb, AABBTree* e_aabb, AABBTree* t_aabb)
 {
 	Vector3 p = Vector3();
@@ -121,9 +154,9 @@ void Grid::computeSignField(AABBTree* v_aabb, AABBTree* e_aabb, AABBTree* t_aabb
 	std::vector<Vector3> e_awpn = e_aabb->geom->getAngleWeightedEdgePseudoNormals();
 	std::vector<Vector3> t_n = t_aabb->geom->getTriangleNormals();
 
-	for (uint iz = 1; iz < Nz - 1; iz++) {
-		for (uint iy = 1; iy < Ny - 1; iy++) {
-			for (uint ix = 1; ix < Nx - 1; ix++) {
+	for (uint iz = 0; iz < Nz; iz++) {
+		for (uint iy = 0; iy < Ny; iy++) {
+			for (uint ix = 0; ix < Nx; ix++) {
 				p.set(
 					o.x + ix * dx,
 					o.y + iy * dy,
@@ -174,9 +207,103 @@ void Grid::computeSignField(AABBTree* v_aabb, AABBTree* e_aabb, AABBTree* t_aabb
 	}
 }
 
+void Grid::bruteForceDistanceField(Geometry* geom)
+{
+	const uint Nx = this->Nx, Ny = this->Ny, Nz = this->Nz;
+	int ix, iy, iz, i, gridPos;
+	Vector3 p = Vector3(); Tri T;
+
+	Vector3 o = bbox.min; // origin
+	uint nx = Nx - 1;
+	uint ny = Ny - 1;
+	uint nz = Nz - 1;
+	float dx = scale.x / nx;
+	float dy = scale.y / ny;
+	float dz = scale.z / nz;
+	float result_distSq, distSq;
+
+	for (iz = 0; iz < Nz; iz++) {
+		for (iy = 0; iy < Ny; iy++) {
+			for (ix = 0; ix < Nx; ix++) {
+
+				result_distSq = FLT_MAX;
+				p.set(
+					o.x + ix * dx,
+					o.y + iy * dy,
+					o.z + iz * dz
+				);
+
+				for (i = 0; i < geom->vertexIndices.size(); i += 3) {
+					T = { 
+						&geom->uniqueVertices[geom->vertexIndices[i]],
+						&geom->uniqueVertices[geom->vertexIndices[i + 1]],
+						&geom->uniqueVertices[geom->vertexIndices[i + 2]] 
+					};
+					distSq = getDistanceToATriangleSq(&T, p);
+
+					result_distSq = distSq < result_distSq ? distSq : result_distSq;
+				}
+
+				gridPos = Nx * Ny * iz + Nx * iy + ix;
+				this->field[gridPos] = sqrt(result_distSq);
+			}
+		}
+	}
+}
+
+void Grid::aabbDistanceField(AABBTree* aabb)
+{
+	const uint Nx = this->Nx, Ny = this->Ny, Nz = this->Nz;
+	int ix, iy, iz, i, gridPos;
+	Vector3 p = Vector3(); Tri T;
+
+	Vector3 o = bbox.min; // origin
+	uint nx = Nx - 1;
+	uint ny = Ny - 1;
+	uint nz = Nz - 1;
+	float dx = scale.x / nx;
+	float dy = scale.y / ny;
+	float dz = scale.z / nz;
+	float distSq;
+
+	for (iz = 0; iz < Nz; iz++) {
+		for (iy = 0; iy < Ny; iy++) {
+			for (ix = 0; ix < Nx; ix++) {
+
+				p.set(
+					o.x + ix * dx,
+					o.y + iy * dy,
+					o.z + iz * dz
+				);
+
+				i = aabb->getClosestPrimitiveId(p);
+				if (i < 0) continue;
+
+				distSq = getDistanceToAPrimitiveSq(aabb->primitives[i], p);
+
+				gridPos = Nx * Ny * iz + Nx * iy + ix;
+				this->field[gridPos] = sqrt(distSq);
+			}
+		}
+	}
+}
+
 void Grid::clean()
 {
 	Nx = 0, Ny = 0, Nz = 0;
 	scale = Vector3(1.0f, 1.0f, 1.0f);
 	field.clear();
+}
+
+Grid subGrids(Grid g0, Grid g1)
+{
+	Grid result = g0;
+	result.sub(g1);
+	return result;
+}
+
+Grid absGrid(Grid g)
+{
+	g.absField();
+	return g;
 }

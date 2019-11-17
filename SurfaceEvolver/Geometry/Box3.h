@@ -22,6 +22,7 @@ public:
 	void expandByFactor(float factor);
 	Vector3 getCenter();
 	Vector3 getSize();
+	bool equals(Box3& other);
 };
 
 #endif

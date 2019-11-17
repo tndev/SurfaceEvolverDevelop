@@ -63,7 +63,7 @@ int main()
 
 	if (iterateCubeSphereTest) {
 		size_t min_Res = 30, max_Res = 40;
-		size_t min_Ns = 1, max_Ns = 2;
+		size_t min_Ns = 0, max_Ns = 1;
 		std::fstream timing("timing.txt", std::fstream::out);
 
 		for (unsigned int res = min_Res; res < max_Res; res += 20) {
@@ -76,12 +76,34 @@ int main()
 				
 				std::cout << "init SDF..." << std::endl;
 
-				SDF sdf = SDF(&g, res);
+				SDF sdf_FS = SDF(&g, res);
 
-				std::cout << sdf.getComputationProperties();
-				timing << sdf.getComputationProperties();
+				std::cout << sdf_FS.getComputationProperties();
+				timing << sdf_FS.getComputationProperties();
 				
-				sdf.exportGrid(&e, "voxFieldSDF" + std::to_string(res) + "-" + std::to_string(n)); // save to vti		
+				sdf_FS.exportGrid(&e); // save to vti	
+
+				/*
+				SDF sdf_AABB = SDF(&g, res, SDF_Method::aabb_dist);
+
+				std::cout << sdf_AABB.getComputationProperties();
+				timing << sdf_AABB.getComputationProperties();
+
+				sdf_AABB.exportGrid(&e);
+
+				SDF sdf_Brute = SDF(&g, res, SDF_Method::brute_force);
+
+				std::cout << sdf_Brute.getComputationProperties();
+				timing << sdf_Brute.getComputationProperties();
+
+				sdf_Brute.exportGrid(&e);
+
+				Grid FSerror = absGrid(subGrids(*sdf_FS.grid, *sdf_Brute.grid));
+				Grid AABBerror = absGrid(subGrids(*sdf_AABB.grid, *sdf_Brute.grid));
+
+				FSerror.exportToVTI("voxField_" + std::to_string(res) + "FS_ERROR");
+				AABBerror.exportToVTI("voxField_" + std::to_string(res) + "AABB_ERROR");
+				*/
 			}
 		}
 		timing.close();

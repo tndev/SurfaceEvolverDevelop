@@ -138,7 +138,7 @@ void Vector3::normalize()
 		z /= len;
 	}
 	catch (int e) {
-		std::cout << "Attempting to normalize a zero-length vector: length(" << this << ") = " << e << std::endl;
+		std::exception("Attempting to normalize a zero-length vector");
 	}
 }
 

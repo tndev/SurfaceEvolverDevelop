@@ -33,11 +33,20 @@ public:
 
 	void initToVal(float val);
 	void blur();
+	bool equalInDimTo(Grid& other);
+	void add(Grid& other);
+	void sub(Grid& other);
+	void absField();
 	void computeSignField(AABBTree* v_aabb, AABBTree* e_aabb, AABBTree* t_aabb);
+	void bruteForceDistanceField(Geometry* geom);
+	void aabbDistanceField(AABBTree* aabb);
 	void clean();
 private:
 	// fraction of the scale with which the grid should exceed the mesh bbox
 	float max_offset_factor = 0.25;
 };
+
+Grid subGrids(Grid g0, Grid g1);
+Grid absGrid(Grid g);
 
 #endif

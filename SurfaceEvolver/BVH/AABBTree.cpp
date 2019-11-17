@@ -210,7 +210,10 @@ AABBTree::AABBNode* AABBTree::getClosestNode(Vector3& point)
 
 			if (nearNode) {
 				stack.push(nearNode);
-			}			
+			}
+			else if (farNode) {
+				stack.push(farNode);
+			}
 		}
 		else {
 			return item;
@@ -227,7 +230,7 @@ int AABBTree::getClosestPrimitiveId(Vector3& point)
 		return -1;
 	}
 
-	int id; float distSq; float result_distSq = FLT_MAX;
+	int id = -1; float distSq; float result_distSq = FLT_MAX;
 	for (auto&& i : closestNode->primitiveIds) {
 		distSq = getDistanceToAPrimitiveSq(this->primitives[i], point);
 
@@ -236,6 +239,7 @@ int AABBTree::getClosestPrimitiveId(Vector3& point)
 			id = i;
 		}
 	}
+
 	return id;
 }
 

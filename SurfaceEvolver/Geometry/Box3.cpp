@@ -77,3 +77,8 @@ Vector3 Box3::getSize()
 	Vector3 dims = (max - min);
 	return dims;
 }
+
+bool Box3::equals(Box3& other)
+{
+	return (this->min.equals(other.min) && this->max.equals(other.max));
+}

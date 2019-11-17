@@ -6,6 +6,12 @@
 #include "../BVH/Octree.h"
 #include "../ExportImport/VTKExporter.h"
 
+enum class SDF_Method {
+	fast_sweeping = 0,
+	aabb_dist = 1,
+	brute_force = 2,
+};
+
 class SDF
 {
 public:
@@ -18,6 +24,7 @@ public:
 	FastSweep3D* fastSweep;
 
 	uint resolution;
+	SDF_Method method = SDF_Method::fast_sweeping;
 
 	std::string geom_properties = "";
 	std::string time_log = "";
@@ -25,7 +32,7 @@ public:
 	SDF();
 	~SDF();
 	SDF(const SDF& other);
-	SDF(Geometry* geom, uint resolution);
+	SDF(Geometry* geom, uint resolution, SDF_Method method = SDF_Method::fast_sweeping);
 
 	void exportGrid(VTKExporter* e, std::string export_name = "");
 	std::string getComputationProperties();
