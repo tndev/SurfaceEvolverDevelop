@@ -1,3 +1,9 @@
-﻿  Octree.cpp
+﻿  Grid.cpp
 D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\poly2tri\sweep\sweep_context.h(161,24): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(239,18): warning C4018: '<': signed/unsigned mismatch
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(240,19): warning C4018: '<': signed/unsigned mismatch
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(241,20): warning C4018: '<': signed/unsigned mismatch
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(283,18): warning C4018: '<': signed/unsigned mismatch
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(284,19): warning C4018: '<': signed/unsigned mismatch
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(285,20): warning C4018: '<': signed/unsigned mismatch
   SurfaceEvolver.vcxproj -> D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\x64\Debug\SurfaceEvolver.exe

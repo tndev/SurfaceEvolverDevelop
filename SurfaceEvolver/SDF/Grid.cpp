@@ -16,18 +16,25 @@ Grid::Grid(const Grid& other)
 	this->max = other.max;
 }
 
-Grid::Grid(uint Nx, uint Ny, uint Nz, Box3 bbox, float initVal)
+Grid::Grid(uint Nx, uint Ny, uint Nz, Box3 bbox, bool addOffset, float initVal)
 {
 	// re-scale to fit the rest of the field
 	this->bbox = bbox;
-	Vector3 origScale = bbox.getSize();
-	float offset = max_offset_factor * std::fmaxf(origScale.x, std::fmaxf(origScale.y, origScale.z));
-	this->bbox.expandByOffset(offset);
-	Vector3 newScale = this->bbox.getSize();
-	this->Nx = (uint)std::floor(newScale.x / origScale.x * Nx); 
-	this->Ny = (uint)std::floor(newScale.y / origScale.y * Ny);
-	this->Nz = (uint)std::floor(newScale.z / origScale.z * Nz);
-	this->scale = newScale;
+	if (addOffset) {
+		Vector3 origScale = bbox.getSize();
+		float offset = max_offset_factor * std::fmaxf(origScale.x, std::fmaxf(origScale.y, origScale.z));
+		this->bbox.expandByOffset(offset);
+		Vector3 newScale = this->bbox.getSize();
+		this->Nx = (uint)std::floor((1.0f + 2.0f * max_offset_factor) * Nx);
+		this->Ny = (uint)std::floor((1.0f + 2.0f * max_offset_factor) * Ny);
+		this->Nz = (uint)std::floor((1.0f + 2.0f * max_offset_factor) * Nz);
+		this->scale = newScale;
+	}
+	else {
+		this->scale = bbox.getSize();
+		this->Nx = Nx; this->Ny = Ny; this->Nz = Nz;
+	}
+
 	this->field = std::vector<float>((size_t)this->Nx * this->Ny * this->Nz, initVal); // init field
 	this->frozenCells = std::vector<bool>((size_t)this->Nx * this->Ny * this->Nz, false); // unfreeze all
 }
@@ -302,13 +309,110 @@ void Grid::clean()
 	field.clear();
 }
 
-void Grid::scaleBy(Vector3& scale)
+void Grid::scaleBy(Vector3& s)
 {
 	uint oldNx = Nx, oldNy = Ny, oldNz = Nz;
-	this->Nx = (uint)std::floor(scale.x * Nx);
-	this->Ny = (uint)std::floor(scale.y * Ny);
-	this->Nz = (uint)std::floor(scale.z * Nz);
+
+	this->Nx = (uint)std::floor(s.x * Nx);
+	this->Ny = (uint)std::floor(s.y * Ny);
+	this->Nz = (uint)std::floor(s.z * Nz);
 	std::vector<float> oldField = this->field;
+	this->field = std::vector<float>(Nx * Ny * Nz);
+	Vector3 p = Vector3(), o = bbox.min;
+	uint nx = Nx - 1;
+	uint ny = Ny - 1;
+	uint nz = Nz - 1;
+	uint gridPos;
+	float dx = this->scale.x / nx;
+	float dy = this->scale.y / ny;
+	float dz = this->scale.z / nz;
+	std::vector<Vector3> positionBuffer = {};
+	std::vector<float> valueBuffer = {};
+
+	uint ix, iy, iz;
+	
+	for (iz = 0; iz < Nz; iz++) {
+		for (iy = 0; iy < Ny; iy++) {
+			for (ix = 0; ix < Nx; ix++) {
+
+				p.set(
+					o.x + ix * dx,
+					o.y + iy * dy,
+					o.z + iz * dz
+				);				
+
+				positionBuffer.clear(); // for old min and max positions
+				valueBuffer.clear(); // for old cell vertex values
+				this->getSurroundingCells(p, oldNx, oldNy, oldNz, &oldField, &positionBuffer, &valueBuffer);
+
+				gridPos = Nx * Ny * iz + Nx * iy + ix;
+				this->field[gridPos] = trilinearInterpolate(p, positionBuffer, valueBuffer);
+			}
+		}
+	}
+
+}
+
+void Grid::getSurroundingCells(Vector3& pos,
+	uint oldNx, uint oldNy, uint oldNz,	std::vector<float>* oldField,
+	std::vector<Vector3>* positionBuffer, std::vector<float>* valueBuffer)
+{
+	uint ix = std::min((uint)std::floor((pos.x - bbox.min.x) * oldNx / this->scale.x), oldNx - 1);
+	uint iy = std::min((uint)std::floor((pos.y - bbox.min.y) * oldNy / this->scale.y), oldNy - 1);
+	uint iz = std::min((uint)std::floor((pos.z - bbox.min.z) * oldNz / this->scale.z), oldNz - 1);
+
+	uint ix1 = std::min(ix + 1, oldNx - 1);
+	uint iy1 = std::min(iy + 1, oldNy - 1);
+	uint iz1 = std::min(iz + 1, oldNz - 1);
+
+	uint i000 = oldNx * oldNy * iz + oldNx * iy + ix;
+	uint i100 = oldNx * oldNy * iz + oldNx * iy + ix1;
+	uint i010 = oldNx * oldNy * iz + oldNx * iy1 + ix;
+	uint i110 = oldNx * oldNy * iz + oldNx * iy1 + ix1;
+	uint i001 = oldNx * oldNy * iz1 + oldNx * iy + ix;
+	uint i101 = oldNx * oldNy * iz1 + oldNx * iy + ix1;
+	uint i011 = oldNx * oldNy * iz1 + oldNx * iy1 + ix;
+	uint i111 = oldNx * oldNy * iz1 + oldNx * iy1 + ix1;
+
+	valueBuffer->push_back(oldField->at(i000));
+	valueBuffer->push_back(oldField->at(i100));
+	valueBuffer->push_back(oldField->at(i010));
+	valueBuffer->push_back(oldField->at(i110));
+	valueBuffer->push_back(oldField->at(i001));
+	valueBuffer->push_back(oldField->at(i101));
+	valueBuffer->push_back(oldField->at(i011));
+	valueBuffer->push_back(oldField->at(i111));
+
+	positionBuffer->push_back(Vector3(
+		bbox.min.x + (float)ix / (float)oldNx * this->scale.x,
+		bbox.min.y + (float)iy / (float)oldNy * this->scale.y,
+		bbox.min.z + (float)iz / (float)oldNz * this->scale.z
+	));
+
+	positionBuffer->push_back(Vector3(
+		bbox.min.x + (float)(ix + 1) / (float)oldNx * this->scale.x,
+		bbox.min.y + (float)(iy + 1) / (float)oldNy * this->scale.y,
+		bbox.min.z + (float)(iz + 1) / (float)oldNz * this->scale.z
+	));
+}
+
+float Grid::getL2Norm()
+{
+	float result = 0.0f;
+
+	uint gridPos, ix, iy, iz;
+
+	for (iz = 0; iz < Nz; iz++) {
+		for (iy = 0; iy < Ny; iy++) {
+			for (ix = 0; ix < Nx; ix++) {
+
+				gridPos = Nx * Ny * iz + Nx * iy + ix;
+				result += this->field[gridPos] * this->field[gridPos];
+			}
+		}
+	}
+
+	return sqrt(result / (Nx * Ny * Nz));
 }
 
 Grid subGrids(Grid g0, Grid g1)

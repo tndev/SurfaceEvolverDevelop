@@ -79,31 +79,55 @@ int main()
 				
 				std::cout << "init SDF..." << std::endl;
 
+				// Fast sweeping DF, resized from 20 and interpolated
+				SDF sdf_FS_r = SDF(&g, res, true, SDF_Method::fast_sweeping);
+
+				std::cout << sdf_FS_r.getComputationProperties();
+				timing << sdf_FS_r.getComputationProperties();
+				
+				sdf_FS_r.exportGrid(&e); // save to vti
+
+				// Fast sweeping DF
 				SDF sdf_FS = SDF(&g, res);
 
 				std::cout << sdf_FS.getComputationProperties();
 				timing << sdf_FS.getComputationProperties();
-				
-				sdf_FS.exportGrid(&e); // save to vti	
 
+				sdf_FS.exportGrid(&e);
 
-				SDF sdf_AABB = SDF(&g, res, SDF_Method::aabb_dist);
+				// AABB DF
+				SDF sdf_AABB = SDF(&g, res, false, SDF_Method::aabb_dist);
 
 				std::cout << sdf_AABB.getComputationProperties();
 				timing << sdf_AABB.getComputationProperties();
 
 				sdf_AABB.exportGrid(&e);
 
-				SDF sdf_Brute = SDF(&g, res, SDF_Method::brute_force);
+				// Brute force DF
+				SDF sdf_Brute = SDF(&g, res, false, SDF_Method::brute_force);
 
 				std::cout << sdf_Brute.getComputationProperties();
 				timing << sdf_Brute.getComputationProperties();
 
 				sdf_Brute.exportGrid(&e);
 
+				Grid FSerror_r = absGrid(subGrids(*sdf_FS_r.grid, *sdf_Brute.grid));
 				Grid FSerror = absGrid(subGrids(*sdf_FS.grid, *sdf_Brute.grid));
 				Grid AABBerror = absGrid(subGrids(*sdf_AABB.grid, *sdf_Brute.grid));
 
+				float error = FSerror_r.getL2Norm();
+				std::cout << "FS_ERROR_resized L2 Norm: " << error << std::endl;
+				timing << "FS_ERROR_resized L2 Norm: " << error << std::endl;
+
+				error = FSerror.getL2Norm();
+				std::cout << "FS_ERROR L2 Norm: " << error << std::endl;
+				timing << "FS_ERROR L2 Norm: " << error << std::endl;
+
+				error = AABBerror.getL2Norm();
+				std::cout << "AABB_ERROR L2 Norm: " << error << std::endl;
+				timing << "AABB_ERROR L2 Norm: " << error << std::endl;
+
+				FSerror_r.exportToVTI("voxField_" + std::to_string(res) + "FS_ERROR_resized");
 				FSerror.exportToVTI("voxField_" + std::to_string(res) + "FS_ERROR");
 				AABBerror.exportToVTI("voxField_" + std::to_string(res) + "AABB_ERROR");
 
@@ -131,6 +155,12 @@ int main()
 	std::cout << bunny_sdf.getComputationProperties();
 
 	bunny_sdf.exportGrid(&e, "bunnySDF");
+
+	SDF bunny_sdf_r = SDF(&bunny, res, true);
+
+	std::cout << bunny_sdf_r.getComputationProperties();
+
+	bunny_sdf_r.exportGrid(&e, "bunnySDF_r");
 
 	return 1;
 }

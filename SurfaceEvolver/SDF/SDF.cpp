@@ -22,7 +22,7 @@ SDF::SDF(const SDF& other)
 	time_log = other.time_log;
 }
 
-SDF::SDF(Geometry* geom, uint resolution, SDF_Method method)
+SDF::SDF(Geometry* geom, uint resolution, bool scaleAndInterpolate, SDF_Method method)
 {
 	this->resolution = resolution;
 	this->geom = geom;
@@ -41,19 +41,53 @@ SDF::SDF(Geometry* geom, uint resolution, SDF_Method method)
 
 		auto startSDF_Octree = std::chrono::high_resolution_clock::now();
 
-		this->octree = new Octree(this->tri_aabb, this->tri_aabb->bbox, resolution);
+		if (scaleAndInterpolate && resolution > this->resolution_limit) {
+			this->resolution = this->resolution_limit;
+			this->octree = new Octree(this->tri_aabb, this->tri_aabb->bbox, this->resolution_limit);
+		}
+		else {
+			this->octree = new Octree(this->tri_aabb, this->tri_aabb->bbox, resolution);
+		}		
 
 		auto endSDF_Octree = std::chrono::high_resolution_clock::now();
 		std::chrono::duration<float> elapsedSDF_Octree = (endSDF_Octree - startSDF_Octree);
 
-		auto startSDF_FS = std::chrono::high_resolution_clock::now();
+		std::chrono::duration<float> elapsedGridScale;
+		std::chrono::duration<float> elapsedSDF_FS;
 
-		this->grid = new Grid(resolution, resolution, resolution, this->octree->cubeBox);
-		this->octree->setLeafValueToScalarGrid(this->grid);
-		this->fastSweep = new FastSweep3D(this->grid, 8);
+		if (scaleAndInterpolate && resolution > this->resolution_limit) {
+			auto startSDF_FS = std::chrono::high_resolution_clock::now();
 
-		auto endSDF_FS = std::chrono::high_resolution_clock::now();
-		std::chrono::duration<float> elapsedSDF_FS = (endSDF_FS - startSDF_FS);
+			this->grid = new Grid(this->resolution_limit, this->resolution_limit, this->resolution_limit, this->octree->cubeBox);
+			this->octree->setLeafValueToScalarGrid(this->grid);
+			this->fastSweep = new FastSweep3D(this->grid, 8);
+
+			auto endSDF_FS = std::chrono::high_resolution_clock::now();
+			elapsedSDF_FS = (endSDF_FS - startSDF_FS);
+
+			float origRes = std::floor((1.0f + 2.0f * this->grid->max_offset_factor) * resolution);
+
+			Vector3 scaleFactor = Vector3(
+				origRes / std::floor((1.0f + 2.0f * this->grid->max_offset_factor) * this->resolution_limit),
+				origRes / std::floor((1.0f + 2.0f * this->grid->max_offset_factor) * this->resolution_limit),
+				origRes / std::floor((1.0f + 2.0f * this->grid->max_offset_factor) * this->resolution_limit)
+			);
+
+			auto startGridScale = std::chrono::high_resolution_clock::now();
+			this->grid->scaleBy(scaleFactor);
+			auto endGridScale = std::chrono::high_resolution_clock::now();
+			elapsedGridScale = (endGridScale - startGridScale);
+		}
+		else {
+			auto startSDF_FS = std::chrono::high_resolution_clock::now();
+
+			this->grid = new Grid(resolution, resolution, resolution, this->octree->cubeBox);
+			this->octree->setLeafValueToScalarGrid(this->grid);
+			this->fastSweep = new FastSweep3D(this->grid, 8);
+
+			auto endSDF_FS = std::chrono::high_resolution_clock::now();
+			elapsedSDF_FS = (endSDF_FS - startSDF_FS);
+		}
 
 		// TODO: Sign computation
 		/*
@@ -90,11 +124,13 @@ SDF::SDF(Geometry* geom, uint resolution, SDF_Method method)
 		std::chrono::duration<float> elapsedSDF = (endSDF - startSDF);
 
 		this->geom_properties = "=== " + this->geom->name + " === \n" + "verts: " + std::to_string(this->geom->uniqueVertices.size()) +
-			", triangles: " + std::to_string(this->tri_aabb->primitives.size()) + ", grid resolution: " + std::to_string(resolution) + "^3 \n";
+			", triangles: " + std::to_string(this->tri_aabb->primitives.size()) + ", octree resolution: " + std::to_string(resolution) + "^3, grid resolution: " + std::to_string(this->grid->Nx) + "^3 " +
+			((scaleAndInterpolate && resolution > this->resolution_limit) ? ", rescaled from: " + std::to_string(this->resolution) + "^2\n" : "\n");
 		this->time_log =
 			"computation times:  AABBTree: " + std::to_string(elapsedSDF_AABB.count()) +
 			" s, Octree: (build: " + std::to_string(elapsedSDF_Octree.count()) + " s, get_leaves: " + std::to_string(this->octree->leaf_retrieve_time) +
 			" s), FastSweep3D: " + std::to_string(elapsedSDF_FS.count()) + " s, \n" +
+			((scaleAndInterpolate && resolution > this->resolution_limit) ? "Grid scale: " + std::to_string(elapsedGridScale.count()) + " s \n": "") +
 			//" vertex AABBTree: " + std::to_string(elapsedSDF_VertTree.count()) + " s, edge AABBTree: " + std::to_string(elapsedSDF_EdgeTree.count()) + " s, grid sign computation: " + std::to_string(elapsedSDF_Sign.count()) + "s\n" +
 			"====> TOTAL: " + std::to_string(elapsedSDF.count()) + " s" + "\n\n";
 	}

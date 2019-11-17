@@ -1,14 +1,23 @@
 === IcoSphere, detail: 0, radius: 50.000000 === 
-verts: 12, triangles: 20, grid resolution: 30^3 
-computation times:  AABBTree: 0.001041 s, Octree: (build: 1.467973 s, get_leaves: 0.014889 s), FastSweep3D: 1.053489 s, 
-====> TOTAL: 2.522511 s
+verts: 12, triangles: 20, octree resolution: 30^3, grid resolution: 45^3 , rescaled from: 15^2
+computation times:  AABBTree: 0.001139 s, Octree: (build: 0.392685 s, get_leaves: 0.003745 s), FastSweep3D: 0.131831 s, 
+Grid scale: 0.499179 s 
+====> TOTAL: 1.024850 s
+
+=== IcoSphere, detail: 0, radius: 50.000000 === 
+verts: 12, triangles: 20, octree resolution: 30^3, grid resolution: 45^3 
+computation times:  AABBTree: 0.000989 s, Octree: (build: 1.471179 s, get_leaves: 0.016366 s), FastSweep3D: 1.116677 s, 
+====> TOTAL: 2.588848 s
 
 === IcoSphere, detail: 0, radius: 50.000000 === 
 verts: 12, triangles: 20, grid resolution: 30^3 
-computation times:  AABBTree build: 0.000954 s, DF w AABBTree query: 7.153530 s
-====> TOTAL: 7.171696 s
+computation times:  AABBTree build: 0.000925 s, DF w AABBTree query: 5.356157 s
+====> TOTAL: 5.370931 s
 
 === IcoSphere, detail: 0, radius: 50.000000 === 
 verts: 12, triangles: 20, grid resolution: 30^3 
-BRUTE FORCE ::: computation times: ====> TOTAL: 5.256455 s
+BRUTE FORCE ::: computation times: ====> TOTAL: 6.774235 s
 
+FS_ERROR_resized L2 Norm: 3.72707
+FS_ERROR L2 Norm: 1.3743
+AABB_ERROR L2 Norm: 0

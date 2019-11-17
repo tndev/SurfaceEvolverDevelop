@@ -26,7 +26,7 @@ public:
 
 	Grid();
 	Grid(const Grid& other);
-	Grid(uint Nx, uint Ny, uint Nz, Box3 bbox, float initVal = LARGE_VAL);
+	Grid(uint Nx, uint Ny, uint Nz, Box3 bbox, bool addOffset = true, float initVal = LARGE_VAL);
 	~Grid();
 
 	void exportToVTI(std::string filename);
@@ -41,10 +41,14 @@ public:
 	void bruteForceDistanceField(Geometry* geom);
 	void aabbDistanceField(AABBTree* aabb);
 	void clean();
-	void scaleBy(Vector3& scale);
-private:
+	void scaleBy(Vector3& s);
 	// fraction of the scale with which the grid should exceed the mesh bbox
 	float max_offset_factor = 0.25;
+	void getSurroundingCells(Vector3& pos,
+		uint oldNx, uint oldNy, uint oldNz, std::vector<float>* oldField,
+		std::vector<Vector3>* positionBuffer, std::vector<float>* valueBuffer);
+
+	float getL2Norm();
 };
 
 Grid subGrids(Grid g0, Grid g1);
