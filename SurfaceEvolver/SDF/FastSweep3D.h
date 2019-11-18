@@ -5,6 +5,7 @@
 #include <chrono>
 #include <cstdlib>
 #include "Grid.h"
+#include "../ExportImport/VTKExporter.h"
 
 // This is a solver for Eikonal equation |grad(u(x))| = 1 (i.e. the distance function)
 // an Eikonal equation |grad(u(x))| = f(x) with a general rhs might require more than
@@ -21,10 +22,10 @@ public:
 
 	FastSweep3D();
 	FastSweep3D(const FastSweep3D& other);
-	FastSweep3D(Grid* grid, uint Nsweeps, bool blur = false);
+	FastSweep3D(Grid* grid, uint Nsweeps, bool saveGridStates = false, bool blur = false);
 	~FastSweep3D();
 
-	void sweep();
+	void sweep(bool saveGridStates);
 };
 
 #endif

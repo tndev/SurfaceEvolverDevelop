@@ -36,6 +36,39 @@ AABBTree::~AABBTree()
 {
 }
 
+uint AABBTree::getDepth()
+{
+	if (this->root == nullptr) {
+		return 0;
+	}
+
+	std::list<AABBTree::AABBNode*> queue;
+	queue.push_back(this->root);
+
+	AABBTree::AABBNode* front = nullptr;
+	uint depth = 0;
+
+	while (!queue.empty()) {
+		uint size = queue.size();
+
+		while (size--) {
+			front = queue.front();
+			queue.pop_front();
+
+			if (front->left != nullptr) {
+				queue.push_back(front->left);
+			}
+			if (front->right != nullptr) {
+				queue.push_back(front->right);
+			}
+		}
+
+		depth++;
+	}
+
+	return depth;
+}
+
 bool AABBTree::hasPrimitives()
 {
 	return this->primitives.size() > 0;
@@ -130,6 +163,26 @@ std::vector<AABBTree::AABBNode> AABBTree::flatten()
 	}
 
 	return resultArray;
+}
+
+void AABBTree::getAllNodes(std::vector<AABBNode>* buffer)
+{
+	std::stack<AABBNode*> nodeStack;
+	nodeStack.push(this->root);
+
+	while (nodeStack.size()) {
+		AABBNode* item = nodeStack.top();
+		nodeStack.pop();
+
+		buffer->push_back(*item);
+
+		if (item->left) {
+			nodeStack.push(item->left);
+		}
+		if (item->right) {
+			nodeStack.push(item->right);
+		}
+	}
 }
 
 std::vector<AABBTree::AABBNode> AABBTree::flattenToDepth(uint depth)
@@ -289,19 +342,15 @@ std::vector<Geometry> AABBTree::getAABBPrimitivesOfDepth(uint depth)
 
 		for (uint i = 0; i < leaf.primitiveIds.size(); i++) {
 			Geometry primGeom = Geometry();
-			primGeom.uniqueVertices = std::vector<Vector3>(
-				*this->primitives[leaf.primitiveIds[i]].vertices.begin(),
-				*this->primitives[leaf.primitiveIds[i]].vertices.end()
-			);
+			uint Nverts = this->primitives[leaf.primitiveIds[i]].vertices.size();
+			for (uint k = 0; k < Nverts; k++) {
+				primGeom.uniqueVertices.push_back(*this->primitives[leaf.primitiveIds[i]].vertices[k]);
 
-			for (uint j = 0; j < 3; j++) {
-				primGeom.vertices.push_back(this->primitives[leaf.primitiveIds[i]].vertices[j]->x);
-				primGeom.vertices.push_back(this->primitives[leaf.primitiveIds[i]].vertices[j]->y);
-				primGeom.vertices.push_back(this->primitives[leaf.primitiveIds[i]].vertices[j]->z);
+				primGeom.vertices.push_back(this->primitives[leaf.primitiveIds[i]].vertices[k]->x);
+				primGeom.vertices.push_back(this->primitives[leaf.primitiveIds[i]].vertices[k]->y);
+				primGeom.vertices.push_back(this->primitives[leaf.primitiveIds[i]].vertices[k]->z);
 
-				// normals will be computed when merging geoms
-
-				primGeom.vertexIndices.push_back(j);
+				primGeom.vertexIndices.push_back(k);
 			}
 			primGeoms.push_back(primGeom);
 		}
@@ -310,37 +359,65 @@ std::vector<Geometry> AABBTree::getAABBPrimitivesOfDepth(uint depth)
 	return primGeoms;
 }
 
+void AABBTree::GenerateFullTreeBoxVisualisation(VTKExporter& e)
+{
+	std::cout << "--------------------------------------------" << std::endl;
+	std::vector<Geometry> boxGeoms = {};
+	std::vector<AABBNode> nodeBuffer = {};
+	std::cout << "obtaining AABB nodes..." << std::endl;
+	this->getAllNodes(&nodeBuffer);
+	std::cout << nodeBuffer.size() << " AABB nodes retrieved" << std::endl;
+
+	std::cout << "generating box geometries..." << std::endl;
+	for (auto&& n : nodeBuffer) {
+		float dimX = n.bbox.max.x - n.bbox.min.x;
+		float dimY = n.bbox.max.y - n.bbox.min.y;
+		float dimZ = n.bbox.max.z - n.bbox.min.z;
+		PrimitiveBox box = PrimitiveBox(dimX, dimY, dimZ, 1, 1, 1);
+		Vector3 t = n.bbox.min;
+		box.applyMatrix(Matrix4().makeTranslation(t.x, t.y, t.z));
+		boxGeoms.push_back(box);
+	}
+
+	Geometry resultGeom = mergeGeometries(boxGeoms);
+	e.initExport(resultGeom, geom->name + "_AABB_allBoxes");
+	std::cout << "AABB box geometries retrieved and exported" << std::endl;
+}
+
+void AABBTree::GenerateFullLeafBoxVisualisation(VTKExporter& e)
+{
+	std::cout << "--------------------------------------------" << std::endl;
+	std::cout << "obtaining AABB leaf boxes..." << std::endl;
+	std::vector<Geometry> boxGeoms = getAABBLeafGeoms();
+	std::cout << boxGeoms.size() << " AABB leaf boxes retrieved" << std::endl;
+	Geometry resultGeom = mergeGeometries(boxGeoms);
+	e.initExport(resultGeom, geom->name + "_AABB_leafBoxes");
+	std::cout << "AABB leaf boxes exported" << std::endl;
+}
+
 uint depth(AABBTree* tree)
 {
-	if (tree->root == nullptr) {
-		return 0;
+	return tree->getDepth();
+}
+
+void AABBTree::GenerateStepwiseLeafBoxVisualisation(VTKExporter& e)
+{
+	std::cout << "--------------------------------------------" << std::endl;
+	uint t_depth = this->getDepth();
+	std::cout << "generating AABB leaf visualisation of depth = 0, ..., " << t_depth << std::endl;
+
+	for (uint d = 0; d < t_depth; d++) {
+		std::cout << "d = " << d << "..." << std::endl;
+		std::vector<Geometry> boxGeoms = this->getAABBGeomsOfDepth(d);
+		std::vector<Geometry> triGeoms = this->getAABBPrimitivesOfDepth(d);
+
+		Geometry resultBoxGeom = mergeGeometries(boxGeoms);
+		Geometry resultTriGeom = mergeGeometries(triGeoms);
+
+		e.initExport(resultBoxGeom, geom->name + "_AABB_leafBB_step-" + std::to_string(d));
+		e.initExport(resultTriGeom, geom->name + "_AABB_leafTris_step-" + std::to_string(d));
 	}
-
-	std::list<AABBTree::AABBNode*> queue;
-	queue.push_back(tree->root);
-
-	AABBTree::AABBNode* front = nullptr;
-	uint depth = 0;
-
-	while (!queue.empty()) {
-		uint size = queue.size();
-
-		while (size--) {
-			front = queue.front();
-			queue.pop_front();
-
-			if (front->left != nullptr) {
-				queue.push_back(front->left);
-			}
-			if (front->right != nullptr) {
-				queue.push_back(front->right);
-			}
-		}
-
-		depth++;
-	}
-
-	return depth;
+	std::cout << "AABB leaf visualisations finished" << std::endl;
 }
 
 AABBTree::AABBNode::AABBNode()

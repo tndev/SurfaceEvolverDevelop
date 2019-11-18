@@ -3,6 +3,7 @@
 
 #include <stack>
 #include "../GeometryObject/PrimitiveBox.h"
+#include "../ExportImport/VTKExporter.h"
 
 #define MAX_DEPTH 20
 
@@ -61,11 +62,14 @@ public:
 	AABBTree(Geometry* geom, PrimitiveType type = PrimitiveType::tri);
 	~AABBTree();
 
+	uint getDepth();
+
 	bool hasPrimitives();
 	bool boxIntersectsAPrimitive(Box3* box);
 	float boxIntersectsAPrimitiveAtDistance(Box3* box);
 
 	std::vector<AABBNode> flatten();
+	void getAllNodes(std::vector<AABBNode>* buffer);
 	std::vector<AABBNode> flattenToDepth(uint depth);
 	void getPrimitivesInABox(Box3* box, std::vector<uint>* primIdBuffer);
 
@@ -75,6 +79,10 @@ public:
 	std::vector<Geometry> getAABBGeomsOfDepth(uint depth); // for visualisation
 	std::vector<Geometry> getAABBLeafGeoms(); // for visualisation
 	std::vector<Geometry> getAABBPrimitivesOfDepth(uint depth); // for visualisation
+
+	void GenerateFullTreeBoxVisualisation(VTKExporter& e);
+	void GenerateFullLeafBoxVisualisation(VTKExporter& e);
+	void GenerateStepwiseLeafBoxVisualisation(VTKExporter& e);
 };
 
 uint depth(AABBTree* root);

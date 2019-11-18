@@ -22,7 +22,7 @@ SDF::SDF(const SDF& other)
 	time_log = other.time_log;
 }
 
-SDF::SDF(Geometry* geom, uint resolution, bool scaleAndInterpolate, SDF_Method method)
+SDF::SDF(Geometry* geom, uint resolution, bool saveGridStates, bool scaleAndInterpolate, SDF_Method method)
 {
 	this->resolution = resolution;
 	this->geom = geom;
@@ -60,7 +60,7 @@ SDF::SDF(Geometry* geom, uint resolution, bool scaleAndInterpolate, SDF_Method m
 
 			this->grid = new Grid(this->resolution_limit, this->resolution_limit, this->resolution_limit, this->octree->cubeBox);
 			this->octree->setLeafValueToScalarGrid(this->grid);
-			this->fastSweep = new FastSweep3D(this->grid, 8);
+			this->fastSweep = new FastSweep3D(this->grid, 8, saveGridStates);
 
 			auto endSDF_FS = std::chrono::high_resolution_clock::now();
 			elapsedSDF_FS = (endSDF_FS - startSDF_FS);
@@ -83,7 +83,7 @@ SDF::SDF(Geometry* geom, uint resolution, bool scaleAndInterpolate, SDF_Method m
 
 			this->grid = new Grid(resolution, resolution, resolution, this->octree->cubeBox);
 			this->octree->setLeafValueToScalarGrid(this->grid);
-			this->fastSweep = new FastSweep3D(this->grid, 8);
+			this->fastSweep = new FastSweep3D(this->grid, 8, saveGridStates);
 
 			auto endSDF_FS = std::chrono::high_resolution_clock::now();
 			elapsedSDF_FS = (endSDF_FS - startSDF_FS);

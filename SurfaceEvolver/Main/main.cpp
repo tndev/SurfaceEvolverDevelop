@@ -57,7 +57,7 @@ void performTest(uint res, Geometry& g, std::fstream& timing, VTKExporter& e) {
 	std::cout << "init SDF..." << std::endl;
 
 	// Fast sweeping DF, resized from 20 and interpolated
-	SDF sdf_FS_r = SDF(&g, res, true, SDF_Method::fast_sweeping);
+	SDF sdf_FS_r = SDF(&g, res, false, true, SDF_Method::fast_sweeping);
 
 	std::cout << sdf_FS_r.getComputationProperties();
 	timing << sdf_FS_r.getComputationProperties();
@@ -73,7 +73,7 @@ void performTest(uint res, Geometry& g, std::fstream& timing, VTKExporter& e) {
 	sdf_FS.exportGrid(&e);
 
 	// AABB DF
-	SDF sdf_AABB = SDF(&g, res, false, SDF_Method::aabb_dist);
+	SDF sdf_AABB = SDF(&g, res, false, false, SDF_Method::aabb_dist);
 
 	std::cout << sdf_AABB.getComputationProperties();
 	timing << sdf_AABB.getComputationProperties();
@@ -81,7 +81,7 @@ void performTest(uint res, Geometry& g, std::fstream& timing, VTKExporter& e) {
 	sdf_AABB.exportGrid(&e);
 
 	// Brute force DF
-	SDF sdf_Brute = SDF(&g, res, false, SDF_Method::brute_force);
+	SDF sdf_Brute = SDF(&g, res, false, false, SDF_Method::brute_force);
 
 	std::cout << sdf_Brute.getComputationProperties();
 	timing << sdf_Brute.getComputationProperties();
@@ -169,18 +169,27 @@ int main()
 
 
 	uint res = 30; // octree resolution	
-	SDF bunny_sdf = SDF(&bunny, res);
+	SDF bunny_sdf = SDF(&bunny, res /*, true */);
 
 	std::cout << bunny_sdf.getComputationProperties();
 
 	bunny_sdf.exportGrid(&e, "bunnySDF");
 
-	SDF bunny_sdf_r = SDF(&bunny, res, true);
+	// tree visualisation
+	bunny_sdf.tri_aabb->GenerateFullTreeBoxVisualisation(e);
+	bunny_sdf.tri_aabb->GenerateFullLeafBoxVisualisation(e);
+	bunny_sdf.tri_aabb->GenerateStepwiseLeafBoxVisualisation(e);
+	bunny_sdf.octree->GenerateFullOctreeBoxVisualisation(e);
+	bunny_sdf.octree->GenerateLeafCellVisualisation(e);
+
+	SDF bunny_sdf_r = SDF(&bunny, res, false, true);
 
 	std::cout << bunny_sdf_r.getComputationProperties();
 
 	bunny_sdf_r.exportGrid(&e, "bunnySDF_r");
 
+	/* The brute force DF of the bunny model will take ~27 min ! 
+	
 	SDF bunny_sdf_b = SDF(&bunny, res, false, SDF_Method::brute_force);
 
 	std::cout << bunny_sdf_b.getComputationProperties();
@@ -197,7 +206,7 @@ int main()
 	std::cout << "FS_ERROR_resized L2 Norm: " << error << std::endl;
 
 	error = bunnySDF_Error.getL2Norm();
-	std::cout << "FS_ERROR L2 Norm: " << error << std::endl;
+	std::cout << "FS_ERROR L2 Norm: " << error << std::endl; */
 
 	return 1;
 }

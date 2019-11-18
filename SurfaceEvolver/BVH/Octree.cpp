@@ -182,6 +182,23 @@ Octree::~Octree()
 {
 }
 
+void Octree::getAllNodes(std::vector<OctreeNode>* nodeBuffer)
+{
+	std::stack<OctreeNode*> stack = {};
+	stack.push(this->root);
+
+	while (stack.size()) {
+		OctreeNode* item = stack.top();
+		stack.pop();
+
+		nodeBuffer->push_back(*item);
+
+		for (uint i = 0; i < item->children.size(); i++) {
+			stack.push(item->children[i]);
+		}
+	}
+}
+
 void Octree::getLeafBoxGeoms(std::vector<Geometry>* geoms)
 {
 	auto startGetLeaves = std::chrono::high_resolution_clock::now();
@@ -202,6 +219,53 @@ void Octree::getLeafBoxGeoms(std::vector<Geometry>* geoms)
 		Vector3 t = b->min;
 		box.applyMatrix(Matrix4().makeTranslation(t.x, t.y, t.z));
 		geoms->push_back(box);
+	}
+}
+
+void Octree::GenerateFullOctreeBoxVisualisation(VTKExporter& e)
+{
+	std::cout << "--------------------------------------------" << std::endl;
+	std::vector<Geometry> boxGeoms = {};
+	std::vector<OctreeNode> nodeBuffer = {};
+	std::cout << "obtaining Octree nodes..." << std::endl;
+	this->getAllNodes(&nodeBuffer);
+	std::cout << nodeBuffer.size() << "Octree nodes retrieved" << std::endl;
+
+	std::cout << "generating box geometries..." << std::endl;
+	for (auto&& n : nodeBuffer) {
+		float dimX = n.box.max.x - n.box.min.x;
+		float dimY = n.box.max.y - n.box.min.y;
+		float dimZ = n.box.max.z - n.box.min.z;
+		PrimitiveBox box = PrimitiveBox(dimX, dimY, dimZ, 1, 1, 1);
+		Vector3 t = n.box.min;
+		box.applyMatrix(Matrix4().makeTranslation(t.x, t.y, t.z));
+		boxGeoms.push_back(box);
+	}
+
+	Geometry resultGeom = mergeGeometries(boxGeoms);
+	e.initExport(resultGeom, this->aabbTree->geom->name + "_Octree_allBoxes");
+	std::cout << "Octree box geometries retrieved and exported" << std::endl;
+}
+
+void Octree::GenerateLeafCellVisualisation(VTKExporter& e, bool visualizeCentroids)
+{
+	std::cout << "--------------------------------------------" << std::endl;
+	std::vector<Geometry> boxGeoms = {};
+	std::cout << "obtaining Octree leaf boxes..." << std::endl;
+	this->getLeafBoxGeoms(&boxGeoms);
+	std::cout << boxGeoms.size() << " Octree leaf boxes retrieved" << std::endl;
+	Geometry resultGeom = mergeGeometries(boxGeoms);
+	e.initExport(resultGeom, this->aabbTree->geom->name + "_Octree_leafBoxes");
+	std::cout << "Octree leaf boxes exported" << std::endl;
+
+	if (visualizeCentroids) {
+		std::cout << "obtaining Octree leaf box centroids..." << std::endl;
+		std::vector<Vector3> centroids = {};
+		for (auto&& b : boxGeoms) {
+			centroids.push_back(0.5 * (b.uniqueVertices[0] + b.uniqueVertices[6]));
+		}
+		e.exportPointData(centroids, this->aabbTree->geom->name + "_Octree_leafCentroids");
+		std::cout << centroids.size() << " Octree leaf box centroids retrieved and exported" << std::endl;
 	}
 }
 

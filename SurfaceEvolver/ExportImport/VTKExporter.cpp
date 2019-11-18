@@ -101,6 +101,25 @@ void VTKExporter::initExport(Geometry object, std::string filename)
 	vtk.close();
 }
 
+void VTKExporter::exportPointData(std::vector<Vector3> points, std::string filename)
+{
+	std::string suffix = ".vtk";
+
+	std::fstream vtk(pathPrefix + filename + suffix, std::fstream::out);
+
+	vtk << "# vtk DataFile Version 4.2" << std::endl;
+	vtk << "vtk output" << std::endl;
+	vtk << "ASCII" << std::endl;
+	vtk << "DATASET " << this->outputType << std::endl;
+	vtk << "POINTS " << points.size() << " float" << std::endl << std::endl;
+
+	for (auto&& p : points) {
+		vtk << p.x << " " << p.y << " " << p.z << std::endl;
+	}
+
+	vtk.close();
+}
+
 size_t VTKExporter::countTriangulationIndices(std::vector<BufferGeom::Triangulation>& triangulations)
 {
 	std::vector<BufferGeom::Triangulation> T = triangulations;

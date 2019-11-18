@@ -12,13 +12,13 @@ FastSweep3D::FastSweep3D(const FastSweep3D& other)
 	Nsweeps = other.Nsweeps;
 }
 
-FastSweep3D::FastSweep3D(Grid* grid, uint Nsweeps, bool blur)
+FastSweep3D::FastSweep3D(Grid* grid, uint Nsweeps, bool saveGridStates, bool blur)
 {
 	this->grid = grid;
 	this->h = this->grid->scale.x / this->grid->Nx;
 	this->Nsweeps = Nsweeps;
 
-	this->sweep();
+	this->sweep(saveGridStates);
 	if (blur) this->grid->blur();
 }
 
@@ -26,7 +26,7 @@ FastSweep3D::~FastSweep3D()
 {
 }
 
-void FastSweep3D::sweep()
+void FastSweep3D::sweep(bool saveGridStates)
 {
 	const uint Nx = grid->Nx, Ny = grid->Ny, Nz = grid->Nz;
 	int s, i, j, k, gridPos;
@@ -37,6 +37,10 @@ void FastSweep3D::sweep()
 	const int dirX[8][3] = { { 0, Nx - 1, 1 }, { Nx - 1, 0, -1 }, { Nx - 1, 0, -1 }, { Nx - 1, 0, -1 }, { Nx - 1, 0, -1 }, { 0, Nx - 1, 1 }, { 0, Nx - 1, 1 }, { 0, Nx - 1, 1 } };
 	const int dirY[8][3] = { { 0, Ny - 1, 1 }, { 0, Ny - 1, 1 }, { Ny - 1, 0, -1 }, { Ny - 1, 0, -1 }, { 0, Ny - 1, 1 }, { 0, Ny - 1, 1 }, { Ny - 1, 0, -1 }, { Ny - 1, 0, -1 } };
 	const int dirZ[8][3] = { { 0, Nz - 1, 1 }, { 0, Nz - 1, 1 }, { 0, Nz - 1, 1 }, { Nz - 1, 0, -1 }, { Nz - 1, 0, -1 }, { Nz - 1, 0, -1 }, { Nz - 1, 0, -1 }, { 0, Nz - 1, 1 } };
+
+	if (saveGridStates) { // save grid state
+		this->grid->exportToVTI("FSGrid_sweep-0");
+	}
 
 	for (s = 0; s < Nsweeps; s++) {
 		// std::cout << "sweep " << s << " ... " << std::endl;
@@ -116,6 +120,10 @@ void FastSweep3D::sweep()
 					}
 				}
 			}
+		}
+
+		if (saveGridStates) { // save grid state
+			this->grid->exportToVTI("FSGrid_sweep-" + std::to_string(s + 1));
 		}
 	}
 	grid->frozenCells.clear();

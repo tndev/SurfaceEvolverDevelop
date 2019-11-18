@@ -5,6 +5,7 @@
 #include <stack>
 #include <chrono>
 #include "AABBTree.h"
+#include "../ExportImport/VTKExporter.h"
 #include "../GeometryObject/PrimitiveBox.h"
 #include "../SDF/Grid.h"
 
@@ -56,7 +57,12 @@ public:
 	Octree(AABBTree* aabbTree, Box3 bbox, uint resolution);
 	~Octree();
 
+	void getAllNodes(std::vector<OctreeNode>* nodeBuffer);
+
 	void getLeafBoxGeoms(std::vector<Geometry>* geoms); // for visualisation
+	void GenerateFullOctreeBoxVisualisation(VTKExporter& e);
+	void GenerateLeafCellVisualisation(VTKExporter& e, bool visualizeCentroids = true);
+
 	void setLeafValueToScalarGrid(Grid* grid);
 	void setConstantValueToScalarGrid(Grid* grid, float value);
 };
