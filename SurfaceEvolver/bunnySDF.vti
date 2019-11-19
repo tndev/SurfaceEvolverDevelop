@@ -1,5 +1,5 @@
 <VTKFile type="ImageData" version="1.0" byte_order="LittleEndian" header_type="UInt64">
-	<ImageData WholeExtent="0 44 0 44 0 44" Origin="-0.13467 -0.00697991 -0.101969" Spacing="0.0053577 0.0053577 0.0053577">
+	<ImageData WholeExtent="0 44 0 44 0 44" Origin="-0.132051 -0.00436058 -0.0993497" Spacing="0.00523864 0.00523864 0.00523864">
 		<Piece Extent="0 44 0 44 0 44">
 			<PointData Scalars="Scalars_">
 				<DataArray type="Float32" Name="Scalars_" format="ascii" RangeMin="0" RangeMax="100">

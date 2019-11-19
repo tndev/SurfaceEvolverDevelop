@@ -51,12 +51,12 @@ void Grid::exportToVTI(std::string filename)
 	uint nx = Nx - 1;
 	uint ny = Ny - 1;
 	uint nz = Nz - 1;
-	float dx = scale.x / nx;
-	float dy = scale.y / ny;
-	float dz = scale.z / nz;
+	float dx = scale.x / Nx;
+	float dy = scale.y / Ny;
+	float dz = scale.z / Nz;
 
 	vti << "<VTKFile type=\"ImageData\" version=\"1.0\" byte_order=\"LittleEndian\" header_type=\"UInt64\">" << std::endl;
-	vti << "	<ImageData WholeExtent=\"0 " << nx << " 0 " << ny << " 0 " << nz << "\" Origin=\"" << o.x << " " << o.y << " " << o.z << "\" Spacing=\"" << dx << " " << dy << " " << dz << "\">" << std::endl;
+	vti << "	<ImageData WholeExtent=\"0 " << nx << " 0 " << ny << " 0 " << nz << "\" Origin=\"" << o.x + 0.5 * dx << " " << o.y + 0.5 * dy << " " << o.z + 0.5 * dz << "\" Spacing=\"" << dx << " " << dy << " " << dz << "\">" << std::endl;
 	vti << "		<Piece Extent=\"0 " << nx << " 0 " << ny << " 0 " << nz << "\">" << std::endl;
 	vti << "			<PointData Scalars=\"Scalars_\">" << std::endl;
 	vti << "				<DataArray type=\"Float32\" Name=\"Scalars_\" format=\"ascii\" RangeMin=\"" << min << "\" RangeMax=\"" << max << "\">" << std::endl;

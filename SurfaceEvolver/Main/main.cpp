@@ -119,11 +119,11 @@ int main()
 
 	VTKExporter e = VTKExporter();
 
-	bool iterateCubeSphereTest = false;
+	bool iterateCubeSphereTest = true;
 
 	if (iterateCubeSphereTest) {
 		size_t min_Res = 30, max_Res = 60;
-		size_t min_Ns = 0, max_Ns = 2;
+		size_t min_Ns = 0, max_Ns = 5;
 		std::fstream timing("timing.txt", std::fstream::out);
 
 		for (unsigned int res = min_Res; res < max_Res; res += 20) {
@@ -176,11 +176,11 @@ int main()
 	bunny_sdf.exportGrid(&e, "bunnySDF");
 
 	// tree visualisation
-	bunny_sdf.tri_aabb->GenerateFullTreeBoxVisualisation(e);
+	/* bunny_sdf.tri_aabb->GenerateFullTreeBoxVisualisation(e);
 	bunny_sdf.tri_aabb->GenerateFullLeafBoxVisualisation(e);
 	bunny_sdf.tri_aabb->GenerateStepwiseLeafBoxVisualisation(e);
 	bunny_sdf.octree->GenerateFullOctreeBoxVisualisation(e);
-	bunny_sdf.octree->GenerateLeafCellVisualisation(e);
+	bunny_sdf.octree->GenerateLeafCellVisualisation(e); */
 
 	SDF bunny_sdf_r = SDF(&bunny, res, false, true);
 
