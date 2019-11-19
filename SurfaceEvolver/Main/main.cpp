@@ -119,7 +119,7 @@ int main()
 
 	VTKExporter e = VTKExporter();
 
-	bool iterateCubeSphereTest = true;
+	bool iterateCubeSphereTest = false;
 
 	if (iterateCubeSphereTest) {
 		size_t min_Res = 30, max_Res = 60;
@@ -182,11 +182,13 @@ int main()
 	bunny_sdf.octree->GenerateFullOctreeBoxVisualisation(e);
 	bunny_sdf.octree->GenerateLeafCellVisualisation(e); */
 
+	/* Interpolated bunny DF:
 	SDF bunny_sdf_r = SDF(&bunny, res, false, true);
 
 	std::cout << bunny_sdf_r.getComputationProperties();
 
 	bunny_sdf_r.exportGrid(&e, "bunnySDF_r");
+	*/
 
 	/* The brute force DF of the bunny model will take ~27 min ! 
 	
