@@ -30,7 +30,8 @@
 // - Get exact octree centroid to closest triangle dist
 // - Unite AABB, Octree and FastSweep3D into a single class
 // - debug and optimize FastSweep3D
-// - interpolate distance field for higher resolutions
+// - interpolate distance field for higher resolutions (not much improvement)
+// - perform simple DF tests for geom primitives like sphere, icosphere, cubesphere
 
 //  POSTPONED:
 //
@@ -40,7 +41,6 @@
 //   DONE, BUT MIGHT BE IMPROVED:
 //
 // - AABB and Octree have to take as little space as possible
-// - perform simple DF tests for geom primitives like sphere, icosphere, cubesphere
 
 //   WIP:
 // 
@@ -49,6 +49,7 @@
 //   TODO (weekend Nov.15th - Nov.17th):
 //
 // - cleanup main & prep for VTK window form
+// - improve AABB split position sampling
 // - flat AABB
 // - Inverse transform grid upon transforming mesh
 // - debug AABB closest primitive lookup
