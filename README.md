@@ -6,7 +6,9 @@ Done: generate a distance field field around a mesh using the [Fast Sweeping Met
 
 Current WIP: optimize the construction of AABBTree and Octree. Try flat node array + dynamic update under small transformations of the mesh
 
-Progress So far:
+### ============ Progress So far ===============:
+
+# 1 Evolution In the Normal Direction - Distance Function
 
 #### 1. Take the input geometry & construct an AABB Tree
 ![AABBFull](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/BunnyAABBNodes.jpg)
