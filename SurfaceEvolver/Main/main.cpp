@@ -51,6 +51,7 @@
 // - cleanup main & prep for VTK window form
 // - improve AABB split position sampling
 // - flat AABB
+// - AABB update for transformations + Timing test
 // - Inverse transform grid upon transforming mesh
 // - debug AABB closest primitive lookup
 
