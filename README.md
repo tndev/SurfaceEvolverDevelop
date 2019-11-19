@@ -6,10 +6,12 @@ Done: generate a distance field field around a mesh using the [Fast Sweeping Met
 
 Current WIP: optimize the construction of AABBTree and Octree. Try flat node array + dynamic update under small transformations of the mesh
 
-![Voxelization](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/BunnyAABBToOctree.jpg)
+![Voxelization](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/BunnyAABBToOctree.jpg){:height="700px" width="400px"}
+
+![FastSweep](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/FastSweepResized.gif){:height="700px" width="400px"}
 
 ## Result:
 
-![DF](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/bunnySDFContour1.jpg)
+![DF](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/bunnySDFContour1.jpg){:height="700px" width="400px"}
 
 
