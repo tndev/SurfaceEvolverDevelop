@@ -8,10 +8,10 @@ Current WIP: optimize the construction of AABBTree and Octree. Try flat node arr
 
 ![Voxelization](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/BunnyAABBToOctree.jpg)
 
+![FastSweep](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/FastSweepResized.gif)
+
 ## Result:
 
-![DF](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/CorrectBunnyDist.jpg)
+![DF](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/bunnySDFContour1.jpg)
 
-### Cube:
 
-![cubeDF](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/CorrectCubeDist.jpg)
