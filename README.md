@@ -23,6 +23,7 @@ Progress So far:
 
 ### Result:
 ![DF](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/BunnySDF_FS.jpg)
-#### Error |MyMethodGrid - BruteForceGrid|:
+### Error :
+|MyMethodGrid(x,y,z) - BruteForceGrid(x,y,z)|
 ![error](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/BunnySDF_FS_Error.jpg)
 
