@@ -23,6 +23,6 @@ Progress So far:
 
 ### Result:
 ![DF](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/bunnySDFContour1.jpg)
-#### (mean) L2 Error:
+#### Error |MyMethodGrid - BruteForceGrid|:
 ![error](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/BunnySDF_FS_Error.jpg)
 
