@@ -27,3 +27,5 @@ Progress So far:
 |MyMethodGrid(x,y,z) - BruteForceGrid(x,y,z)|
 ![error](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/BunnySDF_FS_Error.jpg)
 
+## Time computation results for primitives:
+![primRes](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/primResultsAnim.gif)
