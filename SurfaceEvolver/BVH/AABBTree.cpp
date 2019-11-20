@@ -515,23 +515,27 @@ void AABBTree::AABBNode::construct(std::vector<uint>* primitiveIds, uint depthLe
 
 float AABBTree::AABBNode::getSplitPosition(std::vector<uint>& primitiveIds, std::vector<uint>* out_left, std::vector<uint>* out_right)
 {
-	std::vector<float> splitPositions = {};
-	std::vector<float> splitsLeft = {};
-	std::vector<float> splitsRight = {};
+	const uint CUTS = 8; uint i, j;
+	float* splitPositions = new float[CUTS];
+	float* splitsLeft = new float[CUTS];
+	float* splitsRight = new float[CUTS];
 
-	const uint CUTS = 8;
-	for (uint i = 1; i <= CUTS; i++) {
-		splitPositions.push_back(bbox.min.getCoordById(axis) * (1.0f - ((float)i / (CUTS + 1.0f))) + bbox.max.getCoordById(axis) * ((float)i / (CUTS + 1.0f)));
-		splitsLeft.push_back(0.0f);
-		splitsRight.push_back(0.0f);
+	for (i = 0; i < CUTS; i++) {
+		splitPositions[i] = 
+			bbox.min.getCoordById(axis) * (1.0f - ((float)(i + 1) / (float)(CUTS + 1.0f))) +
+			bbox.max.getCoordById(axis) * ((float)(i + 1) / (float)(CUTS + 1.0f));
+		splitsLeft[i] = 0.0f;
+		splitsRight[i] = 0.0f;
 	}
 
-	// count triangles for each split, we don't want to fill arrays here (lot of wasted cycles and memory ops)
-	for (uint i = 0; i < primitiveIds.size(); i++) {
-		float min = this->tree->primitives[primitiveIds[i]].getMinById(axis);
-		float max = this->tree->primitives[primitiveIds[i]].getMaxById(axis);
+	float min, max;
 
-		for (uint j = 0; j < splitPositions.size(); j++) {
+	// count triangles for each split, we don't want to fill arrays here (lot of wasted cycles and memory ops)
+	for (i = 0; i < primitiveIds.size(); i++) {
+		min = this->tree->primitives[primitiveIds[i]].getMinById(axis);
+		max = this->tree->primitives[primitiveIds[i]].getMaxById(axis);
+
+		for (j = 0; j < CUTS; j++) {
 			if (min <= splitPositions[j]) {
 				++splitsLeft[j];
 			}
@@ -544,7 +548,7 @@ float AABBTree::AABBNode::getSplitPosition(std::vector<uint>& primitiveIds, std:
 	// pick the best split location
 	float bestCost = FLT_MAX;
 	float bestSplitPosition = bbox.min.getCoordById(axis) * 0.5f + bbox.max.getCoordById(axis) * 0.5f;
-	for (uint i = 0; i < splitPositions.size(); i++) {
+	for (i = 0; i < CUTS; i++) {
 		float cost = getCostEstimate(splitPositions[i], splitsLeft[i], splitsRight[i]);
 		if (cost < bestCost) {
 			bestCost = cost;
@@ -564,6 +568,10 @@ float AABBTree::AABBNode::getSplitPosition(std::vector<uint>& primitiveIds, std:
 			out_right->push_back(primitiveIds[i]);
 		}
 	}
+
+	delete[] splitsLeft;
+	delete[] splitsRight;
+	delete[] splitPositions;
 
 	return bestSplitPosition;
 }

@@ -364,7 +364,7 @@ verts: 12, triangles: 20, grid resolution: 50^3
 BRUTE FORCE ::: computation times: ====> TOTAL: 27.966856 s
 
 FS_ERROR_resized L2 Norm: 3.69816
-FS_ERROR L2 Norm: 0.827772
+FS_ERROR L2 Norm: 0.827772    // Log[(1/45)/(1/75), (1.3743/0.827772)] = 0.992437
 AABB_ERROR L2 Norm: 0
 === PrimitiveBox, dimensions: (57.735027, 57.735027, 57.735027), segments: (1, 1, 1) === 
 verts: 8, triangles: 12, octree resolution: 50^3, grid resolution: 75^3 , rescaled from: 15^2

@@ -46,8 +46,9 @@
 // 
 
 
-//   TODO (weekend Nov.15th - Nov.17th):
+//   TODO:
 //
+// - optimize Box-Triangle intersection https://github.com/rvisser/cgProject/blob/master/source/aabbTriangle.cpp
 // - cleanup main & prep for VTK window form
 // - improve AABB split position sampling
 // - flat AABB
@@ -124,37 +125,58 @@ int main()
 	bool iterateCubeSphereTest = false;
 
 	if (iterateCubeSphereTest) {
-		size_t min_Res = 30, max_Res = 60;
+		size_t min_Res = 20, max_Res = 60;
 		size_t min_Ns = 0, max_Ns = 5;
-		std::fstream timing("timing.txt", std::fstream::out);
+		std::fstream timing_cubes("timing_cubes.txt", std::fstream::out);
 
-		for (unsigned int res = min_Res; res < max_Res; res += 20) {
-			for (unsigned int n = min_Ns; n < max_Ns; n++) {
-
-				std::cout << "icosphere(" << n << "), grid_res = " << res << std::endl;
-				IcoSphere g0 = IcoSphere(n, r);
-				Vector3 axis = normalize(Vector3(1, 1, 1));
-				g0.applyMatrix(Matrix4().makeRotationAxis(axis.x, axis.y, axis.z, M_PI / 6.));
-				e.initExport(g0, "icosphere" + std::to_string(res) + "-" + std::to_string(n));
-
-				performTest(res, g0, timing, e);
+		Vector3 axis = normalize(Vector3(1, 1, 1));
+        
+		for (uint n = min_Ns; n < max_Ns; n++) {
+			for (uint i = 0; i <= 2; i++) {
+				uint res = min_Res * pow(2, i);
 
 				std::cout << "cube(" << n + 1 << "), grid_res = " << res << std::endl;
 				PrimitiveBox g1 = PrimitiveBox(a, a, a, n + 1, n + 1, n + 1);
 				g1.applyMatrix(Matrix4().makeRotationAxis(axis.x, axis.y, axis.z, M_PI / 6.));
 				e.initExport(g1, "cube" + std::to_string(res) + "-" + std::to_string(n));
 
-				performTest(res, g1, timing, e);
+				performTest(res, g1, timing_cubes, e);
 
 				std::cout << "cubesphere(" << n + 1 << "), grid_res = " << res << std::endl;
 				CubeSphere g2 = CubeSphere(n + 1, r);
 				g2.applyMatrix(Matrix4().makeRotationAxis(axis.x, axis.y, axis.z, M_PI / 6.));
 				e.initExport(g2, "cubesphere" + std::to_string(res) + "-" + std::to_string(n));
 
-				performTest(res, g2, timing, e);
+				performTest(res, g2, timing_cubes, e);
 			}
 		}
-		timing.close();
+		timing_cubes.close();
+	}
+
+
+	bool iterateIcoSphereTest = false;
+
+	if (iterateIcoSphereTest) {
+		size_t min_Res = 20, max_Res = 60;
+		size_t min_Ns = 0, max_Ns = 2;
+		std::fstream timing_ico("timing_ico.txt", std::fstream::out);
+
+		Vector3 axis = normalize(Vector3(1, 1, 1));
+
+		for (uint n = min_Ns; n < max_Ns; n++) {
+			for (uint i = 0; i <= 2; i++) {
+				uint res = min_Res * pow(2, i);
+
+				std::cout << "icosphere(" << n << "), grid_res = " << res << std::endl;
+				IcoSphere g0 = IcoSphere(n, r);
+				g0.applyMatrix(Matrix4().makeRotationAxis(axis.x, axis.y, axis.z, M_PI / 6.));
+				e.initExport(g0, "icosphere" + std::to_string(res) + "-" + std::to_string(n));
+
+				performTest(res, g0, timing_ico, e);
+			}
+		}
+
+		timing_ico.close();
 	}
 
 
