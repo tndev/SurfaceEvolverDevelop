@@ -1,11 +1,11 @@
-﻿  AABBTree.cpp
+﻿  main.cpp
 D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\poly2tri\sweep\sweep_context.h(161,24): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(21,33): warning C4305: 'argument': truncation from 'double' to 'float'
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(22,32): warning C4305: 'argument': truncation from 'double' to 'float'
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(52,27): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(244,16): warning C4101: 't_right': unreferenced local variable
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(244,8): warning C4101: 't_left': unreferenced local variable
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(345,72): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(552,79): warning C4244: 'argument': conversion from 'float' to 'unsigned int', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(552,63): warning C4244: 'argument': conversion from 'float' to 'unsigned int', possible loss of data
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\main.cpp(120,10): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\main.cpp(134,23): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\main.cpp(136,14): warning C4244: 'initializing': conversion from 'double' to 'unsigned int', possible loss of data
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\main.cpp(140,80): warning C4305: 'argument': truncation from 'double' to 'float'
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\main.cpp(147,80): warning C4305: 'argument': truncation from 'double' to 'float'
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\main.cpp(166,23): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\main.cpp(168,14): warning C4244: 'initializing': conversion from 'double' to 'unsigned int', possible loss of data
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\main.cpp(172,80): warning C4305: 'argument': truncation from 'double' to 'float'
   SurfaceEvolver.vcxproj -> D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\x64\Debug\SurfaceEvolver.exe

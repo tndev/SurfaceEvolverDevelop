@@ -671,15 +671,17 @@ bool getTriangleBoxIntersection(Tri& vertices, Vector3* bboxCenter, Vector3 bbox
 {
 	bboxHalfSize.addScalar(offset);
 
-	std::vector<Vector3> verts = { *vertices[0] - *bboxCenter, *vertices[1] - *bboxCenter, *vertices[2] - *bboxCenter };
+	Vector3 vert0 = *vertices[0] - *bboxCenter;
+	Vector3 vert1 = *vertices[1] - *bboxCenter;
+	Vector3 vert2 = *vertices[2] - *bboxCenter;
 
-	Vector3 t_min = verts[0];
-	t_min.min(verts[1]);
-	t_min.min(verts[2]);
+	Vector3 t_min = vert0;
+	t_min.min(vert1);
+	t_min.min(vert2);
 
-	Vector3 t_max = verts[0];
-	t_max.max(verts[1]);
-	t_max.max(verts[2]);
+	Vector3 t_max = vert0;
+	t_max.max(vert1);
+	t_max.max(vert2);
 
 	bool aabb_overlap = (
 		!(t_max.x < -bboxHalfSize.x || t_min.x > bboxHalfSize.x) &&
@@ -691,20 +693,27 @@ bool getTriangleBoxIntersection(Tri& vertices, Vector3* bboxCenter, Vector3 bbox
 		return false;
 	}
 
-	Vector3 n = optTriNormal != nullptr ? *optTriNormal : normalize(cross(verts[1] - verts[0], verts[2] - verts[0]));
+	Vector3 n = optTriNormal != nullptr ? *optTriNormal : normalize(cross(vert1 - vert0, vert2 - vert0));
 
 	// plane-bbox intersection
 	Vector3 nf_mask = Vector3((n.x > 0 ? 1 : -1), (n.y > 0 ? 1 : -1), (n.z > 0 ? 1 : -1));
 	Vector3 near_corner = multiply(bboxHalfSize, nf_mask);
 	Vector3 far_corner = -1.0f * multiply(bboxHalfSize, nf_mask);
-	float dist_near_s = sgn(dot(n, near_corner) - dot(n, verts[0]));
-	float dist_far_s = sgn(dot(n, far_corner) - dot(n, verts[0]));
+	float dist_near_s = sgn(dot(n, near_corner) - dot(n, vert0));
+	float dist_far_s = sgn(dot(n, far_corner) - dot(n, vert0));
 	if (fabs(dist_near_s - dist_far_s) < FLT_EPSILON) {
 		return false;
 	}
 
-	std::vector<Vector3> f = { (verts[1] - verts[0]), (verts[2] - verts[1]), (verts[0] - verts[2]) };
-	std::vector<Vector3> axes = { Vector3(1, 0, 0), Vector3(0, 1, 0), Vector3(0, 0, 1) };
+	Vector3 f[3] = {
+		(vert1 - vert0),
+		(vert2 - vert1),
+		(vert0 - vert2)
+	};
+
+	Vector3 axes[3] = {
+		Vector3(1, 0, 0), Vector3(0, 1, 0), Vector3(0, 0, 1)
+	};
 
 	Vector3 a;
 	float p0, p1, p2, min, max, r;
@@ -712,9 +721,9 @@ bool getTriangleBoxIntersection(Tri& vertices, Vector3* bboxCenter, Vector3 bbox
 	for (uint i = 0; i < 3; ++i) {
 		for (uint j = 0; j < 3; ++j) {
 			a = cross(axes[i], f[j]);
-			p0 = a.dot(verts[0]);
-			p1 = a.dot(verts[1]);
-			p2 = a.dot(verts[2]);
+			p0 = a.dot(vert0);
+			p1 = a.dot(vert1);
+			p2 = a.dot(vert2);
 			min = std::fminf(p0, std::fminf(p1, p2));
 			max = std::fmaxf(p0, std::fmaxf(p1, p2));
 
