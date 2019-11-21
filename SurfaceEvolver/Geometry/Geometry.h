@@ -117,14 +117,15 @@ Geometry mergeGeometries(std::vector<Geometry>& geometries);
 Vector3 getTriangleNormal(StructGeom::Triangle triangle, Vector3& resultNormal);
 
 // intersections:
-bool getTriangleBoxIntersection(Tri& vertices, Vector3* bboxCenter, Vector3 bboxHalfSize, float offset = 0.0001f, Vector3* optTriNormal = nullptr);
+bool getPlaneBoxIntersection(Vector3* normal, Vector3* vert, Vector3* boxMax);
+bool getTriangleBoxIntersection(Vector3** T, Vector3* boxCenter, Vector3* boxHalfSize);
 bool getEdgeBoxIntersection(Edge& vertices, Vector3* boxMin, Vector3* boxMax);
 bool getPrimitiveBoxIntersection(Primitive& primitive, Vector3* boxCenter, Vector3* boxMin, Vector3* boxMax, Vector3* boxHalfSize, float offset = 0.0001f);
 
 float getRayTriangleIntersection(Vector3& rayStart, Vector3& rayDirection, Tri* tri, float minParam, float maxParam);
 
 // distances:
-float getDistanceToATriangleSq(Tri* vertices, Vector3& point);
+float getDistanceToATriangleSq(Vector3** vertices, Vector3* point);
 float getDistanceToATriangleSq2(Tri* vertices, Vector3& point);
 // it's hard to say which one of the previous two is faster
 float getDistanceToAnEdgeSq(Edge* vertices, Vector3& point);

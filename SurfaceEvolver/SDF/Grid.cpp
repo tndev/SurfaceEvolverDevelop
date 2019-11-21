@@ -202,7 +202,12 @@ void Grid::computeSignField(AABBTree* v_aabb, AABBTree* e_aabb, AABBTree* t_aabb
 						continue;
 					}
 
-					rt = getDistanceToATriangleSq(&t_aabb->primitives[tId].vertices, p);
+					Vector3** t = new Vector3 * [3];
+					t[0] = t_aabb->primitives[tId].vertices[0];
+					t[1] = t_aabb->primitives[tId].vertices[1];
+					t[2] = t_aabb->primitives[tId].vertices[2];
+					rt = getDistanceToATriangleSq(t, &p);
+					delete[] t;
 
 					if (re < rt) {
 						sign = (dot((p - getClosestPtOnAnEdge(&e_aabb->primitives[eId].vertices, p)), e_awpn[eId]) < 0.0f ? -1 : 1);
@@ -248,12 +253,12 @@ void Grid::bruteForceDistanceField(Geometry* geom)
 				);
 
 				for (i = 0; i < geom->vertexIndices.size(); i += 3) {
-					T = { 
-						&geom->uniqueVertices[geom->vertexIndices[i]],
-						&geom->uniqueVertices[geom->vertexIndices[i + 1]],
-						&geom->uniqueVertices[geom->vertexIndices[i + 2]] 
-					};
-					distSq = getDistanceToATriangleSq(&T, p);
+					Vector3** t = new Vector3 * [3];
+					t[0] = &geom->uniqueVertices[geom->vertexIndices[i]];
+					t[1] = &geom->uniqueVertices[geom->vertexIndices[i + 1]];
+					t[2] = &geom->uniqueVertices[geom->vertexIndices[i + 2]];
+					distSq = getDistanceToATriangleSq(t, &p);
+					delete[] t;
 
 					result_distSq = distSq < result_distSq ? distSq : result_distSq;
 				}

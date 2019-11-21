@@ -663,79 +663,165 @@ Vector3 getTriangleNormal(StructGeom::Triangle triangle, Vector3& resultNormal)
 	return resultNormal;
 }
 
+// ====== Helper macros for vectors (to increase speed) ============
+
+#define CROSS(dest, v1, v2)						\
+          dest.x = v1.y * v2.z - v1.z * v2.y;   \
+          dest.y = v1.z * v2.x - v1.x * v2.z;	\
+          dest.z = v1.x * v2.y - v1.y * v2.x;
+
+#define DOT(v1, v2) (v1.x * v2.x + v1.y * v2.y + v1.z * v2.z)
+
+#define SUB(dest, v1, v2)						\
+          dest.x = v1.x - v2.x;					\
+          dest.y = v1.y - v2.y;					\
+          dest.z = v1.z - v2.z;
+
+#define FINDMINMAX(x0, x1, x2, min, max)		\
+		  min = max = x0;						\
+		  if (x1 < min) min = x1;				\
+		  if (x1 > max) max = x1;				\
+		  if (x2 < min) min = x2;				\
+		  if (x2 > max) max = x2;
+
+bool getPlaneBoxIntersection(Vector3* normal, Vector3* vert, Vector3* boxMax) {
+	int q;
+	Vector3 vmin, vmax;
+	float v;
+
+	for (q = 0; q <= 2; q++) {
+		v = vert->getCoordById(q);
+
+		if (normal->getCoordById(q) > 0.0f) {
+			vmin.setCoordById(-boxMax->getCoordById(q) - v, q);
+			vmax.setCoordById(boxMax->getCoordById(q) - v, q);
+		} else {
+			vmin.setCoordById(boxMax->getCoordById(q) - v, q);
+			vmax.setCoordById(-boxMax->getCoordById(q) - v, q);
+		}
+	}
+
+	if (DOT((*normal), vmin) > 0.0f) return false;
+	if (DOT((*normal), vmax) >= 0.0f) return true;
+	return false;
+}
+
+// =================== Helper macros for axis tests ======================
+// X-tests:
+
+#define AXISTEST_X01(a, b, fa, fb)									   \
+		p0 = a * v0.y - b * v0.z;			       				       \
+		p2 = a * v2.y - b * v2.z;			       					   \
+        if (p0 < p2) {min = p0; max = p2;} else {min = p2; max = p0;}  \
+		rad = fa * boxHalfSize->y + fb * boxHalfSize->z;		       \
+		if (min > rad || max < -rad) return false;
+
+#define AXISTEST_X2(a, b, fa, fb)									   \
+		p0 = a * v0.y - b * v0.z;									   \
+		p1 = a * v1.y - b * v1.z;		       						   \
+        if (p0 < p1) {min = p0; max = p1;} else {min = p1; max = p0;}  \
+		rad = fa * boxHalfSize->y + fb * boxHalfSize->z;			   \
+		if (min > rad || max < -rad) return false;
+
+// Y-tests:
+
+#define AXISTEST_Y02(a, b, fa, fb)									   \
+		p0 = -a * v0.x + b * v0.z;				   					   \
+		p2 = -a * v2.x + b * v2.z;				       				   \
+		if (p0 < p2) {min = p0; max = p2;} else {min = p2; max = p0;}  \
+		rad = fa * boxHalfSize->x + fb * boxHalfSize->z;		       \
+		if (min > rad || max <- rad) return false;
+
+#define AXISTEST_Y1(a, b, fa, fb)							    	   \
+		p0 = -a * v0.x + b * v0.z;		      					       \
+		p1 = -a * v1.x + b  *v1.z;					                   \
+		if (p0 < p1) {min = p0; max = p1;} else {min = p1; max = p0;}  \
+		rad = fa * boxHalfSize->x + fb * boxHalfSize->z;			   \
+		if (min > rad || max < -rad) return false;
+
+// Z-tests:
+
+#define AXISTEST_Z12(a, b, fa, fb)									   \
+		p1 = a * v1.x - b * v1.y;			 			               \
+		p2 = a * v2.x - b * v2.y;			       	                   \
+		if (p2 < p1) {min = p2; max = p1;} else {min = p1; max = p2;}  \
+		rad = fa * boxHalfSize->x + fb * boxHalfSize->y;			   \
+		if (min > rad || max < -rad) return false;
+
+#define AXISTEST_Z0(a, b, fa, fb)									   \
+		p0 = a * v0.x - b * v0.y;									   \
+		p1 = a * v1.x - b * v1.y;									   \
+		if (p0 < p1) {min = p0; max = p1;} else {min = p1; max = p0;}  \
+		rad = fa * boxHalfSize->x + fb * boxHalfSize->y;			   \
+		if (min > rad || max < -rad) return false;
+
+// =====================================================
+
+bool getTriangleBoxIntersection(Vector3** T, Vector3* boxCenter, Vector3* boxHalfSize) {
+	Vector3 v0, v1, v2;
+	float min, max, p0, p1, p2, rad, fex, fey, fez;
+	Vector3 normal, e0, e1, e2;
+
+	SUB(v0, (*T[0]), (*boxCenter));
+	SUB(v1, (*T[1]), (*boxCenter));
+	SUB(v2, (*T[2]), (*boxCenter));
+
+	// tri edges:
+	SUB(e0, v1, v0);
+	SUB(e1, v2, v1);
+	SUB(e2, v0, v2);
+
+	// 9 axis tests:
+	fex = fabsf(e0.x);
+	fey = fabsf(e0.y);
+	fez = fabsf(e0.z);
+
+	AXISTEST_X01(e0.z, e0.y, fez, fey);
+	AXISTEST_Y02(e0.z, e0.x, fez, fex);
+	AXISTEST_Z12(e0.y, e0.x, fey, fex);
+
+	fex = fabsf(e1.x);
+	fey = fabsf(e1.y);
+	fez = fabsf(e1.z);
+
+	AXISTEST_X01(e1.z, e1.y, fez, fey);
+	AXISTEST_Y02(e1.z, e1.x, fez, fex);
+	AXISTEST_Z0(e1.y, e1.x, fey, fex);
+
+	fex = fabsf(e2.x);
+	fey = fabsf(e2.y);
+	fez = fabsf(e2.z);
+
+	AXISTEST_X2(e2.z, e2.y, fez, fey);
+	AXISTEST_Y1(e2.z, e2.x, fez, fex);
+	AXISTEST_Z12(e2.y, e2.x, fey, fex);
+
+	// test for AABB overlap in x, y, and z:
+	// test in x:
+	FINDMINMAX(v0.x, v1.x, v2.x, min, max);
+	if (min > boxHalfSize->x || max < -boxHalfSize->x) return false;
+
+	// test in y:
+	FINDMINMAX(v0.y, v1.y, v2.y, min, max);
+	if (min > boxHalfSize->y || max < -boxHalfSize->y) return false;
+
+	// test in z:
+	FINDMINMAX(v0.z, v1.z, v2.z, min, max);
+	if (min > boxHalfSize->z || max < -boxHalfSize->z) return false;
+
+	// test if the box intersects the triangle plane  dot(normal, x) + d = 0
+
+	CROSS(normal, e0, e1);
+
+	if (!getPlaneBoxIntersection(&normal, &v0, boxHalfSize)) return false;
+
+	return true;
+}
+
 template <typename T> int sgn(T val) {
 	return (T(0) < val) - (val < T(0));
 }
 
-bool getTriangleBoxIntersection(Tri& vertices, Vector3* bboxCenter, Vector3 bboxHalfSize, float offset, Vector3* optTriNormal)
-{
-	bboxHalfSize.addScalar(offset);
-
-	Vector3 vert0 = *vertices[0] - *bboxCenter;
-	Vector3 vert1 = *vertices[1] - *bboxCenter;
-	Vector3 vert2 = *vertices[2] - *bboxCenter;
-
-	Vector3 t_min = vert0;
-	t_min.min(vert1);
-	t_min.min(vert2);
-
-	Vector3 t_max = vert0;
-	t_max.max(vert1);
-	t_max.max(vert2);
-
-	bool aabb_overlap = (
-		!(t_max.x < -bboxHalfSize.x || t_min.x > bboxHalfSize.x) &&
-		!(t_max.y < -bboxHalfSize.y || t_min.y > bboxHalfSize.y) &&
-		!(t_max.z < -bboxHalfSize.z || t_min.z > bboxHalfSize.z)
-		);
-
-	if (!aabb_overlap) {
-		return false;
-	}
-
-	Vector3 n = optTriNormal != nullptr ? *optTriNormal : normalize(cross(vert1 - vert0, vert2 - vert0));
-
-	// plane-bbox intersection
-	Vector3 nf_mask = Vector3((n.x > 0 ? 1 : -1), (n.y > 0 ? 1 : -1), (n.z > 0 ? 1 : -1));
-	Vector3 near_corner = multiply(bboxHalfSize, nf_mask);
-	Vector3 far_corner = -1.0f * multiply(bboxHalfSize, nf_mask);
-	float dist_near_s = sgn(dot(n, near_corner) - dot(n, vert0));
-	float dist_far_s = sgn(dot(n, far_corner) - dot(n, vert0));
-	if (fabs(dist_near_s - dist_far_s) < FLT_EPSILON) {
-		return false;
-	}
-
-	Vector3 f[3] = {
-		(vert1 - vert0),
-		(vert2 - vert1),
-		(vert0 - vert2)
-	};
-
-	Vector3 axes[3] = {
-		Vector3(1, 0, 0), Vector3(0, 1, 0), Vector3(0, 0, 1)
-	};
-
-	Vector3 a;
-	float p0, p1, p2, min, max, r;
-
-	for (uint i = 0; i < 3; ++i) {
-		for (uint j = 0; j < 3; ++j) {
-			a = cross(axes[i], f[j]);
-			p0 = a.dot(vert0);
-			p1 = a.dot(vert1);
-			p2 = a.dot(vert2);
-			min = std::fminf(p0, std::fminf(p1, p2));
-			max = std::fmaxf(p0, std::fmaxf(p1, p2));
-
-			r = bboxHalfSize.dot(Vector3(fabs(a.x), fabs(a.y), fabs(a.z)));
-			if (min > r || max < -r) {
-				return false;
-			}
-		}
-	}
-
-	return true;
-}
 
 bool getEdgeBoxIntersection(Edge& vertices, Vector3* boxMin, Vector3* boxMax)
 {
@@ -779,197 +865,137 @@ bool getPrimitiveBoxIntersection(Primitive& primitive, Vector3* boxCenter, Vecto
 		return getEdgeBoxIntersection(primitive.vertices, boxMin, boxMax);
 	}
 	else if (primitive.vertices.size() == 3) {
-		return getTriangleBoxIntersection(primitive.vertices, boxCenter, *boxHalfSize, offset);
+		Vector3** t = new Vector3*[3];
+		t[0] = primitive.vertices[0];
+		t[1] = primitive.vertices[1];
+		t[2] = primitive.vertices[2];
+		return getTriangleBoxIntersection(t, boxCenter, boxHalfSize);
+		delete[] t;
 	}
 
 	return false;
 }
 
-float getDistanceToATriangleSq(Tri* vertices, Vector3& point)
+float getDistanceToATriangleSq(Vector3** vertices, Vector3* point)
 {
-	Vector3 diff = point - *vertices->at(0);
-	Vector3 edge0 = *vertices->at(1) - *vertices->at(0);
-	Vector3 edge1 = *vertices->at(2) - *vertices->at(0);
-	float a00 = dot(edge0, edge0);
-	float a01 = dot(edge0, edge1);
-	float a11 = dot(edge1, edge1);
-	float b0 = -dot(diff, edge0);
-	float b1 = -dot(diff, edge1);
+	Vector3 diff = *point - *vertices[0];
+	Vector3 edge0 = *vertices[1] - *vertices[0];
+	Vector3 edge1 = *vertices[2] - *vertices[0];
+	float a00 = DOT(edge0, edge0);
+	float a01 = DOT(edge0, edge1);
+	float a11 = DOT(edge1, edge1);
+	float b0 = -DOT(diff, edge0);
+	float b1 = -DOT(diff, edge1);
 	float const zero = (float)0;
 	float const one = (float)1;
 	float det = a00 * a11 - a01 * a01;
 	float t0 = a01 * b1 - a11 * b0;
 	float t1 = a01 * b0 - a00 * b1;
 
-	if (t0 + t1 <= det)
-	{
-		if (t0 < zero)
-		{
-			if (t1 < zero)  // region 4
-			{
-				if (b0 < zero)
-				{
+	if (t0 + t1 <= det)	{
+		if (t0 < zero) {
+			if (t1 < zero) { // region 4			
+				if (b0 < zero) {
 					t1 = zero;
-					if (-b0 >= a00)  // V1
-					{
+					if (-b0 >= a00) { // V1					
 						t0 = one;
-					}
-					else  // E01
-					{
+					} else { // E01					
 						t0 = -b0 / a00;
 					}
-				}
-				else
-				{
+				} else {
 					t0 = zero;
-					if (b1 >= zero)  // V0
-					{
+					if (b1 >= zero) { // V0					
 						t1 = zero;
-					}
-					else if (-b1 >= a11)  // V2
-					{
+					} else if (-b1 >= a11) { // V2					
 						t1 = one;
-					}
-					else  // E20
-					{
+					} else { // E20					
 						t1 = -b1 / a11;
 					}
 				}
-			}
-			else  // region 3
-			{
+			} else { // region 3			
 				t0 = zero;
-				if (b1 >= zero)  // V0
-				{
+				if (b1 >= zero) { // V0				
 					t1 = zero;
-				}
-				else if (-b1 >= a11)  // V2
-				{
+				} else if (-b1 >= a11) { // V2				
 					t1 = one;
-				}
-				else  // E20
-				{
+				} else { // E20				
 					t1 = -b1 / a11;
 				}
 			}
-		}
-		else if (t1 < zero)  // region 5
-		{
+		} else if (t1 < zero) { // region 5		
 			t1 = zero;
-			if (b0 >= zero)  // V0
-			{
+			if (b0 >= zero) { // V0			
 				t0 = zero;
-			}
-			else if (-b0 >= a00)  // V1
-			{
+			} else if (-b0 >= a00) { // V1			
 				t0 = one;
-			}
-			else  // E01
-			{
+			} else { // E01			
 				t0 = -b0 / a00;
 			}
-		}
-		else  // region 0, interior
-		{
+		} else { // region 0, interior		
 			float invDet = one / det;
 			t0 *= invDet;
 			t1 *= invDet;
 		}
-	}
-	else
-	{
+	} else {	
 		float tmp0, tmp1, numer, denom;
 
-		if (t0 < zero)  // region 2
-		{
+		if (t0 < zero) { // region 2		
 			tmp0 = a01 + b0;
 			tmp1 = a11 + b1;
-			if (tmp1 > tmp0)
-			{
+			if (tmp1 > tmp0) {			
 				numer = tmp1 - tmp0;
 				denom = a00 - ((float)2) * a01 + a11;
-				if (numer >= denom)  // V1
-				{
+				if (numer >= denom) { // V1				
 					t0 = one;
 					t1 = zero;
-				}
-				else  // E12
-				{
+				} else { // E12				
 					t0 = numer / denom;
 					t1 = one - t0;
 				}
-			}
-			else
-			{
+			} else {
 				t0 = zero;
-				if (tmp1 <= zero)  // V2
-				{
+				if (tmp1 <= zero) { // V2				
 					t1 = one;
-				}
-				else if (b1 >= zero)  // V0
-				{
+				} else if (b1 >= zero) { // V0				
 					t1 = zero;
-				}
-				else  // E20
-				{
+				} else { // E20				
 					t1 = -b1 / a11;
 				}
 			}
-		}
-		else if (t1 < zero)  // region 6
-		{
+		} else if (t1 < zero) { // region 6		
 			tmp0 = a01 + b1;
 			tmp1 = a00 + b0;
-			if (tmp1 > tmp0)
-			{
+			if (tmp1 > tmp0) {			
 				numer = tmp1 - tmp0;
 				denom = a00 - ((float)2) * a01 + a11;
-				if (numer >= denom)  // V2
-				{
+				if (numer >= denom) { // V2				
 					t1 = one;
 					t0 = zero;
-				}
-				else  // E12
-				{
+				} else { // E12				
 					t1 = numer / denom;
 					t0 = one - t1;
 				}
-			}
-			else
-			{
+			} else {
 				t1 = zero;
-				if (tmp1 <= zero)  // V1
-				{
+				if (tmp1 <= zero) { // V1				
 					t0 = one;
-				}
-				else if (b0 >= zero)  // V0
-				{
+				} else if (b0 >= zero) { // V0				
 					t0 = zero;
-				}
-				else  // E01
-				{
+				} else { // E01				
 					t0 = -b0 / a00;
 				}
 			}
-		}
-		else  // region 1
-		{
+		} else { // region 1		
 			numer = a11 + b1 - a01 - b0;
-			if (numer <= zero)  // V2
-			{
+			if (numer <= zero) { // V2			
 				t0 = zero;
 				t1 = one;
-			}
-			else
-			{
+			} else {			
 				denom = a00 - ((float)2) * a01 + a11;
-				if (numer >= denom)  // V1
-				{
+				if (numer >= denom) { // V1				
 					t0 = one;
 					t1 = zero;
-				}
-				else  // 12
-				{
+				} else { // 12				
 					t0 = numer / denom;
 					t1 = one - t0;
 				}
@@ -977,9 +1003,9 @@ float getDistanceToATriangleSq(Tri* vertices, Vector3& point)
 		}
 	}
 
-	Vector3 closest = *vertices->at(0) + t0 * edge0 + t1 * edge1;
-	diff = point - closest;
-	return dot(diff, diff);
+	Vector3 closest = *vertices[0] + t0 * edge0 + t1 * edge1;
+	SUB(diff, (*point), closest);
+	return DOT(diff, diff);
 }
 
 float clamp(float v, float lo, float hi)
@@ -1031,7 +1057,12 @@ float getDistanceToAPrimitiveSq(Primitive& primitive, Vector3& point)
 		return getDistanceToAnEdgeSq(&primitive.vertices, point);
 	}
 	else if (primitive.vertices.size() == 3) {
-		return getDistanceToATriangleSq(&primitive.vertices, point);
+		Vector3** t = new Vector3 * [3];
+		t[0] = primitive.vertices[0];
+		t[1] = primitive.vertices[1];
+		t[2] = primitive.vertices[2];
+		return getDistanceToATriangleSq(t, &point);
+		delete[] t;
 	}
 
 	std::cout << "invalid primitive vert count!" << std::endl;
