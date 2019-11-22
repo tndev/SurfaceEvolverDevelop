@@ -350,7 +350,8 @@ void Grid::scaleBy(Vector3& s)
 	float* oldField = new float[oldExtent];
 	for (i = 0; i < oldExtent; i++) oldField[i] = this->field[i];
 
-	this->field = new float[Nx * Ny * Nz];
+	this->gridExtent = this->Nx * this->Ny * this->Nz;
+	this->field = new float[this->gridExtent];
 	Vector3 p = Vector3(), o = bbox.min;
 	uint nx = Nx - 1;
 	uint ny = Ny - 1;
