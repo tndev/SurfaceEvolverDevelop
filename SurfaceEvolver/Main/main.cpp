@@ -45,6 +45,9 @@
 
 //   WIP:
 // 
+// - add Quaternion class and TRS decomposition of Matrix4
+// - AABB update for transformations + Timing test
+// - Inverse transform grid upon transforming mesh
 
 
 //   TODO:
@@ -52,9 +55,8 @@
 // - cleanup main & prep for VTK window form
 // - improve AABB split position sampling
 // - flat AABB
-// - AABB update for transformations + Timing test
-// - Inverse transform grid upon transforming mesh
 // - debug AABB closest primitive lookup
+// - compare results with CGAL distance query implementation
 
 void performTest(uint res, Geometry& g, std::fstream& timing, VTKExporter& e) {
 	std::cout << "init SDF..." << std::endl;
@@ -192,12 +194,23 @@ int main()
 	std::cout << "Model loaded after " << elapsedObj.count() << " seconds" << std::endl;
 
 
-	uint res = 20; // octree resolution	
-	SDF bunny_sdf = SDF(&bunny, res /*, true */);
+	uint res = 30; // octree resolution
+	SDF bunny_sdf = SDF(&bunny, res);
 
 	std::cout << bunny_sdf.getComputationProperties();
 
 	bunny_sdf.exportGrid(&e, "bunnySDF");
+
+	Vector3 axis = normalize(Vector3(1, 1, 1));
+	Matrix4 sdfTransform = Matrix4().makeTranslation(0.5, 0.5, 0.5);
+	sdfTransform.setToScale(2.0f, 2.0f, 2.0f);
+	//.makeRotationAxis(axis.x, axis.y, axis.z, M_PI / 6.);
+	bunny_sdf.applyMatrix(sdfTransform);
+
+	std::cout << bunny_sdf.last_transform;
+
+	bunny_sdf.exportGrid(&e, "bunnySDF_scaled");
+	e.initExport(*bunny_sdf.geom, "sfBunny_scaled");
 
 	// tree visualisation
 	/* bunny_sdf.tri_aabb->GenerateFullTreeBoxVisualisation(e);

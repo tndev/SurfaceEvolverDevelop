@@ -276,24 +276,48 @@ AABBTree::AABBNode* AABBTree::getClosestNode(Vector3& point)
 	return nullptr;
 }
 
-int AABBTree::getClosestPrimitiveId(Vector3& point)
+int AABBTree::getClosestPrimitiveIdAndDist(Vector3& point, float* result)
 {
 	AABBNode* closestNode = this->getClosestNode(point);
 	if (!closestNode) {
 		return -1;
 	}
 
-	int id = -1; float distSq; float result_distSq = FLT_MAX;
+	int id = -1; float distSq; *result = FLT_MAX;
 	for (auto&& i : closestNode->primitiveIds) {
 		distSq = getDistanceToAPrimitiveSq(this->primitives[i], point);
 
-		if (distSq < result_distSq) {
-			result_distSq = distSq;
+		if (distSq < *result) {
+			*result = distSq;
 			id = i;
 		}
 	}
 
 	return id;
+}
+
+void AABBTree::applyMatrix(Matrix4& m)
+{
+	// this->geom->applyMatrix(m);
+	this->bbox.min.applyMatrix4(m);
+	this->bbox.max.applyMatrix4(m);
+
+	std::stack<AABBNode*> nodeStack;
+	nodeStack.push(this->root);
+
+	while (nodeStack.size()) {
+		AABBNode* item = nodeStack.top();
+		nodeStack.pop();
+
+		item->applyMatrix(m);
+
+		if (item->left) {
+			nodeStack.push(item->left);
+		}
+		if (item->right) {
+			nodeStack.push(item->right);
+		}
+	}
 }
 
 std::vector<Geometry> AABBTree::getAABBGeomsOfDepth(uint depth)
@@ -469,9 +493,9 @@ void AABBTree::AABBNode::construct(std::vector<uint>* primitiveIds, uint depthLe
 		return;
 	}
 
-	// choose axis with maximum extent to split by. this appears to be a bit better than to cycle axes
+	// choosing the longest split axis seems to be faster
 	Vector3 bboxSize = this->bbox.getSize();
-	if (bboxSize.x > bboxSize.y&& bboxSize.x > bboxSize.z) {
+	if (bboxSize.x > bboxSize.y && bboxSize.x > bboxSize.z) {
 		this->axis = 0;
 	}
 	else if (bboxSize.y > bboxSize.z) {
@@ -606,4 +630,10 @@ void AABBTree::AABBNode::filterPrimitives()
 		}
 	}
 	this->primitiveIds = newPrimitiveIds;
+}
+
+void AABBTree::AABBNode::applyMatrix(Matrix4& m)
+{
+	bbox.min.applyMatrix4(m);
+	bbox.max.applyMatrix4(m);
 }

@@ -161,7 +161,7 @@ SDF::SDF(Geometry* geom, uint resolution, bool saveGridStates, bool scaleAndInte
 		std::chrono::duration<float> elapsedSDF = (endSDF - startSDF);
 
 		this->geom_properties = "=== " + this->geom->name + " === \n" + "verts: " + std::to_string(this->geom->uniqueVertices.size()) +
-			", triangles: " + std::to_string(this->tri_aabb->primitives.size()) + ", grid resolution: " + std::to_string(resolution) + "^3 \n";
+			", triangles: " + std::to_string(this->tri_aabb->primitives.size()) + ", grid resolution: " + std::to_string(this->grid->Nx) + "^3 \n";
 		this->time_log =
 			"computation times:  AABBTree build: " + std::to_string(elapsedSDF_AABB.count()) + " s, DF \w AABBTree query: " + std::to_string(elapsedSDF_Lookup.count()) + " s\n" +
 			"====> TOTAL: " + std::to_string(elapsedSDF.count()) + " s" + "\n\n";
@@ -182,7 +182,7 @@ SDF::SDF(Geometry* geom, uint resolution, bool saveGridStates, bool scaleAndInte
 		std::chrono::duration<float> elapsedSDF = (endSDF - startSDF);
 
 		this->geom_properties = "=== " + this->geom->name + " === \n" + "verts: " + std::to_string(this->geom->uniqueVertices.size()) +
-			", triangles: " + std::to_string(this->geom->vertexIndices.size() / 3) + ", grid resolution: " + std::to_string(resolution) + "^3 \n";
+			", triangles: " + std::to_string(this->geom->vertexIndices.size() / 3) + ", grid resolution: " + std::to_string(this->grid->Nx) + "^3 \n";
 		this->time_log =
 			"BRUTE FORCE ::: computation times: ====> TOTAL: " + std::to_string(elapsedSDF.count()) + " s" + "\n\n";
 	}
@@ -211,4 +211,40 @@ void SDF::exportGrid(VTKExporter* e, std::string export_name)
 std::string SDF::getComputationProperties()
 {
 	return this->geom_properties + this->time_log;
+}
+
+void SDF::applyMatrix(Matrix4& m)
+{
+	if (!this->tri_aabb && !this->octree) {
+		std::cout << "SDF not initiated" << std::endl;
+		return;
+	}
+
+	auto startSDFTransform = std::chrono::high_resolution_clock::now();
+	this->geom->applyMatrix(m);
+	Matrix4 mInverse = Matrix4().getInverse(m);
+	this->tri_aabb->applyMatrix(m);
+	auto endSDFTransform = std::chrono::high_resolution_clock::now();
+
+	auto startSDFRecompute = std::chrono::high_resolution_clock::now();
+
+	delete this->octree;
+	this->octree = new Octree(this->tri_aabb, this->tri_aabb->bbox, resolution);
+
+	delete this->grid;
+	this->grid = new Grid(resolution, resolution, resolution, this->octree->cubeBox);
+
+	this->octree->setLeafValueToScalarGrid(this->grid);
+	
+	delete this->fastSweep;
+	this->fastSweep = new FastSweep3D(this->grid, 8);
+
+	auto endSDFRecompute = std::chrono::high_resolution_clock::now();
+
+	std::chrono::duration<float> elapsedSDF_Transform = (endSDFTransform - startSDFTransform);
+	std::chrono::duration<float> elapsedSDF_Recompute = (endSDFRecompute - startSDFRecompute);
+
+	this->last_transform = "SDF Transform: " + std::to_string(elapsedSDF_Transform.count()) +
+		" s, SDF Recompute: " + std::to_string(elapsedSDF_Recompute.count()) +
+		" s, TOTAL: " + std::to_string(elapsedSDF_Recompute.count() + elapsedSDF_Transform.count()) + " s\n";
 }

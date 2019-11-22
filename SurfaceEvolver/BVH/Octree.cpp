@@ -20,18 +20,18 @@ template <typename T> int sgn(T val) {
 
 // ======================== Helper macros for Octree subdivision ======================
 
-#define SET_BOX_MIN_COORD(b, i, j, k)									\
-		b.min.set(														\
-				this->box.min.x + ((float)i / 2.0f) * size.x,			\
-				this->box.min.y + ((float)j / 2.0f) * size.y,			\
-				this->box.min.z + ((float)k / 2.0f) * size.z			\
+#define SET_BOX_MIN_COORD(b, B, i, j, k)									\
+		b.min.set(															\
+				B.min.x + ((float)i / 2.0f) * size.x,						\
+				B.min.y + ((float)j / 2.0f) * size.y,						\
+				B.min.z + ((float)k / 2.0f) * size.z						\
 		);
 
-#define SET_BOX_MAX_COORD(b, i, j, k)									\
-		b.max.set(														\
-				this->box.min.x + ((float)(i + 1) / 2.0f) * size.x,		\
-				this->box.min.y + ((float)(j + 1) / 2.0f) * size.y,		\
-				this->box.min.z + ((float)(k + 1) / 2.0f) * size.z		\
+#define SET_BOX_MAX_COORD(b, B, i, j, k)									\
+		b.max.set(															\
+				B.min.x + ((float)(i + 1) / 2.0f) * size.x,					\
+				B.min.y + ((float)(j + 1) / 2.0f) * size.y,					\
+				B.min.z + ((float)(k + 1) / 2.0f) * size.z					\
 		);
 
 Octree::OctreeNode::OctreeNode(Octree* tree, Box3 box, OctreeNode* parent, uint depthLeft)
@@ -41,6 +41,7 @@ Octree::OctreeNode::OctreeNode(Octree* tree, Box3 box, OctreeNode* parent, uint 
 	this->box = box;
 	Vector3 size = this->box.getSize();
 	this->tree->nodeCount++;
+	this->depthLeft == depthLeft;
 
 	if (this->isLargerThanLeaf(&size) && depthLeft > 0) {
 		this->children = new OctreeNode * [8];
@@ -50,8 +51,8 @@ Octree::OctreeNode::OctreeNode(Octree* tree, Box3 box, OctreeNode* parent, uint 
 		for (i = 0; i < 2; i++) {
 			for (j = 0; j < 2; j++) {
 				for (k = 0; k < 2; k++) {
-					SET_BOX_MIN_COORD(childBox, i, j, k);
-					SET_BOX_MAX_COORD(childBox, i, j, k);
+					SET_BOX_MIN_COORD(childBox, this->box, i, j, k);
+					SET_BOX_MAX_COORD(childBox, this->box, i, j, k);
 					/*if (intersectsPrimitives(&childBox)) {
 						this->children.push_back(new OctreeNode(this->tree, childBox, this, depthLeft - 1));
 					}*/
@@ -162,6 +163,12 @@ void Octree::OctreeNode::getLeafBoxesAndValues(std::vector<Box3*>* boxBuffer, st
 			}
 		}
 	}
+}
+
+void Octree::OctreeNode::applyMatrix(Matrix4& m)
+{
+	box.min.applyMatrix4(m);
+	box.max.applyMatrix4(m);
 }
 
 Octree::Octree()
@@ -346,5 +353,55 @@ void Octree::setConstantValueToScalarGrid(Grid* grid, float value)
 		gridPos = Nx * Ny * iz + Nx * iy + ix;
 		grid->field[gridPos] = value;
 		grid->frozenCells[gridPos] = true; // freeze initial condition
+	}
+}
+
+void Octree::applyMatrix(Matrix4& m)
+{
+	cubeBox.min.applyMatrix4(m);
+	cubeBox.max.applyMatrix4(m);
+
+	std::stack<OctreeNode*> stack = {};
+	stack.push(this->root);
+	uint i; bool largerThanLeaf;
+	Vector3 size = Vector3();
+
+	while (stack.size()) {
+		OctreeNode* item = stack.top();
+		stack.pop();
+
+		item->applyMatrix(m);
+		size = item->box.getSize();
+
+		largerThanLeaf = item->isLargerThanLeaf(&size);
+		if (largerThanLeaf && item->depthLeft > 0 && item->children == nullptr) {
+			item->children = new OctreeNode * [8];
+			uint chId = 0; Box3 childBox = Box3();
+			int i, j, k;
+			for (i = 0; i < 2; i++) {
+				for (j = 0; j < 2; j++) {
+					for (k = 0; k < 2; k++) {
+						SET_BOX_MIN_COORD(childBox, item->box, i, j, k);
+						SET_BOX_MAX_COORD(childBox, item->box, i, j, k);
+						if (item->intersectsPrimitives(&childBox)) {
+							item->children[chId] = new OctreeNode(this, childBox, item, item->depthLeft - 1);
+							stack.push(item->children[chId]);
+						}
+						else {
+							item->children[chId] = nullptr;
+						}
+						chId++;
+					}
+				}
+			}
+		} else if (!largerThanLeaf && item->children != nullptr) { // turn into a leaf
+			delete[] item->children;
+			item->children = nullptr;
+		}
+		else {
+			for (i = 0; i < 8; i++) {
+				if (item->children[i]) stack.push(item->children[i]);
+			}
+		}
 	}
 }

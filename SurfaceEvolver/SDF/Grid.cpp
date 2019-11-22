@@ -6,9 +6,17 @@ Grid::Grid()
 
 Grid::Grid(const Grid& other)
 {
-	this->field = std::vector<float>(other.field);
-	this->frozenCells = std::vector<bool>(other.frozenCells);
 	this->Nx = other.Nx; this->Ny = other.Ny; this->Nz = other.Nz;
+	if (this->field) delete[] this->field;
+	if (this->frozenCells) delete[] this->frozenCells;
+
+	uint i, gridExtent = this->Nx * this->Ny * this->Nz;
+	this->field = new float[gridExtent];
+	this->frozenCells = new bool[gridExtent];
+	for (i = 0; i < gridExtent; i++) {
+		this->field[i] = other.field[i]; // initialize field
+		this->frozenCells[i] = other.frozenCells[i]; // unfreeze all
+	}
 	this->scale = other.scale;
 	this->bbox = other.bbox;
 
@@ -35,12 +43,18 @@ Grid::Grid(uint Nx, uint Ny, uint Nz, Box3 bbox, bool addOffset, float initVal)
 		this->Nx = Nx; this->Ny = Ny; this->Nz = Nz;
 	}
 
-	this->field = std::vector<float>((size_t)this->Nx * this->Ny * this->Nz, initVal); // init field
-	this->frozenCells = std::vector<bool>((size_t)this->Nx * this->Ny * this->Nz, false); // unfreeze all
+	uint i; this->gridExtent = this->Nx * this->Ny * this->Nz;
+	this->field = new float[gridExtent];
+	this->frozenCells = new bool[gridExtent];
+	for (i = 0; i < gridExtent; i++) {
+		this->field[i] = initVal; // initialize field
+		this->frozenCells[i] = false; // unfreeze all
+	}
 }
 
 Grid::~Grid()
 {
+	this->clean();
 }
 
 void Grid::exportToVTI(std::string filename)
@@ -61,7 +75,7 @@ void Grid::exportToVTI(std::string filename)
 	vti << "			<PointData Scalars=\"Scalars_\">" << std::endl;
 	vti << "				<DataArray type=\"Float32\" Name=\"Scalars_\" format=\"ascii\" RangeMin=\"" << min << "\" RangeMax=\"" << max << "\">" << std::endl;
 
-	for (uint i = 0; i < field.size(); i ++) {
+	for (uint i = 0; i < this->gridExtent; i ++) {
 		vti << this->field[i] << std::endl;
 	}
 
@@ -78,12 +92,20 @@ void Grid::exportToVTI(std::string filename)
 
 void Grid::initToVal(float val)
 {
-	this->field = std::vector<float>((size_t)Nx * Ny * Nz, val);
+	if (this->field) delete[] this->field;
+	if (this->frozenCells) delete[] this->frozenCells;
+	uint i;
+	this->field = new float[gridExtent];
+	this->frozenCells = new bool[gridExtent];
+	for (i = 0; i < gridExtent; i++) {
+		this->field[i] = val; // initialize field
+		this->frozenCells[i] = false; // unfreeze all
+	}
 }
 
 void Grid::blur()
 {
-	auto applyGrid3x3Kernel = [&](std::vector<float>* bfield, uint ix, uint iy, uint iz) {
+	auto applyGrid3x3Kernel = [&](float* bfield, uint ix, uint iy, uint iz) {
 		float kernelSum = 0.0f;
 		uint gridPos = 0;
 		for (int i = -1; i <= 1; i++) {
@@ -93,7 +115,7 @@ void Grid::blur()
 						Nx * Ny * std::min(std::max((int)iz + i, 0), (int)Nz - 1) +
 						Nx * std::min(std::max((int)iy + j, 0), (int)Ny - 1) +
 						std::min(std::max((int)ix + k, 0), (int)Nx - 1);
-					kernelSum += bfield->at(gridPos);
+					kernelSum += bfield[gridPos];
 				}
 			}
 		}
@@ -102,12 +124,16 @@ void Grid::blur()
 		field[gridPos] = result;
 	};
 
-	std::vector<float> bfield = std::vector<float>(field);
+	float* bfield = new float[gridExtent];
+	for (uint i = 0; i < gridExtent; i++) bfield[i] = this->field[i];
 	for (uint iz = 1; iz < Nz - 1; iz++) {
 		for (uint iy = 1; iy < Ny - 1; iy++) {
-			for (uint ix = 1; ix < Nx - 1; ix++) applyGrid3x3Kernel(&bfield, ix, iy, iz);
+			for (uint ix = 1; ix < Nx - 1; ix++) applyGrid3x3Kernel(bfield, ix, iy, iz);
 		}
 	}
+	delete[] this->field;
+	this->field = new float[gridExtent];
+	for (uint i = 0; i < gridExtent; i++) this->field[i] = bfield[i];
 }
 
 bool Grid::equalInDimTo(Grid& other)
@@ -121,7 +147,7 @@ bool Grid::equalInDimTo(Grid& other)
 void Grid::add(Grid& other)
 {
 	if (this->equalInDimTo(other)) {
-		for (uint i = 0; i < this->field.size(); i++) {
+		for (uint i = 0; i < gridExtent; i++) {
 			this->field[i] += other.field[i];
 		}
 	}
@@ -133,7 +159,7 @@ void Grid::add(Grid& other)
 void Grid::sub(Grid& other)
 {
 	if (this->equalInDimTo(other)) {
-		for (uint i = 0; i < this->field.size(); i++) {
+		for (uint i = 0; i < gridExtent; i++) {
 			this->field[i] -= other.field[i];
 		}
 	}
@@ -144,7 +170,7 @@ void Grid::sub(Grid& other)
 
 void Grid::absField()
 {
-	for (uint i = 0; i < this->field.size(); i++) {
+	for (uint i = 0; i < gridExtent; i++) {
 		this->field[i] = fabs(this->field[i]);
 	}
 }
@@ -171,12 +197,12 @@ void Grid::computeSignField(AABBTree* v_aabb, AABBTree* e_aabb, AABBTree* t_aabb
 	for (uint iz = 0; iz < Nz; iz++) {
 		for (uint iy = 0; iy < Ny; iy++) {
 			for (uint ix = 0; ix < Nx; ix++) {
-				p.set(
+				/*p.set(
 					o.x + ix * dx,
 					o.y + iy * dy,
 					o.z + iz * dz
 				);
-				vId = v_aabb->getClosestPrimitiveId(p);
+				vId = v_aabb->getClosestPrimitiveIdAndDist(p);
 				if (vId < 0) {
 					continue;
 				}
@@ -220,7 +246,7 @@ void Grid::computeSignField(AABBTree* v_aabb, AABBTree* e_aabb, AABBTree* t_aabb
 						gridPos = Nx * Ny * iz + Nx * iy + ix;
 						this->field[gridPos] *= sign;
 					}
-				}
+				}*/
 			}
 		}
 	}
@@ -295,10 +321,8 @@ void Grid::aabbDistanceField(AABBTree* aabb)
 					o.z + iz * dz
 				);
 
-				i = aabb->getClosestPrimitiveId(p);
+				i = aabb->getClosestPrimitiveIdAndDist(p, &distSq);
 				if (i < 0) continue;
-
-				distSq = getDistanceToAPrimitiveSq(aabb->primitives[i], p);
 
 				gridPos = Nx * Ny * iz + Nx * iy + ix;
 				this->field[gridPos] = sqrt(distSq);
@@ -311,7 +335,8 @@ void Grid::clean()
 {
 	Nx = 0, Ny = 0, Nz = 0;
 	scale = Vector3(1.0f, 1.0f, 1.0f);
-	field.clear();
+	if (this->field) delete[] field;
+	if (this->frozenCells) delete[] frozenCells;
 }
 
 void Grid::scaleBy(Vector3& s)
@@ -321,8 +346,11 @@ void Grid::scaleBy(Vector3& s)
 	this->Nx = (uint)std::floor(s.x * Nx);
 	this->Ny = (uint)std::floor(s.y * Ny);
 	this->Nz = (uint)std::floor(s.z * Nz);
-	std::vector<float> oldField = this->field;
-	this->field = std::vector<float>(Nx * Ny * Nz);
+	uint oldExtent = oldNx * oldNy * oldNz, i;
+	float* oldField = new float[oldExtent];
+	for (i = 0; i < oldExtent; i++) oldField[i] = this->field[i];
+
+	this->field = new float[Nx * Ny * Nz];
 	Vector3 p = Vector3(), o = bbox.min;
 	uint nx = Nx - 1;
 	uint ny = Ny - 1;
@@ -348,7 +376,7 @@ void Grid::scaleBy(Vector3& s)
 
 				positionBuffer.clear(); // for old min and max positions
 				valueBuffer.clear(); // for old cell vertex values
-				this->getSurroundingCells(p, oldNx, oldNy, oldNz, &oldField, &positionBuffer, &valueBuffer);
+				this->getSurroundingCells(p, oldNx, oldNy, oldNz, oldField, &positionBuffer, &valueBuffer);
 
 				gridPos = Nx * Ny * iz + Nx * iy + ix;
 				this->field[gridPos] = trilinearInterpolate(p, positionBuffer, valueBuffer);
@@ -359,7 +387,7 @@ void Grid::scaleBy(Vector3& s)
 }
 
 void Grid::getSurroundingCells(Vector3& pos,
-	uint oldNx, uint oldNy, uint oldNz,	std::vector<float>* oldField,
+	uint oldNx, uint oldNy, uint oldNz,	float* oldField,
 	std::vector<Vector3>* positionBuffer, std::vector<float>* valueBuffer)
 {
 	uint ix = std::min((uint)std::floor((pos.x - bbox.min.x) * oldNx / this->scale.x), oldNx - 1);
@@ -379,14 +407,14 @@ void Grid::getSurroundingCells(Vector3& pos,
 	uint i011 = oldNx * oldNy * iz1 + oldNx * iy1 + ix;
 	uint i111 = oldNx * oldNy * iz1 + oldNx * iy1 + ix1;
 
-	valueBuffer->push_back(oldField->at(i000));
-	valueBuffer->push_back(oldField->at(i100));
-	valueBuffer->push_back(oldField->at(i010));
-	valueBuffer->push_back(oldField->at(i110));
-	valueBuffer->push_back(oldField->at(i001));
-	valueBuffer->push_back(oldField->at(i101));
-	valueBuffer->push_back(oldField->at(i011));
-	valueBuffer->push_back(oldField->at(i111));
+	valueBuffer->push_back(oldField[i000]);
+	valueBuffer->push_back(oldField[i100]);
+	valueBuffer->push_back(oldField[i010]);
+	valueBuffer->push_back(oldField[i110]);
+	valueBuffer->push_back(oldField[i001]);
+	valueBuffer->push_back(oldField[i101]);
+	valueBuffer->push_back(oldField[i011]);
+	valueBuffer->push_back(oldField[i111]);
 
 	positionBuffer->push_back(Vector3(
 		bbox.min.x + (float)ix / (float)oldNx * this->scale.x,
@@ -418,6 +446,22 @@ float Grid::getL2Norm()
 	}
 
 	return sqrt(result / (Nx * Ny * Nz));
+}
+
+void Grid::clearFrozenCells()
+{
+	if (this->frozenCells) {
+		delete[] this->frozenCells;
+		this->frozenCells = nullptr;
+	}
+}
+
+void Grid::clearField()
+{
+	if (this->field) {
+		delete[] this->field;
+		this->field = nullptr;
+	}
 }
 
 Grid subGrids(Grid g0, Grid g1)

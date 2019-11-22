@@ -15,19 +15,20 @@ enum class SDF_Method {
 class SDF
 {
 public:
-	Geometry* geom;
-	AABBTree* tri_aabb;
-	AABBTree* edge_aabb;
-	AABBTree* vert_aabb;
-	Octree* octree;
-	Grid* grid;
-	FastSweep3D* fastSweep;
+	Geometry* geom = nullptr;
+	AABBTree* tri_aabb = nullptr;
+	AABBTree* edge_aabb = nullptr;
+	AABBTree* vert_aabb = nullptr;
+	Octree* octree = nullptr;
+	Grid* grid = nullptr;
+	FastSweep3D* fastSweep = nullptr;
 
 	uint resolution;
 	SDF_Method method = SDF_Method::fast_sweeping;
 
 	std::string geom_properties = "";
 	std::string time_log = "";
+	std::string last_transform = "";
 
 	SDF();
 	~SDF();
@@ -36,6 +37,8 @@ public:
 
 	void exportGrid(VTKExporter* e, std::string export_name = "");
 	std::string getComputationProperties();
+
+	void applyMatrix(Matrix4& m);
 public:
 	uint resolution_limit = 15;
 };

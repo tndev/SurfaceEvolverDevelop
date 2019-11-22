@@ -28,6 +28,7 @@ public:
 		Box3 box;
 
 		float centroidDistance = INFINITY; // infinity unless it's a leaf
+		uint depthLeft = MAX_OCTREE_DEPTH;
 
 		OctreeNode();
 		OctreeNode(const OctreeNode& other);
@@ -39,6 +40,8 @@ public:
 		void getLeafNodes(std::vector<OctreeNode*>* leafBuffer);
 		void getLeafBoxes(std::vector<Box3*>* boxBuffer);
 		void getLeafBoxesAndValues(std::vector<Box3*>* boxBuffer, std::vector<float>* valueBuffer);
+
+		void applyMatrix(Matrix4& m);
 	};
 
 	OctreeNode* root = nullptr;
@@ -66,6 +69,8 @@ public:
 
 	void setLeafValueToScalarGrid(Grid* grid);
 	void setConstantValueToScalarGrid(Grid* grid, float value);
+
+	void applyMatrix(Matrix4& m);
 };
 
 #endif

@@ -15,9 +15,10 @@
 class Grid
 {
 public:
-	std::vector<float> field;
-	std::vector<bool> frozenCells;
-	uint Nx = 0, Ny = 0, Nz = 0; // index dims
+	float* field = nullptr;
+	bool* frozenCells = nullptr;
+	uint gridExtent;
+	uint Nx, Ny, Nz; // index dims
 	Vector3 scale = Vector3(1.0f, 1.0f, 1.0f);
 	Box3 bbox;
 
@@ -45,10 +46,13 @@ public:
 	// fraction of the scale with which the grid should exceed the mesh bbox
 	float max_offset_factor = 0.25;
 	void getSurroundingCells(Vector3& pos,
-		uint oldNx, uint oldNy, uint oldNz, std::vector<float>* oldField,
+		uint oldNx, uint oldNy, uint oldNz, float* oldField,
 		std::vector<Vector3>* positionBuffer, std::vector<float>* valueBuffer);
 
 	float getL2Norm();
+
+	void clearFrozenCells();
+	void clearField();
 };
 
 Grid subGrids(Grid g0, Grid g1);

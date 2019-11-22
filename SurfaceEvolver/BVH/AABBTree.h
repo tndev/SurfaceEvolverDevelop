@@ -46,6 +46,8 @@ public:
 		float getCostEstimate(float splitPos, uint nLeft, uint nRight);
 		bool hasEnoughBranching(size_t nLeftPrims, size_t nRightPrims, size_t nPrims);
 		void filterPrimitives();  // returns only primitives which actually intersect leaf box
+
+		void applyMatrix(Matrix4& m);
 	};
 
 	Box3 bbox;
@@ -74,8 +76,11 @@ public:
 	void getPrimitivesInABox(Box3* box, std::vector<uint>* primIdBuffer);
 
 	AABBNode* getClosestNode(Vector3& point);
-	int getClosestPrimitiveId(Vector3& point);
+	int getClosestPrimitiveIdAndDist(Vector3& point, float* result);
 
+	void applyMatrix(Matrix4& m);
+
+	// ---- Visualisations ----
 	std::vector<Geometry> getAABBGeomsOfDepth(uint depth); // for visualisation
 	std::vector<Geometry> getAABBLeafGeoms(); // for visualisation
 	std::vector<Geometry> getAABBPrimitivesOfDepth(uint depth); // for visualisation
@@ -83,6 +88,7 @@ public:
 	void GenerateFullTreeBoxVisualisation(VTKExporter& e);
 	void GenerateFullLeafBoxVisualisation(VTKExporter& e);
 	void GenerateStepwiseLeafBoxVisualisation(VTKExporter& e);
+	// ------------------------
 };
 
 uint depth(AABBTree* root);
