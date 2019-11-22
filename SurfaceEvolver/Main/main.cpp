@@ -32,6 +32,7 @@
 // - debug and optimize FastSweep3D
 // - interpolate distance field for higher resolutions (not much improvement)
 // - perform simple DF tests for geom primitives like sphere, icosphere, cubesphere
+// - optimize Box-Triangle intersection https://github.com/rvisser/cgProject/blob/master/source/aabbTriangle.cpp
 
 //  POSTPONED:
 //
@@ -48,7 +49,6 @@
 
 //   TODO:
 //
-// - optimize Box-Triangle intersection https://github.com/rvisser/cgProject/blob/master/source/aabbTriangle.cpp
 // - cleanup main & prep for VTK window form
 // - improve AABB split position sampling
 // - flat AABB
@@ -192,7 +192,7 @@ int main()
 	std::cout << "Model loaded after " << elapsedObj.count() << " seconds" << std::endl;
 
 
-	uint res = 30; // octree resolution	
+	uint res = 20; // octree resolution	
 	SDF bunny_sdf = SDF(&bunny, res /*, true */);
 
 	std::cout << bunny_sdf.getComputationProperties();

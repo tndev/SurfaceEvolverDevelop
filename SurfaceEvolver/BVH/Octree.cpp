@@ -10,11 +10,29 @@ Octree::OctreeNode::OctreeNode(const OctreeNode& other)
 	tree = other.tree;
 	box = other.box;
 	centroidDistance = other.centroidDistance;
+	children = new OctreeNode*[8];
+	for (uint i = 0; i < 8; i++) children[i] = other.children[i];
 }
 
 template <typename T> int sgn(T val) {
 	return (T(0) < val) - (val < T(0));
 }
+
+// ======================== Helper macros for Octree subdivision ======================
+
+#define SET_BOX_MIN_COORD(b, i, j, k)									\
+		b.min.set(														\
+				this->box.min.x + ((float)i / 2.0f) * size.x,			\
+				this->box.min.y + ((float)j / 2.0f) * size.y,			\
+				this->box.min.z + ((float)k / 2.0f) * size.z			\
+		);
+
+#define SET_BOX_MAX_COORD(b, i, j, k)									\
+		b.max.set(														\
+				this->box.min.x + ((float)(i + 1) / 2.0f) * size.x,		\
+				this->box.min.y + ((float)(j + 1) / 2.0f) * size.y,		\
+				this->box.min.z + ((float)(k + 1) / 2.0f) * size.z		\
+		);
 
 Octree::OctreeNode::OctreeNode(Octree* tree, Box3 box, OctreeNode* parent, uint depthLeft)
 {
@@ -25,15 +43,25 @@ Octree::OctreeNode::OctreeNode(Octree* tree, Box3 box, OctreeNode* parent, uint 
 	this->tree->nodeCount++;
 
 	if (this->isLargerThanLeaf(&size) && depthLeft > 0) {
-		for (uint i = 0; i < 2; i++) {
-			for (uint j = 0; j < 2; j++) {
-				for (uint k = 0; k < 2; k++) {
-					Vector3 offset0 = multiply(Vector3((float)i / 2.0f, (float)j / 2.0f, (float)k / 2.0f), size);
-					Vector3 offset1 = multiply(Vector3((float)(i + 1) / 2.0f, (float)(j + 1) / 2.0f, (float)(k + 1) / 2.0f), size);
-					Box3 box = Box3(this->box.min + offset0, this->box.min + offset1);
-					if (intersectsPrimitives(&box)) {
-						this->children.push_back(new OctreeNode(this->tree, box, this, depthLeft - 1));
+		this->children = new OctreeNode * [8];
+		uint chId = 0;
+		Box3 childBox = Box3();
+		int i, j, k;
+		for (i = 0; i < 2; i++) {
+			for (j = 0; j < 2; j++) {
+				for (k = 0; k < 2; k++) {
+					SET_BOX_MIN_COORD(childBox, i, j, k);
+					SET_BOX_MAX_COORD(childBox, i, j, k);
+					/*if (intersectsPrimitives(&childBox)) {
+						this->children.push_back(new OctreeNode(this->tree, childBox, this, depthLeft - 1));
+					}*/
+					if (intersectsPrimitives(&childBox)) {
+						this->children[chId] = new OctreeNode(this->tree, childBox, this, depthLeft - 1);
 					}
+					else {
+						this->children[chId] = nullptr;
+					}
+					chId++;
 				}
 			}
 		}
@@ -48,25 +76,8 @@ Octree::OctreeNode::OctreeNode(Octree* tree, Box3 box, OctreeNode* parent, uint 
 
 		for (auto&& ti : intersectedTriangleIds) {
 			distSq = getDistanceToAPrimitiveSq(this->tree->aabbTree->primitives[ti], center);
-
-			/*if (distSq < resultDistSq) {
-				resultDistSq = distSq;
-				id = ti;
-			}*/
 			resultDistSq = distSq < resultDistSq ? distSq : resultDistSq;
 		}
-
-		/* Vector3 triNormal = Vector3();
-		Tri T = {
-			this->tree->aabbTree->primitives[id].vertices[0],
-			this->tree->aabbTree->primitives[id].vertices[1],
-			this->tree->aabbTree->primitives[id].vertices[2]
-		};
-		getTriangleNormal(T, triNormal);
-		Vector3 triCentroid = (*T[0] + *T[1] + *T[2]) / 3.0f;
-		triNormal.normalize();
-		float sign = sgn(dot(center - triCentroid, triNormal));
-		this->centroidDistance = sign * sqrt(resultDistSq); */
 		this->centroidDistance = sqrt(resultDistSq);
 	}
 }
@@ -83,7 +94,7 @@ bool Octree::OctreeNode::isLargerThanLeaf(Vector3* size)
 
 bool Octree::OctreeNode::isALeaf()
 {
-	return this->children.empty() && !this->isLargerThanLeaf(&this->box.getSize());
+	return (this->children == nullptr && !this->isLargerThanLeaf(&this->box.getSize()));
 }
 
 using Leaf = Octree::OctreeNode;
@@ -91,6 +102,7 @@ void Octree::OctreeNode::getLeafNodes(std::vector<Leaf*>* leafBuffer)
 {
 	std::stack<Leaf*> stack = {};
 	stack.push(this);
+	uint i;
 
 	while (stack.size()) {
 		Leaf* item = stack.top();
@@ -99,9 +111,12 @@ void Octree::OctreeNode::getLeafNodes(std::vector<Leaf*>* leafBuffer)
 		if (item->isALeaf()) {
 			leafBuffer->push_back(item);
 		} else {
-			for (uint i = 0; i < item->children.size(); i++) {
-				stack.push(item->children[i]);
+			for (i = 0; i < 8; i++) {
+				if (item->children[i]) stack.push(item->children[i]);
 			}
+			/* for (i = 0; i < item->children.size(); i++) {
+				stack.push(item->children[i]);
+			}*/
 		}
 	}
 }
@@ -110,6 +125,7 @@ void Octree::OctreeNode::getLeafBoxes(std::vector<Box3*>* boxBuffer)
 {
 	std::stack<Leaf*> stack = {};
 	stack.push(this);
+	uint i;
 
 	while (stack.size()) {
 		Leaf* item = stack.top();
@@ -119,8 +135,8 @@ void Octree::OctreeNode::getLeafBoxes(std::vector<Box3*>* boxBuffer)
 			boxBuffer->push_back(&item->box);
 		}
 		else {
-			for (uint i = 0; i < item->children.size(); i++) {
-				stack.push(item->children[i]);
+			for (i = 0; i < 8; i++) {
+				if (item->children[i]) stack.push(item->children[i]);
 			}
 		}
 	}
@@ -130,6 +146,7 @@ void Octree::OctreeNode::getLeafBoxesAndValues(std::vector<Box3*>* boxBuffer, st
 {
 	std::stack<Leaf*> stack = {};
 	stack.push(this);
+	uint i;
 
 	while (stack.size()) {
 		Leaf* item = stack.top();
@@ -140,8 +157,8 @@ void Octree::OctreeNode::getLeafBoxesAndValues(std::vector<Box3*>* boxBuffer, st
 			valueBuffer->push_back(item->centroidDistance);
 		}
 		else {
-			for (uint i = 0; i < item->children.size(); i++) {
-				stack.push(item->children[i]);
+			for (i = 0; i < 8; i++) {
+				if (item->children[i]) stack.push(item->children[i]);
 			}
 		}
 	}
@@ -186,6 +203,7 @@ void Octree::getAllNodes(std::vector<OctreeNode>* nodeBuffer)
 {
 	std::stack<OctreeNode*> stack = {};
 	stack.push(this->root);
+	uint i;
 
 	while (stack.size()) {
 		OctreeNode* item = stack.top();
@@ -193,8 +211,8 @@ void Octree::getAllNodes(std::vector<OctreeNode>* nodeBuffer)
 
 		nodeBuffer->push_back(*item);
 
-		for (uint i = 0; i < item->children.size(); i++) {
-			stack.push(item->children[i]);
+		for (i = 0; i < 8; i++) {
+			if (item->children[i]) stack.push(item->children[i]);
 		}
 	}
 }

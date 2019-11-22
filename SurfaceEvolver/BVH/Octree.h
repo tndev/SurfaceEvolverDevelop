@@ -19,7 +19,8 @@ class Octree
 {
 public:
 	struct OctreeNode {
-		std::vector<OctreeNode*> children = {};
+		OctreeNode** children = nullptr;
+		// std::vector<OctreeNode*> children = {};
 
 		OctreeNode* parent = nullptr;
 		Octree* tree = nullptr;
