@@ -78,15 +78,16 @@ bool AABBTree::boxIntersectsAPrimitive(Box3* box)
 {
 	std::stack<AABBNode*> stack = {};
 	stack.push(this->root);
+	AABBNode* item;
+	Vector3 center; Vector3 halfSize;
+	box->setToCenter(&center);
+	box->setToHalfSize(&halfSize);
 
 	while (stack.size()) {
-		AABBNode* item = stack.top();
+		item = stack.top();
 		stack.pop();
 
 		if (item->isALeaf()) {
-			Vector3 center = box->getCenter();
-			Vector3 halfSize = box->getSize();
-			halfSize = 0.5 * halfSize;
 			for (auto&& pId:item->primitiveIds) {
 				if (getPrimitiveBoxIntersection(this->primitives.at(pId), &center, &box->min, &box->max, &halfSize, 0.0f)) {
 					return true;
@@ -110,15 +111,16 @@ float AABBTree::boxIntersectsAPrimitiveAtDistance(Box3* box)
 {
 	std::stack<AABBNode*> stack = {};
 	stack.push(this->root);
+	AABBNode* item;
+	Vector3 center; Vector3 halfSize;
+	box->setToCenter(&center);
+	box->setToHalfSize(&halfSize);
 
 	while (stack.size()) {
-		AABBNode* item = stack.top();
+		item = stack.top();
 		stack.pop();
 
 		if (item->isALeaf()) {
-			Vector3 center = box->getCenter();
-			Vector3 halfSize = 0.5 * box->getSize();
-
 			for (auto&& pId : item->primitiveIds) {
 				if (getPrimitiveBoxIntersection(this->primitives.at(pId), &center, &box->min, &box->max, &halfSize, 0.0f)) {
 					return getDistanceToAPrimitiveSq(this->primitives.at(pId), center);
@@ -144,9 +146,10 @@ std::vector<AABBTree::AABBNode> AABBTree::flatten()
 
 	std::stack<AABBNode*> nodeStack = {};
 	nodeStack.push(this->root);
+	AABBNode* item;
 
 	while (nodeStack.size()) {
-		AABBNode* item = nodeStack.top();
+		item = nodeStack.top();
 		nodeStack.pop();
 
 		if (item->isALeaf()) {
@@ -219,9 +222,10 @@ void AABBTree::getPrimitivesInABox(Box3* box, std::vector<uint>* primIdBuffer)
 
 	std::stack<AABBNode*> stack = {};
 	stack.push(this->root);
+	AABBNode* item;
 
 	while (stack.size()) {
-		AABBNode* item = stack.top();
+		item = stack.top();
 		stack.pop();
 
 		if (item->isALeaf()) {
@@ -247,15 +251,17 @@ AABBTree::AABBNode* AABBTree::getClosestNode(Vector3& point)
 
 	std::stack<AABBNode*> stack = {};
 	stack.push(this->root);
+	AABBNode* item; AABBNode* nearNode; AABBNode* farNode;
+	bool leftIsNear;
 
 	while (stack.size()) {
-		AABBNode* item = stack.top();
+		item = stack.top();
 		stack.pop();
 
 		if (item->left || item->right) {
-			bool leftIsNear = point.getCoordById(item->axis) < item->splitPosition;
-			AABBNode* nearNode = item->left;
-			AABBNode* farNode = item->right;
+			leftIsNear = point.getCoordById(item->axis) < item->splitPosition;
+			nearNode = item->left;
+			farNode = item->right;
 			if (!leftIsNear) {
 				nearNode = item->right;
 				farNode = item->left;
@@ -304,9 +310,10 @@ void AABBTree::applyMatrix(Matrix4& m)
 
 	std::stack<AABBNode*> nodeStack;
 	nodeStack.push(this->root);
+	AABBNode* item;
 
 	while (nodeStack.size()) {
-		AABBNode* item = nodeStack.top();
+		item = nodeStack.top();
 		nodeStack.pop();
 
 		item->applyMatrix(m);
@@ -581,7 +588,7 @@ float AABBTree::AABBNode::getSplitPosition(std::vector<uint>& primitiveIds, std:
 	}
 
 	// fill left and right arrays now that best split position is known
-	for (uint i = 0; i < primitiveIds.size(); i++) {
+	for (i = 0; i < primitiveIds.size(); i++) {
 		float min = this->tree->primitives[primitiveIds[i]].getMinById(axis);
 		float max = this->tree->primitives[primitiveIds[i]].getMaxById(axis);
 

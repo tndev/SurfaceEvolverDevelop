@@ -34,7 +34,7 @@ public:
 		OctreeNode(const OctreeNode& other);
 		OctreeNode(Octree* tree, Box3 box, OctreeNode* parent = nullptr, uint depthLeft = MAX_OCTREE_DEPTH);
 		bool intersectsPrimitives(Box3* box);
-		bool isLargerThanLeaf(Vector3* size);
+		bool isLargerThanLeaf(float* size);
 		bool isALeaf();
 
 		void getLeafNodes(std::vector<OctreeNode*>* leafBuffer);

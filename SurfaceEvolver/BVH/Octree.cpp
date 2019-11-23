@@ -22,24 +22,27 @@ template <typename T> int sgn(T val) {
 
 #define SET_BOX_MIN_COORD(b, B, i, j, k)									\
 		b.min.set(															\
-				B.min.x + ((float)i / 2.0f) * size.x,						\
-				B.min.y + ((float)j / 2.0f) * size.y,						\
-				B.min.z + ((float)k / 2.0f) * size.z						\
+				B.min.x + ((float)i / 2.0f) * size,							\
+				B.min.y + ((float)j / 2.0f) * size,							\
+				B.min.z + ((float)k / 2.0f) * size							\
 		);
 
 #define SET_BOX_MAX_COORD(b, B, i, j, k)									\
 		b.max.set(															\
-				B.min.x + ((float)(i + 1) / 2.0f) * size.x,					\
-				B.min.y + ((float)(j + 1) / 2.0f) * size.y,					\
-				B.min.z + ((float)(k + 1) / 2.0f) * size.z					\
+				B.min.x + ((float)(i + 1) / 2.0f) * size,					\
+				B.min.y + ((float)(j + 1) / 2.0f) * size,					\
+				B.min.z + ((float)(k + 1) / 2.0f) * size					\
 		);
+
+#define GET_CUBE_SIZE(b)													\
+		b.max.x - b.min.x;
 
 Octree::OctreeNode::OctreeNode(Octree* tree, Box3 box, OctreeNode* parent, uint depthLeft)
 {
 	this->tree = tree; // so it knows what tree it belongs to
 	this->parent = parent;
 	this->box = box;
-	Vector3 size = this->box.getSize();
+	float size = GET_CUBE_SIZE(this->box);
 	this->tree->nodeCount++;
 	this->depthLeft == depthLeft;
 
@@ -88,14 +91,15 @@ bool Octree::OctreeNode::intersectsPrimitives(Box3* box)
 	return this->tree->aabbTree->boxIntersectsAPrimitive(box);
 }
 
-bool Octree::OctreeNode::isLargerThanLeaf(Vector3* size)
+bool Octree::OctreeNode::isLargerThanLeaf(float* size)
 {
-	return (size->x > this->tree->leafSize); // they're all cubes
+	return (*size > this->tree->leafSize); // they're all cubes
 }
 
 bool Octree::OctreeNode::isALeaf()
 {
-	return (this->children == nullptr && !this->isLargerThanLeaf(&this->box.getSize()));
+	float size = this->box.max.x - this->box.min.x;
+	return (this->children == nullptr && !this->isLargerThanLeaf(&size));
 }
 
 using Leaf = Octree::OctreeNode;
@@ -364,14 +368,14 @@ void Octree::applyMatrix(Matrix4& m)
 	std::stack<OctreeNode*> stack = {};
 	stack.push(this->root);
 	uint i; bool largerThanLeaf;
-	Vector3 size = Vector3();
+	float size;
 
 	while (stack.size()) {
 		OctreeNode* item = stack.top();
 		stack.pop();
 
 		item->applyMatrix(m);
-		size = item->box.getSize();
+		size = GET_CUBE_SIZE(item->box);
 
 		largerThanLeaf = item->isLargerThanLeaf(&size);
 		if (largerThanLeaf && item->depthLeft > 0 && item->children == nullptr) {

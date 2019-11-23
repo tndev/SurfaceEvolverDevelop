@@ -78,6 +78,45 @@ Vector3 Box3::getSize()
 	return dims;
 }
 
+void Box3::setToCenter(Vector3* target)
+{
+	if (isEmpty()) {
+		return;
+	}
+
+	target->set(
+		0.5 * (this->min.x + this->max.x),
+		0.5 * (this->min.y + this->max.y),
+		0.5 * (this->min.z + this->max.z)
+	);
+}
+
+void Box3::setToSize(Vector3* target)
+{
+	if (isEmpty()) {
+		return;
+	}
+
+	target->set(
+		(this->max.x - this->min.x),
+		(this->max.y - this->min.y),
+		(this->max.z - this->min.z)
+	);
+}
+
+void Box3::setToHalfSize(Vector3* target)
+{
+	if (isEmpty()) {
+		return;
+	}
+
+	target->set(
+		0.5 * (this->max.x - this->min.x),
+		0.5 * (this->max.y - this->min.y),
+		0.5 * (this->max.z - this->min.z)
+	);
+}
+
 bool Box3::equals(Box3& other)
 {
 	return (this->min.equals(other.min) && this->max.equals(other.max));
