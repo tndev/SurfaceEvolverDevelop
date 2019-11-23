@@ -1,4 +1,5 @@
 #include "Geometry.h"
+#include "Quaternion.h"
 
 #define failedTriang 0
 
@@ -1006,12 +1007,6 @@ float getDistanceToATriangleSq(Vector3** vertices, Vector3* point)
 	Vector3 closest = *vertices[0] + t0 * edge0 + t1 * edge1;
 	SUB(diff, (*point), closest);
 	return DOT(diff, diff);
-}
-
-float clamp(float v, float lo, float hi)
-{
-	assert(!(hi < lo));
-	return (v < lo) ? lo : (hi < v) ? hi : v;
 }
 
 int const sign(float x)

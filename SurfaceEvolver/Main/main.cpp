@@ -33,6 +33,7 @@
 // - interpolate distance field for higher resolutions (not much improvement)
 // - perform simple DF tests for geom primitives like sphere, icosphere, cubesphere
 // - optimize Box-Triangle intersection https://github.com/rvisser/cgProject/blob/master/source/aabbTriangle.cpp
+// - add Quaternion class and TRS decomposition of Matrix4
 
 //  POSTPONED:
 //
@@ -45,7 +46,6 @@
 
 //   WIP:
 // 
-// - add Quaternion class and TRS decomposition of Matrix4
 // - AABB update for transformations + Timing test
 // - Inverse transform grid upon transforming mesh
 

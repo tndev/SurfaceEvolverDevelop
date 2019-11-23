@@ -166,6 +166,7 @@
     <ClCompile Include="Geometry\Geometry.cpp" />
     <ClCompile Include="Geometry\Matrix3.cpp" />
     <ClCompile Include="Geometry\Matrix4.cpp" />
+    <ClCompile Include="Geometry\Quaternion.cpp" />
     <ClCompile Include="Geometry\Vector3.cpp" />
     <ClCompile Include="Main\main.cpp" />
     <ClCompile Include="poly2tri\common\shapes.cc" />
@@ -191,6 +192,7 @@
     <ClInclude Include="Geometry\Geometry.h" />
     <ClInclude Include="Geometry\Matrix3.h" />
     <ClInclude Include="Geometry\Matrix4.h" />
+    <ClInclude Include="Geometry\Quaternion.h" />
     <ClInclude Include="Geometry\Vector3.h" />
     <ClInclude Include="poly2tri\common\shapes.h" />
     <ClInclude Include="poly2tri\common\utils.h" />

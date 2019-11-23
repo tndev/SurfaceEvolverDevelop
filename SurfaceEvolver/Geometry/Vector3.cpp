@@ -1,5 +1,6 @@
 #include "Vector3.h"
 #include "Matrix4.h"
+#include "Quaternion.h"
 
 #define zeroVect 0
 
@@ -36,6 +37,12 @@ Vector3::~Vector3()
 void Vector3::set(float x, float y, float z)
 {
 	this->x = x; this->y = y; this->z = z;
+}
+
+Vector3 Vector3::setAndReturn(float x, float y, float z)
+{
+	this->set(x, y, z);
+	return *this;
 }
 
 void Vector3::setCoordById(float val, unsigned int id)
@@ -112,6 +119,28 @@ void Vector3::toArray(float* a)
 	a[0] = x;
 	a[1] = y;
 	a[2] = z;
+}
+
+void Vector3::applyQuaternion(Quaternion& q)
+{
+	// calculate quat * vector
+
+	float ix = q.w * x + q.y * z - q.z * y;
+	float iy = q.w * y + q.z * x - q.x * z;
+	float iz = q.w * z + q.x * y - q.y * x;
+	float iw = -q.x * x - q.y * y - q.z * z;
+
+	// calculate result * inverse quat
+
+	this->x = ix * q.w + iw * -q.x + iy * -q.z - iz * -q.y;
+	this->y = iy * q.w + iw * -q.y + iz * -q.x - ix * -q.z;
+	this->z = iz * q.w + iw * -q.z + ix * -q.y - iy * -q.x;
+}
+
+void Vector3::applyAxisAngle(Vector3& axis, float angle)
+{
+	Quaternion q = Quaternion().setFromAxisAngleAndReturn(&axis, angle);
+	applyQuaternion(q);
 }
 
 void Vector3::applyMatrix4(Matrix4& m)

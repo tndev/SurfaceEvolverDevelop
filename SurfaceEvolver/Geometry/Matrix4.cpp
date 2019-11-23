@@ -82,6 +82,37 @@ void Matrix4::setToIdentity()
 	);
 }
 
+void Matrix4::compose(Vector3* position, Quaternion* quaternion, Vector3* scale)
+{
+	float* te = this->elements;
+
+	float x = quaternion->x, y = quaternion->y, z = quaternion->z, w = quaternion->w;
+	float x2 = x + x, y2 = y + y, z2 = z + z;
+	float xx = x * x2, xy = x * y2, xz = x * z2;
+	float yy = y * y2, yz = y * z2, zz = z * z2;
+	float wx = w * x2, wy = w * y2, wz = w * z2;
+
+	te[0] = (1 - (yy + zz)) * scale->x;
+	te[1] = (xy + wz) * scale->x;
+	te[2] = (xz - wy) * scale->x;
+	te[3] = 0;
+
+	te[4] = (xy - wz) * scale->y;
+	te[5] = (1 - (xx + zz)) * scale->y;
+	te[6] = (yz + wx) * scale->y;
+	te[7] = 0;
+
+	te[8] = (xz + wy) * scale->z;
+	te[9] = (yz - wx) * scale->z;
+	te[10] = (1 - (xx + yy)) * scale->z;
+	te[11] = 0;
+
+	te[12] = position->x;
+	te[13] = position->y;
+	te[14] = position->z;
+	te[15] = 1;
+}
+
 void Matrix4::transpose()
 {
 	float* e = elements;
@@ -139,6 +170,49 @@ Matrix4 Matrix4::makeTranslation(float tx, float ty, float tz)
 	);
 
 	return *this;
+}
+
+void Matrix4::decompose(Vector3* position, Quaternion* quaternion, Vector3* scale)
+{
+	float* te = this->elements;
+
+	Vector3 _v1 = Vector3();
+	float sx = _v1.setAndReturn(te[0], te[1], te[2]).length();
+	float sy = _v1.setAndReturn(te[4], te[5], te[6]).length();
+	float sz = _v1.setAndReturn(te[8], te[9], te[10]).length();
+
+	// if determine is negative, we need to invert one scale
+	float det = this->determinant();
+	if (det < 0) sx = -sx;
+
+	position->x = te[12];
+	position->y = te[13];
+	position->z = te[14];
+
+	// scale the rotation part
+	Matrix4 _m1 = *this;
+
+	float invSX = 1.0f / sx;
+	float invSY = 1.0f / sy;
+	float invSZ = 1.0f / sz;
+
+	_m1.elements[0] *= invSX;
+	_m1.elements[1] *= invSX;
+	_m1.elements[2] *= invSX;
+
+	_m1.elements[4] *= invSY;
+	_m1.elements[5] *= invSY;
+	_m1.elements[6] *= invSY;
+
+	_m1.elements[8] *= invSZ;
+	_m1.elements[9] *= invSZ;
+	_m1.elements[10] *= invSZ;
+
+	quaternion->setFromRotationMatrix(&_m1);
+
+	scale->x = sx;
+	scale->y = sy;
+	scale->z = sz;
 }
 
 float Matrix4::determinant()

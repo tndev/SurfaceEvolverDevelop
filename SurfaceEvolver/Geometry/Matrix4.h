@@ -1,8 +1,12 @@
 #ifndef MATRIX4_H_
 #define MATRIX4_H_
 
+// there will be circular dependencies upon classes Quaternion and Vector3 
+// thanks to compose and decompose methods
 #include <iostream>
+#include "Vector3.h"
 #include "Matrix3.h"
+#include "Quaternion.h"
 
 class Matrix4
 {
@@ -36,6 +40,7 @@ public:
 
 	bool isIdentity();
 	void setToIdentity();
+	void compose(Vector3* position, Quaternion* quaternion, Vector3* scale);
 
 	// the following methods do not return a value
 	// use external methods instead
@@ -45,6 +50,8 @@ public:
 	Matrix4 setToScale(float sx, float sy, float sz);
 	Matrix4 makeRotationAxis(float ax, float ay, float az, float angle);
 	Matrix4 makeTranslation(float tx, float ty, float tz);
+
+	void decompose(Vector3* position, Quaternion* quaternion, Vector3* scale);
 
 	float determinant();
 	Matrix4 getInverse(Matrix4& from);

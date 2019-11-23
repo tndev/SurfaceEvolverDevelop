@@ -97,6 +97,9 @@
     <ClCompile Include="SDF\SDF.cpp">
       <Filter>SDF</Filter>
     </ClCompile>
+    <ClCompile Include="Geometry\Quaternion.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="poly2tri\common\shapes.h">
@@ -170,6 +173,9 @@
     </ClInclude>
     <ClInclude Include="SDF\SDF.h">
       <Filter>SDF</Filter>
+    </ClInclude>
+    <ClInclude Include="Geometry\Quaternion.h">
+      <Filter>Geometry</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

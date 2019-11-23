@@ -1,8 +1,11 @@
 #ifndef VECTOR3_H_
 #define VECTOR3_H_
 
+// to fix circular dependency of methods applyQuaternion and applyMatrix4
+class Quaternion;
+class Matrix4;
+
 #include <iostream>
-#include "Matrix4.h"
 #include "Matrix3.h"
 
 class Vector3
@@ -17,6 +20,7 @@ public:
 	~Vector3();
 
 	void set(float x, float y, float z);
+	Vector3 setAndReturn(float x, float y, float z);
 	void setCoordById(float val, unsigned int id);
 	void min(Vector3 other);
 	void max(Vector3 other);
@@ -35,6 +39,8 @@ public:
 
 	void toArray(float* a);
 
+	void applyQuaternion(Quaternion& q);
+	void applyAxisAngle(Vector3& axis, float angle);
 	void applyMatrix4(Matrix4& m);
 	void applyMatrix3(Matrix3& m);
 	void addScalar(float scalar);
