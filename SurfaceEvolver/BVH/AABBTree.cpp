@@ -609,17 +609,24 @@ float AABBTree::AABBNode::getSplitPosition(std::vector<uint>& primitiveIds, std:
 
 // ============ Adaptive resampling helper macros ============
 
-#define FLERP(y0, y1, x0, x1, x)						\
+#define FLERP(y0, y1, x0, x1, x)									\
 		y0 + (x - x0) * (y1 - y0) / (x1 - x0);
 
 // ---------------------------------------------------------
 
-#define SHIFT_m256_LEFT(source, target)					\
-		t0 = _mm256_permute_ps(source, 0x39);			\
-		t1 = _mm256_permute2f128_ps(t0, t0, 0x01);		\
+#define SHIFT_m256_LEFT(source, target)								\
+		t0 = _mm256_permute_ps(source, 0x39);						\
+		t1 = _mm256_permute2f128_ps(t0, t0, 0x01);					\
 		target = _mm256_blend_ps(t0, t1, 0x88);
 
 // ---------------------------------------------------------
+
+#define SHIFT_m256_RIGHT(source, target)							\
+		t0 = _mm256_permute_ps(source, _MM_SHUFFLE(2, 1, 0, 3));	\
+		t1 = _mm256_permute2f128_ps(t0, t0, 41);					\
+		target = _mm256_blend_ps(t0, t1, 0x11);
+
+// --------------------------------------------------------
 
 float AABBTree::AABBNode::getAdaptivelyResampledSplitPosition(std::vector<uint>& primitiveIds, std::vector<uint>* out_left, std::vector<uint>* out_right)
 {
@@ -660,23 +667,13 @@ float AABBTree::AABBNode::getAdaptivelyResampledSplitPosition(std::vector<uint>&
 
 		mask_L = _mm_cmple_ps(_mm_set1_ps(min), B_min_shift);
 		mask_R = _mm_cmpge_ps(_mm_set1_ps(max), B_min_shift);
-		r_L = _mm_setr_ps(
-			(m_Li[0] > 0) * 1.0f,
-			(m_Li[1] > 0) * 1.0f,
-			(m_Li[2] > 0) * 1.0f,
-			(m_Li[3] > 0) * 1.0f
-		);
-		r_R = _mm_setr_ps(
-			(m_Ri[0] > 0) * 1.0f,
-			(m_Ri[1] > 0) * 1.0f,
-			(m_Ri[2] > 0) * 1.0f,
-			(m_Ri[3] > 0) * 1.0f
-		);
+		r_L = _mm_setr_ps((m_Li[0] > 0) * 1.0f,	(m_Li[1] > 0) * 1.0f, (m_Li[2] > 0) * 1.0f,	(m_Li[3] > 0) * 1.0f);
+		r_R = _mm_setr_ps((m_Ri[0] > 0) * 1.0f,	(m_Ri[1] > 0) * 1.0f, (m_Ri[2] > 0) * 1.0f,	(m_Ri[3] > 0) * 1.0f);
 		C_L = _mm_add_ps(C_L, r_L);
 		C_R = _mm_add_ps(C_R, r_R);
 	}
 
-	// DUMMY situation:
+	// DUMMY situation: All primitives are gathered on the left
 
 	cl[0] = 10; cl[1] = 100; cl[2] = 300; cl[3] = 1500;
 	cr[0] = 2000; cr[1] = 500; cr[2] = 100; cr[3] = 8;
@@ -685,58 +682,35 @@ float AABBTree::AABBNode::getAdaptivelyResampledSplitPosition(std::vector<uint>&
 
 	uint N_primitives = primitiveIds.size();
 	// range [0, N_primitives] sampling
-	union { __m128 S_L; float sl[4]; };
-	union { __m128 S_R; float sr[4]; };
-	float ran_s, cMin;
-	for (i = 0; i < CUTS; i++) {
+	union { __m256 S_L; float sl[5]; };
+	union { __m256 S_R; float sr[5]; };
+	float ran_s, cMin, cMax;
+
+	// segment samples have to be counted here (no lerping the values backwards required):
+	// extended ranges
+	union { __m256 C_L_ext; float cl_ext[6]; };
+	union { __m256 C_R_ext; float cr_ext[6]; };
+	C_L_ext = _mm256_castps128_ps256(C_L);
+	SHIFT_m256_RIGHT(C_L_ext, C_L_ext); cl_ext[5] = 1.0f * N_primitives;
+	C_R_ext = _mm256_castps128_ps256(C_R);
+	SHIFT_m256_RIGHT(C_R_ext, C_R_ext); cr_ext[0] = 1.0f * N_primitives;
+	// store in reverse since C_R(x) is non-increasing
+	C_R_ext = _mm256_setr_ps(cr_ext[5], cr_ext[4], cr_ext[3], cr_ext[2], cr_ext[1], cr_ext[0], 0.0f, 0.0f);
+
+	S_L = _mm256_setzero_ps();
+	S_R = _mm256_setzero_ps();
+
+	for (i = 0; i <= CUTS; i++) {
 		ran_s = (float)(i + 1) / (float)(CUTS + 1) * N_primitives;
 
 		cMin = (i != 0 ? cl[i - 1] : 0.0f);
-		sl[i] = FLERP(BminR[i], BminR[i + 1], cMin, cl[i], ran_s);
-		cMin = (i != 0 ? cr[i - 1] : N_primitives * 1.0f);
-		sr[i] = FLERP(BminR[i], BminR[i + 1], cMin, cr[i], ran_s);
+		cMax = (i < CUTS ? cl[i] : 1.0f * N_primitives);
+		sl[i] += ((cMax > ran_s && cMin < ran_s) ? 1.0f : 0.0f);
+
+		cMin = (i != 0 ? cr[i - 1] : 1.0f * N_primitives);
+		cMax = (i < CUTS ? cr[i] : 0.0f);
+		sr[i] += ((cMax < ran_s && cMin > ran_s) ? 1.0f : 0.0f);
 	}
-	// store S_R in reverse since C_R(x) is non-increasing
-	S_R = _mm_shuffle_ps(S_R, S_R, _MM_SHUFFLE(0, 1, 2, 3));
-
-	// ===== Stage 3: Counting samples in sample regions:
-	// N_L += (BminR < S_L ? 1 : 0)
-	// N_R += (BminR > S_R ? 1 : 0)
-	union { __m256 N_L; float nl[5]; };
-	union { __m256 N_R; float nr[5]; };
-	N_L = _mm256_setzero_ps();
-	N_R = _mm256_setzero_ps();
-
-	union {	__m128 B_max_shift; float bmx[4]; };
-	SHIFT_m256_LEFT(s_res, s_res);
-	B_max_shift = _mm256_castps256_ps128(s_res);
-	// B_min_shift => upper bounds 0, 1, 2, 3
-	__m128 B_min_R_cut = _mm256_castps256_ps128(B_min_R); // lower bounds 0, 1, 2, 3
-
-	// use interval masks:
-	union { __m128 mask_Lmx; uint m_Limx[4]; };
-	union { __m128 mask_Rmx; uint m_Rimx[4]; };
-	mask_L = _mm_cmplt_ps(S_L, B_min_shift);
-	mask_R = _mm_cmplt_ps(S_R, B_min_shift);
-	mask_Lmx = _mm_cmpgt_ps(S_L, B_min_R_cut);
-	mask_Rmx = _mm_cmpgt_ps(S_R, B_min_R_cut);
-
-	r_L = _mm_setr_ps(
-		(m_Li[0] > 0 && m_Limx[0] > 0) * 1.0f,
-		(m_Li[1] > 0 && m_Limx[1] > 0) * 1.0f,
-		(m_Li[2] > 0 && m_Limx[2] > 0) * 1.0f,
-		(m_Li[3] > 0 && m_Limx[3] > 0) * 1.0f
-	);
-	r_R = _mm_setr_ps(
-		(m_Ri[0] > 0 && m_Rimx[0] > 0) * 1.0f,
-		(m_Ri[1] > 0 && m_Rimx[1] > 0) * 1.0f,
-		(m_Ri[2] > 0 && m_Rimx[2] > 0) * 1.0f,
-		(m_Ri[3] > 0 && m_Rimx[3] > 0) * 1.0f
-	);
-	N_L = _mm256_add_ps(N_L, _mm256_castps128_ps256(r_L));
-	N_R = _mm256_add_ps(N_R, _mm256_castps128_ps256(r_R));
-	nl[4] += (sl[3] < bmx[3] && sl[3] > bmn[3] ? 1.0f : 0.0f);
-	nr[4] += (sr[3] > bmn[3] && sr[3] < bmx[3] ? 1.0f : 0.0f);
 
 	// ==== Stage 4: adding more sampling positions to subdivided segments
 
