@@ -672,14 +672,14 @@ float AABBTree::AABBNode::getAdaptivelyResampledSplitPosition(std::vector<uint>&
 	// range [0, N_primitives] sampling
 	union { __m128 S_L; float sl[4]; };
 	union { __m128 S_R; float sr[4]; };
-	float ran_s, cMax;
+	float ran_s, cMin;
 	for (i = 0; i < CUTS; i++) {
 		ran_s = (float)(i + 1) / (float)(CUTS + 1) * N_primitives;
 
-		cMax = (i + 1 < CUTS ? cl[i + 1] : 1.0f * N_primitives);
-		sl[i] = FLERP(BminR[i], BminR[i + 1], cl[i], cMax, ran_s);
-		cMax = (i + 1 < CUTS ? cr[i + 1] : 0.0f);
-		sr[i] = FLERP(BminR[i], BminR[i + 1], cr[i], cMax, ran_s);
+		cMin = (i != 0 ? cl[i - 1] : 0.0f);
+		sl[i] = FLERP(BminR[i], BminR[i + 1], cMin, cl[i], ran_s);
+		cMin = (i != 0 ? cr[i - 1] : N_primitives * 1.0f);
+		sr[i] = FLERP(BminR[i], BminR[i + 1], cMin, cr[i], ran_s);
 	}
 
 	// ===== Stage 3: Counting samples in sample regions:
