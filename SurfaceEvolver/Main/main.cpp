@@ -119,7 +119,7 @@ int main()
 {
 	float r = 50.0f;
 	unsigned int d = 3;
-	float a = 2 * r / sqrt(3.);
+	float a = 2.0f * r / sqrt(3.0f);
 	unsigned int ns = 10;
 
 	VTKExporter e = VTKExporter();

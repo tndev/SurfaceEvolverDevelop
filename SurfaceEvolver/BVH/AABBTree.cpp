@@ -607,6 +607,67 @@ float AABBTree::AABBNode::getSplitPosition(std::vector<uint>& primitiveIds, std:
 	return bestSplitPosition;
 }
 
+float AABBTree::AABBNode::getAdaptivelyResampledSplitPosition(std::vector<uint>& primitiveIds, std::vector<uint>* out_left, std::vector<uint>* out_right)
+{
+	const uint CUTS = 8; uint i, j;
+	float* splitPositions = new float[CUTS];
+	int* splitsLeft = new int[CUTS] {};
+	int* splitsRight = new int[CUTS] {};
+
+	for (i = 0; i < CUTS; i++) {
+		splitPositions[i] =
+			bbox.min.getCoordById(axis) * (1.0f - ((float)(i + 1) / (float)(CUTS + 1.0f))) +
+			bbox.max.getCoordById(axis) * ((float)(i + 1) / (float)(CUTS + 1.0f));
+	}
+
+	float min, max;
+
+	// count primitives for each split
+	for (i = 0; i < primitiveIds.size(); i++) {
+		min = this->tree->primitives[primitiveIds[i]].getMinById(axis);
+		max = this->tree->primitives[primitiveIds[i]].getMaxById(axis);
+
+		for (j = 0; j < CUTS; j++) {
+			if (min <= splitPositions[j]) {
+				++splitsLeft[j];
+			}
+			if (max >= splitPositions[j]) {
+				++splitsRight[j];
+			}
+		}
+	}
+
+	// assuming splitsLeft are samples of a non-decreasing function C_L
+	// and splitsRight are samples of a non-increasing function C_R
+	int minLeft = splitsLeft[0], maxLeft = splitsLeft[CUTS - 1];
+	int minRight = splitsRight[CUTS - 1], maxRight = splitsRight[0];
+
+	// find min and max for the primitive counts for the left and right candidates
+	/*for (i = 0; i < CUTS; i++) {
+		minLeft = splitsLeft[i] < minLeft ? splitsLeft[i] : minLeft;
+		maxLeft = splitsLeft[i] > maxLeft ? splitsLeft[i] : maxLeft;
+		minRight = splitsRight[i] < minRight ? splitsRight[i] : minRight;
+		maxRight = splitsRight[i] > maxRight ? splitsRight[i] : maxRight;
+	}*/
+
+	// evenly sample the range of the L/R primitive count function
+	float* L_samples = new float[CUTS];
+	float* R_samples = new float[CUTS];
+	int* L_sampleCountBuckets = new int[CUTS] {};
+	int* R_sampleCountBuckets = new int[CUTS] {};
+	float L_sample_min, L_sample_max;
+	float R_sample_min, R_sample_max;
+
+	for (i = 0; i < CUTS; i++) {
+		L_samples[i] = 1.0f * minLeft + (maxLeft - minLeft) * ((float)(i + 1) / (float)(CUTS + 1));
+		R_samples[i] = 1.0f * minRight + (maxRight - minRight) * (1.0f - (float)(i + 1) / (float)(CUTS + 1));
+
+
+	}
+
+	return 0.0f;
+}
+
 float AABBTree::AABBNode::getCostEstimate(float splitPos, uint nLeft, uint nRight)
 {
 	Box3 l_bbox = this->bbox;
