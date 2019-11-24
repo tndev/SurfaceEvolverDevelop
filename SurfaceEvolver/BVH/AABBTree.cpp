@@ -607,11 +607,17 @@ float AABBTree::AABBNode::getSplitPosition(std::vector<uint>& primitiveIds, std:
 	return bestSplitPosition;
 }
 
+// ============ Adaptive resampling helper macros ============
+
+#define FLERP(y0, y1, x0, x1, x)					\
+		y0 + (x - x0) * (y1 - y0) / (x1 - x0);
+
 float AABBTree::AABBNode::getAdaptivelyResampledSplitPosition(std::vector<uint>& primitiveIds, std::vector<uint>* out_left, std::vector<uint>* out_right)
 {
 	const uint CUTS = 4; uint i, j;
 	float min, max;
 
+	// === Stage 1: Initial sampling of C_L(x) and C_R(x)
 	// split interval limits:
 	float a = bbox.min.getCoordById(axis);
 	float b = bbox.max.getCoordById(axis);
@@ -623,15 +629,20 @@ float AABBTree::AABBNode::getAdaptivelyResampledSplitPosition(std::vector<uint>&
 		BminR[i] = a * (1.0f - ((float)i/ (float)(CUTS + 1.0f))) + b * ((float)i / (float)(CUTS + 1.0f));
 	}
 	// set C_L(x) = 0, C_R(x) = 0
-	__m128 C_L = _mm_setzero_ps();
-	__m128 C_R = _mm_setzero_ps();
+	union { __m128 C_L; float cl[4]; };
+	union { __m128 C_R; float cr[4]; };
+	C_L = _mm_setzero_ps();
+	C_R = _mm_setzero_ps();
 
 	// masks for C_L and C_R increments:
-	union { __m128 mask_L; int m_Li[4]; };
-	union { __m128 mask_R; int m_Ri[4]; };
+	union { __m128 mask_L; uint m_Li[4]; };
+	union { __m128 mask_R; uint m_Ri[4]; };
 	__m128 r_L, r_R;
 	// shift B_min_R to the left to avoid applying mask to split at x = a:
-	__m128 B_min_shift = _mm256_castps256_ps128(_mm256_permute_ps(B_min_R, 1));
+	__m256 t0 = _mm256_permute_ps(B_min_R, 0x39);
+	__m256 t1 = _mm256_permute2f128_ps(t0, t0, 0x01);
+	__m256 s_res = _mm256_blend_ps(t0, t1, 0x88);
+	__m128 B_min_shift = _mm256_castps256_ps128(s_res);
 
 	for (i = 0; i < primitiveIds.size(); i++) {
 		min = this->tree->primitives[primitiveIds[i]].getMinById(axis);
@@ -640,22 +651,59 @@ float AABBTree::AABBNode::getAdaptivelyResampledSplitPosition(std::vector<uint>&
 		mask_L = _mm_cmple_ps(_mm_set1_ps(min), B_min_shift);
 		mask_R = _mm_cmpge_ps(_mm_set1_ps(max), B_min_shift);
 		r_L = _mm_setr_ps(
-			(m_Li[0] >= 0) * 1.0f,
-			(m_Li[1] >= 0) * 1.0f,
-			(m_Li[2] >= 0) * 1.0f,
-			(m_Li[3] >= 0) * 1.0f
+			(m_Li[0] > 0) * 1.0f,
+			(m_Li[1] > 0) * 1.0f,
+			(m_Li[2] > 0) * 1.0f,
+			(m_Li[3] > 0) * 1.0f
 		);
 		r_R = _mm_setr_ps(
-			(m_Ri[0] >= 0) * 1.0f,
-			(m_Ri[1] >= 0) * 1.0f,
-			(m_Ri[2] >= 0) * 1.0f,
-			(m_Ri[3] >= 0) * 1.0f
+			(m_Ri[0] > 0) * 1.0f,
+			(m_Ri[1] > 0) * 1.0f,
+			(m_Ri[2] > 0) * 1.0f,
+			(m_Ri[3] > 0) * 1.0f
 		);
 		C_L = _mm_add_ps(C_L, r_L);
 		C_R = _mm_add_ps(C_R, r_R);
 	}
 
+	// ===== Stage 2: Sample range [0, N_primitives] & lerp sample inputs S_L, and S_R ======
 
+	uint N_primitives = primitiveIds.size();
+	// range [0, N_primitives] sampling
+	union { __m128 S_L; float sl[4]; };
+	union { __m128 S_R; float sr[4]; };
+	float ran_s, cMax;
+	for (i = 0; i < CUTS; i++) {
+		ran_s = (float)(i + 1) / (float)(CUTS + 1) * N_primitives;
+
+		cMax = (i + 1 < CUTS ? cl[i + 1] : 1.0f * N_primitives);
+		sl[i] = FLERP(BminR[i], BminR[i + 1], cl[i], cMax, ran_s);
+		cMax = (i + 1 < CUTS ? cr[i + 1] : 0.0f);
+		sr[i] = FLERP(BminR[i], BminR[i + 1], cr[i], cMax, ran_s);
+	}
+
+	// ===== Stage 3: Counting samples in sample regions:
+	// N_L += (BminR < S_L ? 1 : 0)
+	// N_R += (BminR > S_R ? 1 : 0)
+	__m128 N_L = _mm_setzero_ps();
+	__m128 N_R = _mm_setzero_ps();
+
+	mask_L = _mm_cmplt_ps(B_min_shift, S_L);
+	mask_R = _mm_cmpgt_ps(B_min_shift, S_R);
+	r_L = _mm_setr_ps(
+		(m_Li[0] > 0) * 1.0f,
+		(m_Li[1] > 0) * 1.0f,
+		(m_Li[2] > 0) * 1.0f,
+		(m_Li[3] > 0) * 1.0f
+	);
+	r_R = _mm_setr_ps(
+		(m_Ri[0] > 0) * 1.0f,
+		(m_Ri[1] > 0) * 1.0f,
+		(m_Ri[2] > 0) * 1.0f,
+		(m_Ri[3] > 0) * 1.0f
+	);
+	N_L = _mm_add_ps(N_L, r_L);
+	N_R = _mm_add_ps(N_R, r_R);
 
 	return 0.0f;
 }
