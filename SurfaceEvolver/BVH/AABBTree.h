@@ -2,6 +2,8 @@
 #define AABBTREE_H_
 
 #include <stack>
+#include <nmmintrin.h>
+#include <immintrin.h>
 #include "../GeometryObject/PrimitiveBox.h"
 #include "../ExportImport/VTKExporter.h"
 

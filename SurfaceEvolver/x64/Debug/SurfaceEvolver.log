@@ -8,6 +8,7 @@ D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.
 D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(376,72): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
 D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(583,79): warning C4244: 'argument': conversion from 'float' to 'unsigned int', possible loss of data
 D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(583,63): warning C4244: 'argument': conversion from 'float' to 'unsigned int', possible loss of data
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(612,31): warning C4101: 'j': unreferenced local variable
 LINK : warning LNK4075: ignoring '/INCREMENTAL' due to '/PROFILE' specification
 AABBTree.obj : warning LNK4075: ignoring '/EDITANDCONTINUE' due to '/OPT:REF' specification
   SurfaceEvolver.vcxproj -> D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\x64\Debug\SurfaceEvolver.exe

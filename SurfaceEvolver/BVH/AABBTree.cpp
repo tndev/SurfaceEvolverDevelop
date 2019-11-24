@@ -515,7 +515,7 @@ void AABBTree::AABBNode::construct(std::vector<uint>* primitiveIds, uint depthLe
 	std::vector<uint> leftPrimitiveIds = {};
 	std::vector<uint> rightPrimitiveIds = {};
 
-	this->splitPosition = this->getSplitPosition(*primitiveIds, &leftPrimitiveIds, &rightPrimitiveIds); // classify primitives
+	this->splitPosition = this->getAdaptivelyResampledSplitPosition(*primitiveIds, &leftPrimitiveIds, &rightPrimitiveIds); // classify primitives
 
 	const bool stopBranching = !this->hasEnoughBranching(leftPrimitiveIds.size(), rightPrimitiveIds.size(), primitiveIds->size());
 	if (stopBranching) {
@@ -609,61 +609,53 @@ float AABBTree::AABBNode::getSplitPosition(std::vector<uint>& primitiveIds, std:
 
 float AABBTree::AABBNode::getAdaptivelyResampledSplitPosition(std::vector<uint>& primitiveIds, std::vector<uint>* out_left, std::vector<uint>* out_right)
 {
-	const uint CUTS = 8; uint i, j;
-	float* splitPositions = new float[CUTS];
-	int* splitsLeft = new int[CUTS] {};
-	int* splitsRight = new int[CUTS] {};
-
-	for (i = 0; i < CUTS; i++) {
-		splitPositions[i] =
-			bbox.min.getCoordById(axis) * (1.0f - ((float)(i + 1) / (float)(CUTS + 1.0f))) +
-			bbox.max.getCoordById(axis) * ((float)(i + 1) / (float)(CUTS + 1.0f));
-	}
-
+	const uint CUTS = 4; uint i, j;
 	float min, max;
 
-	// count primitives for each split
+	// split interval limits:
+	float a = bbox.min.getCoordById(axis);
+	float b = bbox.max.getCoordById(axis);
+
+	// splits:
+	union { __m256 B_min_R; float BminR[6]; };
+	B_min_R = _mm256_setzero_ps();
+	for (i = 0; i <= CUTS + 1; i++) {
+		BminR[i] = a * (1.0f - ((float)i/ (float)(CUTS + 1.0f))) + b * ((float)i / (float)(CUTS + 1.0f));
+	}
+	// set C_L(x) = 0, C_R(x) = 0
+	__m128 C_L = _mm_setzero_ps();
+	__m128 C_R = _mm_setzero_ps();
+
+	// masks for C_L and C_R increments:
+	union { __m128 mask_L; int m_Li[4]; };
+	union { __m128 mask_R; int m_Ri[4]; };
+	__m128 r_L, r_R;
+	// shift B_min_R to the left to avoid applying mask to split at x = a:
+	__m128 B_min_shift = _mm256_castps256_ps128(_mm256_permute_ps(B_min_R, 1));
+
 	for (i = 0; i < primitiveIds.size(); i++) {
 		min = this->tree->primitives[primitiveIds[i]].getMinById(axis);
 		max = this->tree->primitives[primitiveIds[i]].getMaxById(axis);
 
-		for (j = 0; j < CUTS; j++) {
-			if (min <= splitPositions[j]) {
-				++splitsLeft[j];
-			}
-			if (max >= splitPositions[j]) {
-				++splitsRight[j];
-			}
-		}
+		mask_L = _mm_cmple_ps(_mm_set1_ps(min), B_min_shift);
+		mask_R = _mm_cmpge_ps(_mm_set1_ps(max), B_min_shift);
+		r_L = _mm_setr_ps(
+			(m_Li[0] >= 0) * 1.0f,
+			(m_Li[1] >= 0) * 1.0f,
+			(m_Li[2] >= 0) * 1.0f,
+			(m_Li[3] >= 0) * 1.0f
+		);
+		r_R = _mm_setr_ps(
+			(m_Ri[0] >= 0) * 1.0f,
+			(m_Ri[1] >= 0) * 1.0f,
+			(m_Ri[2] >= 0) * 1.0f,
+			(m_Ri[3] >= 0) * 1.0f
+		);
+		C_L = _mm_add_ps(C_L, r_L);
+		C_R = _mm_add_ps(C_R, r_R);
 	}
 
-	// assuming splitsLeft are samples of a non-decreasing function C_L
-	// and splitsRight are samples of a non-increasing function C_R
-	int minLeft = splitsLeft[0], maxLeft = splitsLeft[CUTS - 1];
-	int minRight = splitsRight[CUTS - 1], maxRight = splitsRight[0];
 
-	// find min and max for the primitive counts for the left and right candidates
-	/*for (i = 0; i < CUTS; i++) {
-		minLeft = splitsLeft[i] < minLeft ? splitsLeft[i] : minLeft;
-		maxLeft = splitsLeft[i] > maxLeft ? splitsLeft[i] : maxLeft;
-		minRight = splitsRight[i] < minRight ? splitsRight[i] : minRight;
-		maxRight = splitsRight[i] > maxRight ? splitsRight[i] : maxRight;
-	}*/
-
-	// evenly sample the range of the L/R primitive count function
-	float* L_samples = new float[CUTS];
-	float* R_samples = new float[CUTS];
-	int* L_sampleCountBuckets = new int[CUTS] {};
-	int* R_sampleCountBuckets = new int[CUTS] {};
-	float L_sample_min, L_sample_max;
-	float R_sample_min, R_sample_max;
-
-	for (i = 0; i < CUTS; i++) {
-		L_samples[i] = 1.0f * minLeft + (maxLeft - minLeft) * ((float)(i + 1) / (float)(CUTS + 1));
-		R_samples[i] = 1.0f * minRight + (maxRight - minRight) * (1.0f - (float)(i + 1) / (float)(CUTS + 1));
-
-
-	}
 
 	return 0.0f;
 }
