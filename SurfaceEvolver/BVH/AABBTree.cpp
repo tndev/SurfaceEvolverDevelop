@@ -661,7 +661,8 @@ float AABBTree::AABBNode::getAdaptivelyResampledSplitPosition(std::vector<uint>&
 	SHIFT_m256_LEFT(B_min_R, s_res);
 	B_min_shift = _mm256_castps256_ps128(s_res);
 
-	for (i = 0; i < primitiveIds.size(); i++) {
+	uint N_primitives = primitiveIds.size();
+	for (i = 0; i < N_primitives; i++) {
 		min = this->tree->primitives[primitiveIds[i]].getMinById(axis);
 		max = this->tree->primitives[primitiveIds[i]].getMaxById(axis);
 
@@ -678,15 +679,13 @@ float AABBTree::AABBNode::getAdaptivelyResampledSplitPosition(std::vector<uint>&
 	cl[0] = 10; cl[1] = 100; cl[2] = 300; cl[3] = 1500;
 	cr[0] = 2000; cr[1] = 500; cr[2] = 100; cr[3] = 8;
 
-	// ===== Stage 2: Sample range [0, N_primitives] & lerp sample inputs S_L, and S_R ======
-
-	uint N_primitives = primitiveIds.size();
+	// ===== Stage 2: Sample range [0, N_primitives] uniformly & count the number of samples within each segment ======
 	// range [0, N_primitives] sampling
-	union { __m256 S_L; float sl[5]; };
-	union { __m256 S_R; float sr[5]; };
+	union { __m256i S_L; uint sl[5]; };
+	union { __m256i S_R; uint sr[5]; };
 	float ran_s, cMin, cMax;
 
-	// segment samples have to be counted here (no lerping the values backwards required):
+	// segment samples have to be counted here:
 	// extended ranges
 	union { __m256 C_L_ext; float cl_ext[6]; };
 	union { __m256 C_R_ext; float cr_ext[6]; };
@@ -697,22 +696,69 @@ float AABBTree::AABBNode::getAdaptivelyResampledSplitPosition(std::vector<uint>&
 	// store in reverse since C_R(x) is non-increasing
 	C_R_ext = _mm256_setr_ps(cr_ext[5], cr_ext[4], cr_ext[3], cr_ext[2], cr_ext[1], cr_ext[0], 0.0f, 0.0f);
 
-	S_L = _mm256_setzero_ps();
-	S_R = _mm256_setzero_ps();
+	S_L = _mm256_setzero_si256();
+	S_R = _mm256_setzero_si256();
 
-	for (i = 0; i <= CUTS; i++) {
+	// compare masks for sampling interval bounds
+	union { __m256 cmpMin_SL; uint cmSL[6]; };
+	union { __m256 cmpMin_SR; uint cmSR[6]; };
+	union { __m256 cmpMax_SL; uint cmxSL[6]; };
+	union { __m256 cmpMax_SR; uint cmxSR[6]; };
+
+	for (i = 0; i < CUTS; i++) {
 		ran_s = (float)(i + 1) / (float)(CUTS + 1) * N_primitives;
 
-		cMin = (i != 0 ? cl[i - 1] : 0.0f);
-		cMax = (i < CUTS ? cl[i] : 1.0f * N_primitives);
-		sl[i] += ((cMax > ran_s && cMin < ran_s) ? 1.0f : 0.0f);
+		t0 = _mm256_set1_ps(ran_s);
+		cmpMin_SL = _mm256_cmp_ps(t0, C_L_ext, _CMP_GT_OS);
+		cmpMin_SR = _mm256_cmp_ps(t0, C_R_ext, _CMP_GT_OS);
+		cmpMax_SL = _mm256_cmp_ps(t0, C_L_ext, _CMP_LT_OS);
+		cmpMax_SR = _mm256_cmp_ps(t0, C_R_ext, _CMP_LT_OS);
+		S_L = _mm256_add_epi32(S_L,
+			_mm256_setr_epi32(
+				(cmSL[0] > 0 && cmxSL[1] > 0) * 1,
+				(cmSL[1] > 0 && cmxSL[2] > 0) * 1,
+				(cmSL[2] > 0 && cmxSL[3] > 0) * 1,
+				(cmSL[3] > 0 && cmxSL[4] > 0) * 1,
+				(cmSL[4] > 0 && cmxSL[5] > 0) * 1,
+				0, 0, 0));
 
-		cMin = (i != 0 ? cr[i - 1] : 1.0f * N_primitives);
-		cMax = (i < CUTS ? cr[i] : 0.0f);
-		sr[i] += ((cMax < ran_s && cMin > ran_s) ? 1.0f : 0.0f);
+		S_R = _mm256_add_epi32(S_R,
+			_mm256_setr_epi32(
+				(cmSR[0] > 0 && cmxSR[1] > 0) * 1,
+				(cmSR[1] > 0 && cmxSR[2] > 0) * 1,
+				(cmSR[2] > 0 && cmxSR[3] > 0) * 1,
+				(cmSR[3] > 0 && cmxSR[4] > 0) * 1,
+				(cmSR[4] > 0 && cmxSR[5] > 0) * 1,
+				0, 0, 0));
 	}
+	S_R = _mm256_setr_epi32(sr[4], sr[3], sr[2], sr[1], sr[0], 0, 0, 0);
 
-	// ==== Stage 4: adding more sampling positions to subdivided segments
+	// ==== Stage 3: add more sampling positions to subdivided segments
+
+	union { __m256 all_samplePos_L; float allspl[8]; };
+	union { __m256 all_samplePos_R; float allspr[8]; };
+	uint nSeg_L = 0, nSeg_R = 0;
+	float segLen = (b - a) / 5.0f;
+
+	for (i = 0; i <= CUTS; i++) {
+		if (i > 0) {
+			allspl[nSeg_L++] = BminR[i];
+			allspr[nSeg_R++] = BminR[i];
+		}
+		for (j = 0; j < sl[i]; j++) {
+			allspl[nSeg_L++] = BminR[i] + (float)(j + 1) / (float)(sl[i] + 1) * segLen;
+		}
+		for (j = 0; j < sr[i]; j++) {
+			allspr[nSeg_R++] = BminR[i] + (float)(j + 1) / (float)(sr[i] + 1) * segLen;
+		}
+	}
+	
+
+	// ==== Stage 4: sample C_L and C_R on all sample points & construct a piecewise quadratic approximation of C_L + C_R to minimize
+	for (i = 0; i < N_primitives; i++) {
+		min = this->tree->primitives[primitiveIds[i]].getMinById(axis);
+		max = this->tree->primitives[primitiveIds[i]].getMaxById(axis);
+	}
 
 	return 0.0f;
 }
