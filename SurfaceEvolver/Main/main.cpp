@@ -32,8 +32,9 @@
 // - debug and optimize FastSweep3D
 // - interpolate distance field for higher resolutions (not much improvement)
 // - perform simple DF tests for geom primitives like sphere, icosphere, cubesphere
-// - optimize Box-Triangle intersection https://github.com/rvisser/cgProject/blob/master/source/aabbTriangle.cpp
+// - optimize Box-Triangle intersection
 // - add Quaternion class and TRS decomposition of Matrix4
+// - improve AABB split position sampling (done for 2 * 4 samples - 265-bit registers)
 
 //  POSTPONED:
 //
@@ -53,7 +54,7 @@
 //   TODO:
 //
 // - cleanup main & prep for VTK window form
-// - improve AABB split position sampling
+// - implement adaptive resampling for 512-bit registers - 2 * 8 sampling positions (if possible)
 // - flat AABB
 // - debug AABB closest primitive lookup
 // - compare results with CGAL distance query implementation
