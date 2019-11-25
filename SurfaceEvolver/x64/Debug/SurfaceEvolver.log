@@ -8,9 +8,9 @@ D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.
 D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(376,72): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
 D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(583,79): warning C4244: 'argument': conversion from 'float' to 'unsigned int', possible loss of data
 D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(583,63): warning C4244: 'argument': conversion from 'float' to 'unsigned int', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(664,41): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(686,21): warning C4101: 'cMax': unreferenced local variable
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(686,15): warning C4101: 'cMin': unreferenced local variable
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(681,41): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(701,21): warning C4101: 'cMax': unreferenced local variable
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(701,15): warning C4101: 'cMin': unreferenced local variable
 LINK : warning LNK4075: ignoring '/INCREMENTAL' due to '/PROFILE' specification
 AABBTree.obj : warning LNK4075: ignoring '/EDITANDCONTINUE' due to '/OPT:REF' specification
   SurfaceEvolver.vcxproj -> D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\x64\Debug\SurfaceEvolver.exe

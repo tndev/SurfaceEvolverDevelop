@@ -609,31 +609,48 @@ float AABBTree::AABBNode::getSplitPosition(std::vector<uint>& primitiveIds, std:
 
 // ============ Adaptive resampling helper macros ============
 
-#define FLERP(y0, y1, x0, x1, x)									\
+#define FLERP(y0, y1, x0, x1, x)													\
 		y0 + (x - x0) * (y1 - y0) / (x1 - x0);
 
 // ---------------------------------------------------------
 
-#define SHIFT_m256_LEFT(source, target)								\
-		t0 = _mm256_permute_ps(source, 0x39);						\
-		t1 = _mm256_permute2f128_ps(t0, t0, 0x01);					\
+#define SHIFT_m256_LEFT(source, target)												\
+		t0 = _mm256_permute_ps(source, 0x39);										\
+		t1 = _mm256_permute2f128_ps(t0, t0, 0x01);									\
 		target = _mm256_blend_ps(t0, t1, 0x88);
 
 // ---------------------------------------------------------
 
-#define SHIFT_m256_RIGHT(source, target)							\
-		t0 = _mm256_permute_ps(source, _MM_SHUFFLE(2, 1, 0, 3));	\
-		t1 = _mm256_permute2f128_ps(t0, t0, 41);					\
+#define SHIFT_m256_RIGHT(source, target)											\
+		t0 = _mm256_permute_ps(source, _MM_SHUFFLE(2, 1, 0, 3));					\
+		t1 = _mm256_permute2f128_ps(t0, t0, 41);									\
 		target = _mm256_blend_ps(t0, t1, 0x11);
+
+// --------------------------------------------------------
+
+#define BOX_AREA(b)																	\
+		2.0f * (b.max.x - b.min.x) +												\
+		2.0f * (b.max.y - b.min.y) +												\
+		2.0f * (b.max.z - b.min.z);
+
+// --------------------------------------------------------
+
+#define GET_QUAD_MIN_BETWEEN_PTS(x0, y0, x1, y1, x2, y2, xMin)						\
+		det = (x0 - x1) * (x0 - x2) * (x1 - x2);									\
+		det0 = x2 * (y1 - y0) + x1 * (y0 - y2) + x0 * (y2 - y1);					\
+		det1 = x2 * x2 * (y0 - y1) + x0 * x0 * (y1 - y2) + x1 * x1 * (y2 - y0);		\
+		a2 = det0 / det; a1 = det1 / det;											\
+		xMin = -a1 / (2.0f * a2);
 
 // --------------------------------------------------------
 
 float AABBTree::AABBNode::getAdaptivelyResampledSplitPosition(std::vector<uint>& primitiveIds, std::vector<uint>* out_left, std::vector<uint>* out_right)
 {
+	const float tot_BoxArea = BOX_AREA(this->bbox);
 	const uint CUTS = 4; uint i, j;
-	float min, max;
 
-	// === Stage 1: Initial sampling of C_L(x) and C_R(x)
+	// === Stage 1: Initial sampling of C_L(x) and C_R(x) ========================================================
+
 	// split interval limits:
 	float a = bbox.min.getCoordById(axis);
 	float b = bbox.max.getCoordById(axis);
@@ -662,24 +679,22 @@ float AABBTree::AABBNode::getAdaptivelyResampledSplitPosition(std::vector<uint>&
 	B_min_shift = _mm256_castps256_ps128(s_res);
 
 	uint N_primitives = primitiveIds.size();
+	float* primMins = new float[N_primitives];
+	float* primMaxes = new float[N_primitives];
 	for (i = 0; i < N_primitives; i++) {
-		min = this->tree->primitives[primitiveIds[i]].getMinById(axis);
-		max = this->tree->primitives[primitiveIds[i]].getMaxById(axis);
+		primMins[i] = this->tree->primitives[primitiveIds[i]].getMinById(axis);
+		primMaxes[i] = this->tree->primitives[primitiveIds[i]].getMaxById(axis);
 
-		mask_L = _mm_cmple_ps(_mm_set1_ps(min), B_min_shift);
-		mask_R = _mm_cmpge_ps(_mm_set1_ps(max), B_min_shift);
+		mask_L = _mm_cmple_ps(_mm_set1_ps(primMins[i]), B_min_shift);
+		mask_R = _mm_cmpge_ps(_mm_set1_ps(primMaxes[i]), B_min_shift);
 		r_L = _mm_setr_ps((m_Li[0] > 0) * 1.0f,	(m_Li[1] > 0) * 1.0f, (m_Li[2] > 0) * 1.0f,	(m_Li[3] > 0) * 1.0f);
 		r_R = _mm_setr_ps((m_Ri[0] > 0) * 1.0f,	(m_Ri[1] > 0) * 1.0f, (m_Ri[2] > 0) * 1.0f,	(m_Ri[3] > 0) * 1.0f);
 		C_L = _mm_add_ps(C_L, r_L);
 		C_R = _mm_add_ps(C_R, r_R);
 	}
 
-	// DUMMY situation: All primitives are gathered on the left
-	/*
-	cl[0] = 10; cl[1] = 100; cl[2] = 300; cl[3] = 1500;
-	cr[0] = 2000; cr[1] = 500; cr[2] = 100; cr[3] = 8;*/
-
 	// ===== Stage 2: Sample range [0, N_primitives] uniformly & count the number of samples within each segment ======
+
 	// range [0, N_primitives] sampling
 	union { __m256i S_L; uint sl[5]; };
 	union { __m256i S_R; uint sr[5]; };
@@ -733,7 +748,7 @@ float AABBTree::AABBNode::getAdaptivelyResampledSplitPosition(std::vector<uint>&
 	}
 	S_R = _mm256_setr_epi32(sr[4], sr[3], sr[2], sr[1], sr[0], 0, 0, 0);
 
-	// ==== Stage 3: add more sampling positions to subdivided segments
+	// ==== Stage 3: add more sampling positions to subdivided segments ===========================================
 
 	union { __m256 all_samplePos_L; float allspl[8]; };
 	union { __m256 all_samplePos_R; float allspr[8]; };
@@ -752,9 +767,20 @@ float AABBTree::AABBNode::getAdaptivelyResampledSplitPosition(std::vector<uint>&
 			allspr[nSeg_R++] = BminR[i] + (float)(j + 1) / (float)(sr[i] + 1) * segLen;
 		}
 	}
-	
 
-	// ==== Stage 4: RESAMPLE C_L and C_R on all sample points & construct a piecewise quadratic approximation of C_L + C_R to minimize
+	// Compute surface area heuristic SAH:
+	// remaining two dimensions of the child box candidates
+	float boxDim0 = this->bbox.max.getCoordById((axis + 1) % 3) - this->bbox.min.getCoordById((axis + 1) % 3);
+	float boxDim1 = this->bbox.max.getCoordById((axis + 2) % 3) - this->bbox.min.getCoordById((axis + 2) % 3);
+	__m256 SA_L, SA_R;
+
+	// SA_L(x) = (boxDim_L(x) + boxDim0 + boxDim1) * 2.0f / tot_BoxArea
+	// SA_R(x) = (boxDim_R(x) + boxDim0 + boxDim1) * 2.0f / tot_BoxArea
+	SA_L = _mm256_mul_ps(_mm256_add_ps(_mm256_sub_ps(all_samplePos_L, _mm256_set1_ps(a)), _mm256_add_ps(_mm256_set1_ps(boxDim0), _mm256_set1_ps(boxDim1))), _mm256_set1_ps(2.0f / tot_BoxArea));
+	SA_R = _mm256_mul_ps(_mm256_add_ps(_mm256_sub_ps(_mm256_set1_ps(b), all_samplePos_R), _mm256_add_ps(_mm256_set1_ps(boxDim0), _mm256_set1_ps(boxDim1))), _mm256_set1_ps(2.0f / tot_BoxArea));
+
+	// ==== Stage 4: RESAMPLE C_L and C_R on all sample points & construct a piecewise quadratic approximation of cost(x) to minimize
+
 	union { __m256 C_L_final; float cl_fin[8]; };
 	union { __m256 C_R_final; float cr_fin[8]; };
 	C_L_final = _mm256_setzero_ps();
@@ -763,10 +789,11 @@ float AABBTree::AABBNode::getAdaptivelyResampledSplitPosition(std::vector<uint>&
 	union { __m256 mask_CL; uint mcl[8]; };
 	union { __m256 mask_CR; uint mcr[8]; };
 	__m256 rs_L, rs_R;
+	float min, max;
 
 	for (i = 0; i < N_primitives; i++) {
-		min = this->tree->primitives[primitiveIds[i]].getMinById(axis);
-		max = this->tree->primitives[primitiveIds[i]].getMaxById(axis);
+		min = primMins[i];
+		max = primMaxes[i];
 
 		mask_CL = _mm256_cmp_ps(_mm256_set1_ps(min), all_samplePos_L, _CMP_LT_OS);
 		mask_CR = _mm256_cmp_ps(_mm256_set1_ps(max), all_samplePos_R, _CMP_GT_OS);
@@ -782,7 +809,40 @@ float AABBTree::AABBNode::getAdaptivelyResampledSplitPosition(std::vector<uint>&
 		C_R_final = _mm256_add_ps(C_R_final, rs_R);
 	}
 
-	return 0.0f;
+	// cost(x) = C_L(x) * SA_L(x) + C_R(x) * SA_R(x):
+	union { __m256 COST; float cost[8]; };
+	COST = _mm256_add_ps(_mm256_mul_ps(C_L_final, SA_L), _mm256_mul_ps(C_R_final, SA_R));
+
+	// ==== Stage 5: Minimize cost(x) & classify primitives  =============================================================
+
+	float bestSplit, minCost = FLT_MAX;
+	uint nPrimLeft, nPrimRight;
+	for (i = 1; i < 2 * CUTS; i++) {
+		if (cost[i] < minCost) {
+			minCost = cost[i];
+			bestSplit = allspl[i];
+			nPrimLeft = ((uint)cl_fin[i]);
+			nPrimRight = ((uint)cr_fin[i]);
+		}
+	}
+
+	// fill left and right arrays now that best split position is known
+	for (i = 0; i < N_primitives; i++) {
+		min = primMins[i];
+		max = primMaxes[i];
+
+		if (min <= bestSplit) {
+			out_left->push_back(primitiveIds[i]);
+		}
+		if (max >= bestSplit) {
+			out_right->push_back(primitiveIds[i]);
+		}
+	}
+
+	delete[] primMins;
+	delete[] primMaxes;
+
+	return bestSplit;
 }
 
 float AABBTree::AABBNode::getCostEstimate(float splitPos, uint nLeft, uint nRight)
