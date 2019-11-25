@@ -675,9 +675,9 @@ float AABBTree::AABBNode::getAdaptivelyResampledSplitPosition(std::vector<uint>&
 	}
 
 	// DUMMY situation: All primitives are gathered on the left
-
+	/*
 	cl[0] = 10; cl[1] = 100; cl[2] = 300; cl[3] = 1500;
-	cr[0] = 2000; cr[1] = 500; cr[2] = 100; cr[3] = 8;
+	cr[0] = 2000; cr[1] = 500; cr[2] = 100; cr[3] = 8;*/
 
 	// ===== Stage 2: Sample range [0, N_primitives] uniformly & count the number of samples within each segment ======
 	// range [0, N_primitives] sampling
@@ -754,10 +754,32 @@ float AABBTree::AABBNode::getAdaptivelyResampledSplitPosition(std::vector<uint>&
 	}
 	
 
-	// ==== Stage 4: sample C_L and C_R on all sample points & construct a piecewise quadratic approximation of C_L + C_R to minimize
+	// ==== Stage 4: RESAMPLE C_L and C_R on all sample points & construct a piecewise quadratic approximation of C_L + C_R to minimize
+	union { __m256 C_L_final; float cl_fin[8]; };
+	union { __m256 C_R_final; float cr_fin[8]; };
+	C_L_final = _mm256_setzero_ps();
+	C_R_final = _mm256_setzero_ps();
+	// masks for C_L and C_R increments:
+	union { __m256 mask_CL; uint mcl[8]; };
+	union { __m256 mask_CR; uint mcr[8]; };
+	__m256 rs_L, rs_R;
+
 	for (i = 0; i < N_primitives; i++) {
 		min = this->tree->primitives[primitiveIds[i]].getMinById(axis);
 		max = this->tree->primitives[primitiveIds[i]].getMaxById(axis);
+
+		mask_CL = _mm256_cmp_ps(_mm256_set1_ps(min), all_samplePos_L, _CMP_LT_OS);
+		mask_CR = _mm256_cmp_ps(_mm256_set1_ps(max), all_samplePos_R, _CMP_GT_OS);
+		rs_L = _mm256_setr_ps(
+			(mcl[0] > 0) * 1.0f, (mcl[1] > 0) * 1.0f, (mcl[2] > 0) * 1.0f, (mcl[3] > 0) * 1.0f,
+			(mcl[4] > 0) * 1.0f, (mcl[5] > 0) * 1.0f, (mcl[6] > 0) * 1.0f, (mcl[7] > 0) * 1.0f
+		);
+		rs_R = _mm256_setr_ps(
+			(mcr[0] > 0) * 1.0f, (mcr[1] > 0) * 1.0f, (mcr[2] > 0) * 1.0f, (mcr[3] > 0) * 1.0f,
+			(mcr[4] > 0) * 1.0f, (mcr[5] > 0) * 1.0f, (mcr[6] > 0) * 1.0f, (mcr[7] > 0) * 1.0f
+		);
+		C_L_final = _mm256_add_ps(C_L_final, rs_L);
+		C_R_final = _mm256_add_ps(C_R_final, rs_R);
 	}
 
 	return 0.0f;
