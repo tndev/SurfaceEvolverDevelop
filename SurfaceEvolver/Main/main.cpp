@@ -52,12 +52,13 @@
 
 //   WIP:
 // 
-// - flat AABB
+// - flat AABB and Octree
 
 
 //   TODO:
 //
 // - sign computation \w (arbitrary)ray-mesh intersection (even # of intersections = 1, odd # of intersections = -1)
+// - implement a method/class to get CPU instruction set, mainly whether it supports AVX, an alternate resampling method has to be implemented for CPU's that do not support AVX
 // - implement cutoff offset for the bounding cube to compute the field on minimum necessary subset (box)
 // - compose a linear system for evolution from CubeSphere to PrimitiveBox of the same subdivision level
 // - implement a VTK window form using a working example for mesh rendering and SDF volume rendering
@@ -198,7 +199,7 @@ int main()
 	std::cout << "Model loaded after " << elapsedObj.count() << " seconds" << std::endl;
 
 
-	uint res = 50; // octree resolution
+	uint res = 30; // octree resolution
 	SDF bunny_sdf = SDF(&bunny, res);
 
 	std::cout << bunny_sdf.getComputationProperties();

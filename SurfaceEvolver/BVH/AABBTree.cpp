@@ -642,7 +642,7 @@ float AABBTree::AABBNode::getSplitPosition(std::vector<uint>& primitiveIds, std:
 //
 float AABBTree::AABBNode::getAdaptivelyResampledSplitPosition(std::vector<uint>& primitiveIds, std::vector<uint>* out_left, std::vector<uint>* out_right)
 {
-	const float tot_BoxArea = BOX_AREA(this->bbox);
+	const float tot_BoxArea = BOX_AREA(bbox);
 	const uint CUTS = 4; uint i, j;
 
 	// === Stage 1: Initial sampling of C_L(x) and C_R(x) ========================================================
@@ -817,7 +817,7 @@ float AABBTree::AABBNode::getAdaptivelyResampledSplitPosition(std::vector<uint>&
 
 	// ==== Stage 5: Minimize cost(x) & classify primitives  =============================================================
 
-	/**/
+	/*
 	// Alternative I: Quad interpolate argmin of cost(x) between triplets of sampled positions when when triplets form a convex parabolic arc
 	//
 	// extended discretisation domain including a and b
@@ -838,11 +838,11 @@ float AABBTree::AABBNode::getAdaptivelyResampledSplitPosition(std::vector<uint>&
 			);
 			break;
 		}
-	}
+	}*/
 	// Alternative I.a: implement sort order method for __m265 vector to obtain the indices of minimal splits
 	// then, interpolate a parabola using the ids of 3 minimal indices
 
-	/*
+	/**/
 	// Alternative II: simply find min cost by comparing vals - less exact, but
 	// faster than previous by ~20%
 	
@@ -852,8 +852,8 @@ float AABBTree::AABBNode::getAdaptivelyResampledSplitPosition(std::vector<uint>&
 			minCost = cost[i];
 			bestSplit = allspl[i];
 		}
-	}*/
-
+	}
+	
 
 	// fill left and right arrays now that best split position is known:
 	for (i = 0; i < N_primitives; i++) {
