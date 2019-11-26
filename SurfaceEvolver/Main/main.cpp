@@ -34,11 +34,16 @@
 // - perform simple DF tests for geom primitives like sphere, icosphere, cubesphere
 // - optimize Box-Triangle intersection
 // - add Quaternion class and TRS decomposition of Matrix4
-// - improve AABB split position sampling (done for 2 * 4 samples - 265-bit registers)
+// - adaptive resampling of split cost function (done for 2 * 4 samples - 265-bit registers)
+// - minimize split cost function using a piecewise-quadratic interpolation to find the minimum (20% slower than simple cost(x) < minCost comparison)
 
 //  POSTPONED:
 //
-// - Interior/Exterior mesh Sign (Needs to build on top of FastSweep3D)
+// - implement sort order function of a 256-bit AVX vector
+// - AABB update for transformations + Timing test
+// - Inverse transform grid upon transforming mesh
+// - implement adaptive resampling for 512-bit registers - 2 * 8 sampling positions (if possible)
+// - compare results with CGAL distance query implementation
 
 
 //   DONE, BUT MIGHT BE IMPROVED:
@@ -47,17 +52,15 @@
 
 //   WIP:
 // 
-// - AABB update for transformations + Timing test
-// - Inverse transform grid upon transforming mesh
+// - flat AABB
 
 
 //   TODO:
 //
-// - cleanup main & prep for VTK window form
-// - implement adaptive resampling for 512-bit registers - 2 * 8 sampling positions (if possible)
-// - flat AABB
-// - debug AABB closest primitive lookup
-// - compare results with CGAL distance query implementation
+// - sign computation \w (arbitrary)ray-mesh intersection (even # of intersections = 1, odd # of intersections = -1)
+// - implement cutoff offset for the bounding cube to compute the field on minimum necessary subset (box)
+// - compose a linear system for evolution from CubeSphere to PrimitiveBox of the same subdivision level
+// - implement a VTK window form using a working example for mesh rendering and SDF volume rendering
 
 void performTest(uint res, Geometry& g, std::fstream& timing, VTKExporter& e) {
 	std::cout << "init SDF..." << std::endl;
@@ -195,7 +198,7 @@ int main()
 	std::cout << "Model loaded after " << elapsedObj.count() << " seconds" << std::endl;
 
 
-	uint res = 30; // octree resolution
+	uint res = 50; // octree resolution
 	SDF bunny_sdf = SDF(&bunny, res);
 
 	std::cout << bunny_sdf.getComputationProperties();

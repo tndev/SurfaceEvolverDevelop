@@ -501,11 +501,10 @@ void AABBTree::AABBNode::construct(std::vector<uint>* primitiveIds, uint depthLe
 	}
 
 	// choosing the longest split axis seems to be faster
-	Vector3 bboxSize = this->bbox.getSize();
-	if (bboxSize.x > bboxSize.y && bboxSize.x > bboxSize.z) {
+	if ((bbox.max.x - bbox.min.x) > (bbox.max.y - bbox.min.y) && (bbox.max.x - bbox.min.x) > (bbox.max.z - bbox.min.z)) {
 		this->axis = 0;
 	}
-	else if (bboxSize.y > bboxSize.z) {
+	else if ((bbox.max.y - bbox.min.y) > (bbox.max.z - bbox.min.z)) {
 		this->axis = 1;
 	}
 	else {
@@ -609,11 +608,6 @@ float AABBTree::AABBNode::getSplitPosition(std::vector<uint>& primitiveIds, std:
 
 // ============ Adaptive resampling helper macros ============
 
-#define FLERP(y0, y1, x0, x1, x)													\
-		y0 + (x - x0) * (y1 - y0) / (x1 - x0);
-
-// ---------------------------------------------------------
-
 #define SHIFT_m256_LEFT(source, target)												\
 		t0 = _mm256_permute_ps(source, 0x39);										\
 		t1 = _mm256_permute2f128_ps(t0, t0, 0x01);									\
@@ -633,17 +627,19 @@ float AABBTree::AABBNode::getSplitPosition(std::vector<uint>& primitiveIds, std:
 		2.0f * (b.max.y - b.min.y) +												\
 		2.0f * (b.max.z - b.min.z);
 
-// --------------------------------------------------------
+// ---------------------------------------------------------
 
-#define GET_QUAD_MIN_BETWEEN_PTS(x0, y0, x1, y1, x2, y2, xMin)						\
+#define GET_QUAD_MIN_BETWEEN_PTS(x0, y0, x1, y1, x2, y2, target)					\
 		det = (x0 - x1) * (x0 - x2) * (x1 - x2);									\
 		det0 = x2 * (y1 - y0) + x1 * (y0 - y2) + x0 * (y2 - y1);					\
 		det1 = x2 * x2 * (y0 - y1) + x0 * x0 * (y1 - y2) + x1 * x1 * (y2 - y0);		\
 		a2 = det0 / det; a1 = det1 / det;											\
-		xMin = -a1 / (2.0f * a2);
+		target = -a1 / (2.0f * a2);
 
 // --------------------------------------------------------
 
+// Fast kd-tree Construction with an Adaptive Error-Bounded Heuristic (Hunt, Mark, Stoll)
+//
 float AABBTree::AABBNode::getAdaptivelyResampledSplitPosition(std::vector<uint>& primitiveIds, std::vector<uint>* out_left, std::vector<uint>* out_right)
 {
 	const float tot_BoxArea = BOX_AREA(this->bbox);
@@ -657,10 +653,15 @@ float AABBTree::AABBNode::getAdaptivelyResampledSplitPosition(std::vector<uint>&
 
 	// splits:
 	union { __m256 B_min_R; float BminR[6]; };
-	B_min_R = _mm256_setzero_ps();
-	for (i = 0; i <= CUTS + 1; i++) {
-		BminR[i] = a * (1.0f - ((float)i/ (float)(CUTS + 1.0f))) + b * ((float)i / (float)(CUTS + 1.0f));
-	}
+	B_min_R = _mm256_setr_ps(
+		a,
+		a * (1.0f - (1.0f / (CUTS + 1))) + b * (1.0f / (CUTS + 1)),
+		a * (1.0f - (2.0f / (CUTS + 1))) + b * (2.0f / (CUTS + 1)),
+		a * (1.0f - (3.0f / (CUTS + 1))) + b * (3.0f / (CUTS + 1)),
+		a * (1.0f - (4.0f / (CUTS + 1))) + b * (4.0f / (CUTS + 1)),
+		b,
+		0.0f, 0.0f
+	);
 
 	// set C_L(x) = 0, C_R(x) = 0
 	union { __m128 C_L; float cl[4]; };
@@ -681,6 +682,7 @@ float AABBTree::AABBNode::getAdaptivelyResampledSplitPosition(std::vector<uint>&
 	uint N_primitives = primitiveIds.size();
 	float* primMins = new float[N_primitives];
 	float* primMaxes = new float[N_primitives];
+
 	for (i = 0; i < N_primitives; i++) {
 		primMins[i] = this->tree->primitives[primitiveIds[i]].getMinById(axis);
 		primMaxes[i] = this->tree->primitives[primitiveIds[i]].getMaxById(axis);
@@ -815,18 +817,45 @@ float AABBTree::AABBNode::getAdaptivelyResampledSplitPosition(std::vector<uint>&
 
 	// ==== Stage 5: Minimize cost(x) & classify primitives  =============================================================
 
+	/**/
+	// Alternative I: Quad interpolate argmin of cost(x) between triplets of sampled positions when when triplets form a convex parabolic arc
+	//
+	// extended discretisation domain including a and b
+	float dD[10] = {a, allspl[0], allspl[1], allspl[2], allspl[3], allspl[4], allspl[5], allspl[6], allspl[7], b};
+	// extended cost sample vector also evaluated at a and b	
+	float cost_ab[10] = {(float)N_primitives, cost[0], cost[1], cost[2], cost[3], cost[4], cost[5], cost[6], cost[7], (float)N_primitives};
+
+	float bestSplit = a;
+	float det, det0, det1, a1, a2; // used in quad interpolation
+
+	for (i = 1; i <= 2 * CUTS; i++) {
+		if ((cost_ab[i - 1] >= cost_ab[i]) && (cost_ab[i] <= cost_ab[i + 1])) {
+			// interpolating min iff the leading pts form a concave parabola
+			GET_QUAD_MIN_BETWEEN_PTS(
+				dD[i - 1], cost_ab[i - 1],
+				dD[i], cost_ab[i],
+				dD[i + 1], cost_ab[i + 1], bestSplit
+			);
+			break;
+		}
+	}
+	// Alternative I.a: implement sort order method for __m265 vector to obtain the indices of minimal splits
+	// then, interpolate a parabola using the ids of 3 minimal indices
+
+	/*
+	// Alternative II: simply find min cost by comparing vals - less exact, but
+	// faster than previous by ~20%
+	
 	float bestSplit, minCost = FLT_MAX;
-	uint nPrimLeft, nPrimRight;
 	for (i = 1; i < 2 * CUTS; i++) {
 		if (cost[i] < minCost) {
 			minCost = cost[i];
 			bestSplit = allspl[i];
-			nPrimLeft = ((uint)cl_fin[i]);
-			nPrimRight = ((uint)cr_fin[i]);
 		}
-	}
+	}*/
 
-	// fill left and right arrays now that best split position is known
+
+	// fill left and right arrays now that best split position is known:
 	for (i = 0; i < N_primitives; i++) {
 		min = primMins[i];
 		max = primMaxes[i];
