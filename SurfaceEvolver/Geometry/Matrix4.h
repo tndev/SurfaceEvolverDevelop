@@ -46,6 +46,11 @@ public:
 	// use external methods instead
 	void transpose();
 	void multiplyScalar(float scalar);
+	void multiplyMatrices(Matrix4& a, Matrix4& b);
+	void multiply(Matrix4& m);
+	Matrix4 multiply(Matrix4 m);
+	void premultiply(Matrix4& m);
+	Matrix4 premultiply(Matrix4 m);
 
 	Matrix4 setToScale(float sx, float sy, float sz);
 	Matrix4 makeRotationAxis(float ax, float ay, float az, float angle);

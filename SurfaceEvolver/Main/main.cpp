@@ -208,8 +208,7 @@ int main()
 	bunny_sdf.exportGrid(&e, "bunnySDF");
 
 	Vector3 axis = normalize(Vector3(1, 1, 1));
-	Matrix4 sdfTransform = Matrix4().makeTranslation(0.5, 0.5, 0.5);
-	sdfTransform.setToScale(2.0f, 2.0f, 2.0f);
+	Matrix4 sdfTransform = Matrix4().makeTranslation(0.5, 0.5, 0.5).multiply(Matrix4().setToScale(2.0f, 2.0f, 2.0f));
 	//.makeRotationAxis(axis.x, axis.y, axis.z, M_PI / 6.);
 	bunny_sdf.applyMatrix(sdfTransform);
 
@@ -218,12 +217,12 @@ int main()
 	bunny_sdf.exportGrid(&e, "bunnySDF_scaled");
 	e.initExport(*bunny_sdf.geom, "sfBunny_scaled");
 
-	PrimitiveBox cube = PrimitiveBox(a, a, a, 10, 10, 10);
-	// cube.applyMatrix(Matrix4().makeRotationAxis(axis.x, axis.y, axis.z, M_PI / 6.));
+	PrimitiveBox cube = PrimitiveBox(a, a, a, 1, 1, 1);
+	cube.applyMatrix(Matrix4().makeRotationAxis(axis.x, axis.y, axis.z, M_PI / 6.));
 	e.initExport(cube, "cube");
 
 	SDF cubeSDF = SDF(&cube, res, true); // signed dist to cube
-	std::cout << cubeSDF.getComputationProperties();
+	std::cout << std::endl << cubeSDF.getComputationProperties();
 	cubeSDF.exportGrid(&e, "cubeSDF");
 	
 
