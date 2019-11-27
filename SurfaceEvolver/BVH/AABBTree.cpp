@@ -140,6 +140,95 @@ float AABBTree::boxIntersectsAPrimitiveAtDistance(Box3* box)
 	return INFINITY;
 }
 
+uint AABBTree::rayIntersect(Vector3& rayOrigin, Vector3& rayDirection, float rayMinParam, float rayMaxParam)
+{
+	uint hitCount = 0;
+	float minParam = rayMinParam, maxParam = rayMaxParam;
+	float t, t_split;
+	Vector3 rayStart = rayStart;
+	Vector3 rayEnd = rayStart + maxParam * rayDirection;
+	Vector3 rayInvDirection = Vector3(1.0f / rayDirection.x, 1.0f / rayDirection.y, 1.0f / rayDirection.z);
+	Edge rayEdge = { &rayStart, &rayEnd };
+	bool leftIsNear, force_near, force_far, t_splitAtInfinity;
+	bool treeBoxHit = getRayBoxIntersection(rayEdge, &bbox.min, &bbox.max, &minParam);
+	if (!treeBoxHit) {
+		return hitCount;
+	}
+
+	AABBNode* item;	AABBNode* nearNode;	AABBNode* farNode;
+	std::pair<float, float> params;
+
+	std::stack<AABBNode*> stack = {};
+	stack.push(this->root);
+	std::stack<std::pair<float, float>> paramStack = {};
+	paramStack.push({ minParam, maxParam });
+
+	while (stack.size()) {
+		item = stack.top();
+		stack.pop();
+		params = paramStack.top();
+		paramStack.pop();
+
+		if (item->isALeaf()) {
+			if (getRayBoxIntersection(rayEdge, &item->bbox.min, &item->bbox.max, &minParam)) {
+				minParam = params.first; maxParam = params.second;
+				rayStart.set(rayStart.x + minParam * rayDirection.x, rayStart.y + minParam * rayDirection.y, rayStart.z + minParam * rayDirection.z);
+				for (auto&& pId : item->primitiveIds) {
+					t = getRayTriangleIntersection(rayStart, rayDirection, &primitives[pId].vertices, std::max(params.first, rayMinParam), std::min(params.second, rayMaxParam));
+					if (t > 0) {
+						hitCount++;
+						minParam = t;
+					}					
+				}
+				minParam = 0.0f;
+			}
+		}
+		else {
+			leftIsNear = rayDirection.getCoordById(item->axis) >= 0.0f;
+			nearNode = item->left; farNode = item->right;
+			if (!leftIsNear) {
+				nearNode = item->right;
+				farNode = item->left;
+			}
+
+			t_split = (item->splitPosition - rayStart.getCoordById(item->axis)) * rayInvDirection.getCoordById(item->axis);
+			force_near = false; force_far = false;
+			t_splitAtInfinity = t_split > FLT_MAX || t_split < -FLT_MAX;
+			if (t_splitAtInfinity) {
+				if (rayStart.getCoordById(item->axis) <= item->splitPosition &&
+					rayStart.getCoordById(item->axis) >= item->bbox.min.getCoordById(item->axis)) {
+					if (leftIsNear) force_near = true;
+					else force_far = true;
+				}
+				if (rayStart.getCoordById(item->axis) >= item->splitPosition &&
+					rayStart.getCoordById(item->axis) <= item->bbox.max.getCoordById(item->axis)) {
+					if (leftIsNear) force_near = true;
+					else force_far = true;
+				}
+			}
+
+			if (farNode && ((!t_splitAtInfinity && params.second >= t_split) || force_far)) {
+				stack.push(farNode);
+				minParam = params.first;
+				if (!t_splitAtInfinity) {
+					minParam = std::max(minParam, t_split);
+				}
+				paramStack.push({minParam, params.second});
+			}
+			if (nearNode && ((!t_splitAtInfinity && params.first <= t_split) || force_near)) {
+				stack.push(nearNode);
+				maxParam = params.second;
+				if (!t_splitAtInfinity) {
+					maxParam = std::min(maxParam, t_split);
+				}
+				paramStack.push({ params.first , maxParam });
+			}
+		}
+	}
+
+	return hitCount;
+}
+
 std::vector<AABBTree::AABBNode> AABBTree::flatten()
 {
 	std::vector<AABBNode> resultArray = {};
@@ -910,4 +999,16 @@ void AABBTree::AABBNode::applyMatrix(Matrix4& m)
 {
 	bbox.min.applyMatrix4(m);
 	bbox.max.applyMatrix4(m);
+}
+
+AABBTree::AABBRay::AABBRay()
+{
+}
+
+AABBTree::AABBRay::AABBRay(Vector3* start, Vector3* dir)
+{
+	this->start.set(start->x, start->y, start->z);
+	if (dir) {
+		this->direction.set(dir->x, dir->y, dir->z);
+	}	
 }

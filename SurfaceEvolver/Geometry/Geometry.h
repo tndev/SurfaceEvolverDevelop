@@ -119,7 +119,7 @@ Vector3 getTriangleNormal(StructGeom::Triangle triangle, Vector3& resultNormal);
 // intersections:
 bool getPlaneBoxIntersection(Vector3* normal, Vector3* vert, Vector3* boxMax);
 bool getTriangleBoxIntersection(Vector3** T, Vector3* boxCenter, Vector3* boxHalfSize);
-bool getEdgeBoxIntersection(Edge& vertices, Vector3* boxMin, Vector3* boxMax);
+bool getRayBoxIntersection(Edge& vertices, Vector3* boxMin, Vector3* boxMax, float* hitParam);
 bool getPrimitiveBoxIntersection(Primitive& primitive, Vector3* boxCenter, Vector3* boxMin, Vector3* boxMax, Vector3* boxHalfSize, float offset = 0.0001f);
 
 float getRayTriangleIntersection(Vector3& rayStart, Vector3& rayDirection, Tri* tri, float minParam, float maxParam);

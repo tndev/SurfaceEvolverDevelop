@@ -53,6 +53,19 @@ public:
 		void applyMatrix(Matrix4& m);
 	};
 
+	struct AABBRay {
+		Vector3 start = Vector3();
+		Vector3 direction = Vector3(1.0f, 0.0f, 0.0f);
+		Vector3 invDirection = Vector3(1.0f / direction.x, FLT_MAX, FLT_MAX);
+		// std::vector<std::pair<float, float>> minMaxParams = {};
+		uint hitCount = 0;
+		// std::vector<uint> hitIds = {};
+		// std::vector<AABBNode*> hitNodes = {};
+
+		AABBRay();
+		AABBRay(Vector3* start, Vector3* dir = nullptr);
+	};
+
 	Box3 bbox;
 
 	uint depth = 0;
@@ -72,6 +85,8 @@ public:
 	bool hasPrimitives();
 	bool boxIntersectsAPrimitive(Box3* box);
 	float boxIntersectsAPrimitiveAtDistance(Box3* box);
+	// returns the number of ray-mesh intersections
+	uint rayIntersect(Vector3& rayOrigin, Vector3& rayDirection, float rayMinParam = 0.0f, float rayMaxParam = FLT_MAX);
 
 	std::vector<AABBNode> flatten();
 	void getAllNodes(std::vector<AABBNode>* buffer);

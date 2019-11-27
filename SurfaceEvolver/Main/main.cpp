@@ -52,12 +52,12 @@
 
 //   WIP:
 // 
-// - flat AABB and Octree
+// - sign computation \w (arbitrary)ray-mesh intersection (even # of intersections = 1, odd # of intersections = -1)
 
 
 //   TODO:
 //
-// - sign computation \w (arbitrary)ray-mesh intersection (even # of intersections = 1, odd # of intersections = -1)
+// - flat AABB and Octree
 // - implement a method/class to get CPU instruction set, mainly whether it supports AVX, an alternate resampling method has to be implemented for CPU's that do not support AVX
 // - implement cutoff offset for the bounding cube to compute the field on minimum necessary subset (box)
 // - compose a linear system for evolution from CubeSphere to PrimitiveBox of the same subdivision level
