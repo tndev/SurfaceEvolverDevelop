@@ -179,7 +179,7 @@ void Grid::computeSignField(AABBTree* aabb)
 {
 	Vector3 p = Vector3();
 	Vector3 c = aabb->bbox.getCenter();
-	Vector3 rayDirection = Vector3();
+	Vector3 rayDirection = normalize(Vector3(1, 1, 1));
 	float sign = 1.0f, val; uint gridPos;
 	int intersectCount;
 
@@ -199,12 +199,6 @@ void Grid::computeSignField(AABBTree* aabb)
 					o.x + ix * dx,
 					o.y + iy * dy,
 					o.z + iz * dz
-				);
-				val = sqrt((p.x - c.x) * (p.x - c.x) + (p.y - c.y) * (p.y - c.y) + (p.z - c.z) * (p.z - c.z));
-				rayDirection.set(
-					(p.x - c.x) / val,
-					(p.y - c.y) / val,
-					(p.z - c.z) / val
 				);
 				gridPos = Nx * Ny * iz + Nx * iy + ix;
 				intersectCount = aabb->rayIntersect(p, rayDirection);

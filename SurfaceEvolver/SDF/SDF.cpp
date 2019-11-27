@@ -22,7 +22,7 @@ SDF::SDF(const SDF& other)
 	time_log = other.time_log;
 }
 
-SDF::SDF(Geometry* geom, uint resolution, bool saveGridStates, bool scaleAndInterpolate, SDF_Method method)
+SDF::SDF(Geometry* geom, uint resolution, bool computeSign, bool saveGridStates, bool scaleAndInterpolate, SDF_Method method)
 {
 	this->resolution = resolution;
 	this->geom = geom;
@@ -103,10 +103,13 @@ SDF::SDF(Geometry* geom, uint resolution, bool saveGridStates, bool scaleAndInte
 		Since it would already produce distances, this approach would not need to use an Eikonal solver such as FastSweep.
 		*/
 
-		auto startSDF_Sign = std::chrono::high_resolution_clock::now();
-		this->grid->computeSignField(this->tri_aabb);		
-		auto endSDF_Sign = std::chrono::high_resolution_clock::now();
-		std::chrono::duration<float> elapsedSDF_Sign = (endSDF_Sign - startSDF_Sign);
+		std::chrono::duration<float> elapsedSDF_Sign;
+		if (computeSign) {
+			auto startSDF_Sign = std::chrono::high_resolution_clock::now();
+			this->grid->computeSignField(this->tri_aabb);
+			auto endSDF_Sign = std::chrono::high_resolution_clock::now();
+			elapsedSDF_Sign = (endSDF_Sign - startSDF_Sign);
+		}
 
 		auto endSDF = std::chrono::high_resolution_clock::now();
 		std::chrono::duration<float> elapsedSDF = (endSDF - startSDF);
@@ -119,7 +122,7 @@ SDF::SDF(Geometry* geom, uint resolution, bool saveGridStates, bool scaleAndInte
 			" s, Octree: (build: " + std::to_string(elapsedSDF_Octree.count()) + " s, get_leaves: " + std::to_string(this->octree->leaf_retrieve_time) +
 			" s), FastSweep3D: " + std::to_string(elapsedSDF_FS.count()) + " s, \n" +
 			((scaleAndInterpolate && resolution > this->resolution_limit) ? "Grid scale: " + std::to_string(elapsedGridScale.count()) + " s \n": "") +
-			"grid sign computation: " + std::to_string(elapsedSDF_Sign.count()) + "s\n" +
+			(computeSign ? ("grid sign computation: " + std::to_string(elapsedSDF_Sign.count()) + "s\n") : "") +
 			"====> TOTAL: " + std::to_string(elapsedSDF.count()) + " s" + "\n\n";
 	}
 	else if (method == SDF_Method::aabb_dist) {

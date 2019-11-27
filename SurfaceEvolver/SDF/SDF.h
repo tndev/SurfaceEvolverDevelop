@@ -33,7 +33,7 @@ public:
 	SDF();
 	~SDF();
 	SDF(const SDF& other);
-	SDF(Geometry* geom, uint resolution, bool saveGridStates = false, bool scaleAndInterpolate = false, SDF_Method method = SDF_Method::fast_sweeping);
+	SDF(Geometry* geom, uint resolution, bool computeSign = false, bool saveGridStates = false, bool scaleAndInterpolate = false, SDF_Method method = SDF_Method::fast_sweeping);
 
 	void exportGrid(VTKExporter* e, std::string export_name = "");
 	std::string getComputationProperties();

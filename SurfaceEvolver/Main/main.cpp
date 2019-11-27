@@ -57,6 +57,7 @@
 
 //   TODO:
 //
+// - matrix multiplication for Matrix4 and Matrix3
 // - flat AABB and Octree
 // - implement a method/class to get CPU instruction set, mainly whether it supports AVX, an alternate resampling method has to be implemented for CPU's that do not support AVX
 // - implement cutoff offset for the bounding cube to compute the field on minimum necessary subset (box)
@@ -67,7 +68,7 @@ void performTest(uint res, Geometry& g, std::fstream& timing, VTKExporter& e) {
 	std::cout << "init SDF..." << std::endl;
 
 	// Fast sweeping DF, resized from 20 and interpolated
-	SDF sdf_FS_r = SDF(&g, res, false, true, SDF_Method::fast_sweeping);
+	SDF sdf_FS_r = SDF(&g, res, false, false, true, SDF_Method::fast_sweeping);
 
 	std::cout << sdf_FS_r.getComputationProperties();
 	timing << sdf_FS_r.getComputationProperties();
@@ -83,7 +84,7 @@ void performTest(uint res, Geometry& g, std::fstream& timing, VTKExporter& e) {
 	sdf_FS.exportGrid(&e);
 
 	// AABB DF
-	SDF sdf_AABB = SDF(&g, res, false, false, SDF_Method::aabb_dist);
+	SDF sdf_AABB = SDF(&g, res, false, false, false, SDF_Method::aabb_dist);
 
 	std::cout << sdf_AABB.getComputationProperties();
 	timing << sdf_AABB.getComputationProperties();
@@ -91,7 +92,7 @@ void performTest(uint res, Geometry& g, std::fstream& timing, VTKExporter& e) {
 	sdf_AABB.exportGrid(&e);
 
 	// Brute force DF
-	SDF sdf_Brute = SDF(&g, res, false, false, SDF_Method::brute_force);
+	SDF sdf_Brute = SDF(&g, res, false, false, false, SDF_Method::brute_force);
 
 	std::cout << sdf_Brute.getComputationProperties();
 	timing << sdf_Brute.getComputationProperties();
@@ -216,6 +217,15 @@ int main()
 
 	bunny_sdf.exportGrid(&e, "bunnySDF_scaled");
 	e.initExport(*bunny_sdf.geom, "sfBunny_scaled");
+
+	PrimitiveBox cube = PrimitiveBox(a, a, a, 10, 10, 10);
+	// cube.applyMatrix(Matrix4().makeRotationAxis(axis.x, axis.y, axis.z, M_PI / 6.));
+	e.initExport(cube, "cube");
+
+	SDF cubeSDF = SDF(&cube, res, true); // signed dist to cube
+	std::cout << cubeSDF.getComputationProperties();
+	cubeSDF.exportGrid(&e, "cubeSDF");
+	
 
 	// tree visualisation
 	/* bunny_sdf.tri_aabb->GenerateFullTreeBoxVisualisation(e);
