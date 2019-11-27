@@ -26,6 +26,8 @@ public:
 	void setToSize(Vector3* target);
 	void setToHalfSize(Vector3* target);
 	bool equals(Box3& other);
+
+	Vector3* getBoundById(unsigned int id);
 };
 
 #endif

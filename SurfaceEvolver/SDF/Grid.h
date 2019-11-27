@@ -38,7 +38,7 @@ public:
 	void add(Grid& other);
 	void sub(Grid& other);
 	void absField();
-	void computeSignField(AABBTree* v_aabb, AABBTree* e_aabb, AABBTree* t_aabb);
+	void computeSignField(AABBTree* aabb);
 	void bruteForceDistanceField(Geometry* geom);
 	void aabbDistanceField(AABBTree* aabb);
 	void clean();

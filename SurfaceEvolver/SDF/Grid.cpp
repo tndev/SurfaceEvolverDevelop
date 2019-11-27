@@ -175,11 +175,13 @@ void Grid::absField()
 	}
 }
 
-void Grid::computeSignField(AABBTree* v_aabb, AABBTree* e_aabb, AABBTree* t_aabb)
+void Grid::computeSignField(AABBTree* aabb)
 {
 	Vector3 p = Vector3();
-	int sign = 1; uint gridPos;
-	int vId, eId, tId;
+	Vector3 c = aabb->bbox.getCenter();
+	Vector3 rayDirection = Vector3();
+	float sign = 1.0f, val; uint gridPos;
+	int intersectCount;
 
 	Vector3 o = bbox.min; // origin
 	Vector3 pn; float rv, re, rt;
@@ -190,63 +192,28 @@ void Grid::computeSignField(AABBTree* v_aabb, AABBTree* e_aabb, AABBTree* t_aabb
 	float dy = scale.y / ny;
 	float dz = scale.z / nz;
 
-	std::vector<Vector3> v_awpn = v_aabb->geom->getAngleWeightedVertexPseudoNormals();
-	std::vector<Vector3> e_awpn = e_aabb->geom->getAngleWeightedEdgePseudoNormals();
-	std::vector<Vector3> t_n = t_aabb->geom->getTriangleNormals();
-
 	for (uint iz = 0; iz < Nz; iz++) {
 		for (uint iy = 0; iy < Ny; iy++) {
 			for (uint ix = 0; ix < Nx; ix++) {
-				/*p.set(
+				p.set(
 					o.x + ix * dx,
 					o.y + iy * dy,
 					o.z + iz * dz
 				);
-				vId = v_aabb->getClosestPrimitiveIdAndDist(p);
-				if (vId < 0) {
-					continue;
-				}
-
-				rv = (p - v_aabb->geom->uniqueVertices[vId]).lengthSq();
-
-				eId = e_aabb->getClosestPrimitiveId(p);
-				if (eId < 0) {
-					continue;
-				}
-
-				re = getDistanceToAnEdgeSq(&e_aabb->primitives[eId].vertices, p);
-				
-				if (rv < re) {
-					sign = (dot((p - v_aabb->geom->uniqueVertices[vId]), v_awpn[vId]) < 0.0f ? -1 : 1);
-					gridPos = Nx * Ny * iz + Nx * iy + ix;
-					this->field[gridPos] *= sign;
-					continue;
-				}
-				else {
-					tId = t_aabb->getClosestPrimitiveId(p);
-					if (tId < 0) {
-						continue;
-					}
-
-					Vector3** t = new Vector3 * [3];
-					t[0] = t_aabb->primitives[tId].vertices[0];
-					t[1] = t_aabb->primitives[tId].vertices[1];
-					t[2] = t_aabb->primitives[tId].vertices[2];
-					rt = getDistanceToATriangleSq(t, &p);
-					delete[] t;
-
-					if (re < rt) {
-						sign = (dot((p - getClosestPtOnAnEdge(&e_aabb->primitives[eId].vertices, p)), e_awpn[eId]) < 0.0f ? -1 : 1);
-						gridPos = Nx * Ny * iz + Nx * iy + ix;
-						this->field[gridPos] *= sign;
-						continue;
-					}
-					else {
-						sign = (dot((p - getClosestPtOnATriangle(&t_aabb->primitives[tId].vertices, p)), t_n[tId]) < 0.0f ? -1 : 1);
-						gridPos = Nx * Ny * iz + Nx * iy + ix;
-						this->field[gridPos] *= sign;
-					}
+				val = sqrt((p.x - c.x) * (p.x - c.x) + (p.y - c.y) * (p.y - c.y) + (p.z - c.z) * (p.z - c.z));
+				rayDirection.set(
+					(p.x - c.x) / val,
+					(p.y - c.y) / val,
+					(p.z - c.z) / val
+				);
+				gridPos = Nx * Ny * iz + Nx * iy + ix;
+				intersectCount = aabb->rayIntersect(p, rayDirection);
+				/*if (intersectCount > 0) {
+					intersectCount *= 1;
 				}*/
+				sign = (intersectCount % 2 == 1 ? -1.0f : 1.0f);
+				val = sign * this->field[gridPos];
+				this->field[gridPos] = val;
 			}
 		}
 	}

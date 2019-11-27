@@ -103,22 +103,10 @@ SDF::SDF(Geometry* geom, uint resolution, bool saveGridStates, bool scaleAndInte
 		Since it would already produce distances, this approach would not need to use an Eikonal solver such as FastSweep.
 		*/
 
-		/*
-		auto startSDF_VertTree = std::chrono::high_resolution_clock::now();
-		this->vert_aabb = new AABBTree(geom, PrimitiveType::vert);
-		auto endSDF_VertTree = std::chrono::high_resolution_clock::now();
-		std::chrono::duration<float> elapsedSDF_VertTree = (endSDF_VertTree - startSDF_VertTree);
-
-		auto startSDF_EdgeTree = std::chrono::high_resolution_clock::now();
-		this->edge_aabb = new AABBTree(geom, PrimitiveType::edge);
-		auto endSDF_EdgeTree = std::chrono::high_resolution_clock::now();
-		std::chrono::duration<float> elapsedSDF_EdgeTree = (endSDF_EdgeTree - startSDF_EdgeTree);
-
 		auto startSDF_Sign = std::chrono::high_resolution_clock::now();
-		this->grid->computeSignField(this->vert_aabb, this->edge_aabb, this->tri_aabb);
+		this->grid->computeSignField(this->tri_aabb);		
 		auto endSDF_Sign = std::chrono::high_resolution_clock::now();
 		std::chrono::duration<float> elapsedSDF_Sign = (endSDF_Sign - startSDF_Sign);
-		*/
 
 		auto endSDF = std::chrono::high_resolution_clock::now();
 		std::chrono::duration<float> elapsedSDF = (endSDF - startSDF);
@@ -131,7 +119,7 @@ SDF::SDF(Geometry* geom, uint resolution, bool saveGridStates, bool scaleAndInte
 			" s, Octree: (build: " + std::to_string(elapsedSDF_Octree.count()) + " s, get_leaves: " + std::to_string(this->octree->leaf_retrieve_time) +
 			" s), FastSweep3D: " + std::to_string(elapsedSDF_FS.count()) + " s, \n" +
 			((scaleAndInterpolate && resolution > this->resolution_limit) ? "Grid scale: " + std::to_string(elapsedGridScale.count()) + " s \n": "") +
-			//" vertex AABBTree: " + std::to_string(elapsedSDF_VertTree.count()) + " s, edge AABBTree: " + std::to_string(elapsedSDF_EdgeTree.count()) + " s, grid sign computation: " + std::to_string(elapsedSDF_Sign.count()) + "s\n" +
+			"grid sign computation: " + std::to_string(elapsedSDF_Sign.count()) + "s\n" +
 			"====> TOTAL: " + std::to_string(elapsedSDF.count()) + " s" + "\n\n";
 	}
 	else if (method == SDF_Method::aabb_dist) {

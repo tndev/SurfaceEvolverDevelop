@@ -121,3 +121,11 @@ bool Box3::equals(Box3& other)
 {
 	return (this->min.equals(other.min) && this->max.equals(other.max));
 }
+
+Vector3* Box3::getBoundById(unsigned int id)
+{
+	if (id == 0) {
+		return &min;
+	}
+	return &max;
+}

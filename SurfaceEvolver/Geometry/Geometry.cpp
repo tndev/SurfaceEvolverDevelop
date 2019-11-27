@@ -824,7 +824,7 @@ template <typename T> int sgn(T val) {
 }
 
 
-bool getRayBoxIntersection(Edge& vertices, Vector3* boxMin, Vector3* boxMax, float* hitParam)
+bool getEdgeBoxIntersection(Edge& vertices, Vector3* boxMin, Vector3* boxMax)
 {
 	Vector3 edge_direction = *vertices[1] - *vertices[0];
 	float edge_param = edge_direction.length();
@@ -850,7 +850,6 @@ bool getRayBoxIntersection(Edge& vertices, Vector3* boxMin, Vector3* boxMax, flo
 		}
 	}
 
-	*hitParam = t_min;
 	return (t_max >= t_min && t_max >= 0.0f && t_min <= edge_param);
 }
 
@@ -862,10 +861,10 @@ bool getPrimitiveBoxIntersection(Primitive& primitive, Vector3* boxCenter, Vecto
 			(primitive.vertices[0]->x >= boxMin->x && primitive.vertices[0]->x <= boxMax->x) &&
 			(primitive.vertices[0]->y >= boxMin->y && primitive.vertices[0]->y <= boxMax->y) &&
 			(primitive.vertices[0]->z >= boxMin->z && primitive.vertices[0]->z <= boxMax->z)
-			);
+		);
 	}
 	else if (primitive.vertices.size() == 2) {
-		return getRayBoxIntersection(primitive.vertices, boxMin, boxMax, &hitParam);
+		return getEdgeBoxIntersection(primitive.vertices, boxMin, boxMax);
 	}
 	else if (primitive.vertices.size() == 3) {
 		Vector3** t = new Vector3*[3];

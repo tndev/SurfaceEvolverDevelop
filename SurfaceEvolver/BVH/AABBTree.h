@@ -57,7 +57,9 @@ public:
 		Vector3 start = Vector3();
 		Vector3 direction = Vector3(1.0f, 0.0f, 0.0f);
 		Vector3 invDirection = Vector3(1.0f / direction.x, FLT_MAX, FLT_MAX);
-		// std::vector<std::pair<float, float>> minMaxParams = {};
+
+		float minParam = 0.0f;
+		float maxParam = FLT_MAX;
 		uint hitCount = 0;
 		// std::vector<uint> hitIds = {};
 		// std::vector<AABBNode*> hitNodes = {};
@@ -110,5 +112,6 @@ public:
 };
 
 uint depth(AABBTree* root);
+bool getRayBoxIntersection(const AABBTree::AABBRay& r, Vector3* boxMin, Vector3* boxMax, float* hitParam);
 
 #endif

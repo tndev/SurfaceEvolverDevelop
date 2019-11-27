@@ -144,19 +144,21 @@ uint AABBTree::rayIntersect(Vector3& rayOrigin, Vector3& rayDirection, float ray
 {
 	uint hitCount = 0;
 	float minParam = rayMinParam, maxParam = rayMaxParam;
-	float t, t_split;
-	Vector3 rayStart = rayStart;
+	Vector3 rayStart = rayOrigin;
 	Vector3 rayEnd = rayStart + maxParam * rayDirection;
 	Vector3 rayInvDirection = Vector3(1.0f / rayDirection.x, 1.0f / rayDirection.y, 1.0f / rayDirection.z);
-	Edge rayEdge = { &rayStart, &rayEnd };
-	bool leftIsNear, force_near, force_far, t_splitAtInfinity;
-	bool treeBoxHit = getRayBoxIntersection(rayEdge, &bbox.min, &bbox.max, &minParam);
+	AABBRay ray = AABBRay(&rayOrigin);
+
+	bool treeBoxHit = getRayBoxIntersection(ray, &bbox.min, &bbox.max, &minParam);
 	if (!treeBoxHit) {
 		return hitCount;
 	}
 
 	AABBNode* item;	AABBNode* nearNode;	AABBNode* farNode;
 	std::pair<float, float> params;
+	float t, t_split;
+	bool leftIsNear, force_near, force_far, t_splitAtInfinity;
+
 
 	std::stack<AABBNode*> stack = {};
 	stack.push(this->root);
@@ -169,21 +171,7 @@ uint AABBTree::rayIntersect(Vector3& rayOrigin, Vector3& rayDirection, float ray
 		params = paramStack.top();
 		paramStack.pop();
 
-		if (item->isALeaf()) {
-			if (getRayBoxIntersection(rayEdge, &item->bbox.min, &item->bbox.max, &minParam)) {
-				minParam = params.first; maxParam = params.second;
-				rayStart.set(rayStart.x + minParam * rayDirection.x, rayStart.y + minParam * rayDirection.y, rayStart.z + minParam * rayDirection.z);
-				for (auto&& pId : item->primitiveIds) {
-					t = getRayTriangleIntersection(rayStart, rayDirection, &primitives[pId].vertices, std::max(params.first, rayMinParam), std::min(params.second, rayMaxParam));
-					if (t > 0) {
-						hitCount++;
-						minParam = t;
-					}					
-				}
-				minParam = 0.0f;
-			}
-		}
-		else {
+		if (!item->isALeaf()) {
 			leftIsNear = rayDirection.getCoordById(item->axis) >= 0.0f;
 			nearNode = item->left; farNode = item->right;
 			if (!leftIsNear) {
@@ -213,7 +201,7 @@ uint AABBTree::rayIntersect(Vector3& rayOrigin, Vector3& rayDirection, float ray
 				if (!t_splitAtInfinity) {
 					minParam = std::max(minParam, t_split);
 				}
-				paramStack.push({minParam, params.second});
+				paramStack.push({ minParam, params.second });
 			}
 			if (nearNode && ((!t_splitAtInfinity && params.first <= t_split) || force_near)) {
 				stack.push(nearNode);
@@ -222,6 +210,15 @@ uint AABBTree::rayIntersect(Vector3& rayOrigin, Vector3& rayDirection, float ray
 					maxParam = std::min(maxParam, t_split);
 				}
 				paramStack.push({ params.first , maxParam });
+			}
+		}
+		else {
+			for (auto&& pId : item->primitiveIds) {
+				t = getRayTriangleIntersection(rayStart, rayDirection, &primitives[pId].vertices, std::max(params.first, rayMinParam), std::min(params.second, rayMaxParam));
+				if (t > 0) {
+					hitCount++;
+					rayStart.set(rayStart.x + t * rayDirection.x, rayStart.y + t * rayDirection.y, rayStart.z + t * rayDirection.z);
+				}
 			}
 		}
 	}
@@ -518,6 +515,42 @@ void AABBTree::GenerateFullLeafBoxVisualisation(VTKExporter& e)
 uint depth(AABBTree* tree)
 {
 	return tree->getDepth();
+}
+
+bool getRayBoxIntersection(const AABBTree::AABBRay& r, Vector3* boxMin, Vector3* boxMax, float* hitParam)
+{
+	float tmin, tmax, tymin, tymax, tzmin, tzmax;
+	bool signX = r.invDirection.x < 0;
+	bool signY = r.invDirection.y < 0;
+	bool signZ = r.invDirection.z < 0;
+	float b0X = (signX ? boxMax->x : boxMin->x);
+	float b0Y = (signY ? boxMax->y : boxMin->y);
+	float b0Z = (signZ ? boxMax->z : boxMin->z);
+	float b1X = (signX ? boxMin->x : boxMax->x);
+	float b1Y = (signY ? boxMin->y : boxMax->y);
+	float b1Z = (signZ ? boxMin->z : boxMax->z);
+	
+	tmin = (b0X - r.start.x) * r.invDirection.x;
+	tmax = (b1X - r.start.x) * r.invDirection.x;
+	tymin = (b0Y - r.start.y) * r.invDirection.y;
+	tymax = (b1Y - r.start.y) * r.invDirection.y;
+
+	if ((tmin > tymax) || (tymin > tmax)) return false;
+	if (tymin > tmin) tmin = tymin;
+	if (tymax < tmax) tmax = tymax;
+
+	tzmin = (b0Z - r.start.z) * r.invDirection.z;
+	tzmax = (b1Z - r.start.z) * r.invDirection.z;
+
+	if ((tmin > tzmax) || (tzmin > tmax)) return false;
+	if (tzmin > tmin) tmin = tzmin;
+	if (tzmax < tmax) tmax = tzmax;
+
+	if ((tmin < r.maxParam) && (tmax > r.minParam)) {
+		*hitParam = tmax;
+		return true;
+	}
+	return false;
 }
 
 void AABBTree::GenerateStepwiseLeafBoxVisualisation(VTKExporter& e)
@@ -906,7 +939,7 @@ float AABBTree::AABBNode::getAdaptivelyResampledSplitPosition(std::vector<uint>&
 
 	// ==== Stage 5: Minimize cost(x) & classify primitives  =============================================================
 
-	/*
+	/**/
 	// Alternative I: Quad interpolate argmin of cost(x) between triplets of sampled positions when when triplets form a convex parabolic arc
 	//
 	// extended discretisation domain including a and b
@@ -927,11 +960,11 @@ float AABBTree::AABBNode::getAdaptivelyResampledSplitPosition(std::vector<uint>&
 			);
 			break;
 		}
-	}*/
+	}
 	// Alternative I.a: implement sort order method for __m265 vector to obtain the indices of minimal splits
 	// then, interpolate a parabola using the ids of 3 minimal indices
 
-	/**/
+	/*
 	// Alternative II: simply find min cost by comparing vals - less exact, but
 	// faster than previous by ~20%
 	
@@ -941,7 +974,7 @@ float AABBTree::AABBNode::getAdaptivelyResampledSplitPosition(std::vector<uint>&
 			minCost = cost[i];
 			bestSplit = allspl[i];
 		}
-	}
+	}*/
 	
 
 	// fill left and right arrays now that best split position is known:
