@@ -178,9 +178,19 @@ void Grid::absField()
 void Grid::computeSignField(AABBTree* aabb)
 {
 	Vector3 p = Vector3();
-	Vector3 rayDirection = normalize(Vector3(1, 0.25, 0.5));
+
+	/*Vector3 rayDirection_X = Vector3(1, 0, 0);
+	Vector3 rayDirection_nX = Vector3(-1, 0, 0);
+	Vector3 rayDirection_Y = Vector3(0, 1, 0);
+	Vector3 rayDirection_nY = Vector3(0, -1, 0);
+	Vector3 rayDirection_Z = Vector3(0, 0, 1);
+	Vector3 rayDirection_nZ = Vector3(0, 0, -1);*/
+
+	Vector3 rayDirection = normalize(Vector3(1, 0.5, 0.25));
+
 	float sign = 1.0f, val; uint gridPos;
 	int intersectCount;
+	// bool int0, int1, int2, int3, int4, int5;
 
 	/*
 	Vector3 testPt = Vector3(-15, 5, 15);*/
@@ -209,7 +219,19 @@ void Grid::computeSignField(AABBTree* aabb)
 				if (p.equalsWithEpsilon(testPt, dx)) {
 					intersectCount *= 1;
 				}*/
+
+				/*
+				int0 = aabb->boolRayIntersect(p, rayDirection_X);
+				int1 = aabb->boolRayIntersect(p, rayDirection_nX);
+				int2 = aabb->boolRayIntersect(p, rayDirection_Y);
+				int3 = aabb->boolRayIntersect(p, rayDirection_nY);
+				int4 = aabb->boolRayIntersect(p, rayDirection_Z);
+				int5 = aabb->boolRayIntersect(p, rayDirection_nZ);*/
+
+				// (int0 && int1 && int2 && int3 && int4 && int5)
+
 				intersectCount = aabb->rayIntersect(p, rayDirection);
+
 				sign = (intersectCount % 2 == 1 ? -1.0f : 1.0f);
 				val = sign * this->field[gridPos];
 				this->field[gridPos] = val;

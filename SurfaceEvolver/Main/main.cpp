@@ -40,11 +40,15 @@
 
 //  POSTPONED:
 //
-// - implement sort order function of a 256-bit AVX vector
+// - implement sort order function of a 256-bit AVX vector (needs a proper lookup hash)
 // - AABB update for transformations + Timing test
 // - Inverse transform grid upon transforming mesh
 // - implement adaptive resampling for 512-bit registers - 2 * 8 sampling positions (if possible)
 // - compare results with CGAL distance query implementation
+// - sign computation \w (arbitrary)ray-mesh intersection (even # of intersections = 1, odd # of intersections = -1)
+//   Important notes:
+//		- split position matters, yet sometimes a less precise estimate yields better result than quad min. Trying 8 sample positions could help
+//		- still no idea why the near/far cycle's written this way. Sometimes it leads the traversal to only one intersection, ignoring the rest, because they're "far"
 
 //   DONE, BUT MIGHT BE IMPROVED:
 //
@@ -52,12 +56,11 @@
 
 //   WIP:
 // 
-// - sign computation \w (arbitrary)ray-mesh intersection (even # of intersections = 1, odd # of intersections = -1)
+// - flat AABB and Octree
 
 
 //   TODO:
 //
-// - flat AABB and Octree
 // - implement a method/class to get CPU instruction set, mainly whether it supports AVX, an alternate resampling method has to be implemented for CPU's that do not support AVX
 // - implement cutoff offset for the bounding cube to compute the field on minimum necessary subset (box)
 // - compose a linear system for evolution from CubeSphere to PrimitiveBox of the same subdivision level
@@ -188,7 +191,7 @@ int main()
 	
 	uint res = 30; // octree resolution
 	Vector3 axis = normalize(Vector3(1, 1, 1));
-	/*
+	
 	auto startObjLoad = std::chrono::high_resolution_clock::now();
 	// === Timed code ============
 	OBJImporter obj = OBJImporter();
@@ -201,12 +204,12 @@ int main()
 	std::cout << "Model loaded after " << elapsedObj.count() << " seconds" << std::endl;
 
 	
-	SDF bunny_sdf = SDF(&bunny, res, true);
+	SDF bunny_sdf = SDF(&bunny, res);
 
 	std::cout << bunny_sdf.getComputationProperties();
 
 	bunny_sdf.exportGrid(&e, "bunnySDF");
-	
+	/*
 	Matrix4 sdfTransform = Matrix4().makeTranslation(0.5, 0.5, 0.5).multiply(Matrix4().setToScale(2.0f, 2.0f, 2.0f));
 	//.makeRotationAxis(axis.x, axis.y, axis.z, M_PI / 6.);
 	bunny_sdf.applyMatrix(sdfTransform);
@@ -216,15 +219,15 @@ int main()
 	bunny_sdf.exportGrid(&e, "bunnySDF_scaled");
 	e.initExport(*bunny_sdf.geom, "sfBunny_scaled");*/
 
-	
-	PrimitiveBox cube = PrimitiveBox(a, a, a, 1, 1, 1);
+	/*
+	PrimitiveBox cube = PrimitiveBox(a, a, a, 2, 2, 2);
 	cube.applyMatrix(Matrix4().makeRotationAxis(axis.x, axis.y, axis.z, M_PI / 6.));
 	e.initExport(cube, "cube");
 
 	SDF cubeSDF = SDF(&cube, res, true); // signed dist to cube
 	std::cout << std::endl << cubeSDF.getComputationProperties();
-	cubeSDF.exportGrid(&e, "cubeSDF");
-	/**/
+	cubeSDF.exportGrid(&e, "cubeSDF");*/
+	
 
 	// tree visualisation
 	/*

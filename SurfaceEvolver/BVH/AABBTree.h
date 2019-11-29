@@ -89,6 +89,7 @@ public:
 	float boxIntersectsAPrimitiveAtDistance(Box3* box);
 	// returns the number of ray-mesh intersections
 	uint rayIntersect(Vector3& rayOrigin, Vector3& rayDirection, float rayMinParam = 0.0f, float rayMaxParam = FLT_MAX);
+	bool boolRayIntersect(Vector3& rayOrigin, Vector3& rayDirection, float rayMinParam = 0.0f, float rayMaxParam = FLT_MAX);
 
 	std::vector<AABBNode> flatten();
 	void getAllNodes(std::vector<AABBNode>* buffer);
