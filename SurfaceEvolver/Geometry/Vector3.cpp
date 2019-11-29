@@ -92,6 +92,15 @@ bool Vector3::equals(Vector3 other)
 	);
 }
 
+bool Vector3::equalsWithEpsilon(Vector3 other, float epsilon)
+{
+	return (
+		fabs(this->x - other.x) < epsilon &&
+		fabs(this->y - other.y) < epsilon &&
+		fabs(this->z - other.z) < epsilon
+		);
+}
+
 void Vector3::negate()
 {
 	this->x = -x;

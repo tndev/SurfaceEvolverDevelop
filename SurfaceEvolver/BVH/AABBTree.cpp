@@ -145,11 +145,11 @@ uint AABBTree::rayIntersect(Vector3& rayOrigin, Vector3& rayDirection, float ray
 	uint hitCount = 0;
 	float minParam = rayMinParam, maxParam = rayMaxParam;
 	Vector3 rayStart = rayOrigin;
-	Vector3 rayEnd = rayStart + maxParam * rayDirection;
 	Vector3 rayInvDirection = Vector3(1.0f / rayDirection.x, 1.0f / rayDirection.y, 1.0f / rayDirection.z);
-	AABBRay ray = AABBRay(&rayOrigin);
+	AABBRay ray = AABBRay(&rayOrigin, &rayDirection);
 
-	bool treeBoxHit = getRayBoxIntersection(ray, &bbox.min, &bbox.max, &minParam);
+	float hitParam;
+	bool treeBoxHit = getRayBoxIntersection(ray, &bbox.min, &bbox.max, &hitParam);
 	if (!treeBoxHit) {
 		return hitCount;
 	}

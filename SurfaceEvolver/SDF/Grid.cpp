@@ -178,10 +178,13 @@ void Grid::absField()
 void Grid::computeSignField(AABBTree* aabb)
 {
 	Vector3 p = Vector3();
-	Vector3 c = aabb->bbox.getCenter();
 	Vector3 rayDirection = normalize(Vector3(1, 1, 1));
 	float sign = 1.0f, val; uint gridPos;
 	int intersectCount;
+
+	/*
+	float a = 100.0f / sqrt(3.0f);
+	Vector3 testPt = Vector3(0.25 * a, 0.85 * a, 0.75 * a);*/
 
 	Vector3 o = bbox.min; // origin
 	Vector3 pn; float rv, re, rt;
@@ -191,20 +194,21 @@ void Grid::computeSignField(AABBTree* aabb)
 	float dx = scale.x / nx;
 	float dy = scale.y / ny;
 	float dz = scale.z / nz;
+	uint iz, iy, ix;
 
-	for (uint iz = 0; iz < Nz; iz++) {
-		for (uint iy = 0; iy < Ny; iy++) {
-			for (uint ix = 0; ix < Nx; ix++) {
+	for (iz = 0; iz < Nz; iz++) {
+		for (iy = 0; iy < Ny; iy++) {
+			for (ix = 0; ix < Nx; ix++) {
 				p.set(
 					o.x + ix * dx,
 					o.y + iy * dy,
 					o.z + iz * dz
 				);
 				gridPos = Nx * Ny * iz + Nx * iy + ix;
-				intersectCount = aabb->rayIntersect(p, rayDirection);
-				/*if (intersectCount > 0) {
+				/*if (p.equalsWithEpsilon(testPt, dx)) {
 					intersectCount *= 1;
 				}*/
+				intersectCount = aabb->rayIntersect(p, rayDirection);
 				sign = (intersectCount % 2 == 1 ? -1.0f : 1.0f);
 				val = sign * this->field[gridPos];
 				this->field[gridPos] = val;

@@ -27,6 +27,7 @@ public:
 	float getCoordById(unsigned int id);
 
 	bool equals(Vector3 other);
+	bool equalsWithEpsilon(Vector3 other, float epsilon);
 
 	void negate();
 	float dot(Vector3 other);

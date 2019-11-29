@@ -36,6 +36,7 @@
 // - add Quaternion class and TRS decomposition of Matrix4
 // - adaptive resampling of split cost function (done for 2 * 4 samples - 265-bit registers)
 // - minimize split cost function using a piecewise-quadratic interpolation to find the minimum (20% slower than simple cost(x) < minCost comparison)
+// - matrix multiplication for Matrix4
 
 //  POSTPONED:
 //
@@ -44,7 +45,6 @@
 // - Inverse transform grid upon transforming mesh
 // - implement adaptive resampling for 512-bit registers - 2 * 8 sampling positions (if possible)
 // - compare results with CGAL distance query implementation
-
 
 //   DONE, BUT MIGHT BE IMPROVED:
 //
@@ -57,7 +57,6 @@
 
 //   TODO:
 //
-// - matrix multiplication for Matrix4 and Matrix3
 // - flat AABB and Octree
 // - implement a method/class to get CPU instruction set, mainly whether it supports AVX, an alternate resampling method has to be implemented for CPU's that do not support AVX
 // - implement cutoff offset for the bounding cube to compute the field on minimum necessary subset (box)
@@ -186,8 +185,10 @@ int main()
 
 		timing_ico.close();
 	}
-
-
+	
+	uint res = 30; // octree resolution
+	Vector3 axis = normalize(Vector3(1, 1, 1));
+	/*
 	auto startObjLoad = std::chrono::high_resolution_clock::now();
 	// === Timed code ============
 	OBJImporter obj = OBJImporter();
@@ -200,14 +201,13 @@ int main()
 	std::cout << "Model loaded after " << elapsedObj.count() << " seconds" << std::endl;
 
 
-	uint res = 30; // octree resolution
+	
 	SDF bunny_sdf = SDF(&bunny, res);
 
 	std::cout << bunny_sdf.getComputationProperties();
 
 	bunny_sdf.exportGrid(&e, "bunnySDF");
 
-	Vector3 axis = normalize(Vector3(1, 1, 1));
 	Matrix4 sdfTransform = Matrix4().makeTranslation(0.5, 0.5, 0.5).multiply(Matrix4().setToScale(2.0f, 2.0f, 2.0f));
 	//.makeRotationAxis(axis.x, axis.y, axis.z, M_PI / 6.);
 	bunny_sdf.applyMatrix(sdfTransform);
@@ -215,7 +215,7 @@ int main()
 	std::cout << bunny_sdf.last_transform;
 
 	bunny_sdf.exportGrid(&e, "bunnySDF_scaled");
-	e.initExport(*bunny_sdf.geom, "sfBunny_scaled");
+	e.initExport(*bunny_sdf.geom, "sfBunny_scaled");*/
 
 	PrimitiveBox cube = PrimitiveBox(a, a, a, 1, 1, 1);
 	cube.applyMatrix(Matrix4().makeRotationAxis(axis.x, axis.y, axis.z, M_PI / 6.));
@@ -224,14 +224,20 @@ int main()
 	SDF cubeSDF = SDF(&cube, res, true); // signed dist to cube
 	std::cout << std::endl << cubeSDF.getComputationProperties();
 	cubeSDF.exportGrid(&e, "cubeSDF");
+
+	Vector3 testPt = Vector3(0.25 * a, 0.85 * a, 0.75 * a);
+	Vector3 rayDir = normalize(Vector3(1, 1, 1));
+	uint nInters = cubeSDF.tri_aabb->rayIntersect(testPt, rayDir);
 	
 
 	// tree visualisation
-	/* bunny_sdf.tri_aabb->GenerateFullTreeBoxVisualisation(e);
+	/*
+	bunny_sdf.tri_aabb->GenerateFullTreeBoxVisualisation(e);
 	bunny_sdf.tri_aabb->GenerateFullLeafBoxVisualisation(e);
 	bunny_sdf.tri_aabb->GenerateStepwiseLeafBoxVisualisation(e);
 	bunny_sdf.octree->GenerateFullOctreeBoxVisualisation(e);
-	bunny_sdf.octree->GenerateLeafCellVisualisation(e); */
+	bunny_sdf.octree->GenerateLeafCellVisualisation(e); 
+	*/
 
 	/* Interpolated bunny DF:
 	SDF bunny_sdf_r = SDF(&bunny, res, false, true);
