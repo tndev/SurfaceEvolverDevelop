@@ -126,6 +126,5 @@ void FastSweep3D::sweep(bool saveGridStates)
 			this->grid->exportToVTI("FSGrid_sweep-" + std::to_string(s + 1));
 		}
 	}
-	this->grid->clearFrozenCells();
 }
 

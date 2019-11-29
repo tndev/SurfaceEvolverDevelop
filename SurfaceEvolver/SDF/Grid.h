@@ -2,6 +2,7 @@
 #define GRID_H_
 
 #include <vector>
+#include <stack>
 #include <fstream>
 #include <algorithm>
 #include "../BVH/AABBTree.h"
@@ -38,6 +39,7 @@ public:
 	void add(Grid& other);
 	void sub(Grid& other);
 	void absField();
+	void negate();
 	void computeSignField(AABBTree* aabb);
 	void bruteForceDistanceField(Geometry* geom);
 	void aabbDistanceField(AABBTree* aabb);

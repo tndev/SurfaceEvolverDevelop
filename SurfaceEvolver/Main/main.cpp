@@ -195,7 +195,7 @@ int main()
 	auto startObjLoad = std::chrono::high_resolution_clock::now();
 	// === Timed code ============
 	OBJImporter obj = OBJImporter();
-	Geometry bunny = obj.importOBJGeometry("bunny.obj");
+	Geometry bunny = obj.importOBJGeometry("bunny_no_holes.obj");
 	// bunny.applyMatrix(Matrix4().setToScale(100.0f, 100.0f, 100.0f));
 	e.initExport(bunny, "sfBunny");
 	// === Timed code ============
@@ -204,7 +204,7 @@ int main()
 	std::cout << "Model loaded after " << elapsedObj.count() << " seconds" << std::endl;
 
 	
-	SDF bunny_sdf = SDF(&bunny, res);
+	SDF bunny_sdf = SDF(&bunny, res, true);
 
 	std::cout << bunny_sdf.getComputationProperties();
 
@@ -220,7 +220,7 @@ int main()
 	e.initExport(*bunny_sdf.geom, "sfBunny_scaled");*/
 
 	/*
-	PrimitiveBox cube = PrimitiveBox(a, a, a, 2, 2, 2);
+	PrimitiveBox cube = PrimitiveBox(a, a, a, 4, 4, 4);
 	cube.applyMatrix(Matrix4().makeRotationAxis(axis.x, axis.y, axis.z, M_PI / 6.));
 	e.initExport(cube, "cube");
 

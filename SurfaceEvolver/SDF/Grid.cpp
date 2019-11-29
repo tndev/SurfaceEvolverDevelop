@@ -175,69 +175,85 @@ void Grid::absField()
 	}
 }
 
-void Grid::computeSignField(AABBTree* aabb)
+void Grid::negate()
 {
-	Vector3 p = Vector3();
-
-	/*Vector3 rayDirection_X = Vector3(1, 0, 0);
-	Vector3 rayDirection_nX = Vector3(-1, 0, 0);
-	Vector3 rayDirection_Y = Vector3(0, 1, 0);
-	Vector3 rayDirection_nY = Vector3(0, -1, 0);
-	Vector3 rayDirection_Z = Vector3(0, 0, 1);
-	Vector3 rayDirection_nZ = Vector3(0, 0, -1);*/
-
-	Vector3 rayDirection = normalize(Vector3(1, 0.5, 0.25));
-
-	float sign = 1.0f, val; uint gridPos;
-	int intersectCount;
-	// bool int0, int1, int2, int3, int4, int5;
-
-	/*
-	Vector3 testPt = Vector3(-15, 5, 15);*/
-
-	Vector3 o = bbox.min; // origin
-	Vector3 pn; float rv, re, rt;
-	uint nx = Nx - 1;
-	uint ny = Ny - 1;
-	uint nz = Nz - 1;
-	float dx = scale.x / nx;
-	float dy = scale.y / ny;
-	float dz = scale.z / nz;
+	float val;
+	uint gridPos;
 	uint iz, iy, ix;
 
 	for (iz = 0; iz < Nz; iz++) {
 		for (iy = 0; iy < Ny; iy++) {
 			for (ix = 0; ix < Nx; ix++) {
-				p.set(
-					o.x + ix * dx,
-					o.y + iy * dy,
-					o.z + iz * dz
-				);
 				gridPos = Nx * Ny * iz + Nx * iy + ix;
-
-				/*
-				if (p.equalsWithEpsilon(testPt, dx)) {
-					intersectCount *= 1;
-				}*/
-
-				/*
-				int0 = aabb->boolRayIntersect(p, rayDirection_X);
-				int1 = aabb->boolRayIntersect(p, rayDirection_nX);
-				int2 = aabb->boolRayIntersect(p, rayDirection_Y);
-				int3 = aabb->boolRayIntersect(p, rayDirection_nY);
-				int4 = aabb->boolRayIntersect(p, rayDirection_Z);
-				int5 = aabb->boolRayIntersect(p, rayDirection_nZ);*/
-
-				// (int0 && int1 && int2 && int3 && int4 && int5)
-
-				intersectCount = aabb->rayIntersect(p, rayDirection);
-
-				sign = (intersectCount % 2 == 1 ? -1.0f : 1.0f);
-				val = sign * this->field[gridPos];
+				val = -1.0f * this->field[gridPos];
 				this->field[gridPos] = val;
 			}
 		}
 	}
+}
+
+void Grid::computeSignField(AABBTree* aabb)
+{
+	this->negate();
+
+	float val; uint gridPos;
+	uint nx = Nx - 1;
+	uint ny = Ny - 1;
+	uint nz = Nz - 1;
+	
+	uint iz = 0, iy = 0, ix = 0;
+
+	std::stack<std::tuple<uint, uint, uint>> stack = {};
+	std::tuple<uint, uint, uint> idsTriple;
+
+	// find the first unfrozen cell
+	gridPos = 0;
+	while (this->frozenCells[gridPos]) {
+		ix += (ix < nx ? 1 : 0);
+		iy += (iy < ny ? 1 : 0);
+		iz += (iz < nz ? 1 : 0);
+		gridPos = Nx * Ny * iz + Nx * iy + ix;
+	}
+
+	stack.push({ ix, iy, iz });
+
+	// a simple voxel flood
+	while (stack.size()) {
+		idsTriple = stack.top();
+		stack.pop();
+
+		ix = std::get<0>(idsTriple);
+		iy = std::get<1>(idsTriple);
+		iz = std::get<2>(idsTriple);
+
+		gridPos = Nx * Ny * iz + Nx * iy + ix;
+
+		if (!this->frozenCells[gridPos]) {
+			val = -1.0f * this->field[gridPos];
+			this->field[gridPos] = val;
+			this->frozenCells[gridPos] = true; // freeze cell when done
+
+			if (ix > 0) {
+				stack.push({ ix - 1, iy, iz });
+			}
+			if (ix < nx) {
+				stack.push({ ix + 1, iy, iz });
+			}
+			if (iy > 0) {
+				stack.push({ ix, iy - 1, iz });
+			}
+			if (iy < ny) {
+				stack.push({ ix, iy + 1, iz });
+			}
+			if (iz > 0) {
+				stack.push({ ix, iy, iz - 1 });
+			}
+			if (iz < nz) {
+				stack.push({ ix, iy, iz + 1 });
+			}
+		}
+	}
+
 }
 
 
