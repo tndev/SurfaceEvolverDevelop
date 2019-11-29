@@ -200,14 +200,13 @@ int main()
 	std::chrono::duration<float> elapsedObj = (endObjLoad - startObjLoad);
 	std::cout << "Model loaded after " << elapsedObj.count() << " seconds" << std::endl;
 
-
 	
-	SDF bunny_sdf = SDF(&bunny, res);
+	SDF bunny_sdf = SDF(&bunny, res, true);
 
 	std::cout << bunny_sdf.getComputationProperties();
 
 	bunny_sdf.exportGrid(&e, "bunnySDF");
-
+	
 	Matrix4 sdfTransform = Matrix4().makeTranslation(0.5, 0.5, 0.5).multiply(Matrix4().setToScale(2.0f, 2.0f, 2.0f));
 	//.makeRotationAxis(axis.x, axis.y, axis.z, M_PI / 6.);
 	bunny_sdf.applyMatrix(sdfTransform);
@@ -217,6 +216,7 @@ int main()
 	bunny_sdf.exportGrid(&e, "bunnySDF_scaled");
 	e.initExport(*bunny_sdf.geom, "sfBunny_scaled");*/
 
+	
 	PrimitiveBox cube = PrimitiveBox(a, a, a, 1, 1, 1);
 	cube.applyMatrix(Matrix4().makeRotationAxis(axis.x, axis.y, axis.z, M_PI / 6.));
 	e.initExport(cube, "cube");
@@ -224,11 +224,7 @@ int main()
 	SDF cubeSDF = SDF(&cube, res, true); // signed dist to cube
 	std::cout << std::endl << cubeSDF.getComputationProperties();
 	cubeSDF.exportGrid(&e, "cubeSDF");
-
-	Vector3 testPt = Vector3(0.25 * a, 0.85 * a, 0.75 * a);
-	Vector3 rayDir = normalize(Vector3(1, 1, 1));
-	uint nInters = cubeSDF.tri_aabb->rayIntersect(testPt, rayDir);
-	
+	/**/
 
 	// tree visualisation
 	/*

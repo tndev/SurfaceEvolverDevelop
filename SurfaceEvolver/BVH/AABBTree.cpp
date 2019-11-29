@@ -143,7 +143,6 @@ float AABBTree::boxIntersectsAPrimitiveAtDistance(Box3* box)
 uint AABBTree::rayIntersect(Vector3& rayOrigin, Vector3& rayDirection, float rayMinParam, float rayMaxParam)
 {
 	uint hitCount = 0;
-	float minParam = rayMinParam, maxParam = rayMaxParam;
 	Vector3 rayStart = rayOrigin;
 	Vector3 rayInvDirection = Vector3(1.0f / rayDirection.x, 1.0f / rayDirection.y, 1.0f / rayDirection.z);
 	AABBRay ray = AABBRay(&rayOrigin, &rayDirection);
@@ -155,24 +154,21 @@ uint AABBTree::rayIntersect(Vector3& rayOrigin, Vector3& rayDirection, float ray
 	}
 
 	AABBNode* item;	AABBNode* nearNode;	AABBNode* farNode;
-	std::pair<float, float> params;
 	float t, t_split;
 	bool leftIsNear, force_near, force_far, t_splitAtInfinity;
 
 
 	std::stack<AABBNode*> stack = {};
 	stack.push(this->root);
-	std::stack<std::pair<float, float>> paramStack = {};
-	paramStack.push({ minParam, maxParam });
+	std::set<float> t_set = {};
 
 	while (stack.size()) {
 		item = stack.top();
 		stack.pop();
-		params = paramStack.top();
-		paramStack.pop();
+
 
 		if (!item->isALeaf()) {
-			leftIsNear = rayDirection.getCoordById(item->axis) >= 0.0f;
+			leftIsNear = rayOrigin.getCoordById(item->axis) < item->splitPosition;
 			nearNode = item->left; farNode = item->right;
 			if (!leftIsNear) {
 				nearNode = item->right;
@@ -195,35 +191,37 @@ uint AABBTree::rayIntersect(Vector3& rayOrigin, Vector3& rayDirection, float ray
 				}
 			}
 
-			if (farNode && ((!t_splitAtInfinity && params.second >= t_split) || force_far)) {
+			if (farNode && ((!t_splitAtInfinity && rayMaxParam >= t_split) || force_far)) {
 				stack.push(farNode);
-				minParam = params.first;
-				if (!t_splitAtInfinity) {
-					minParam = std::max(minParam, t_split);
-				}
-				paramStack.push({ minParam, params.second });
 			}
-			if (nearNode && ((!t_splitAtInfinity && params.first <= t_split) || force_near)) {
+			if (nearNode && ((!t_splitAtInfinity && rayMinParam <= t_split) || force_near)) {
 				stack.push(nearNode);
-				maxParam = params.second;
-				if (!t_splitAtInfinity) {
-					maxParam = std::min(maxParam, t_split);
-				}
-				paramStack.push({ params.first , maxParam });
 			}
 		}
 		else {
+			/*
+			if (getRayBoxIntersection(ray, &item->bbox.min, &item->bbox.max, &hitParam)) {
+			}
+			*/
+
 			for (auto&& pId : item->primitiveIds) {
-				t = getRayTriangleIntersection(rayStart, rayDirection, &primitives[pId].vertices, std::max(params.first, rayMinParam), std::min(params.second, rayMaxParam));
+				/*
+				if (pId == 10) {
+					t = 0.0f;
+				}*/
+				t = getRayTriangleIntersection(rayStart, rayDirection, &primitives[pId].vertices, rayMinParam, rayMaxParam);
 				if (t > 0) {
 					hitCount++;
-					rayStart.set(rayStart.x + t * rayDirection.x, rayStart.y + t * rayDirection.y, rayStart.z + t * rayDirection.z);
+					// t += (bbox.max.x - bbox.min.x) / 1000.0f;
+					// rayStart.set(rayStart.x + t * rayDirection.x, rayStart.y + t * rayDirection.y, rayStart.z + t * rayDirection.z);
+					t_set.insert(t);
 				}
 			}
+
 		}
 	}
 
-	return hitCount;
+	return t_set.size();
 }
 
 std::vector<AABBTree::AABBNode> AABBTree::flatten()
@@ -809,8 +807,8 @@ float AABBTree::AABBNode::getAdaptivelyResampledSplitPosition(std::vector<uint>&
 		primMins[i] = this->tree->primitives[primitiveIds[i]].getMinById(axis);
 		primMaxes[i] = this->tree->primitives[primitiveIds[i]].getMaxById(axis);
 
-		mask_L = _mm_cmple_ps(_mm_set1_ps(primMins[i]), B_min_shift);
-		mask_R = _mm_cmpge_ps(_mm_set1_ps(primMaxes[i]), B_min_shift);
+		mask_L = _mm_cmplt_ps(_mm_set1_ps(primMins[i]), B_min_shift);
+		mask_R = _mm_cmpgt_ps(_mm_set1_ps(primMaxes[i]), B_min_shift);
 		r_L = _mm_setr_ps((m_Li[0] > 0) * 1.0f,	(m_Li[1] > 0) * 1.0f, (m_Li[2] > 0) * 1.0f,	(m_Li[3] > 0) * 1.0f);
 		r_R = _mm_setr_ps((m_Ri[0] > 0) * 1.0f,	(m_Ri[1] > 0) * 1.0f, (m_Ri[2] > 0) * 1.0f,	(m_Ri[3] > 0) * 1.0f);
 		C_L = _mm_add_ps(C_L, r_L);
@@ -939,7 +937,7 @@ float AABBTree::AABBNode::getAdaptivelyResampledSplitPosition(std::vector<uint>&
 
 	// ==== Stage 5: Minimize cost(x) & classify primitives  =============================================================
 
-	/**/
+	/*
 	// Alternative I: Quad interpolate argmin of cost(x) between triplets of sampled positions when when triplets form a convex parabolic arc
 	//
 	// extended discretisation domain including a and b
@@ -960,11 +958,11 @@ float AABBTree::AABBNode::getAdaptivelyResampledSplitPosition(std::vector<uint>&
 			);
 			break;
 		}
-	}
+	}*/
 	// Alternative I.a: implement sort order method for __m265 vector to obtain the indices of minimal splits
 	// then, interpolate a parabola using the ids of 3 minimal indices
 
-	/*
+	/**/
 	// Alternative II: simply find min cost by comparing vals - less exact, but
 	// faster than previous by ~20%
 	
@@ -974,7 +972,7 @@ float AABBTree::AABBNode::getAdaptivelyResampledSplitPosition(std::vector<uint>&
 			minCost = cost[i];
 			bestSplit = allspl[i];
 		}
-	}*/
+	}
 	
 
 	// fill left and right arrays now that best split position is known:
@@ -982,10 +980,10 @@ float AABBTree::AABBNode::getAdaptivelyResampledSplitPosition(std::vector<uint>&
 		min = primMins[i];
 		max = primMaxes[i];
 
-		if (min <= bestSplit) {
+		if (min < bestSplit) {
 			out_left->push_back(primitiveIds[i]);
 		}
-		if (max >= bestSplit) {
+		if (max > bestSplit) {
 			out_right->push_back(primitiveIds[i]);
 		}
 	}

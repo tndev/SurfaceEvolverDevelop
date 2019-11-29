@@ -178,13 +178,12 @@ void Grid::absField()
 void Grid::computeSignField(AABBTree* aabb)
 {
 	Vector3 p = Vector3();
-	Vector3 rayDirection = normalize(Vector3(1, 1, 1));
+	Vector3 rayDirection = normalize(Vector3(1, 0.25, 0.5));
 	float sign = 1.0f, val; uint gridPos;
 	int intersectCount;
 
 	/*
-	float a = 100.0f / sqrt(3.0f);
-	Vector3 testPt = Vector3(0.25 * a, 0.85 * a, 0.75 * a);*/
+	Vector3 testPt = Vector3(-15, 5, 15);*/
 
 	Vector3 o = bbox.min; // origin
 	Vector3 pn; float rv, re, rt;
@@ -205,7 +204,9 @@ void Grid::computeSignField(AABBTree* aabb)
 					o.z + iz * dz
 				);
 				gridPos = Nx * Ny * iz + Nx * iy + ix;
-				/*if (p.equalsWithEpsilon(testPt, dx)) {
+
+				/*
+				if (p.equalsWithEpsilon(testPt, dx)) {
 					intersectCount *= 1;
 				}*/
 				intersectCount = aabb->rayIntersect(p, rayDirection);
@@ -216,6 +217,7 @@ void Grid::computeSignField(AABBTree* aabb)
 		}
 	}
 }
+
 
 void Grid::bruteForceDistanceField(Geometry* geom)
 {
