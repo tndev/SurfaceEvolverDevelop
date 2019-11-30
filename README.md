@@ -30,8 +30,8 @@ Current WIP: optimize the construction of AABBTree and Octree. Try flat node arr
 ![error](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/BunnySDF_FS_Error.jpg)
 
 #### Sign is computed by negating the grid field d(x,y,z) and flood filling "unfrozen" voxels to set external sign > 0:
-clearly, if the mesh has holes, the flood fill will set all non-boundary voxels to external
 ![SignComp](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/BunnySDF_Sign.jpg)
+clearly, if the mesh has holes, the flood fill will set all non-boundary voxels to external
 
 ## Time computation results for primitives:
 ![primRes](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/primResultsAnim.gif)
