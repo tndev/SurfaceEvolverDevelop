@@ -37,6 +37,7 @@
 // - adaptive resampling of split cost function (done for 2 * 4 samples - 265-bit registers)
 // - minimize split cost function using a piecewise-quadratic interpolation to find the minimum (20% slower than simple cost(x) < minCost comparison)
 // - matrix multiplication for Matrix4
+// - flood fill for sign computation of SDF
 
 //  POSTPONED:
 //

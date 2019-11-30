@@ -5,6 +5,8 @@
 #include <stack>
 #include <fstream>
 #include <algorithm>
+#include <stack>
+#include <nmmintrin.h>
 #include "../BVH/AABBTree.h"
 #include "../Geometry/Vector3.h"
 #include "../Geometry/Box3.h"

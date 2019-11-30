@@ -179,21 +179,16 @@ void Grid::negate()
 {
 	float val;
 	uint gridPos;
-	uint iz, iy, ix;
 
-	for (iz = 0; iz < Nz; iz++) {
-		for (iy = 0; iy < Ny; iy++) {
-			for (ix = 0; ix < Nx; ix++) {
-				gridPos = Nx * Ny * iz + Nx * iy + ix;
-				val = -1.0f * this->field[gridPos];
-				this->field[gridPos] = val;
-			}
-		}
+	for (gridPos = 0; gridPos < this->gridExtent; gridPos++) {
+		val = -1.0f * this->field[gridPos];
+		this->field[gridPos] = val;
 	}
 }
 
 void Grid::computeSignField(AABBTree* aabb)
 {
+	/**/
 	this->negate();
 
 	float val; uint gridPos;
@@ -201,6 +196,77 @@ void Grid::computeSignField(AABBTree* aabb)
 	uint ny = Ny - 1;
 	uint nz = Nz - 1;
 	
+	uint iz = 0, iy = 0, ix = 0;
+
+	union {	__m128i idsTriple; uint ids[3];	};
+	union { __m128i idsMask; uint imask[3]; };
+	std::stack<__m128i> stack = {};
+
+	idsTriple = _mm_setr_epi32(ix, iy, iz, INT_MAX);
+
+	// find the first unfrozen cell
+
+	gridPos = 0;
+	while (this->frozenCells[gridPos]) {
+		idsMask = _mm_cmplt_epi32(idsTriple, _mm_setr_epi32(nx, ny, nz, INT_MAX));
+		idsTriple = _mm_add_epi32(
+			idsTriple, _mm_setr_epi32(
+			(imask[0] > 0) * 1, (imask[1] > 0) * 1, (imask[2] > 0) * 1, 0)
+		);
+		ix = ids[0]; iy = ids[1]; iz = ids[2];
+		gridPos = Nx * Ny * iz + Nx * iy + ix;
+	}
+
+	ids[0] = ix; ids[1] = iy; ids[2] = iz;
+	stack.push(idsTriple);
+
+	// a simple voxel flood
+	while (stack.size()) {
+		idsTriple = stack.top();
+		stack.pop();
+
+		ix = ids[0]; iy = ids[1]; iz = ids[2];
+		gridPos = Nx * Ny * iz + Nx * iy + ix;
+
+		if (!this->frozenCells[gridPos]) {
+			val = -1.0f * this->field[gridPos];
+			this->field[gridPos] = val;
+			this->frozenCells[gridPos] = true; // freeze cell when done
+
+			idsMask = _mm_cmpgt_epi32(idsTriple, _mm_set1_epi32(0)); // lower bounds
+
+			if (imask[0] > 0) {
+				stack.push(_mm_setr_epi32(ix - 1, iy, iz, INT_MAX));
+			}
+			if (imask[1] > 0) {
+				stack.push(_mm_setr_epi32(ix, iy - 1, iz, INT_MAX));
+			}
+			if (imask[2] > 0) {
+				stack.push(_mm_setr_epi32(ix, iy, iz - 1, INT_MAX));
+			}
+
+			idsMask = _mm_cmplt_epi32(idsTriple, _mm_setr_epi32(nx, ny, nz, INT_MAX)); // upper bounds
+
+			if (imask[0] > 0) {
+				stack.push(_mm_setr_epi32(ix + 1, iy, iz, INT_MAX));
+			}
+			if (imask[1] > 0) {
+				stack.push(_mm_setr_epi32(ix, iy + 1, iz, INT_MAX));
+			}
+			if (imask[2] > 0) {
+				stack.push(_mm_setr_epi32(ix, iy, iz + 1, INT_MAX));
+			}
+		}
+	}
+
+	/*
+	this->negate();
+
+	float val; uint gridPos;
+	uint nx = Nx - 1;
+	uint ny = Ny - 1;
+	uint nz = Nz - 1;
+
 	uint iz = 0, iy = 0, ix = 0;
 
 	std::stack<std::tuple<uint, uint, uint>> stack = {};
@@ -252,8 +318,7 @@ void Grid::computeSignField(AABBTree* aabb)
 				stack.push({ ix, iy, iz + 1 });
 			}
 		}
-	}
-
+	}*/
 }
 
 

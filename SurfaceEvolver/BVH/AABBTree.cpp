@@ -199,11 +199,6 @@ uint AABBTree::rayIntersect(Vector3& rayOrigin, Vector3& rayDirection, float ray
 			}
 		}
 		else {
-			/*
-			if (getRayBoxIntersection(ray, &item->bbox.min, &item->bbox.max, &hitParam)) {
-			}
-			*/
-
 			for (auto&& pId : item->primitiveIds) {
 				/*
 				if (pId == 10) {
