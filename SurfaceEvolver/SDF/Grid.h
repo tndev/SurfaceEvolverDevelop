@@ -10,6 +10,7 @@
 #include "../BVH/AABBTree.h"
 #include "../Geometry/Vector3.h"
 #include "../Geometry/Box3.h"
+#include "../Utils/CPUInfo.h"
 
 #define uint unsigned int
 

@@ -50,6 +50,7 @@
 //   Important notes:
 //		- split position matters, yet sometimes a less precise estimate yields better result than quad min. Trying 8 sample positions could help
 //		- still no idea why the near/far cycle's written this way. Sometimes it leads the traversal to only one intersection, ignoring the rest, because they're "far"
+// - flat AABB and Octree (we can try, but this would require dynamic arrays (i.e.: std::vectors) which would be slower than allocation)
 
 //   DONE, BUT MIGHT BE IMPROVED:
 //
@@ -57,12 +58,11 @@
 
 //   WIP:
 // 
-// - flat AABB and Octree
+// - implement a method/class to get CPU instruction set, mainly whether it supports AVX, an alternate resampling method has to be implemented for CPU's that do not support AVX
 
 
 //   TODO:
 //
-// - implement a method/class to get CPU instruction set, mainly whether it supports AVX, an alternate resampling method has to be implemented for CPU's that do not support AVX
 // - implement cutoff offset for the bounding cube to compute the field on minimum necessary subset (box)
 // - compose a linear system for evolution from CubeSphere to PrimitiveBox of the same subdivision level
 // - implement a VTK window form using a working example for mesh rendering and SDF volume rendering
@@ -189,7 +189,7 @@ int main()
 
 		timing_ico.close();
 	}
-	
+
 	uint res = 30; // octree resolution
 	Vector3 axis = normalize(Vector3(1, 1, 1));
 	

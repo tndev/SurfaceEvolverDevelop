@@ -56,9 +56,7 @@ Octree::OctreeNode::OctreeNode(Octree* tree, Box3 box, OctreeNode* parent, uint 
 				for (k = 0; k < 2; k++) {
 					SET_BOX_MIN_COORD(childBox, this->box, i, j, k);
 					SET_BOX_MAX_COORD(childBox, this->box, i, j, k);
-					/*if (intersectsPrimitives(&childBox)) {
-						this->children.push_back(new OctreeNode(this->tree, childBox, this, depthLeft - 1));
-					}*/
+
 					if (intersectsPrimitives(&childBox)) {
 						this->children[chId] = new OctreeNode(this->tree, childBox, this, depthLeft - 1);
 					}

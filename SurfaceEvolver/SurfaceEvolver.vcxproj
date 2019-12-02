@@ -204,6 +204,7 @@
     <ClInclude Include="SDF\FastSweep3D.h" />
     <ClInclude Include="SDF\Grid.h" />
     <ClInclude Include="SDF\SDF.h" />
+    <ClInclude Include="Utils\CPUInfo.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

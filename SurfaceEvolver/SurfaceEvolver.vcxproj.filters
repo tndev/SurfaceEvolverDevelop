@@ -26,6 +26,9 @@
     <Filter Include="SDF">
       <UniqueIdentifier>{48e0675c-e2e5-4bce-8297-d0c17141603e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Utils">
+      <UniqueIdentifier>{65c2913a-2035-41ac-93a5-88ce22e68b56}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="poly2tri\common\shapes.cc">
@@ -176,6 +179,9 @@
     </ClInclude>
     <ClInclude Include="Geometry\Quaternion.h">
       <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\CPUInfo.h">
+      <Filter>Utils</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

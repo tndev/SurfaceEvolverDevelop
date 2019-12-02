@@ -6,6 +6,7 @@
 #include <immintrin.h>
 #include "../GeometryObject/PrimitiveBox.h"
 #include "../ExportImport/VTKExporter.h"
+#include "../Utils/CPUInfo.h"
 
 #define MAX_DEPTH 20
 
