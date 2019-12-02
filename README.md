@@ -37,5 +37,8 @@ Current WIP:
 
 - clearly, if the mesh has holes, the flood fill will set all non-boundary voxels to external
 
+#### Evolution will be carried out in the direction of `-grad(SDF(x,y,z))`:
+![bunnyDirection](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/EvolutionInBunyDirection3D.jpg)
+
 ## Time computation results for primitives:
 ![primRes](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/primResultsAnim.gif)
