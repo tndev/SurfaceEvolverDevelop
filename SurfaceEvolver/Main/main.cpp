@@ -12,11 +12,8 @@
 #include "../GeometryObject/CubeSphere.h"
 #include "../ExportImport/VTKExporter.h"
 #include "../ExportImport/OBJImporter.h"
-#include "../BVH/AABBTree.h"
-#include "../BVH/Octree.h"
-#include "../SDF/Grid.h"
-#include "../SDF/FastSweep3D.h"
 #include "../SDF/SDF.h"
+#include "../Utils/CPUInfo.h"
 
 //   DONE:
 //
@@ -190,7 +187,7 @@ int main()
 		timing_ico.close();
 	}
 
-	uint res = 30; // octree resolution
+	uint res = 67; // octree resolution
 	Vector3 axis = normalize(Vector3(1, 1, 1));
 	
 	auto startObjLoad = std::chrono::high_resolution_clock::now();

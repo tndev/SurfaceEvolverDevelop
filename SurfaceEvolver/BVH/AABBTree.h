@@ -6,7 +6,6 @@
 #include <immintrin.h>
 #include "../GeometryObject/PrimitiveBox.h"
 #include "../ExportImport/VTKExporter.h"
-#include "../Utils/CPUInfo.h"
 
 #define MAX_DEPTH 20
 
@@ -82,6 +81,8 @@ public:
 	AABBTree(const AABBTree& other);
 	AABBTree(Geometry* geom, PrimitiveType type = PrimitiveType::tri);
 	~AABBTree();
+
+	
 
 	uint getDepth();
 

@@ -113,6 +113,7 @@ void getCPUInfo(bool* buffer) {
 	buffer[7] = avxSupportted;
 }
 
+/**/
 bool isAVXSupported() {
 	int cpuinfo[4];
 	__cpuid(cpuinfo, 1);

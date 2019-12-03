@@ -730,7 +730,7 @@ void Sweep::FlipEdgeEvent(SweepContext& tcx, Point& ep, Point& eq, Triangle* t, 
       FlipEdgeEvent(tcx, ep, eq, t, p);
     }
   } else {
-    Point& newP = NextFlipPoint(ep, eq, ot, op);
+    Point newP = NextFlipPoint(ep, eq, ot, op);
     FlipScanEdgeEvent(tcx, ep, eq, *t, ot, newP);
     EdgeEvent(tcx, ep, eq, t, p);
   }
@@ -768,6 +768,7 @@ Point& Sweep::NextFlipPoint(Point& ep, Point& eq, Triangle& ot, Point& op)
   } else{
     //throw new RuntimeException("[Unsupported] Opposing point on constrained edge");
     assert(0);
+	*ot.PointCW(op);
   }
 }
 
@@ -795,7 +796,7 @@ void Sweep::FlipScanEdgeEvent(SweepContext& tcx, Point& ep, Point& eq, Triangle&
     // Turns out at first glance that this is somewhat complicated
     // so it will have to wait.
   } else{
-    Point& newP = NextFlipPoint(ep, eq, ot, op);
+    Point newP = NextFlipPoint(ep, eq, ot, op);
     FlipScanEdgeEvent(tcx, ep, eq, flip_triangle, ot, newP);
   }
 }
