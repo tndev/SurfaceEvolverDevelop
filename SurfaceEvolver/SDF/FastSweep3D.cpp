@@ -29,7 +29,7 @@ FastSweep3D::~FastSweep3D()
 void FastSweep3D::sweep(bool saveGridStates)
 {
 	const uint Nx = grid->Nx, Ny = grid->Ny, Nz = grid->Nz;
-	int s, i, j, k, gridPos;
+	int s, ix, iy, iz, gridPos;
 	float aa[3], tmp, eps = 1e-6;
 	float d_curr, d_new, a, b, c, D;
 
@@ -44,48 +44,49 @@ void FastSweep3D::sweep(bool saveGridStates)
 
 	for (s = 0; s < Nsweeps; s++) {
 		// std::cout << "sweep " << s << " ... " << std::endl;
-		for (i = dirX[s][0]; dirX[s][2] * i <= dirX[s][1]; i += dirX[s][2]) {
-			for (j = dirY[s][0]; dirY[s][2] * j <= dirY[s][1]; j += dirY[s][2]) {
-				for (k = dirZ[s][0]; dirZ[s][2] * k <= dirZ[s][1]; k += dirZ[s][2]) {
-					gridPos = ((i * Ny + j) * Nz + k);
+		for (iz = dirZ[s][0]; dirZ[s][2] * iz <= dirZ[s][1]; iz += dirZ[s][2]) {
+			for (iy = dirY[s][0]; dirY[s][2] * iy <= dirY[s][1]; iy += dirY[s][2]) {
+				for (ix = dirX[s][0]; dirX[s][2] * ix <= dirX[s][1]; ix += dirX[s][2]) {
+					
+					gridPos = ((iz * Ny + iy) * Nx + ix);
+
 					if (!grid->frozenCells[gridPos]) {
 
 						// === neighboring cells (Upwind Godunov) ===
-						// using ternary operator ( ? : ) is faster most of the time
-						if (i == 0 || i == (Nx - 1)) {
-							if (i == 0) {
-								aa[0] = grid->field[gridPos] < grid->field[(((i + 1) * Ny + j) * Nz + k)] ? grid->field[gridPos] : grid->field[(((i + 1) * Ny + j) * Nz + k)];
+						if (iz == 0 || iz == (Nz - 1)) {
+							if (iz == 0) {
+								aa[2] = grid->field[gridPos] < grid->field[((iz + 1) * Ny + iy) * Nx + ix] ? grid->field[gridPos] : grid->field[((iz + 1) * Ny + iy) * Nx + ix];
 							}
-							if (i == (Nx - 1)) {
-								aa[0] = grid->field[(((i - 1) * Ny + j) * Nz + k)] < grid->field[gridPos] ? grid->field[(((i - 1) * Ny + j) * Nz + k)] : grid->field[gridPos];
+							if (iz == (Nz - 1)) {
+								aa[2] = grid->field[((iz - 1) * Ny + iy) * Nx + ix] < grid->field[gridPos] ? grid->field[((iz - 1) * Ny + iy) * Nx + ix] : grid->field[gridPos];
 							}
 						}
 						else {
-							aa[0] = grid->field[(((i - 1) * Ny + j) * Nz + k)] < grid->field[(((i + 1) * Ny + j) * Nz + k)] ? grid->field[(((i - 1) * Ny + j) * Nz + k)] : grid->field[(((i + 1) * Ny + j) * Nz + k)];
+							aa[2] = grid->field[((iz - 1) * Ny + iy) * Nx + ix] < grid->field[((iz + 1) * Ny + iy) * Nx + ix] ? grid->field[((iz - 1) * Ny + iy) * Nx + ix] : grid->field[((iz + 1) * Ny + iy) * Nx + ix];
 						}
 
-						if (j == 0 || j == (Ny - 1)) {
-							if (j == 0) {
-								aa[1] = grid->field[gridPos] < grid->field[((i * Ny + (j + 1)) * Nz + k)] ? grid->field[gridPos] : grid->field[((i * Ny + (j + 1)) * Nz + k)];
+						if (iy == 0 || iy == (Ny - 1)) {
+							if (iy == 0) {
+								aa[1] = grid->field[gridPos] < grid->field[(iz * Ny + (iy + 1)) * Nx + ix] ? grid->field[gridPos] : grid->field[(iz * Ny + (iy + 1)) * Nx + ix];
 							}
-							if (j == (Ny - 1)) {
-								aa[1] = grid->field[((i * Ny + (j - 1)) * Nz + k)] < grid->field[gridPos] ? grid->field[((i * Ny + (j - 1)) * Nz + k)] : grid->field[gridPos];
+							if (iy == (Ny - 1)) {
+								aa[1] = grid->field[(iz * Ny + (iy - 1)) * Nx + ix] < grid->field[gridPos] ? grid->field[(iz * Ny + (iy - 1)) * Nx + ix] : grid->field[gridPos];
 							}
 						}
 						else {
-							aa[1] = grid->field[((i * Ny + (j - 1)) * Nz + k)] < grid->field[((i * Ny + (j + 1)) * Nz + k)] ? grid->field[((i * Ny + (j - 1)) * Nz + k)] : grid->field[((i * Ny + (j + 1)) * Nz + k)];
+							aa[1] = grid->field[(iz * Ny + (iy - 1)) * Nx + ix] < grid->field[(iz * Ny + (iy + 1)) * Nx + ix] ? grid->field[(iz * Ny + (iy - 1)) * Nx + ix] : grid->field[(iz * Ny + (iy + 1)) * Nx + ix];
 						}
 
-						if (k == 0 || k == (Nz - 1)) {
-							if (k == 0) {
-								aa[2] = grid->field[gridPos] < grid->field[((i * Ny + j) * Nz + (k + 1))] ? grid->field[gridPos] : grid->field[((i * Ny + j) * Nz + (k + 1))];
+						if (ix == 0 || ix == (Nx - 1)) {
+							if (ix == 0) {
+								aa[0] = grid->field[gridPos] < grid->field[(iz * Ny + iy) * Nx + (ix + 1)] ? grid->field[gridPos] : grid->field[(iz * Ny + iy) * Nx + (ix + 1)];
 							}
-							if (k == (Nz - 1)) {
-								aa[2] = grid->field[((i * Ny + j) * Nz + (k - 1))] < grid->field[gridPos] ? grid->field[((i * Ny + j) * Nz + (k - 1))] : grid->field[gridPos];
+							if (ix == (Nx - 1)) {
+								aa[0] = grid->field[(iz * Ny + iy) * Nx + (ix - 1)] < grid->field[gridPos] ? grid->field[(iz * Ny + iy) * Nx + (ix - 1)] : grid->field[gridPos];
 							}
 						}
 						else {
-							aa[2] = grid->field[((i * Ny + j) * Nz + (k - 1))] < grid->field[((i * Ny + j) * Nz + (k + 1))] ? grid->field[((i * Ny + j) * Nz + (k - 1))] : grid->field[((i * Ny + j) * Nz + (k + 1))];
+							aa[0] = grid->field[(iz * Ny + iy) * Nx + (ix - 1)] < grid->field[(iz * Ny + iy) * Nx + (ix + 1)] ? grid->field[(iz * Ny + iy) * Nx + (ix - 1)] : grid->field[(iz * Ny + iy) * Nx + (ix + 1)];
 						}
 
 						// simple bubble sort

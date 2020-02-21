@@ -38,6 +38,7 @@
 
 //  POSTPONED:
 //
+// - implement a method/class to get CPU instruction set, mainly whether it supports AVX, an alternate resampling method has to be implemented for CPU's that do not support AVX
 // - implement sort order function of a 256-bit AVX vector (needs a proper lookup hash)
 // - AABB update for transformations + Timing test
 // - Inverse transform grid upon transforming mesh
@@ -55,7 +56,6 @@
 
 //   WIP:
 // 
-// - implement a method/class to get CPU instruction set, mainly whether it supports AVX, an alternate resampling method has to be implemented for CPU's that do not support AVX
 
 
 //   TODO:
@@ -187,7 +187,32 @@ int main()
 		timing_ico.close();
 	}
 
-	uint res = 67; // octree resolution
+	uint res = 27; // octree resolution
+
+	// Cube KDTree test
+	/**/
+	Geometry testBox = PrimitiveBox(100, 100, 100, 1, 1, 1);
+	Matrix4 R1 = Matrix4().makeRotationAxis(1, 0, 0, M_PI / 4);
+	Matrix4 R2 = Matrix4().makeRotationAxis(0, 1, 0, -M_PI / 4);
+	Matrix4 M = Matrix4();
+	M.multiplyMatrices(R1, R2);
+	testBox.applyMatrix(M);
+
+	SDF tb_sdf = SDF(&testBox, 9, true);
+	Box3 obox = tb_sdf.tri_aabb->bbox;
+	obox.expandByOffset(150);
+	Vector3 size = obox.getSize();
+	float maxDim = std::max({ size.x, size.y, size.z });
+	Octree o = Octree(tb_sdf.tri_aabb, obox, std::floor(maxDim / 10));
+	std::vector<Geometry> leafBoxes = {};
+	o.getLeafBoxGeoms(&leafBoxes);
+
+	Grid tg = Grid(std::floor(maxDim / 10), std::floor(maxDim / 10), std::floor(maxDim / 10), obox, false);
+	o.setLeafValueToScalarGrid(&tg);
+
+	FastSweep3D fs = FastSweep3D(&tg, 8);
+	
+
 	Vector3 axis = normalize(Vector3(1, 1, 1));
 	
 	auto startObjLoad = std::chrono::high_resolution_clock::now();
@@ -207,6 +232,7 @@ int main()
 	std::cout << bunny_sdf.getComputationProperties();
 
 	bunny_sdf.exportGrid(&e, "bunnySDF");
+
 	/*
 	Matrix4 sdfTransform = Matrix4().makeTranslation(0.5, 0.5, 0.5).multiply(Matrix4().setToScale(2.0f, 2.0f, 2.0f));
 	//.makeRotationAxis(axis.x, axis.y, axis.z, M_PI / 6.);
@@ -236,13 +262,13 @@ int main()
 	bunny_sdf.octree->GenerateLeafCellVisualisation(e); 
 	*/
 
-	/* Interpolated bunny DF:
-	SDF bunny_sdf_r = SDF(&bunny, res, false, true);
+	/* Interpolated bunny DF: */
+	SDF bunny_sdf_r = SDF(&bunny, res, true, false, true);
 
 	std::cout << bunny_sdf_r.getComputationProperties();
 
 	bunny_sdf_r.exportGrid(&e, "bunnySDF_r");
-	*/
+	
 
 	/* The brute force DF of the bunny model will take ~27 min ! 
 	

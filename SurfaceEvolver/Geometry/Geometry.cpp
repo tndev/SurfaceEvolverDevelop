@@ -735,7 +735,7 @@ bool getPlaneBoxIntersection(Vector3* normal, Vector3* vert, Vector3* boxMax) {
 
 #define AXISTEST_Y1(a, b, fa, fb)							    	   \
 		p0 = -a * v0.x + b * v0.z;		      					       \
-		p1 = -a * v1.x + b  *v1.z;					                   \
+		p1 = -a * v1.x + b * v1.z;					                   \
 		if (p0 < p1) {min = p0; max = p1;} else {min = p1; max = p0;}  \
 		rad = fa * boxHalfSize->x + fb * boxHalfSize->z;			   \
 		if (min > rad || max < -rad) return false;
@@ -855,7 +855,6 @@ bool getEdgeBoxIntersection(Edge& vertices, Vector3* boxMin, Vector3* boxMax)
 
 bool getPrimitiveBoxIntersection(Primitive& primitive, Vector3* boxCenter, Vector3* boxMin, Vector3* boxMax, Vector3* boxHalfSize, float offset)
 {
-	float hitParam;
 	if (primitive.vertices.size() == 1) {
 		return (
 			(primitive.vertices[0]->x >= boxMin->x && primitive.vertices[0]->x <= boxMax->x) &&

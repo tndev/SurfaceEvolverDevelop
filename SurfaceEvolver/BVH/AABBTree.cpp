@@ -834,8 +834,8 @@ float AABBTree::AABBNode::getAdaptivelyResampledSplitPosition(std::vector<uint>&
 	// === Stage 1: Initial sampling of C_L(x) and C_R(x) ========================================================
 
 	// split interval limits:
-	float a = bbox.min.getCoordById(axis);
-	float b = bbox.max.getCoordById(axis);
+	const float a = bbox.min.getCoordById(axis);
+	const float b = bbox.max.getCoordById(axis);
 
 	// splits:
 	union { __m256 B_min_R; float BminR[6]; };

@@ -55,6 +55,8 @@ SDF::SDF(Geometry* geom, uint resolution, bool computeSign, bool saveGridStates,
 		std::chrono::duration<float> elapsedGridScale;
 		std::chrono::duration<float> elapsedSDF_FS;
 
+		std::chrono::duration<float> elapsedSDF_Sign;
+
 		if (scaleAndInterpolate && resolution > this->resolution_limit) {
 			auto startSDF_FS = std::chrono::high_resolution_clock::now();
 
@@ -64,6 +66,13 @@ SDF::SDF(Geometry* geom, uint resolution, bool computeSign, bool saveGridStates,
 
 			auto endSDF_FS = std::chrono::high_resolution_clock::now();
 			elapsedSDF_FS = (endSDF_FS - startSDF_FS);
+
+			if (computeSign) {
+				auto startSDF_Sign = std::chrono::high_resolution_clock::now();
+				this->grid->computeSignField(this->tri_aabb);
+				auto endSDF_Sign = std::chrono::high_resolution_clock::now();
+				elapsedSDF_Sign = (endSDF_Sign - startSDF_Sign);
+			}
 
 			float origRes = std::floor((1.0f + 2.0f * this->grid->max_offset_factor) * resolution);
 
@@ -87,28 +96,13 @@ SDF::SDF(Geometry* geom, uint resolution, bool computeSign, bool saveGridStates,
 
 			auto endSDF_FS = std::chrono::high_resolution_clock::now();
 			elapsedSDF_FS = (endSDF_FS - startSDF_FS);
-		}
 
-		// TODO: Sign computation
-		/*
-		This approach requires one to find the closest point on a mesh feature (vertex, edge, triangle).
-		After ditching the FastSweep3D more viable methods would work something like this:
-
-		Vector3 v = v_aabb->getClosestVertexToPoint(p);
-		Vector3 ep = e_aabb->getClosestEdgePointToPoint(p);
-		Vector3 tp = t_aabb->getClosestTrianglePointToPoint(p);
-
-		and then pick the one closest to p.
-		This method would be much slower than the original DF computation using just the Triangle AABB, Octree and FastSweep3D.
-		Since it would already produce distances, this approach would not need to use an Eikonal solver such as FastSweep.
-		*/
-
-		std::chrono::duration<float> elapsedSDF_Sign;
-		if (computeSign) {
-			auto startSDF_Sign = std::chrono::high_resolution_clock::now();
-			this->grid->computeSignField(this->tri_aabb);
-			auto endSDF_Sign = std::chrono::high_resolution_clock::now();
-			elapsedSDF_Sign = (endSDF_Sign - startSDF_Sign);
+			if (computeSign) {
+				auto startSDF_Sign = std::chrono::high_resolution_clock::now();
+				this->grid->computeSignField(this->tri_aabb);
+				auto endSDF_Sign = std::chrono::high_resolution_clock::now();
+				elapsedSDF_Sign = (endSDF_Sign - startSDF_Sign);
+			}
 		}
 
 		auto endSDF = std::chrono::high_resolution_clock::now();

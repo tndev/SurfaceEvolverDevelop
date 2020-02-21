@@ -40,7 +40,7 @@ public:
 
 	void applyMatrix(Matrix4& m);
 public:
-	uint resolution_limit = 15;
+	uint resolution_limit = 20;
 };
 
 #endif

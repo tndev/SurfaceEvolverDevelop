@@ -43,7 +43,6 @@ Octree::OctreeNode::OctreeNode(Octree* tree, Box3 box, OctreeNode* parent, uint 
 	this->parent = parent;
 	this->box = box;
 	float size = GET_CUBE_SIZE(this->box);
-	this->tree->nodeCount++;
 	this->depthLeft == depthLeft;
 
 	if (this->isLargerThanLeaf(&size) && depthLeft > 0) {
@@ -82,6 +81,8 @@ Octree::OctreeNode::OctreeNode(Octree* tree, Box3 box, OctreeNode* parent, uint 
 		}
 		this->centroidDistance = sqrt(resultDistSq);
 	}
+
+	this->tree->nodeCount++;
 }
 
 bool Octree::OctreeNode::intersectsPrimitives(Box3* box)

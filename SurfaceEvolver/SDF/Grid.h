@@ -46,7 +46,9 @@ public:
 	void bruteForceDistanceField(Geometry* geom);
 	void aabbDistanceField(AABBTree* aabb);
 	void clean();
+
 	void scaleBy(Vector3& s);
+
 	// fraction of the scale with which the grid should exceed the mesh bbox
 	float max_offset_factor = 0.25;
 	void getSurroundingCells(Vector3& pos,
