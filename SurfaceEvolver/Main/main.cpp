@@ -56,13 +56,13 @@
 
 //   WIP:
 // 
+// - compose a linear system for evolution from CubeSphere to PrimitiveBox of the same subdivision level
+// - implement a VTK window form using a working example for mesh rendering and SDF volume rendering
 
 
 //   TODO:
 //
 // - implement cutoff offset for the bounding cube to compute the field on minimum necessary subset (box)
-// - compose a linear system for evolution from CubeSphere to PrimitiveBox of the same subdivision level
-// - implement a VTK window form using a working example for mesh rendering and SDF volume rendering
 
 void performTest(uint res, Geometry& g, std::fstream& timing, VTKExporter& e) {
 	std::cout << "init SDF..." << std::endl;
