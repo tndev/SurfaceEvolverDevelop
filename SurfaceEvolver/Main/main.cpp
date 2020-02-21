@@ -62,6 +62,7 @@
 
 //   TODO:
 //
+// - implement global grid and cellSize-based Octree & SDF (just like in Vctr Engine Meta Object)
 // - implement cutoff offset for the bounding cube to compute the field on minimum necessary subset (box)
 
 void performTest(uint res, Geometry& g, std::fstream& timing, VTKExporter& e) {

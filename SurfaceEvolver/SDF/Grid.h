@@ -20,6 +20,7 @@ class Grid
 public:
 	float* field = nullptr;
 	bool* frozenCells = nullptr;
+	Vector3* gradField = nullptr;
 	uint gridExtent;
 	uint Nx, Ny, Nz; // index dims
 	Vector3 scale = Vector3(1.0f, 1.0f, 1.0f);
@@ -43,6 +44,8 @@ public:
 	void absField();
 	void negate();
 	void computeSignField(AABBTree* aabb);
+	void computeGradient();
+
 	void bruteForceDistanceField(Geometry* geom);
 	void aabbDistanceField(AABBTree* aabb);
 	void clean();
@@ -59,6 +62,7 @@ public:
 
 	void clearFrozenCells();
 	void clearField();
+	Vector3 grad(Vector3& p, Vector3& dXYZ, std::vector<Vector3>* positionBuffer, std::vector<float>* valueBuffer);
 };
 
 Grid subGrids(Grid g0, Grid g1);

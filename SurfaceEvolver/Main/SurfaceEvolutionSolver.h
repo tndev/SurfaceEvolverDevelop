@@ -17,7 +17,9 @@ class SurfaceEvolutionSolver
 {
 public:
 	// params:
-	uint NSteps = 10;
+	uint NSteps = 10; bool saveStates = false;
+	uint NVerts;
+
 	float dt = 0.01f; // time step
 	Grid* sdfGrid = nullptr; // signed distance function grid
 	ElementType type = ElementType::quad;
@@ -31,6 +33,7 @@ public:
 	~SurfaceEvolutionSolver();
 
 	void init();
+	void evolve();
 };
 
 #endif

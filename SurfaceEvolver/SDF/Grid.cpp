@@ -321,6 +321,48 @@ void Grid::computeSignField(AABBTree* aabb)
 	}*/
 }
 
+void Grid::computeGradient()
+{
+	this->gradField = new Vector3[gridExtent]; // init vect field
+	int ix, iy, iz, i, gridPos;
+	Vector3 p = Vector3();
+
+	Vector3 o = bbox.min; // origin
+	uint nx = Nx - 1;
+	uint ny = Ny - 1;
+	uint nz = Nz - 1;
+	float dx = scale.x / nx;
+	float dy = scale.y / ny;
+	float dz = scale.z / nz;
+
+	for (iz = 1; iz < nz; iz++) {
+		for (iy = 1; iy < ny; iy++) {
+			for (ix = 1; ix < nx; ix++) {
+				p.set(
+					o.x + ix * dx,
+					o.y + iy * dy,
+					o.z + iz * dz
+				);
+
+				uint ix1 = ix + 1;
+				uint iy1 = iy + 1;
+				uint iz1 = iz + 1;
+
+				/*
+				uint i000 = oldNx * oldNy * iz + oldNx * iy + ix;
+				uint i100 = oldNx * oldNy * iz + oldNx * iy + ix1;
+				uint i010 = oldNx * oldNy * iz + oldNx * iy1 + ix;
+				uint i110 = oldNx * oldNy * iz + oldNx * iy1 + ix1;
+				uint i001 = oldNx * oldNy * iz1 + oldNx * iy + ix;
+				uint i101 = oldNx * oldNy * iz1 + oldNx * iy + ix1;
+				uint i011 = oldNx * oldNy * iz1 + oldNx * iy1 + ix;
+				uint i111 = oldNx * oldNy * iz1 + oldNx * iy1 + ix1;*/
+
+			}
+		}
+	}
+}
+
 
 void Grid::bruteForceDistanceField(Geometry* geom)
 {
@@ -533,6 +575,41 @@ void Grid::clearField()
 		delete[] this->field;
 		this->field = nullptr;
 	}
+}
+
+Vector3 Grid::grad(Vector3& p, Vector3& dXYZ, std::vector<Vector3>* positionBuffer, std::vector<float>* valueBuffer)
+{
+	Vector3 gradf_p = Vector3();
+	
+	uint ix = std::min((uint)std::floor((p.x - bbox.min.x) * Nx / this->scale.x), Nx - 1);
+	uint iy = std::min((uint)std::floor((p.y - bbox.min.y) * Ny / this->scale.y), Ny - 1);
+	uint iz = std::min((uint)std::floor((p.z - bbox.min.z) * Nz / this->scale.z), Nz - 1);
+
+	uint ix1 = std::min(ix + 1, Nx - 1);
+	uint iy1 = std::min(iy + 1, Ny - 1);
+	uint iz1 = std::min(iz + 1, Nz - 1);
+
+	uint i000 = Nx * Ny * iz + Nx * iy + ix;
+	uint i100 = Nx * Ny * iz + Nx * iy + ix1;
+	uint i010 = Nx * Ny * iz + Nx * iy1 + ix;
+	uint i110 = Nx * Ny * iz + Nx * iy1 + ix1;
+	uint i001 = Nx * Ny * iz1 + Nx * iy + ix;
+	uint i101 = Nx * Ny * iz1 + Nx * iy + ix1;
+	uint i011 = Nx * Ny * iz1 + Nx * iy1 + ix;
+	uint i111 = Nx * Ny * iz1 + Nx * iy1 + ix1;
+
+	valueBuffer->push_back(field[i000]);
+	valueBuffer->push_back(field[i100]);
+	valueBuffer->push_back(field[i010]);
+	valueBuffer->push_back(field[i110]);
+	valueBuffer->push_back(field[i001]);
+	valueBuffer->push_back(field[i101]);
+	valueBuffer->push_back(field[i011]);
+	valueBuffer->push_back(field[i111]);
+
+
+
+	return gradf_p;
 }
 
 Grid subGrids(Grid g0, Grid g1)

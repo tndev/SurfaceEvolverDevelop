@@ -16,7 +16,7 @@ PrimitiveBox::PrimitiveBox(const PrimitiveBox& other)
 	this->segments[1] = other.segments[2];
 }
 
-PrimitiveBox::PrimitiveBox(float x, float y, float z, unsigned int sx, unsigned int sy, unsigned int sz, std::string name)
+PrimitiveBox::PrimitiveBox(float x, float y, float z, unsigned int sx, unsigned int sy, unsigned int sz, bool quad, std::string name)
 {
 	this->dimensions[0] = x;
 	this->dimensions[2] = y;
@@ -25,6 +25,8 @@ PrimitiveBox::PrimitiveBox(float x, float y, float z, unsigned int sx, unsigned 
 	this->segments[0] = sx;
 	this->segments[2] = sy;
 	this->segments[1] = sz;
+
+	this->quad = quad;
 
 	if (name.empty()) {
 		this->name = "PrimitiveBox, dimensions: (" + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) +
@@ -119,7 +121,11 @@ void PrimitiveBox::build()
 			normals[9 * (triId + 1) + 7] = normal.y;
 			normals[9 * (triId + 1) + 8] = normal.z;
 
-			triangulations.push_back({ triId, triId + 1 });
+			if (quad) triangulations.push_back({ triId, triId + 1 });
+			else {
+				triangulations.push_back({ triId });
+				triangulations.push_back({ triId + 1 });
+			}
 	};
 
 	Vector3 currentNormal = Vector3(0, 0, -1);
