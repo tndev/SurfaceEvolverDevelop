@@ -169,6 +169,7 @@
     <ClCompile Include="Geometry\Quaternion.cpp" />
     <ClCompile Include="Geometry\Vector3.cpp" />
     <ClCompile Include="Main\main.cpp" />
+    <ClCompile Include="Main\SurfaceEvolutionSolver.cpp" />
     <ClCompile Include="poly2tri\common\shapes.cc" />
     <ClCompile Include="poly2tri\sweep\advancing_front.cc" />
     <ClCompile Include="poly2tri\sweep\cdt.cc" />
@@ -194,6 +195,7 @@
     <ClInclude Include="Geometry\Matrix4.h" />
     <ClInclude Include="Geometry\Quaternion.h" />
     <ClInclude Include="Geometry\Vector3.h" />
+    <ClInclude Include="Main\SurfaceEvolutionSolver.h" />
     <ClInclude Include="poly2tri\common\shapes.h" />
     <ClInclude Include="poly2tri\common\utils.h" />
     <ClInclude Include="poly2tri\poly2tri.h" />

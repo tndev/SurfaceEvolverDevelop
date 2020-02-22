@@ -103,6 +103,9 @@
     <ClCompile Include="Geometry\Quaternion.cpp">
       <Filter>Geometry</Filter>
     </ClCompile>
+    <ClCompile Include="Main\SurfaceEvolutionSolver.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="poly2tri\common\shapes.h">
@@ -182,6 +185,9 @@
     </ClInclude>
     <ClInclude Include="Utils\CPUInfo.h">
       <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Main\SurfaceEvolutionSolver.h">
+      <Filter>Main</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

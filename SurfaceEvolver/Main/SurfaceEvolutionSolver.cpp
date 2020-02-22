@@ -51,6 +51,17 @@ void SurfaceEvolutionSolver::init()
 
 void SurfaceEvolutionSolver::evolve()
 {
+	const uint Nx = sdfGrid->Nx, Ny = sdfGrid->Ny, Nz = sdfGrid->Nz;
+	Vector3 V = Vector3();
+	// for SDF interpolation from values surrounding V
+	std::vector<Vector3> positionBuffer = {};
+	std::vector<float> valueBuffer = {};
+	float SDF_V; Vector3 gradSDF_V;
+
+	if (!sdfGrid->hasGradient()) {
+		sdfGrid->computeGradient();
+	}
+
 	for (int t = 0; t < NSteps; t++) {
 		// TODO: could perhaps be a static array
 		std::vector<Vector3> vNormals = evolvedSurface->getAngleWeightedVertexPseudoNormals();
@@ -58,13 +69,6 @@ void SurfaceEvolutionSolver::evolve()
 		// evolvedSurface->getVertexCoVolumes();
 
 		// evolvedSurface->getVertexElementCoeffs(); // cotans for triangle elems
-
-		const uint Nx = sdfGrid->Nx, Ny = sdfGrid->Ny, Nz = sdfGrid->Nz;
-		Vector3 V = Vector3();
-		// for SDF interpolation from values surrounding V
-		std::vector<Vector3> positionBuffer = {};
-		std::vector<float> valueBuffer = {};
-		float SDF_V; Vector3 gradSDF_V;
 
 		for (uint i = 0; i < NVerts; i++) {
 			// ===== vertex =================================

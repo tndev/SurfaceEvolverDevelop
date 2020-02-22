@@ -191,7 +191,7 @@ int main()
 	uint res = 27; // octree resolution
 
 	// Cube KDTree test
-	/**/
+	/*
 	Geometry testBox = PrimitiveBox(100, 100, 100, 1, 1, 1);
 	Matrix4 R1 = Matrix4().makeRotationAxis(1, 0, 0, M_PI / 4);
 	Matrix4 R2 = Matrix4().makeRotationAxis(0, 1, 0, -M_PI / 4);
@@ -211,7 +211,7 @@ int main()
 	Grid tg = Grid(std::floor(maxDim / 10), std::floor(maxDim / 10), std::floor(maxDim / 10), obox, false);
 	o.setLeafValueToScalarGrid(&tg);
 
-	FastSweep3D fs = FastSweep3D(&tg, 8);
+	FastSweep3D fs = FastSweep3D(&tg, 8);*/
 	
 
 	Vector3 axis = normalize(Vector3(1, 1, 1));
@@ -232,7 +232,7 @@ int main()
 
 	std::cout << bunny_sdf.getComputationProperties();
 
-	bunny_sdf.exportGrid(&e, "bunnySDF");
+	bunny_sdf.exportGrid(&e, "bunnySDF");	
 
 	/*
 	Matrix4 sdfTransform = Matrix4().makeTranslation(0.5, 0.5, 0.5).multiply(Matrix4().setToScale(2.0f, 2.0f, 2.0f));
@@ -263,13 +263,6 @@ int main()
 	bunny_sdf.octree->GenerateLeafCellVisualisation(e); 
 	*/
 
-	/* Interpolated bunny DF: */
-	SDF bunny_sdf_r = SDF(&bunny, res, true, false, true);
-
-	std::cout << bunny_sdf_r.getComputationProperties();
-
-	bunny_sdf_r.exportGrid(&e, "bunnySDF_r");
-	
 
 	/* The brute force DF of the bunny model will take ~27 min ! 
 	

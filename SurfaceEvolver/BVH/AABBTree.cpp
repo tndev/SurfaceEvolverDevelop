@@ -34,6 +34,8 @@ AABBTree::AABBTree(Geometry* geom, PrimitiveType type)
 
 AABBTree::~AABBTree()
 {
+	delete this->root;
+	this->primitives.clear();
 }
 
 uint AABBTree::getDepth()

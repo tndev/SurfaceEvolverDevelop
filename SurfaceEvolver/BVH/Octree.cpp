@@ -207,6 +207,7 @@ Octree::Octree(AABBTree* aabbTree, Box3 bbox, uint resolution)
 
 Octree::~Octree()
 {
+	delete this->root;
 }
 
 void Octree::getAllNodes(std::vector<OctreeNode>* nodeBuffer)

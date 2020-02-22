@@ -20,8 +20,10 @@ class Grid
 public:
 	float* field = nullptr;
 	bool* frozenCells = nullptr;
-	Vector3* gradField = nullptr;
-	uint gridExtent;
+	float* gradFieldX = nullptr;
+	float* gradFieldY = nullptr;
+	float* gradFieldZ = nullptr;
+	uint gridExtent = 0; uint gradExtent = 0;
 	uint Nx, Ny, Nz; // index dims
 	Vector3 scale = Vector3(1.0f, 1.0f, 1.0f);
 	Box3 bbox;
@@ -33,12 +35,14 @@ public:
 	Grid(const Grid& other);
 	Grid(uint Nx, uint Ny, uint Nz, Box3 bbox, bool addOffset = true, float initVal = LARGE_VAL);
 	~Grid();
+	bool equalInDimTo(Grid& other);
 
 	void exportToVTI(std::string filename);
 
 	void initToVal(float val);
 	void blur();
-	bool equalInDimTo(Grid& other);
+	
+
 	void add(Grid& other);
 	void sub(Grid& other);
 	void absField();
@@ -46,9 +50,12 @@ public:
 	void computeSignField(AABBTree* aabb);
 	void computeGradient();
 
+	bool hasGradient();
+
 	void bruteForceDistanceField(Geometry* geom);
 	void aabbDistanceField(AABBTree* aabb);
-	void clean();
+	void cleanField();
+	void cleanGrad();
 
 	void scaleBy(Vector3& s);
 

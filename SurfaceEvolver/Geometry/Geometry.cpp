@@ -164,9 +164,9 @@ std::vector<Primitive> Geometry::getPrimitives(PrimitiveType type)
 {
 	std::vector<Primitive> result = {};
 	if (type == PrimitiveType::vert) {
-		for (uint i = 0; i < this->uniqueVertices.size(); i ++) {
+		for (uint i = 0; i < this->uniqueVertices.size(); i++) {
 			std::vector<Vector3*> v = { &this->uniqueVertices[i] };
-			result.push_back(v);
+			result.push_back(Primitive(v));
 		}
 	}
 	else if (type == PrimitiveType::edge) {
@@ -178,15 +178,15 @@ std::vector<Primitive> Geometry::getPrimitives(PrimitiveType type)
 			result.push_back(Primitive({ e[0], e[1] }));
 		}
 	}
-	else if (type == PrimitiveType::tri) {
+	else {	
 		for (uint i = 0; i < this->vertexIndices.size(); i += 3) {
-			Vector3* v0 = &this->uniqueVertices[this->vertexIndices[i]];
-			Vector3* v1 = &this->uniqueVertices[this->vertexIndices[i + 1]];
-			Vector3* v2 = &this->uniqueVertices[this->vertexIndices[i + 2]];
+			Tri T = { 
+				&this->uniqueVertices[this->vertexIndices[i]],
+				&this->uniqueVertices[this->vertexIndices[i + 1]],
+				&this->uniqueVertices[this->vertexIndices[i + 2]]
+			};
 
-			Tri T = { v0, v1, v2 };
-
-			result.push_back(T);
+			result.push_back(Primitive(T));
 		}
 	}
 	return result;

@@ -4,10 +4,6 @@ SDF::SDF()
 {
 }
 
-SDF::~SDF()
-{
-}
-
 SDF::SDF(const SDF& other)
 {
 	geom = other.geom;
@@ -104,6 +100,8 @@ SDF::SDF(Geometry* geom, uint resolution, bool computeSign, bool saveGridStates,
 				elapsedSDF_Sign = (endSDF_Sign - startSDF_Sign);
 			}
 		}
+
+		this->grid->computeGradient();
 
 		auto endSDF = std::chrono::high_resolution_clock::now();
 		std::chrono::duration<float> elapsedSDF = (endSDF - startSDF);
