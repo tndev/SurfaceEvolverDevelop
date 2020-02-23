@@ -18,7 +18,8 @@ SDF::SDF(const SDF& other)
 	time_log = other.time_log;
 }
 
-SDF::SDF(Geometry* geom, uint resolution, bool computeSign, bool saveGridStates, bool scaleAndInterpolate, SDF_Method method)
+SDF::SDF(Geometry* geom, uint resolution, bool computeSign, bool computeGradient, 
+	bool saveGridStates, bool scaleAndInterpolate, SDF_Method method)
 {
 	this->resolution = resolution;
 	this->geom = geom;
@@ -101,8 +102,6 @@ SDF::SDF(Geometry* geom, uint resolution, bool computeSign, bool saveGridStates,
 			}
 		}
 
-		this->grid->computeGradient();
-
 		auto endSDF = std::chrono::high_resolution_clock::now();
 		std::chrono::duration<float> elapsedSDF = (endSDF - startSDF);
 
@@ -169,6 +168,10 @@ SDF::SDF(Geometry* geom, uint resolution, bool computeSign, bool saveGridStates,
 		this->time_log =
 			"BRUTE FORCE ::: computation times: ====> TOTAL: " + std::to_string(elapsedSDF.count()) + " s" + "\n\n";
 	}
+
+	if (computeGradient) {
+		this->grid->computeGradient();
+	}
 }
 
 void SDF::exportGrid(VTKExporter* e, std::string export_name)
@@ -189,6 +192,26 @@ void SDF::exportGrid(VTKExporter* e, std::string export_name)
 	else {
 		this->grid->exportToVTI(export_name);
 	}		
+}
+
+void SDF::exportGradientField(VTKExporter* e, std::string export_name)
+{
+	if (export_name.empty()) {
+		std::string method_name;
+		if (this->method == SDF_Method::fast_sweeping) {
+			method_name = "_FSM_";
+		}
+		else if (this->method == SDF_Method::aabb_dist) {
+			method_name = "_AABB_";
+		}
+		else if (this->method == SDF_Method::brute_force) {
+			method_name = "_BRUTE_F_";
+		}
+		this->grid->exportGradientToVTK("voxGradSDF" + std::to_string(this->resolution) + method_name + std::to_string(this->resolution));
+	}
+	else {
+		this->grid->exportGradientToVTK(export_name);
+	}
 }
 
 std::string SDF::getComputationProperties()

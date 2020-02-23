@@ -110,6 +110,45 @@ void Grid::exportToVTI(std::string filename)
 	vti.close();
 }
 
+void Grid::exportGradientToVTK(std::string filename)
+{
+	std::fstream vtk(filename + ".vtk", std::fstream::out);
+
+	uint nx = Nx - 2;
+	uint ny = Ny - 2;
+	uint nz = Nz - 2;
+	float dx = scale.x / Nx;
+	float dy = scale.y / Ny;
+	float dz = scale.z / Nz;
+	Vector3 o = bbox.min; // origin
+	o.x += dx;	o.y += dy; o.z += dz;
+
+	vtk << "# vtk DataFile Version 3.0" << std::endl;
+	vtk << "vtk output" << std::endl;
+	vtk << "ASCII" << std::endl;
+	vtk << "DATASET STRUCTURED_GRID" << std::endl;
+	vtk << "DIMENSIONS " << nx << " " << ny << " " << nz << std::endl;
+
+	vtk << "POINTS " << gradExtent << " float" << std::endl;
+
+	for (uint iz = 0; iz < nz; iz++) {
+		for (uint iy = 0; iy < ny; iy++) {
+			for (uint ix = 0; ix < nx; ix++) {
+				vtk << o.x + (ix + 0.5) * dx << " " << o.y + (iy + 0.5) * dy << " " << o.z + (iz + 0.5) * dz << std::endl;
+			}
+		}
+	}
+
+	vtk << "POINT_DATA " << gradExtent << std::endl;
+	vtk << "VECTORS grad float" << std::endl;
+
+	for (uint i = 0; i < gradExtent; i++) {
+		vtk << gradFieldX[i] << " " << gradFieldY[i] << " " << gradFieldZ[i] << std::endl;
+	}
+
+	vtk.close();
+}
+
 void Grid::initToVal(float val)
 {
 	if (this->field) delete[] this->field;

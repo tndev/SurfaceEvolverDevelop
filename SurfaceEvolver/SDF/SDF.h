@@ -20,7 +20,7 @@ public:
 	AABBTree* edge_aabb = nullptr;
 	AABBTree* vert_aabb = nullptr;
 	Octree* octree = nullptr;
-	Grid* grid = nullptr;
+	Grid* grid = nullptr; // contains scalar field (& its gradient)
 	FastSweep3D* fastSweep = nullptr;
 
 	uint resolution;
@@ -32,9 +32,11 @@ public:
 
 	SDF();
 	SDF(const SDF& other);
-	SDF(Geometry* geom, uint resolution, bool computeSign = false, bool saveGridStates = false, bool scaleAndInterpolate = false, SDF_Method method = SDF_Method::fast_sweeping);
+	SDF(Geometry* geom, uint resolution, bool computeSign = false, bool computeGradient = true,
+		bool saveGridStates = false, bool scaleAndInterpolate = false, SDF_Method method = SDF_Method::fast_sweeping);
 
 	void exportGrid(VTKExporter* e, std::string export_name = "");
+	void exportGradientField(VTKExporter* e, std::string export_name = "");
 	std::string getComputationProperties();
 
 	void applyMatrix(Matrix4& m);

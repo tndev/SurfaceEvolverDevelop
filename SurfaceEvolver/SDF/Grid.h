@@ -20,9 +20,12 @@ class Grid
 public:
 	float* field = nullptr;
 	bool* frozenCells = nullptr;
+	// gradient dims are 2 less than field dims
+	// because we're using central differences for derivatives
 	float* gradFieldX = nullptr;
 	float* gradFieldY = nullptr;
 	float* gradFieldZ = nullptr;
+
 	uint gridExtent = 0; uint gradExtent = 0;
 	uint Nx, Ny, Nz; // index dims
 	Vector3 scale = Vector3(1.0f, 1.0f, 1.0f);
@@ -38,6 +41,7 @@ public:
 	bool equalInDimTo(Grid& other);
 
 	void exportToVTI(std::string filename);
+	void exportGradientToVTK(std::string filename);
 
 	void initToVal(float val);
 	void blur();

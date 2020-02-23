@@ -56,12 +56,14 @@
 
 //   WIP:
 // 
-// - compose a linear system for evolution from CubeSphere to PrimitiveBox of the same subdivision level
-// - implement a VTK window form using a working example for mesh rendering and SDF volume rendering
+// - Test mesh angle weighted pseudonormals
 
 
 //   TODO:
 //
+// - test if grid gradient is computed correctly by exporting to a vtk vector file.
+// - compose a linear system for evolution from CubeSphere to PrimitiveBox of the same subdivision level
+// - implement a VTK window form using a working example for mesh rendering and SDF volume rendering
 // - implement global grid and cellSize-based Octree & SDF (just like in Vctr Engine Meta Object)
 // - implement cutoff offset for the bounding cube to compute the field on minimum necessary subset (box)
 
@@ -69,7 +71,7 @@ void performTest(uint res, Geometry& g, std::fstream& timing, VTKExporter& e) {
 	std::cout << "init SDF..." << std::endl;
 
 	// Fast sweeping DF, resized from 20 and interpolated
-	SDF sdf_FS_r = SDF(&g, res, false, false, true, SDF_Method::fast_sweeping);
+	SDF sdf_FS_r = SDF(&g, res, false, false, false, true, SDF_Method::fast_sweeping);
 
 	std::cout << sdf_FS_r.getComputationProperties();
 	timing << sdf_FS_r.getComputationProperties();
@@ -85,7 +87,7 @@ void performTest(uint res, Geometry& g, std::fstream& timing, VTKExporter& e) {
 	sdf_FS.exportGrid(&e);
 
 	// AABB DF
-	SDF sdf_AABB = SDF(&g, res, false, false, false, SDF_Method::aabb_dist);
+	SDF sdf_AABB = SDF(&g, res, false, false, false, false, SDF_Method::aabb_dist);
 
 	std::cout << sdf_AABB.getComputationProperties();
 	timing << sdf_AABB.getComputationProperties();
@@ -93,7 +95,7 @@ void performTest(uint res, Geometry& g, std::fstream& timing, VTKExporter& e) {
 	sdf_AABB.exportGrid(&e);
 
 	// Brute force DF
-	SDF sdf_Brute = SDF(&g, res, false, false, false, SDF_Method::brute_force);
+	SDF sdf_Brute = SDF(&g, res, false, false, false, false, SDF_Method::brute_force);
 
 	std::cout << sdf_Brute.getComputationProperties();
 	timing << sdf_Brute.getComputationProperties();
@@ -190,30 +192,6 @@ int main()
 
 	uint res = 27; // octree resolution
 
-	// Cube KDTree test
-	/*
-	Geometry testBox = PrimitiveBox(100, 100, 100, 1, 1, 1);
-	Matrix4 R1 = Matrix4().makeRotationAxis(1, 0, 0, M_PI / 4);
-	Matrix4 R2 = Matrix4().makeRotationAxis(0, 1, 0, -M_PI / 4);
-	Matrix4 M = Matrix4();
-	M.multiplyMatrices(R1, R2);
-	testBox.applyMatrix(M);
-
-	SDF tb_sdf = SDF(&testBox, 9, true);
-	Box3 obox = tb_sdf.tri_aabb->bbox;
-	obox.expandByOffset(150);
-	Vector3 size = obox.getSize();
-	float maxDim = std::max({ size.x, size.y, size.z });
-	Octree o = Octree(tb_sdf.tri_aabb, obox, std::floor(maxDim / 10));
-	std::vector<Geometry> leafBoxes = {};
-	o.getLeafBoxGeoms(&leafBoxes);
-
-	Grid tg = Grid(std::floor(maxDim / 10), std::floor(maxDim / 10), std::floor(maxDim / 10), obox, false);
-	o.setLeafValueToScalarGrid(&tg);
-
-	FastSweep3D fs = FastSweep3D(&tg, 8);*/
-	
-
 	Vector3 axis = normalize(Vector3(1, 1, 1));
 	
 	auto startObjLoad = std::chrono::high_resolution_clock::now();
@@ -232,7 +210,8 @@ int main()
 
 	std::cout << bunny_sdf.getComputationProperties();
 
-	bunny_sdf.exportGrid(&e, "bunnySDF");	
+	bunny_sdf.exportGrid(&e, "bunnySDF");
+	bunny_sdf.exportGradientField(&e, "bunnySDF_grad");
 
 	/*
 	Matrix4 sdfTransform = Matrix4().makeTranslation(0.5, 0.5, 0.5).multiply(Matrix4().setToScale(2.0f, 2.0f, 2.0f));
