@@ -149,14 +149,14 @@ int main()
 				std::cout << "cube(" << n + 1 << "), grid_res = " << res << std::endl;
 				PrimitiveBox g1 = PrimitiveBox(a, a, a, n + 1, n + 1, n + 1);
 				g1.applyMatrix(Matrix4().makeRotationAxis(axis.x, axis.y, axis.z, M_PI / 6.));
-				e.initExport(g1, "cube" + std::to_string(res) + "-" + std::to_string(n));
+				e.initExport(&g1, "cube" + std::to_string(res) + "-" + std::to_string(n));
 
 				performTest(res, g1, timing_cubes, e);
 
 				std::cout << "cubesphere(" << n + 1 << "), grid_res = " << res << std::endl;
 				CubeSphere g2 = CubeSphere(n + 1, r);
 				g2.applyMatrix(Matrix4().makeRotationAxis(axis.x, axis.y, axis.z, M_PI / 6.));
-				e.initExport(g2, "cubesphere" + std::to_string(res) + "-" + std::to_string(n));
+				e.initExport(&g2, "cubesphere" + std::to_string(res) + "-" + std::to_string(n));
 
 				performTest(res, g2, timing_cubes, e);
 			}
@@ -181,7 +181,7 @@ int main()
 				std::cout << "icosphere(" << n << "), grid_res = " << res << std::endl;
 				IcoSphere g0 = IcoSphere(n, r);
 				g0.applyMatrix(Matrix4().makeRotationAxis(axis.x, axis.y, axis.z, M_PI / 6.));
-				e.initExport(g0, "icosphere" + std::to_string(res) + "-" + std::to_string(n));
+				e.initExport(&g0, "icosphere" + std::to_string(res) + "-" + std::to_string(n));
 
 				performTest(res, g0, timing_ico, e);
 			}
@@ -199,7 +199,7 @@ int main()
 	OBJImporter obj = OBJImporter();
 	Geometry bunny = obj.importOBJGeometry("bunny_no_holes.obj");
 	// bunny.applyMatrix(Matrix4().setToScale(100.0f, 100.0f, 100.0f));
-	e.initExport(bunny, "sfBunny");
+	e.initExport(&bunny, "sfBunny");
 	// === Timed code ============
 	auto endObjLoad = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<float> elapsedObj = (endObjLoad - startObjLoad);
@@ -212,6 +212,9 @@ int main()
 
 	bunny_sdf.exportGrid(&e, "bunnySDF");
 	bunny_sdf.exportGradientField(&e, "bunnySDF_grad");
+
+	e.exportGeometryVertexNormals(&bunny, "bunnyNormals");
+
 
 	/*
 	Matrix4 sdfTransform = Matrix4().makeTranslation(0.5, 0.5, 0.5).multiply(Matrix4().setToScale(2.0f, 2.0f, 2.0f));

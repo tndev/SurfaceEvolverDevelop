@@ -9,11 +9,11 @@ VTKExporter::~VTKExporter()
 {
 }
 
-void VTKExporter::initExport(Geometry object, std::string filename)
+void VTKExporter::initExport(Geometry* object, std::string filename)
 {
-	if (object.triangulations.size() > 0) {
+	if (object->triangulations.size() > 0) {
 		// analyze input geometry
-		std::pair<std::vector<BufferGeom::Triangulation>, std::vector<size_t>> triangulationsAndSizes = object.getSortedPolygonTriangulationsAndSizes();
+		std::pair<std::vector<BufferGeom::Triangulation>, std::vector<size_t>> triangulationsAndSizes = object->getSortedPolygonTriangulationsAndSizes();
 		unsigned int NPolyTypes = triangulationsAndSizes.second.size();
 		this->outputType = NPolyTypes == 1 ? "POLYDATA" : "UNSTRUCTURED_GRID";
 	}
@@ -26,7 +26,7 @@ void VTKExporter::initExport(Geometry object, std::string filename)
 
 	std::fstream vtk(pathPrefix + filename + suffix, std::fstream::out);
 
-	std::vector<Vector3> uniqueVertices = object.uniqueVertices;
+	std::vector<Vector3> uniqueVertices = object->uniqueVertices;
 	size_t pointCount = uniqueVertices.size();
 
 	vtk << "# vtk DataFile Version 4.2" << std::endl;
@@ -47,13 +47,13 @@ void VTKExporter::initExport(Geometry object, std::string filename)
 	vtk << std::endl << std::endl;
 
 	auto writePolygonIndices = [&](std::string cellType) {
-		size_t NTriIds = this->countTriangulationIndices(object.triangulations);
-		size_t NTriangulations = object.triangulations.size();
+		size_t NTriIds = this->countTriangulationIndices(object->triangulations);
+		size_t NTriangulations = object->triangulations.size();
 
 		std::vector<unsigned int> polySizes = {};
 
 		for (unsigned int i = 0; i < NTriangulations; i++) {
-			unsigned int tSize = object.triangulations[i].size();
+			unsigned int tSize = object->triangulations[i].size();
 			unsigned int vtkRowLength = 3 + tSize;
 
 			if (i == 0 && this->outputType == "POLYDATA") {
@@ -63,7 +63,7 @@ void VTKExporter::initExport(Geometry object, std::string filename)
 				vtk << cellType << " " << NTriangulations << " " << NTriIds + NTriangulations << " " << std::endl;
 			}
 
-			std::vector<unsigned int> polygonIds = object.getPolygonIndicesFromTriangulation(object.triangulations[i]);
+			std::vector<unsigned int> polygonIds = object->getPolygonIndicesFromTriangulation(object->triangulations[i]);
 			polySizes.push_back(vtkRowLength - 1);
 			vtk << vtkRowLength - 1 << " ";
 			for (unsigned int k = 0; k < polygonIds.size(); k++) {
@@ -94,7 +94,7 @@ void VTKExporter::initExport(Geometry object, std::string filename)
 
 	std::string cellType = (this->outputType == "POLYDATA" ? "POLYGONS" : (this->outputType == "UNSTRUCTURED_GRID" ? "CELLS" : ""));
 
-	if (object.hasTriangulations()) {
+	if (object->hasTriangulations()) {
 		writePolygonIndices(cellType);
 	}
 
@@ -115,6 +115,40 @@ void VTKExporter::exportPointData(std::vector<Vector3> points, std::string filen
 
 	for (auto&& p : points) {
 		vtk << p.x << " " << p.y << " " << p.z << std::endl;
+	}
+
+	vtk.close();
+}
+
+void VTKExporter::exportGeometryVertexNormals(Geometry* object, std::string filename)
+{
+	std::string suffix = ".vtk";
+
+	std::fstream vtk(pathPrefix + filename + suffix, std::fstream::out);
+
+	std::vector<Vector3> uniqueVertices = object->uniqueVertices;
+	size_t pointCount = uniqueVertices.size();
+
+	vtk << "# vtk DataFile Version 4.2" << std::endl;
+	vtk << "vtk output" << std::endl;
+	vtk << "ASCII" << std::endl;
+	vtk << "DATASET UNSTRUCTURED_GRID" << std::endl;
+	vtk << "POINTS " << pointCount << " float" << std::endl;
+
+	if (pointCount > 0) {
+		for (int i = 0; i < pointCount; i++) {
+			vtk << uniqueVertices[i].x << " " << uniqueVertices[i].y << " " << uniqueVertices[i].z << std::endl;
+		}
+	}
+
+	vtk << "POINT_DATA " << pointCount << std::endl;
+	vtk << "VECTORS normals float" << std::endl;
+	if (pointCount > 0) {
+		std::vector<Vector3> pseudoNormals = object->getAngleWeightedVertexPseudoNormals();
+
+		for (auto&& n : pseudoNormals) {
+			vtk << n.x << " " << n.y << " " << n.z << std::endl;
+		}
 	}
 
 	vtk.close();

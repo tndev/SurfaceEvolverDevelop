@@ -563,7 +563,7 @@ void AABBTree::GenerateFullTreeBoxVisualisation(VTKExporter& e)
 	}
 
 	Geometry resultGeom = mergeGeometries(boxGeoms);
-	e.initExport(resultGeom, geom->name + "_AABB_allBoxes");
+	e.initExport(&resultGeom, geom->name + "_AABB_allBoxes");
 	std::cout << "AABB box geometries retrieved and exported" << std::endl;
 }
 
@@ -574,7 +574,7 @@ void AABBTree::GenerateFullLeafBoxVisualisation(VTKExporter& e)
 	std::vector<Geometry> boxGeoms = getAABBLeafGeoms();
 	std::cout << boxGeoms.size() << " AABB leaf boxes retrieved" << std::endl;
 	Geometry resultGeom = mergeGeometries(boxGeoms);
-	e.initExport(resultGeom, geom->name + "_AABB_leafBoxes");
+	e.initExport(&resultGeom, geom->name + "_AABB_leafBoxes");
 	std::cout << "AABB leaf boxes exported" << std::endl;
 }
 
@@ -633,8 +633,8 @@ void AABBTree::GenerateStepwiseLeafBoxVisualisation(VTKExporter& e)
 		Geometry resultBoxGeom = mergeGeometries(boxGeoms);
 		Geometry resultTriGeom = mergeGeometries(triGeoms);
 
-		e.initExport(resultBoxGeom, geom->name + "_AABB_leafBB_step-" + std::to_string(d));
-		e.initExport(resultTriGeom, geom->name + "_AABB_leafTris_step-" + std::to_string(d));
+		e.initExport(&resultBoxGeom, geom->name + "_AABB_leafBB_step-" + std::to_string(d));
+		e.initExport(&resultTriGeom, geom->name + "_AABB_leafTris_step-" + std::to_string(d));
 	}
 	std::cout << "AABB leaf visualisations finished" << std::endl;
 }

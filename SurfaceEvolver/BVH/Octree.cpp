@@ -272,7 +272,7 @@ void Octree::GenerateFullOctreeBoxVisualisation(VTKExporter& e)
 	}
 
 	Geometry resultGeom = mergeGeometries(boxGeoms);
-	e.initExport(resultGeom, this->aabbTree->geom->name + "_Octree_allBoxes");
+	e.initExport(&resultGeom, this->aabbTree->geom->name + "_Octree_allBoxes");
 	std::cout << "Octree box geometries retrieved and exported" << std::endl;
 }
 
@@ -284,7 +284,7 @@ void Octree::GenerateLeafCellVisualisation(VTKExporter& e, bool visualizeCentroi
 	this->getLeafBoxGeoms(&boxGeoms);
 	std::cout << boxGeoms.size() << " Octree leaf boxes retrieved" << std::endl;
 	Geometry resultGeom = mergeGeometries(boxGeoms);
-	e.initExport(resultGeom, this->aabbTree->geom->name + "_Octree_leafBoxes");
+	e.initExport(&resultGeom, this->aabbTree->geom->name + "_Octree_leafBoxes");
 	std::cout << "Octree leaf boxes exported" << std::endl;
 
 	if (visualizeCentroids) {
