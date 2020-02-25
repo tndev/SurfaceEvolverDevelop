@@ -8,6 +8,7 @@
 #include <string>
 #include <map>
 #include <set>
+#include <stack>
 #include <time.h>
 #include "Box3.h"
 #include "Matrix4.h"
@@ -26,6 +27,7 @@ namespace StructGeom {
 namespace BufferGeom {
 	using Triangle = std::vector<uint>;
 	using TriWithMarkedVertex = std::pair<Triangle, uint>;
+
 	using Face = std::vector<Vector3*>;
 	using Triangulation = std::vector<uint>;
 };
@@ -98,8 +100,11 @@ public:
 	void getVertexToTriangleMap(std::multimap<Vector3, BufferGeom::TriWithMarkedVertex>* buffer);
 	void getEdgeToTriangleMap(std::multimap<Edge, BufferGeom::Triangle>* buffer);
 	std::vector<Vector3> getAngleWeightedVertexPseudoNormals();
-	std::vector<Vector3> getAngleWeightedEdgePseudoNormals();
 	std::vector<Vector3> getTriangleNormals();
+
+	void getVertexToPolygonMap(std::multimap<Vector3, BufferGeom::TriWithMarkedVertex>* buffer);
+	// returns vertex ring corresponding to finite volume partitions of a ring of adjacent polygons
+	void getVertexFiniteVolumes(std::vector<std::vector<Vector3>>* vVolVerts);
 
 	void applyMatrix(Matrix4 m);
 	Vector3 getNormal(BufferGeom::Face f);

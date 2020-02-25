@@ -35,6 +35,8 @@
 // - minimize split cost function using a piecewise-quadratic interpolation to find the minimum (20% slower than simple cost(x) < minCost comparison)
 // - matrix multiplication for Matrix4
 // - flood fill for sign computation of SDF
+// - Test mesh angle weighted pseudonormals
+// - test if grid gradient is computed correctly by exporting to a vtk vector file.
 
 //  POSTPONED:
 //
@@ -56,12 +58,11 @@
 
 //   WIP:
 // 
-// - Test mesh angle weighted pseudonormals
+// - implement generic triangle/quad centroid co-volume procedure
 
 
 //   TODO:
 //
-// - test if grid gradient is computed correctly by exporting to a vtk vector file.
 // - compose a linear system for evolution from CubeSphere to PrimitiveBox of the same subdivision level
 // - implement a VTK window form using a working example for mesh rendering and SDF volume rendering
 // - implement global grid and cellSize-based Octree & SDF (just like in Vctr Engine Meta Object)
@@ -214,7 +215,16 @@ int main()
 	bunny_sdf.exportGradientField(&e, "bunnySDF_grad");
 
 	e.exportGeometryVertexNormals(&bunny, "bunnyNormals");
+	// e.exportGeometryFiniteVolumeGrid(&bunny, "bunnyFVs");
 
+	
+	IcoSphere is = IcoSphere(1, 50);
+	e.initExport(&is, "icoSphere");
+	e.exportGeometryFiniteVolumeGrid(&is, "icoSphereFVs");
+	
+	CubeSphere cs = CubeSphere(3, 50);
+	e.initExport(&cs, "cubeSphere");
+	e.exportGeometryFiniteVolumeGrid(&cs, "cubeSphereFVs");
 
 	/*
 	Matrix4 sdfTransform = Matrix4().makeTranslation(0.5, 0.5, 0.5).multiply(Matrix4().setToScale(2.0f, 2.0f, 2.0f));

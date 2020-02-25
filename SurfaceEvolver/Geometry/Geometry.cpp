@@ -59,6 +59,7 @@ void Geometry::computeNormals()
 	StructGeom::Triangle faceVerts = { &Vector3(), &Vector3(), &Vector3() };
 
 	Vector3 normal = Vector3();
+	this->normals = std::vector<float>(this->vertices.size());
 	for (unsigned int i = 0; i < this->vertices.size(); i += 9) {
 
 		for (unsigned int j = 0; j < 3; j++) {
@@ -70,9 +71,9 @@ void Geometry::computeNormals()
 		normal = getTriangleNormal(faceVerts, normal);
 
 		for (unsigned int j = 0; j < 3; j++) {
-			this->normals.push_back(normal.x);
-			this->normals.push_back(normal.y);
-			this->normals.push_back(normal.z);
+			this->normals[i + j * 3] = normal.x;
+			this->normals[i + j * 3 + 1] = normal.y;
+			this->normals[i + j * 3 + 2] = normal.z;
 		}
 	}
 }
@@ -244,7 +245,7 @@ std::vector<Vector3> Geometry::getAngleWeightedVertexPseudoNormals()
 			getTriangleNormal(T, triNormal);
 			triNormal.normalize();
 			for (auto&& vi : ti.first) {
-				if (vi != ti.second) { // ignore the marked vertex because its v
+				if (vi != ti.second) { // ignore the marked vertex because it's v
 					verts.push_back(&this->uniqueVertices[vi]);
 				}
 			}
@@ -263,38 +264,101 @@ std::vector<Vector3> Geometry::getAngleWeightedVertexPseudoNormals()
 	return result;
 }
 
-std::vector<Vector3> Geometry::getAngleWeightedEdgePseudoNormals()
+using Polygon = BufferGeom::Triangle;
+using PolyWithMarkedVertex = BufferGeom::TriWithMarkedVertex;
+void Geometry::getVertexToPolygonMap(std::multimap<Vector3, PolyWithMarkedVertex>* buffer)
 {
-	std::vector<Vector3> result = {};
+	std::multimap<Vector3, PolyWithMarkedVertex>::iterator it;
+	for (auto&& t : triangulations) {
+		Polygon face = this->getPolygonIndicesFromTriangulation(t);
+		for (uint j = 0; j < face.size(); j++) {
+			it = buffer->insert(
+				std::pair<Vector3, PolyWithMarkedVertex>(
+					this->uniqueVertices[face[j]],
+					PolyWithMarkedVertex(face, face[j])
+				)
+			);
+		}
+	}
+}
 
-	std::set<Edge> edgesSet = {};
-	this->getEdgesSet(&edgesSet);
-	std::multimap<Edge, BufferGeom::Triangle> edgeToTriangles = {};
-	this->getEdgeToTriangleMap(&edgeToTriangles);
-	std::set<Edge>::iterator set_it;
-	std::multimap<Edge, BufferGeom::Triangle>::iterator map_it;
+void sortPolysWithMarkedVertexByAdjacency(std::vector<PolyWithMarkedVertex>* polys) {
+	std::vector<PolyWithMarkedVertex> result = {};
+	
+	PolyWithMarkedVertex currPoly, leftPoly;
+	// take first
+	std::vector<PolyWithMarkedVertex>::iterator currIt = polys->begin();	
 
-	Vector3 triNormal = Vector3();
+	while (polys->size()) {
+		// copy current poly to the result list
+		currPoly = *currIt;
+		result.push_back(currPoly);
 
-	for (set_it = edgesSet.begin(); set_it != edgesSet.end(); ++set_it) {
-		Edge e = *set_it;
-		map_it = edgeToTriangles.find(e);
-		Vector3 pseudoNormal = Vector3();
-		while (map_it != edgeToTriangles.end()) {
-			BufferGeom::Triangle ti = map_it->second;
-			Tri T = { &uniqueVertices[ti[0]], &uniqueVertices[ti[1]], &uniqueVertices[ti[2]] };
-			getTriangleNormal(T, triNormal);
-			triNormal.normalize();
-			pseudoNormal = pseudoNormal + M_PI * triNormal;
+		// find right edge ids of the selected polygon
+		auto markedIt = std::find(currPoly.first.begin(), currPoly.first.end(), currPoly.second);
+		auto prevIt = (markedIt == currPoly.first.begin() ? currPoly.first.end() - 1 : std::prev(markedIt));
 
-			edgeToTriangles.erase(map_it);
-			map_it = edgeToTriangles.find(e);
+		// erase current poly from the list
+		polys->erase(currIt);
+
+		// search through all remaining polys for left neighbor
+		for (auto it = polys->begin(); it != polys->end(); it++) {
+			leftPoly = *it;
+			// find left edge ids of the left poly candidate
+			auto markedLeftIt = std::find(leftPoly.first.begin(), leftPoly.first.end(), leftPoly.second);
+			auto nextLeftIt = (std::next(markedLeftIt) == leftPoly.first.end() ? leftPoly.first.begin() : std::next(markedLeftIt));
+			
+			if (*prevIt == *nextLeftIt) {
+				// edges match
+				currIt = it;
+				continue;
+			}
+		}
+	}
+	*polys = result;
+}
+
+void Geometry::getVertexFiniteVolumes(std::vector<std::vector<Vector3>>* vVolVerts)
+{
+	// multimap for polygons adjacent to a vertex
+	std::multimap<Vector3, PolyWithMarkedVertex> vertexToPolygons = {};
+	this->getVertexToPolygonMap(&vertexToPolygons);
+	std::multimap<Vector3, PolyWithMarkedVertex>::iterator it;
+	Vector3* v;
+	std::vector<Vector3> volRingVerts = {};
+
+	for (uint i = 0; i < this->uniqueVertices.size(); i++) {
+		v = &this->uniqueVertices[i];
+		it = vertexToPolygons.find(*v);
+
+		// extract adjacent polygons from multimap
+		std::vector<PolyWithMarkedVertex> adjacentPolys = {};
+		while (it != vertexToPolygons.end()) {
+			adjacentPolys.push_back(it->second);
+			vertexToPolygons.erase(it);
+			it = vertexToPolygons.find(*v);
+		}
+		// sort by adjacency within poly ring
+		sortPolysWithMarkedVertexByAdjacency(&adjacentPolys);
+
+		for (auto&& p : adjacentPolys) {
+			Polygon P = p.first;
+
+			auto markedIt = std::find(P.begin(), P.end(), p.second);
+			uint leftId = *(std::next(markedIt) == P.end() ? P.begin() : std::next(markedIt));
+
+			Vector3 centroid = Vector3();
+			for (auto&& Pi : P) centroid = centroid + this->uniqueVertices[Pi];
+			centroid = 1.0f / ((float)P.size()) * centroid;
+
+			volRingVerts.push_back(0.5f * (*v + uniqueVertices[leftId]));
+			volRingVerts.push_back(centroid);
 		}
 
-		result.push_back(pseudoNormal / (2 * M_PI));
+		// the result should be a contour of the finite volume around v
+		vVolVerts->push_back(volRingVerts);
+		volRingVerts.clear();
 	}
-
-	return result;
 }
 
 std::vector<Vector3> Geometry::getTriangleNormals()
@@ -315,6 +379,7 @@ std::vector<Vector3> Geometry::getTriangleNormals()
 
 	return result;
 }
+
 
 std::vector<Vector3> Geometry::getProjectionsAlongNormal(BufferGeom::Face& vertices)
 {

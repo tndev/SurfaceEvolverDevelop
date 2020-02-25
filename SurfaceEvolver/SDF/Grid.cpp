@@ -384,7 +384,7 @@ void Grid::computeGradient()
 {
 	int ix, iy, iz, i, gradPos;
 	
-	float grad_f_x, grad_f_y, grad_f_z;
+	float grad_f_x, grad_f_y, grad_f_z, norm;
 	uint ix0, iy0, iz0, ix1, iy1, iz1;
 	uint gridPosPrevX, gridPosNextX;
 	uint gridPosPrevY, gridPosNextY;
@@ -423,13 +423,17 @@ void Grid::computeGradient()
 				gridPosPrevZ = Nx * Ny * iz0 + Nx * iy + ix;
 				gridPosNextZ = Nx * Ny * iz1 + Nx * iy + ix;
 
+				// central difference
 				grad_f_x = (field[gridPosNextX] - field[gridPosPrevX]) / (2.0f * dx);
 				grad_f_y = (field[gridPosNextY] - field[gridPosPrevY]) / (2.0f * dy);
 				grad_f_z = (field[gridPosNextZ] - field[gridPosPrevZ]) / (2.0f * dz);
 
-				gradFieldX[gradPos] = (float)grad_f_x;
-				gradFieldY[gradPos] = (float)grad_f_y;
-				gradFieldZ[gradPos] = (float)grad_f_z;
+				// Eikonal gradient |grad(d)|=1 has to be normalized
+				norm = sqrt(grad_f_x * grad_f_x + grad_f_y * grad_f_y + grad_f_z * grad_f_z);
+
+				gradFieldX[gradPos] = grad_f_x / norm;
+				gradFieldY[gradPos] = grad_f_y / norm;
+				gradFieldZ[gradPos] = grad_f_z / norm;
 			}
 		}
 	}

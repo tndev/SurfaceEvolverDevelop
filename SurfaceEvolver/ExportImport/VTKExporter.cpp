@@ -26,8 +26,8 @@ void VTKExporter::initExport(Geometry* object, std::string filename)
 
 	std::fstream vtk(pathPrefix + filename + suffix, std::fstream::out);
 
-	std::vector<Vector3> uniqueVertices = object->uniqueVertices;
-	size_t pointCount = uniqueVertices.size();
+	std::vector<Vector3>* uniqueVertices = &object->uniqueVertices;
+	size_t pointCount = uniqueVertices->size();
 
 	vtk << "# vtk DataFile Version 4.2" << std::endl;
 	vtk << "vtk output" << std::endl;
@@ -40,7 +40,7 @@ void VTKExporter::initExport(Geometry* object, std::string filename)
 
 	if (pointCount > 0) {
 		for (int i = 0; i < pointCount; i++) {
-			vtk << uniqueVertices[i].x << " " << uniqueVertices[i].y << " " << uniqueVertices[i].z << newline;
+			vtk << uniqueVertices->at(i).x << " " << uniqueVertices->at(i).y << " " << uniqueVertices->at(i).z << newline;
 		}
 	}
 
@@ -152,6 +152,46 @@ void VTKExporter::exportGeometryVertexNormals(Geometry* object, std::string file
 	}
 
 	vtk.close();
+}
+
+void VTKExporter::exportGeometryFiniteVolumeGrid(Geometry* object, std::string filename)
+{
+	std::vector<std::vector<Vector3>> fvVerts = {};
+	object->getVertexFiniteVolumes(&fvVerts);
+
+	std::vector<Vector3>* uniqueVertices = &object->uniqueVertices;
+	size_t pointCount = uniqueVertices->size();
+	std::vector<Geometry> fvGeometries = {};
+	for (uint i = 0; i < fvVerts.size(); i++) {
+		Geometry fvGeom = Geometry();
+
+		fvGeom.uniqueVertices = { object->uniqueVertices[i] };
+		for (uint j = 0; j < fvVerts[i].size(); j += 2) {
+			fvGeom.uniqueVertices.push_back(fvVerts[i][j]);
+			fvGeom.uniqueVertices.push_back(fvVerts[i][j + 1]);
+
+			fvGeom.vertexIndices.push_back(0);
+			fvGeom.vertexIndices.push_back(j + 1);
+			fvGeom.vertexIndices.push_back(j + 2);
+
+			fvGeom.vertexIndices.push_back(0);
+			fvGeom.vertexIndices.push_back(j + 2);
+			fvGeom.vertexIndices.push_back((j + 3) % fvVerts[i].size());
+
+			fvGeom.triangulations.push_back({ j, j + 1 });
+		}
+
+		fvGeom.vertices = std::vector<float>(3 * fvGeom.vertexIndices.size());
+		for (uint j = 0; j < fvGeom.vertexIndices.size(); j++) {
+			fvGeom.vertices[3 * j] = fvGeom.uniqueVertices[fvGeom.vertexIndices[j]].x;
+			fvGeom.vertices[3 * j + 1] = fvGeom.uniqueVertices[fvGeom.vertexIndices[j]].y;
+			fvGeom.vertices[3 * j + 2] = fvGeom.uniqueVertices[fvGeom.vertexIndices[j]].z;
+		}
+		fvGeometries.push_back(fvGeom);
+	}
+
+	Geometry result = mergeGeometries(fvGeometries);
+	this->initExport(&result, filename);
 }
 
 size_t VTKExporter::countTriangulationIndices(std::vector<BufferGeom::Triangulation>& triangulations)

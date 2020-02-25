@@ -26,7 +26,7 @@ AABBTree::AABBTree(Geometry* geom, PrimitiveType type)
 	// generate index array to primitives
 	std::vector<uint> primitiveIds;
 	primitiveIds.reserve(this->primitives.size());
-	uint n(0); std::generate_n(std::back_inserter(primitiveIds), this->primitives.size(), [n]() mutable { return n++;  });
+	uint n(0); std::generate_n(std::back_inserter(primitiveIds), this->primitives.size(), [n]() mutable { return n++; });
 
 	// generate root and all that follow
 	this->root = new AABBNode(&primitiveIds, this->bbox, this);

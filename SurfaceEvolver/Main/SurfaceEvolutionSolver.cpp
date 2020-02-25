@@ -56,19 +56,16 @@ void SurfaceEvolutionSolver::evolve()
 	// for SDF interpolation from values surrounding V
 	std::vector<Vector3> positionBuffer = {};
 	std::vector<float> valueBuffer = {};
-	float SDF_V; Vector3 gradSDF_V;
+	float SDF_V, gradSDFx_V, gradSDFy_V, gradSDFz_V; Vector3 gradSDF_V;
 
 	if (!sdfGrid->hasGradient()) {
 		sdfGrid->computeGradient();
 	}
 
 	for (int t = 0; t < NSteps; t++) {
-		// TODO: could perhaps be a static array
 		std::vector<Vector3> vNormals = evolvedSurface->getAngleWeightedVertexPseudoNormals();
-
-		// evolvedSurface->getVertexCoVolumes();
-
-		// evolvedSurface->getVertexElementCoeffs(); // cotans for triangle elems
+		std::vector<std::vector<Vector3>> fvVerts = {};
+		evolvedSurface->getVertexFiniteVolumes(&fvVerts);
 
 		for (uint i = 0; i < NVerts; i++) {
 			// ===== vertex =================================
@@ -78,7 +75,6 @@ void SurfaceEvolutionSolver::evolve()
 				evolvedSurface->uniqueVertices[i].z
 			);
 
-
 			// ===== Control coefs ==========================
 			// SDF value
 			positionBuffer.clear(); // for old min and max positions
@@ -86,8 +82,26 @@ void SurfaceEvolutionSolver::evolve()
 			sdfGrid->getSurroundingCells(V, Nx, Ny, Nz, sdfGrid->field, &positionBuffer, &valueBuffer);
 			SDF_V = trilinearInterpolate(V, positionBuffer, valueBuffer);
 
-			// grad SDF
+			// -------- grad SDF --------
+			// grad SDF x
+			positionBuffer.clear(); // for old min and max positions
+			valueBuffer.clear(); // for grad SDF x cell vertex values
+			sdfGrid->getSurroundingCells(V, Nx - 2, Ny - 2, Nz - 2, sdfGrid->gradFieldX, &positionBuffer, &valueBuffer);
+			gradSDFx_V = trilinearInterpolate(V, positionBuffer, valueBuffer);
 
+			// grad SDF y
+			positionBuffer.clear(); // for old min and max positions
+			valueBuffer.clear(); // for grad SDF y cell vertex values
+			sdfGrid->getSurroundingCells(V, Nx - 2, Ny - 2, Nz - 2, sdfGrid->gradFieldY, &positionBuffer, &valueBuffer);
+			gradSDFy_V = trilinearInterpolate(V, positionBuffer, valueBuffer);
+
+			// grad SDF z
+			positionBuffer.clear(); // for old min and max positions
+			valueBuffer.clear(); // for grad SDF z cell vertex values
+			sdfGrid->getSurroundingCells(V, Nx - 2, Ny - 2, Nz - 2, sdfGrid->gradFieldZ, &positionBuffer, &valueBuffer);
+			gradSDFz_V = trilinearInterpolate(V, positionBuffer, valueBuffer);
+
+			gradSDF_V = Vector3(gradSDFx_V, gradSDFy_V, gradSDFz_V);
 
 			// Laplace-Beltrami ctrl func:
 			float eps = 1.0f;

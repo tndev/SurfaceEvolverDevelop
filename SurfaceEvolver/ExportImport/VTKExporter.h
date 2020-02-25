@@ -18,6 +18,7 @@ public:
 	void initExport(Geometry* object, std::string filename);
 	void exportPointData(std::vector<Vector3> points, std::string filename);
 	void exportGeometryVertexNormals(Geometry* object, std::string filename);
+	void exportGeometryFiniteVolumeGrid(Geometry* object, std::string filename);
 private:
 	size_t countTriangulationIndices(std::vector<BufferGeom::Triangulation>& triangulations);
 };
