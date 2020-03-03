@@ -55,10 +55,11 @@
 //   DONE, BUT MIGHT BE IMPROVED:
 //
 // - AABB and Octree have to take as little space as possible
+// - implement generic triangle/quad centroid co-volume procedure (centroid on triangulated polygon)
 
 //   WIP:
 // 
-// - implement generic triangle/quad centroid co-volume procedure
+// - finite volume normal derivatives (Laplace-Beltrami)
 
 
 //   TODO:
@@ -215,16 +216,16 @@ int main()
 	bunny_sdf.exportGradientField(&e, "bunnySDF_grad");
 
 	e.exportGeometryVertexNormals(&bunny, "bunnyNormals");
-	// e.exportGeometryFiniteVolumeGrid(&bunny, "bunnyFVs");
+	e.exportGeometryFiniteVolumeGrid(&bunny, "bunnyFVs");
 
-	
+	/*
 	IcoSphere is = IcoSphere(1, 50);
 	e.initExport(&is, "icoSphere");
 	e.exportGeometryFiniteVolumeGrid(&is, "icoSphereFVs");
 	
 	CubeSphere cs = CubeSphere(3, 50);
 	e.initExport(&cs, "cubeSphere");
-	e.exportGeometryFiniteVolumeGrid(&cs, "cubeSphereFVs");
+	e.exportGeometryFiniteVolumeGrid(&cs, "cubeSphereFVs");*/
 
 	/*
 	Matrix4 sdfTransform = Matrix4().makeTranslation(0.5, 0.5, 0.5).multiply(Matrix4().setToScale(2.0f, 2.0f, 2.0f));

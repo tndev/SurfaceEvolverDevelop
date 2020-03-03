@@ -104,7 +104,7 @@ public:
 
 	void getVertexToPolygonMap(std::multimap<Vector3, BufferGeom::TriWithMarkedVertex>* buffer);
 	// returns vertex ring corresponding to finite volume partitions of a ring of adjacent polygons
-	void getVertexFiniteVolumes(std::vector<std::vector<Vector3>>* vVolVerts);
+	void getVertexFiniteVolumes(std::vector<std::vector<Vector3>>* vVolVerts, std::vector<std::vector<std::vector<uint>>>* adjacentPolyIds);
 
 	void applyMatrix(Matrix4 m);
 	Vector3 getNormal(BufferGeom::Face f);

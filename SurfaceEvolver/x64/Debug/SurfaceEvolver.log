@@ -2,22 +2,22 @@
 D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\poly2tri\sweep\sweep_context.h(161,24): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
 D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(84,127): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
 D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(261,45): warning C4305: 'argument': truncation from 'double' to 'float'
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(487,15): warning C4101: 'e': unreferenced local variable
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(677,51): warning C4267: '+=': conversion from 'size_t' to 'unsigned int', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(678,57): warning C4267: '+=': conversion from 'size_t' to 'unsigned int', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(690,73): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(690,73): warning C4267: 'initializing': conversion from 'size_t' to 'const unsigned int', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(691,75): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(691,75): warning C4267: 'initializing': conversion from 'size_t' to 'const unsigned int', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(1340,33): warning C4305: 'initializing': truncation from 'double' to 'float'
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(1351,10): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(520,20): warning C4244: '=': conversion from '_Ty' to 'float', possible loss of data
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(493,15): warning C4101: 'e': unreferenced local variable
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(683,51): warning C4267: '+=': conversion from 'size_t' to 'unsigned int', possible loss of data
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(684,57): warning C4267: '+=': conversion from 'size_t' to 'unsigned int', possible loss of data
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(696,73): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(696,73): warning C4267: 'initializing': conversion from 'size_t' to 'const unsigned int', possible loss of data
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(697,75): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(697,75): warning C4267: 'initializing': conversion from 'size_t' to 'const unsigned int', possible loss of data
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(1346,33): warning C4305: 'initializing': truncation from 'double' to 'float'
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(1357,10): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(526,20): warning C4244: '=': conversion from '_Ty' to 'float', possible loss of data
           with
           [
               _Ty=unsigned int
           ]
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(534): message : see reference to function template instantiation 'void flipArray<unsigned int>(std::vector<unsigned int,std::allocator<unsigned int>>,unsigned int)' being compiled
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(522,20): warning C4244: '=': conversion from 'float' to '_Ty', possible loss of data
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(540): message : see reference to function template instantiation 'void flipArray<unsigned int>(std::vector<unsigned int,std::allocator<unsigned int>>,unsigned int)' being compiled
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(528,20): warning C4244: '=': conversion from 'float' to '_Ty', possible loss of data
           with
           [
               _Ty=unsigned int

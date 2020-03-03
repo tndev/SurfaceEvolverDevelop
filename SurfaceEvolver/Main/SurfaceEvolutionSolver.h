@@ -15,10 +15,28 @@ enum class ElementType {
 // where v_N is the normal term and v_T is the tangential redistribution term
 class SurfaceEvolutionSolver
 {
+private:
+	double** SysMatrix = nullptr;
+	double* sysRhsX = nullptr;
+	double* sysRhsY = nullptr;
+	double* sysRhsZ = nullptr;
+
+	void clearSystem();
+	void initSystem();
+	void getTriangleVertexLaplaceBeltrami(uint i, std::vector<std::vector<uint>>* adjacentPolys);
+	void getQuadVertexLaplaceBeltrami(uint i, std::vector<std::vector<uint>>* adjacentPolys);
+	// solver helpers
+	void printArray1(std::string name, double* a, int printLim, bool inRow = true);
+	void printArray2(std::string name, double** A, int printLim);
+	double vectorDot(double* a, double* b);
+	double vectorNorm(double* a);
+
+	// solver
+	void Bi_CGSTAB_solve(double** A, double* b, double* x, bool print = false);
 public:
 	// params:
 	uint NSteps = 10; bool saveStates = false;
-	uint NVerts;
+	size_t N;
 
 	float dt = 0.01f; // time step
 	Grid* sdfGrid = nullptr; // signed distance function grid

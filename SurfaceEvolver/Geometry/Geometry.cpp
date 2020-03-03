@@ -318,7 +318,7 @@ void sortPolysWithMarkedVertexByAdjacency(std::vector<PolyWithMarkedVertex>* pol
 	*polys = result;
 }
 
-void Geometry::getVertexFiniteVolumes(std::vector<std::vector<Vector3>>* vVolVerts)
+void Geometry::getVertexFiniteVolumes(std::vector<std::vector<Vector3>>* vVolVerts, std::vector<std::vector<Polygon>>* adjacentPolyIds)
 {
 	// multimap for polygons adjacent to a vertex
 	std::multimap<Vector3, PolyWithMarkedVertex> vertexToPolygons = {};
@@ -340,15 +340,22 @@ void Geometry::getVertexFiniteVolumes(std::vector<std::vector<Vector3>>* vVolVer
 		}
 		// sort by adjacency within poly ring
 		sortPolysWithMarkedVertexByAdjacency(&adjacentPolys);
+		adjacentPolyIds->push_back({ }); 
 
-		for (auto&& p : adjacentPolys) {
-			Polygon P = p.first;
+		for (uint p = 0; p < adjacentPolys.size(); p++) {
+			Polygon P = adjacentPolys[p].first;
+			adjacentPolyIds->at(i).push_back({ i }); // all polys will start with the central vertex F_i
 
-			auto markedIt = std::find(P.begin(), P.end(), p.second);
-			uint leftId = *(std::next(markedIt) == P.end() ? P.begin() : std::next(markedIt));
+			Polygon::iterator markedIt = std::find(P.begin(), P.end(), adjacentPolys[p].second);
+			Polygon::iterator nextIt = (std::next(markedIt) == P.end() ? P.begin() : std::next(markedIt));
+			uint leftId = *nextIt;
 
-			Vector3 centroid = Vector3();
-			for (auto&& Pi : P) centroid = centroid + this->uniqueVertices[Pi];
+			Vector3 centroid = uniqueVertices[*markedIt];
+			while (nextIt != markedIt) {
+				centroid = centroid + uniqueVertices[*nextIt];
+				adjacentPolyIds->at(i).at(p).push_back(*nextIt);
+				nextIt = (std::next(nextIt) == P.end() ? P.begin() : std::next(nextIt));
+			}
 			centroid = 1.0f / ((float)P.size()) * centroid;
 
 			volRingVerts.push_back(0.5f * (*v + uniqueVertices[leftId]));

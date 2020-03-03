@@ -157,7 +157,8 @@ void VTKExporter::exportGeometryVertexNormals(Geometry* object, std::string file
 void VTKExporter::exportGeometryFiniteVolumeGrid(Geometry* object, std::string filename)
 {
 	std::vector<std::vector<Vector3>> fvVerts = {};
-	object->getVertexFiniteVolumes(&fvVerts);
+	std::vector<std::vector<std::vector<uint>>> adjacentPolys = {};
+	object->getVertexFiniteVolumes(&fvVerts, &adjacentPolys);
 
 	std::vector<Vector3>* uniqueVertices = &object->uniqueVertices;
 	size_t pointCount = uniqueVertices->size();
