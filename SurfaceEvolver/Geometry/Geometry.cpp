@@ -28,6 +28,11 @@ bool Geometry::hasVertices()
 	return this->vertices.size() > 0;
 }
 
+bool Geometry::hasUniqueVertices()
+{
+	return this->uniqueVertices.size() > 0;
+}
+
 bool Geometry::hasVertexIndices()
 {
 	return this->vertexIndices.size() > 0;
@@ -87,6 +92,20 @@ void Geometry::computeTriangulations()
 		}
 	}
 	// otherwise the geometry is just a point cloud and has to be triangulated separately
+}
+
+void Geometry::fillVerticesFromUniqueVertices()
+{
+	if (this->hasVertexIndices() && this->hasUniqueVertices()) {
+		uint N = vertexIndices.size();
+		this->vertices.clear();
+		this->vertices = std::vector<float>(N);
+		for (uint i = 0; i < N; i++) {
+			this->vertices[(size_t)3 * i] = this->uniqueVertices[this->vertexIndices[i]].x;
+			this->vertices[(size_t)3 * i + 1] = this->uniqueVertices[this->vertexIndices[i]].y;
+			this->vertices[(size_t)3 * i + 2] = this->uniqueVertices[this->vertexIndices[i]].z;
+		}
+	}
 }
 
 std::vector<unsigned int> Geometry::getPolygonIndicesFromTriangulation(BufferGeom::Triangulation t)

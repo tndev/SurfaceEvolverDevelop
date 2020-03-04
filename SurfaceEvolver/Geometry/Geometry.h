@@ -79,6 +79,7 @@ public:
 	Geometry(const Geometry& other);
 
 	bool hasVertices();
+	bool hasUniqueVertices();
 	bool hasVertexIndices();
 	bool hasNormals();
 	bool hasTriangulations();
@@ -86,6 +87,7 @@ public:
 	Box3 getBoundingBox(Box3 bbox = Box3(), Matrix4 matrix = Matrix4());
 	void computeNormals();
 	void computeTriangulations();
+	void fillVerticesFromUniqueVertices();
 
 	std::vector<uint> getPolygonIndicesFromTriangulation(BufferGeom::Triangulation t);
 	std::vector<Vector3> getProjectionsAlongNormal(BufferGeom::Face& vertices); // TODO: use Vector2
