@@ -14,6 +14,7 @@
 #include "../ExportImport/OBJImporter.h"
 #include "../SDF/SDF.h"
 #include "../Utils/CPUInfo.h"
+#include "SurfaceEvolutionSolver.h"
 
 //   DONE:
 //
@@ -217,6 +218,9 @@ int main()
 
 	e.exportGeometryVertexNormals(&bunny, "bunnyNormals");
 	e.exportGeometryFiniteVolumeGrid(&bunny, "bunnyFVs");
+
+
+	SurfaceEvolutionSolver sphereTest(0.01f, 0.06f, -1, ElementType::tri, nullptr, "testSphere", true);
 
 	/*
 	IcoSphere is = IcoSphere(1, 50);

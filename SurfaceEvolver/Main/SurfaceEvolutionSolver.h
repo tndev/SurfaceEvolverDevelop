@@ -57,29 +57,40 @@ public:
 	bool printHappenings = true; // general things happening output
 	bool printStepOutput = true; // time step output with time measurements etc.
 
+	// whether to compare evolution result with a mean-curvature contracting sphere and return an L2 error:
+	bool performSphereTest = false;
+	float r0 = 50.0f; // test sphere initial radius
+	Vector3 center = Vector3(); // center of a test sphere geometry
+	// flag whether to consider a signed distance function for evolution equation (automatically true when performing sphere test)
+	bool meanCurvatureFlow = false;
+
 	float dt = 0.01f; // time step
+	float tStop = 1.0f; // evolution stopping time
 	Grid* sdfGrid = nullptr; // signed distance function grid
 	ElementType type = ElementType::quad;
 
 	// result (iterated):
 	Geometry* evolvedSurface = nullptr;
+	// finite volume areas per vertex (vertices)
+	std::vector<float> fvAreas = {};
 
 	std::string geomName = "";
 	std::vector<std::string> time_logs = {};
 
 	SurfaceEvolutionSolver();
 	// TODO: Finish copy
-	SurfaceEvolutionSolver(const SurfaceEvolutionSolver& other);
-	SurfaceEvolutionSolver(Grid* sdfGrid, uint NSteps = 10, float dt = 0.01f, ElementType type = ElementType::quad, std::string name = "Sphere", bool saveStates = false);
-	// TODO: Finish delete
+	// SurfaceEvolutionSolver(const SurfaceEvolutionSolver& other);
+	SurfaceEvolutionSolver(
+		float dt = 0.01f, float tStop = 1.0f, int NSteps = -1, ElementType type = ElementType::tri, Grid* sdfGrid = nullptr,
+		std::string name = "Sphere", bool sphereTest = false, bool saveStates = false);
 	~SurfaceEvolutionSolver();
 
 	void init();
 	void evolve();
 
 	// returns a specialized L2error compared to a mean-curvature contracting sphere
-	// with radius r(t) = sqrt(1 - 4 * t)
-	float getSphereL2Error();
+	// with radius r(t) = sqrt(r0 * r0 - 4 * t)
+	float getSphereStepL2Error(float t);
 };
 
 #endif

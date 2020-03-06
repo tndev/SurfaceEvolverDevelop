@@ -1,50 +1,15 @@
-﻿  Geometry.cpp
+﻿  main.cpp
 D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\poly2tri\sweep\sweep_context.h(161,24): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(89,127): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(100,32): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(280,45): warning C4305: 'argument': truncation from 'double' to 'float'
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(513,15): warning C4101: 'e': unreferenced local variable
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(703,51): warning C4267: '+=': conversion from 'size_t' to 'unsigned int', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(704,57): warning C4267: '+=': conversion from 'size_t' to 'unsigned int', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(716,73): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(716,73): warning C4267: 'initializing': conversion from 'size_t' to 'const unsigned int', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(717,75): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(717,75): warning C4267: 'initializing': conversion from 'size_t' to 'const unsigned int', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(1366,33): warning C4305: 'initializing': truncation from 'double' to 'float'
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(1377,10): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(546,20): warning C4244: '=': conversion from '_Ty' to 'float', possible loss of data
-          with
-          [
-              _Ty=unsigned int
-          ]
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(560): message : see reference to function template instantiation 'void flipArray<unsigned int>(std::vector<unsigned int,std::allocator<unsigned int>>,unsigned int)' being compiled
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(548,20): warning C4244: '=': conversion from 'float' to '_Ty', possible loss of data
-          with
-          [
-              _Ty=unsigned int
-          ]
-  SurfaceEvolutionSolver.cpp
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\poly2tri\sweep\sweep_context.h(161,24): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\SurfaceEvolutionSolver.cpp(114,35): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\SurfaceEvolutionSolver.cpp(108,16): warning C4101: 'gradSDFx_V': unreferenced local variable
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\SurfaceEvolutionSolver.cpp(108,40): warning C4101: 'gradSDFz_V': unreferenced local variable
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\SurfaceEvolutionSolver.cpp(108,28): warning C4101: 'gradSDFy_V': unreferenced local variable
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\SurfaceEvolutionSolver.cpp(188,35): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\SurfaceEvolutionSolver.cpp(182,16): warning C4101: 'gradSDFx_V': unreferenced local variable
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\SurfaceEvolutionSolver.cpp(182,40): warning C4101: 'gradSDFz_V': unreferenced local variable
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\SurfaceEvolutionSolver.cpp(182,28): warning C4101: 'gradSDFy_V': unreferenced local variable
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\SurfaceEvolutionSolver.cpp(223,28): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\SurfaceEvolutionSolver.cpp(235,28): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\SurfaceEvolutionSolver.cpp(252,28): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\SurfaceEvolutionSolver.cpp(258,27): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\SurfaceEvolutionSolver.cpp(264,28): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\SurfaceEvolutionSolver.cpp(473,59): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\SurfaceEvolutionSolver.cpp(473,52): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\SurfaceEvolutionSolver.cpp(473,45): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\SurfaceEvolutionSolver.cpp(545,20): warning C4018: '<': signed/unsigned mismatch
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\main.cpp(148,23): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\main.cpp(150,14): warning C4244: 'initializing': conversion from 'double' to 'unsigned int', possible loss of data
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\main.cpp(154,80): warning C4305: 'argument': truncation from 'double' to 'float'
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\main.cpp(161,80): warning C4305: 'argument': truncation from 'double' to 'float'
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\main.cpp(180,23): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\main.cpp(182,14): warning C4244: 'initializing': conversion from 'double' to 'unsigned int', possible loss of data
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\main.cpp(186,80): warning C4305: 'argument': truncation from 'double' to 'float'
   Generating code
-  6 of 2513 functions ( 0.2%) were compiled, the rest were copied from previous compilation.
+  1 of 2542 functions (<0.1%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    98 functions had inline decision re-evaluated but remain unchanged
+    8 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   SurfaceEvolver.vcxproj -> D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\x64\Release\SurfaceEvolver.exe

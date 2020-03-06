@@ -102,14 +102,16 @@ void SurfaceEvolutionSolver::getTriangleEvolutionSystem(
 			evolvedSurface->uniqueVertices[i].z
 		);
 
+		float eps = 1.0f;
 		// SDF interpolation from values surrounding V
 		std::vector<Vector3> positionBuffer = {};
 		std::vector<float> valueBuffer = {};
 		float SDF_V, gradSDFx_V, gradSDFy_V, gradSDFz_V; Vector3 gradSDF_V = Vector3();
 
-		this->getInterpolatedSDFValuesforVertex(&Fi, &SDF_V, &gradSDF_V, positionBuffer, valueBuffer);
-
-		float eps = laplaceBeltramiCtrlFunc(SDF_V);
+		if (!meanCurvatureFlow) {
+			this->getInterpolatedSDFValuesforVertex(&Fi, &SDF_V, &gradSDF_V, positionBuffer, valueBuffer);
+			eps = laplaceBeltramiCtrlFunc(SDF_V);
+		}		
 
 		uint m = adjacentPolys[i].size();
 		// =====================================================================>
@@ -120,7 +122,6 @@ void SurfaceEvolutionSolver::getTriangleEvolutionSystem(
 
 			// fill in values from cotan scheme based on [1], [2], [3]:
 
-			/**/
 			// midpoints:
 			Vector3* M0 = &fvVerts[i][ (size_t)2 * p ];
 			Vector3* baryCenter = &fvVerts[i][ (size_t)2 * p + 1 ];
@@ -155,9 +156,11 @@ void SurfaceEvolutionSolver::getTriangleEvolutionSystem(
 		float vT = this->tangentialVelocitForVertex(Fi, i);
 
 		// grad dist func:
-		float eta = this->etaCtrlFunc(SDF_V, gradSDF_V, vNormals[i]);
+		float eta = ( meanCurvatureFlow ? 0.0f : this->etaCtrlFunc(SDF_V, gradSDF_V, vNormals[i]) );
 
-		sysRhsX[i] += (double)Fi.x + (double)eta + (double)dt * vT;
+		sysRhsX[i] += (double)Fi.x + (double)dt * eta + (double)dt * vT;
+
+		if (performSphereTest) fvAreas.push_back(coVolArea); // save areas as weights for numerical tests
 	}
 }
 
@@ -481,17 +484,22 @@ SurfaceEvolutionSolver::SurfaceEvolutionSolver()
 {
 }
 
-SurfaceEvolutionSolver::SurfaceEvolutionSolver(const SurfaceEvolutionSolver& other)
-{
-}
-
-SurfaceEvolutionSolver::SurfaceEvolutionSolver(Grid* sdfGrid, uint NSteps, float dt, ElementType type, std::string name, bool saveStates)
+SurfaceEvolutionSolver::SurfaceEvolutionSolver(float dt, float tStop, int NSteps, ElementType type, Grid* sdfGrid, std::string name, bool sphereTest, bool saveStates)
 {
 	// ===== Evolution params ==============================
-	this->NSteps = NSteps; this->saveStates = saveStates; 
+	this->saveStates = saveStates; 
+	this->performSphereTest = sphereTest; 
+	if (sphereTest || sdfGrid == nullptr) this->meanCurvatureFlow = true;
 	this->geomName = name;
-
-	this->dt = dt;
+	
+	if (NSteps < 0) {
+		this->NSteps = std::floor(tStop / dt);
+	}
+	else {
+		this->NSteps = NSteps; 
+	}
+	
+	this->dt = dt; this->tStop = tStop;
 	this->sdfGrid = sdfGrid;
 	this->type = type;
 	// -----------------------------------------------------
@@ -502,6 +510,8 @@ SurfaceEvolutionSolver::SurfaceEvolutionSolver(Grid* sdfGrid, uint NSteps, float
 
 SurfaceEvolutionSolver::~SurfaceEvolutionSolver()
 {
+	this->clearSystem(); this->time_logs.clear();
+	this->fvAreas.clear();
 }
 
 void SurfaceEvolutionSolver::init()
@@ -509,7 +519,7 @@ void SurfaceEvolutionSolver::init()
 	// ===== Preparing a source geometry for immersion =====
 	// -----------------------------------------------------
 	// radius
-	float r = 0.499f * std::min({ sdfGrid->scale.x, sdfGrid->scale.y, sdfGrid->scale.z });
+	float r = (meanCurvatureFlow ? r0 : 0.499f * std::min({ sdfGrid->scale.x, sdfGrid->scale.y, sdfGrid->scale.z }));
 	if (type == ElementType::tri) {
 		uint n = 2;
 		evolvedSurface = new IcoSphere(n, r);
@@ -518,7 +528,8 @@ void SurfaceEvolutionSolver::init()
 		uint n = 3;
 		evolvedSurface = new CubeSphere(n, r);
 	}
-	Vector3 center = sdfGrid->bbox.getCenter();
+	Box3 bbox = (meanCurvatureFlow ? evolvedSurface->getBoundingBox() : sdfGrid->bbox);
+	this->center = bbox.getCenter();
 	Matrix4 M = Matrix4().makeTranslation(center.x, center.y, center.z);
 	evolvedSurface->applyMatrix(M);
 	this->N = evolvedSurface->uniqueVertices.size();
@@ -526,10 +537,16 @@ void SurfaceEvolutionSolver::init()
 	std::cout << "============================================================= " << std::endl;
 	std::cout << "----------------------- Initializing ------------------------" << std::endl;
 	std::cout << "------------ S U R F A C E    E V O L U T I O N -------------" << std::endl;
-	std::cout << ">> NSteps = " << NSteps << ", dt = " << dt << std::endl;
+	std::cout << ">> NSteps = " << NSteps << ", dt = " << dt << ", tStop = " << tStop << std::endl;
 	std::cout << ">> Model: " << geomName << ", NVerts = " << N << std::endl;
-	std::cout << ">> SDF grid bounds: min = " << sdfGrid->bbox.min << ", max = " << sdfGrid->bbox.max << std::endl;
-	std::cout << ">> SDF resolution: " << sdfGrid->Nx << " x " << sdfGrid->Ny << " x " << sdfGrid->Nz << std::endl;
+	if (!meanCurvatureFlow) {
+		std::cout << ">> SDF grid bounds: min = " << sdfGrid->bbox.min << ", max = " << sdfGrid->bbox.max << std::endl;
+		std::cout << ">> SDF resolution: " << sdfGrid->Nx << " x " << sdfGrid->Ny << " x " << sdfGrid->Nz << std::endl;
+	}
+	else {
+		std::cout << ">> Performing mean curvature flow test on sphere with r0 = " << r0 << std::endl;
+	}
+
 	std::cout << "-------------------------------------------------------------" << std::endl;
 	std::cout << "starting evolution ..." << std::endl;
 
@@ -538,13 +555,18 @@ void SurfaceEvolutionSolver::init()
 
 void SurfaceEvolutionSolver::evolve()
 {
-	if (!sdfGrid->hasGradient()) {
-		sdfGrid->computeGradient();
+	if (!meanCurvatureFlow) {
+		if (!sdfGrid->hasGradient()) {
+			sdfGrid->computeGradient();
+		}
 	}
 
-	for (int t = 0; t < NSteps; t++) {
+	float sphereTestL2Error = 0.0f;
+
+	for (int ti = 0; ti < NSteps; ti++) {
 		
-		std::cout << "-------- time step t = " << t << "-----------" << std::endl;
+		float t = (float)ti / (float)NSteps * tStop;
+		std::cout << "-------- time step ti = " << ti << ", t = " << t << " -----------" << std::endl;
 
 		// <===== P S E U D O N O R M A L S ========
 		auto startPseudoNormals = std::chrono::high_resolution_clock::now();
@@ -559,7 +581,7 @@ void SurfaceEvolutionSolver::evolve()
 		
 
 
-
+		fvAreas.clear();
 		std::vector<std::vector<Vector3>> fvVerts = {};
 		std::vector<std::vector<std::vector<uint>>> adjacentPolys = {};
 
@@ -625,6 +647,10 @@ void SurfaceEvolutionSolver::evolve()
 		updateGeometry(FnextX, FnextY, FnextZ);
 		if (printHappenings) std::cout << "... done" << std::endl << std::endl;
 
+
+		if (performSphereTest) sphereTestL2Error += this->getSphereStepL2Error(t);
+
+
 		auto endUpdate = std::chrono::high_resolution_clock::now();
 		std::chrono::duration<float> elapsedUpdate = (endUpdate - startUpdate);
 		// ========================================>
@@ -640,9 +666,24 @@ void SurfaceEvolutionSolver::evolve()
 			std::cout << time_log << std::endl;
 		}
 	}
+
+	if (performSphereTest) {
+		sphereTestL2Error *= dt;
+	}
 }
 
-float SurfaceEvolutionSolver::getSphereL2Error()
+float SurfaceEvolutionSolver::getSphereStepL2Error(float t)
 {
-	return 0.0f;
+	// r(t) = sqrt(r0 * r0 - 4 * t);
+	// error for step t is the norm of the difference (Fi - center) - r(t), weighted by the vertex co-volume area
+	// summed through all vertices, of course
+
+	float FRadius;
+	float result = 0.0f;
+
+	for (uint i = 0; i < N; i++) {
+		FRadius = (evolvedSurface->uniqueVertices[i] - center).length();
+		result += fabs(FRadius - sqrt(r0 * r0 - 4 * t)) * fvAreas[i];
+	}
+	return result;
 }
