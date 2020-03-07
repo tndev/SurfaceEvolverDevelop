@@ -99,7 +99,7 @@ void Geometry::fillVerticesFromUniqueVertices()
 	if (this->hasVertexIndices() && this->hasUniqueVertices()) {
 		uint N = vertexIndices.size();
 		this->vertices.clear();
-		this->vertices = std::vector<float>(N);
+		this->vertices = std::vector<float>(3 * N);
 		for (uint i = 0; i < N; i++) {
 			this->vertices[(size_t)3 * i] = this->uniqueVertices[this->vertexIndices[i]].x;
 			this->vertices[(size_t)3 * i + 1] = this->uniqueVertices[this->vertexIndices[i]].y;

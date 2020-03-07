@@ -38,6 +38,8 @@
 // - flood fill for sign computation of SDF
 // - Test mesh angle weighted pseudonormals
 // - test if grid gradient is computed correctly by exporting to a vtk vector file.
+// - finite volume normal derivatives (Laplace-Beltrami)
+// - compose a linear system for evolution from CubeSphere to PrimitiveBox of the same subdivision level
 
 //  POSTPONED:
 //
@@ -60,17 +62,19 @@
 
 //   WIP:
 // 
-// - finite volume normal derivatives (Laplace-Beltrami)
+// - mean curvature flow for sphere test (cotan scheme)
 
 
 //   TODO:
 //
-// - compose a linear system for evolution from CubeSphere to PrimitiveBox of the same subdivision level
+// - quad co-volume scheme
+// - mean curvature flow for sphere test (quad scheme)
+// - mean curvature flow for sphere test (tri interp scheme)
 // - implement a VTK window form using a working example for mesh rendering and SDF volume rendering
 // - implement global grid and cellSize-based Octree & SDF (just like in Vctr Engine Meta Object)
 // - implement cutoff offset for the bounding cube to compute the field on minimum necessary subset (box)
 
-void performTest(uint res, Geometry& g, std::fstream& timing, VTKExporter& e) {
+void performSDFTest(uint res, Geometry& g, std::fstream& timing, VTKExporter& e) {
 	std::cout << "init SDF..." << std::endl;
 
 	// Fast sweeping DF, resized from 20 and interpolated
@@ -136,6 +140,7 @@ int main()
 
 	VTKExporter e = VTKExporter();
 
+	/*
 	bool iterateCubeSphereTest = false;
 
 	if (iterateCubeSphereTest) {
@@ -154,14 +159,14 @@ int main()
 				g1.applyMatrix(Matrix4().makeRotationAxis(axis.x, axis.y, axis.z, M_PI / 6.));
 				e.initExport(&g1, "cube" + std::to_string(res) + "-" + std::to_string(n));
 
-				performTest(res, g1, timing_cubes, e);
+				performSDFTest(res, g1, timing_cubes, e);
 
 				std::cout << "cubesphere(" << n + 1 << "), grid_res = " << res << std::endl;
 				CubeSphere g2 = CubeSphere(n + 1, r);
 				g2.applyMatrix(Matrix4().makeRotationAxis(axis.x, axis.y, axis.z, M_PI / 6.));
 				e.initExport(&g2, "cubesphere" + std::to_string(res) + "-" + std::to_string(n));
 
-				performTest(res, g2, timing_cubes, e);
+				performSDFTest(res, g2, timing_cubes, e);
 			}
 		}
 		timing_cubes.close();
@@ -186,13 +191,16 @@ int main()
 				g0.applyMatrix(Matrix4().makeRotationAxis(axis.x, axis.y, axis.z, M_PI / 6.));
 				e.initExport(&g0, "icosphere" + std::to_string(res) + "-" + std::to_string(n));
 
-				performTest(res, g0, timing_ico, e);
+				performSDFTest(res, g0, timing_ico, e);
 			}
 		}
 
 		timing_ico.close();
-	}
+	}*/
 
+	// ===== BUNNY SDF tests =============================
+
+	/*
 	uint res = 27; // octree resolution
 
 	Vector3 axis = normalize(Vector3(1, 1, 1));
@@ -217,10 +225,10 @@ int main()
 	bunny_sdf.exportGradientField(&e, "bunnySDF_grad");
 
 	e.exportGeometryVertexNormals(&bunny, "bunnyNormals");
-	e.exportGeometryFiniteVolumeGrid(&bunny, "bunnyFVs");
+	e.exportGeometryFiniteVolumeGrid(&bunny, "bunnyFVs");*/
 
 
-	SurfaceEvolutionSolver sphereTest(0.01f, 0.06f, -1, ElementType::tri, nullptr, "testSphere", true);
+	SurfaceEvolutionSolver sphereTest(0.000625f, 0.06f, -1, ElementType::tri, nullptr, "testSphere", true, true);
 
 	/*
 	IcoSphere is = IcoSphere(1, 50);

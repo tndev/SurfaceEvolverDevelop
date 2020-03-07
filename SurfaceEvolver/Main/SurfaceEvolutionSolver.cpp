@@ -8,7 +8,7 @@ void SurfaceEvolutionSolver::clearSystem()
 	}
 	if (sysRhsX != nullptr) delete[] sysRhsX;
 	if (sysRhsY != nullptr) delete[] sysRhsY;
-	if (sysRhsY != nullptr) delete[] sysRhsY;
+	if (sysRhsZ != nullptr) delete[] sysRhsZ;
 
 	SysMatrix = nullptr;
 	sysRhsX = nullptr;
@@ -133,7 +133,7 @@ void SurfaceEvolutionSolver::getTriangleEvolutionSystem(
 			coVolArea += (0.5f * cV2Area0 + 0.5f * cV2Area1);
 
 			// tri vertices:
-			Vector3* F1prev = &evolvedSurface->uniqueVertices[adjacentPolys[i][(p - 1) % m][1]];
+			Vector3* F1prev = &evolvedSurface->uniqueVertices[adjacentPolys[i][(p > 0 ? p - 1 : m - 1)][1]];
 			Vector3* F1 = &evolvedSurface->uniqueVertices[adjacentPolys[i][p][1]]; Vector3* F2prev = F1;
 			Vector3* F2 = &evolvedSurface->uniqueVertices[adjacentPolys[i][p][2]];
 
@@ -141,16 +141,23 @@ void SurfaceEvolutionSolver::getTriangleEvolutionSystem(
 			float Area1 = cross(*F1prev - Fi, *F1prev - *F2prev).length();
 			float Area2 = cross(Fi - *F2, *F1 - *F2).length();
 
+			if (Area1 <= FLT_EPSILON || Area2 <= FLT_EPSILON) {
+				// degenerate element
+				continue;
+			}
+
 			// cotans:
 			float cotan1 = dot(*F1prev - Fi, *F1prev - *F2prev) / Area1;
 			float cotan2 = dot(Fi - *F2, *F1 - *F2) / Area2;
 
-			SysMatrix[i][i] -= 0.5 * ((double)cotan1 + (double)cotan2);
-			SysMatrix[i][adjacentPolys[i][p][i]] += ((double)cotan1 + (double)cotan2) * (dt * eps) / (4.0 * coVolArea);
+			SysMatrix[i][i] += 0.5 * ((double)cotan1 + (double)cotan2);
+			SysMatrix[i][adjacentPolys[i][p][1]] += 0.5 * ((double)cotan1 + (double)cotan2);
 		}
 
 		// diag:
-		SysMatrix[i][i] *= -(dt * eps) / (2.0 * coVolArea); SysMatrix[i][i] += 1.0;
+		SysMatrix[i][i] *= (dt * eps) / (2.0 * coVolArea); SysMatrix[i][i] += 1.0;
+		// off-diag:
+		for (uint p = 0; p < m; p++) SysMatrix[i][adjacentPolys[i][p][1]] *= -(dt * eps) / (2.0 * coVolArea);
 
 		// tangential redist:
 		float vT = this->tangentialVelocitForVertex(Fi, i);
@@ -158,7 +165,9 @@ void SurfaceEvolutionSolver::getTriangleEvolutionSystem(
 		// grad dist func:
 		float eta = ( meanCurvatureFlow ? 0.0f : this->etaCtrlFunc(SDF_V, gradSDF_V, vNormals[i]) );
 
-		sysRhsX[i] += (double)Fi.x + (double)dt * eta + (double)dt * vT;
+		sysRhsX[i] = (double)Fi.x + (double)dt * eta + (double)dt * vT;
+		sysRhsY[i] = (double)Fi.y + (double)dt * eta + (double)dt * vT;
+		sysRhsZ[i] = (double)Fi.z + (double)dt * eta + (double)dt * vT;
 
 		if (performSphereTest) fvAreas.push_back(coVolArea); // save areas as weights for numerical tests
 	}
@@ -209,7 +218,9 @@ void SurfaceEvolutionSolver::getQuadEvolutionSystem(
 		// grad dist func:
 		float eta = this->etaCtrlFunc(SDF_V, gradSDF_V, vNormals[i]);
 
-		sysRhsX[i] += (double)Fi.x + (double)eta + (double)dt * vT;
+		sysRhsX[i] += (double)Fi.x + (double)dt * eta + (double)dt * vT;
+		sysRhsY[i] += (double)Fi.y + (double)dt * eta + (double)dt * vT;
+		sysRhsZ[i] += (double)Fi.z + (double)dt * eta + (double)dt * vT;
 	}
 }
 
@@ -478,16 +489,40 @@ void SurfaceEvolutionSolver::updateGeometry(double* Fx, double* Fy, double* Fz)
 	evolvedSurface->fillVerticesFromUniqueVertices();
 }
 
+void SurfaceEvolutionSolver::exportGeometry(int step)
+{
+	VTKExporter e = VTKExporter();
+	e.initExport(evolvedSurface, geomName + "_" + std::to_string(step));
+}
+
+void SurfaceEvolutionSolver::exportTestGeometry(int step, float t)
+{
+	VTKExporter e = VTKExporter();
+	float r = sqrt(r0 * r0 - 4 * t);
+	Geometry sg;
+	if (type == ElementType::tri) {
+		uint n = 3;
+		sg = IcoSphere(n, r);
+	}
+	else {
+		uint n = 5;
+		sg = CubeSphere(n, r);
+	}
+	e.initExport(&sg, "exactSphere_" + std::to_string(step));
+}
+
 // ====== end solver stuff ================================
 
 SurfaceEvolutionSolver::SurfaceEvolutionSolver()
 {
 }
 
-SurfaceEvolutionSolver::SurfaceEvolutionSolver(float dt, float tStop, int NSteps, ElementType type, Grid* sdfGrid, std::string name, bool sphereTest, bool saveStates)
+SurfaceEvolutionSolver::SurfaceEvolutionSolver(
+	float dt, float tStop, int NSteps, ElementType type, Grid* sdfGrid, 
+	std::string name, bool sphereTest, bool saveStates, bool printSolution)
 {
 	// ===== Evolution params ==============================
-	this->saveStates = saveStates; 
+	this->saveStates = saveStates; this->printSolution = printSolution;
 	this->performSphereTest = sphereTest; 
 	if (sphereTest || sdfGrid == nullptr) this->meanCurvatureFlow = true;
 	this->geomName = name;
@@ -550,6 +585,10 @@ void SurfaceEvolutionSolver::init()
 	std::cout << "-------------------------------------------------------------" << std::endl;
 	std::cout << "starting evolution ..." << std::endl;
 
+	if (saveStates) {
+		exportGeometry(0);
+	}
+
 	// -------------------------------------------------------
 }
 
@@ -563,7 +602,7 @@ void SurfaceEvolutionSolver::evolve()
 
 	float sphereTestL2Error = 0.0f;
 
-	for (int ti = 0; ti < NSteps; ti++) {
+	for (int ti = 1; ti <= NSteps; ti++) {
 		
 		float t = (float)ti / (float)NSteps * tStop;
 		std::cout << "-------- time step ti = " << ti << ", t = " << t << " -----------" << std::endl;
@@ -629,9 +668,15 @@ void SurfaceEvolutionSolver::evolve()
 		auto startLinSolve = std::chrono::high_resolution_clock::now();
 
 		if (printHappenings) std::cout << "3 x " << N << " x " << N << "-sys Bi CGSTAB solve ..." << std::endl;
-		Bi_CGSTAB_solve(SysMatrix, sysRhsX, FnextX);
-		Bi_CGSTAB_solve(SysMatrix, sysRhsY, FnextY);
-		Bi_CGSTAB_solve(SysMatrix, sysRhsZ, FnextZ);
+		Bi_CGSTAB_solve(SysMatrix, sysRhsX, FnextX, printSolution);
+		Bi_CGSTAB_solve(SysMatrix, sysRhsY, FnextY, printSolution);
+		Bi_CGSTAB_solve(SysMatrix, sysRhsZ, FnextZ, printSolution);
+		if (printSolution) {
+			printArray1("Fx", FnextX, 6);
+			printArray1("Fy", FnextY, 6);
+			printArray1("Fz", FnextZ, 6);
+		}
+
 		if (printHappenings) std::cout << "... done" << std::endl;
 
 		auto endLinSolve = std::chrono::high_resolution_clock::now();
@@ -645,8 +690,13 @@ void SurfaceEvolutionSolver::evolve()
 
 		if (printHappenings) std::cout << "updating surface geometry ..." << std::endl;
 		updateGeometry(FnextX, FnextY, FnextZ);
-		if (printHappenings) std::cout << "... done" << std::endl << std::endl;
-
+		if (printHappenings) std::cout << "... done" << std::endl;
+		if (saveStates) {
+			std::cout << "exporting step to VTK..." << std::endl;
+			exportGeometry(ti);
+			if (performSphereTest) exportTestGeometry(ti, t);
+			std::cout << "... done" << std::endl;
+		}
 
 		if (performSphereTest) sphereTestL2Error += this->getSphereStepL2Error(t);
 
@@ -669,6 +719,7 @@ void SurfaceEvolutionSolver::evolve()
 
 	if (performSphereTest) {
 		sphereTestL2Error *= dt;
+		std::cout << "L2 Error: " << sphereTestL2Error << std::endl;
 	}
 }
 

@@ -6,6 +6,7 @@
 #include "../Geometry/Geometry.h"
 #include "../GeometryObject/Icosphere.h"
 #include "../GeometryObject/CubeSphere.h"
+#include "../ExportImport/VTKExporter.h"
 
 enum class ElementType {
 	tri = 0,
@@ -48,6 +49,8 @@ private:
 
 	// postproc
 	void updateGeometry(double* Fx, double* Fy, double* Fz);
+	void exportGeometry(int step);
+	void exportTestGeometry(int step, float t); // exports an ico/quad sphere determined by r(t) = sqrt(r0 * r0 - 4 * t) for comparison
 public:
 	// params:
 	uint NSteps = 10; 
@@ -55,11 +58,12 @@ public:
 
 	bool saveStates = false;
 	bool printHappenings = true; // general things happening output
+	bool printSolution = false; // whether to print Bi-CGStab solution output for each (xyz) component
 	bool printStepOutput = true; // time step output with time measurements etc.
 
 	// whether to compare evolution result with a mean-curvature contracting sphere and return an L2 error:
 	bool performSphereTest = false;
-	float r0 = 50.0f; // test sphere initial radius
+	float r0 = 1.0f; // test sphere initial radius
 	Vector3 center = Vector3(); // center of a test sphere geometry
 	// flag whether to consider a signed distance function for evolution equation (automatically true when performing sphere test)
 	bool meanCurvatureFlow = false;
@@ -80,9 +84,11 @@ public:
 	SurfaceEvolutionSolver();
 	// TODO: Finish copy
 	// SurfaceEvolutionSolver(const SurfaceEvolutionSolver& other);
+
+	// NSteps = -1 implies determining NSteps from tStop and dt
 	SurfaceEvolutionSolver(
 		float dt = 0.01f, float tStop = 1.0f, int NSteps = -1, ElementType type = ElementType::tri, Grid* sdfGrid = nullptr,
-		std::string name = "Sphere", bool sphereTest = false, bool saveStates = false);
+		std::string name = "Sphere", bool sphereTest = false, bool saveStates = false, bool printSolution = false);
 	~SurfaceEvolutionSolver();
 
 	void init();
