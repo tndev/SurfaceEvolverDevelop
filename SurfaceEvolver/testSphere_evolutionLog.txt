@@ -1,0 +1,3081 @@
+=============================================================
+----------------------- Initializing ------------------------
+------------ S U R F A C E    E V O L U T I O N -------------
+>> NSteps = 384, dt = 0.000156, tStop = 0.060000
+>> Model: testSphere, NVerts = 642
+>> Performing mean curvature flow test on sphere with r0 = 1.000000
+-------------------------------------------------------------
+starting evolution ...
+-------- time step ti = 1, t = 0.00015625 -----------
+step 1 L2 error: 3.05514e-07
+step 1 time log:
+surface pseudonormals: 0.007523 s, surface finite volumes: 0.007523 s
+filling sys matrix: 0.000610 s
+(vector) linear sys solve: 0.021758 s
+geom update: 0.000098 s
+evolution step total: 0.037513 s
+-------- time step ti = 2, t = 0.0003125 -----------
+step 2 L2 error: 6.10914e-07
+step 2 time log:
+surface pseudonormals: 0.003912 s, surface finite volumes: 0.003912 s
+filling sys matrix: 0.000595 s
+(vector) linear sys solve: 0.009112 s
+geom update: 0.000096 s
+evolution step total: 0.017627 s
+-------- time step ti = 3, t = 0.00046875 -----------
+step 3 L2 error: 9.16291e-07
+step 3 time log:
+surface pseudonormals: 0.003613 s, surface finite volumes: 0.003613 s
+filling sys matrix: 0.000616 s
+(vector) linear sys solve: 0.003646 s
+geom update: 0.000086 s
+evolution step total: 0.011573 s
+-------- time step ti = 4, t = 0.000625 -----------
+step 4 L2 error: 1.22168e-06
+step 4 time log:
+surface pseudonormals: 0.003216 s, surface finite volumes: 0.003216 s
+filling sys matrix: 0.000528 s
+(vector) linear sys solve: 0.003806 s
+geom update: 0.000120 s
+evolution step total: 0.010885 s
+-------- time step ti = 5, t = 0.00078125 -----------
+step 5 L2 error: 1.52693e-06
+step 5 time log:
+surface pseudonormals: 0.003195 s, surface finite volumes: 0.003195 s
+filling sys matrix: 0.000606 s
+(vector) linear sys solve: 0.009488 s
+geom update: 0.000090 s
+evolution step total: 0.016575 s
+-------- time step ti = 6, t = 0.0009375 -----------
+step 6 L2 error: 1.8322e-06
+step 6 time log:
+surface pseudonormals: 0.003181 s, surface finite volumes: 0.003181 s
+filling sys matrix: 0.000498 s
+(vector) linear sys solve: 0.002820 s
+geom update: 0.000079 s
+evolution step total: 0.009759 s
+-------- time step ti = 7, t = 0.00109375 -----------
+step 7 L2 error: 2.13731e-06
+step 7 time log:
+surface pseudonormals: 0.003338 s, surface finite volumes: 0.003338 s
+filling sys matrix: 0.000653 s
+(vector) linear sys solve: 0.005324 s
+geom update: 0.000091 s
+evolution step total: 0.012743 s
+-------- time step ti = 8, t = 0.00125 -----------
+step 8 L2 error: 2.44251e-06
+step 8 time log:
+surface pseudonormals: 0.004304 s, surface finite volumes: 0.004304 s
+filling sys matrix: 0.000526 s
+(vector) linear sys solve: 0.003301 s
+geom update: 0.000095 s
+evolution step total: 0.012529 s
+-------- time step ti = 9, t = 0.00140625 -----------
+step 9 L2 error: 2.74764e-06
+step 9 time log:
+surface pseudonormals: 0.003473 s, surface finite volumes: 0.003473 s
+filling sys matrix: 0.000579 s
+(vector) linear sys solve: 0.010051 s
+geom update: 0.000095 s
+evolution step total: 0.017672 s
+-------- time step ti = 10, t = 0.0015625 -----------
+step 10 L2 error: 3.05268e-06
+step 10 time log:
+surface pseudonormals: 0.005018 s, surface finite volumes: 0.005018 s
+filling sys matrix: 0.000654 s
+(vector) linear sys solve: 0.008338 s
+geom update: 0.000108 s
+evolution step total: 0.019135 s
+-------- time step ti = 11, t = 0.00171875 -----------
+step 11 L2 error: 3.35763e-06
+step 11 time log:
+surface pseudonormals: 0.003609 s, surface finite volumes: 0.003609 s
+filling sys matrix: 0.000729 s
+(vector) linear sys solve: 0.007354 s
+geom update: 0.000105 s
+evolution step total: 0.015406 s
+-------- time step ti = 12, t = 0.001875 -----------
+step 12 L2 error: 3.66265e-06
+step 12 time log:
+surface pseudonormals: 0.004477 s, surface finite volumes: 0.004477 s
+filling sys matrix: 0.000713 s
+(vector) linear sys solve: 0.014426 s
+geom update: 0.000062 s
+evolution step total: 0.024155 s
+-------- time step ti = 13, t = 0.00203125 -----------
+step 13 L2 error: 3.96757e-06
+step 13 time log:
+surface pseudonormals: 0.003414 s, surface finite volumes: 0.003414 s
+filling sys matrix: 0.000620 s
+(vector) linear sys solve: 0.013448 s
+geom update: 0.000058 s
+evolution step total: 0.020955 s
+-------- time step ti = 14, t = 0.0021875 -----------
+step 14 L2 error: 4.27243e-06
+step 14 time log:
+surface pseudonormals: 0.004961 s, surface finite volumes: 0.004961 s
+filling sys matrix: 0.000513 s
+(vector) linear sys solve: 0.004395 s
+geom update: 0.000053 s
+evolution step total: 0.014885 s
+-------- time step ti = 15, t = 0.00234375 -----------
+step 15 L2 error: 4.57719e-06
+step 15 time log:
+surface pseudonormals: 0.003161 s, surface finite volumes: 0.003161 s
+filling sys matrix: 0.000483 s
+(vector) linear sys solve: 0.006829 s
+geom update: 0.000056 s
+evolution step total: 0.013690 s
+-------- time step ti = 16, t = 0.0025 -----------
+step 16 L2 error: 4.88201e-06
+step 16 time log:
+surface pseudonormals: 0.004118 s, surface finite volumes: 0.004118 s
+filling sys matrix: 0.000587 s
+(vector) linear sys solve: 0.003784 s
+geom update: 0.000055 s
+evolution step total: 0.012661 s
+-------- time step ti = 17, t = 0.00265625 -----------
+step 17 L2 error: 5.18671e-06
+step 17 time log:
+surface pseudonormals: 0.003331 s, surface finite volumes: 0.003331 s
+filling sys matrix: 0.000500 s
+(vector) linear sys solve: 0.003956 s
+geom update: 0.000059 s
+evolution step total: 0.011176 s
+-------- time step ti = 18, t = 0.0028125 -----------
+step 18 L2 error: 5.49144e-06
+step 18 time log:
+surface pseudonormals: 0.003138 s, surface finite volumes: 0.003138 s
+filling sys matrix: 0.000582 s
+(vector) linear sys solve: 0.004178 s
+geom update: 0.000055 s
+evolution step total: 0.011091 s
+-------- time step ti = 19, t = 0.00296875 -----------
+step 19 L2 error: 5.796e-06
+step 19 time log:
+surface pseudonormals: 0.003159 s, surface finite volumes: 0.003159 s
+filling sys matrix: 0.000544 s
+(vector) linear sys solve: 0.004711 s
+geom update: 0.000060 s
+evolution step total: 0.011634 s
+-------- time step ti = 20, t = 0.003125 -----------
+step 20 L2 error: 6.10056e-06
+step 20 time log:
+surface pseudonormals: 0.004165 s, surface finite volumes: 0.004165 s
+filling sys matrix: 0.000923 s
+(vector) linear sys solve: 0.013279 s
+geom update: 0.000098 s
+evolution step total: 0.022631 s
+-------- time step ti = 21, t = 0.00328125 -----------
+step 21 L2 error: 6.4051e-06
+step 21 time log:
+surface pseudonormals: 0.004526 s, surface finite volumes: 0.004526 s
+filling sys matrix: 0.001060 s
+(vector) linear sys solve: 0.013519 s
+geom update: 0.000146 s
+evolution step total: 0.023777 s
+-------- time step ti = 22, t = 0.0034375 -----------
+step 22 L2 error: 6.70966e-06
+step 22 time log:
+surface pseudonormals: 0.004383 s, surface finite volumes: 0.004383 s
+filling sys matrix: 0.001055 s
+(vector) linear sys solve: 0.004145 s
+geom update: 0.000061 s
+evolution step total: 0.014027 s
+-------- time step ti = 23, t = 0.00359375 -----------
+step 23 L2 error: 7.01396e-06
+step 23 time log:
+surface pseudonormals: 0.003356 s, surface finite volumes: 0.003356 s
+filling sys matrix: 0.000583 s
+(vector) linear sys solve: 0.004655 s
+geom update: 0.000104 s
+evolution step total: 0.012054 s
+-------- time step ti = 24, t = 0.00375 -----------
+step 24 L2 error: 7.31836e-06
+step 24 time log:
+surface pseudonormals: 0.004577 s, surface finite volumes: 0.004577 s
+filling sys matrix: 0.001003 s
+(vector) linear sys solve: 0.004740 s
+geom update: 0.000055 s
+evolution step total: 0.014950 s
+-------- time step ti = 25, t = 0.00390625 -----------
+step 25 L2 error: 7.6228e-06
+step 25 time log:
+surface pseudonormals: 0.003361 s, surface finite volumes: 0.003361 s
+filling sys matrix: 0.000539 s
+(vector) linear sys solve: 0.004669 s
+geom update: 0.000054 s
+evolution step total: 0.011985 s
+-------- time step ti = 26, t = 0.0040625 -----------
+step 26 L2 error: 7.92704e-06
+step 26 time log:
+surface pseudonormals: 0.003292 s, surface finite volumes: 0.003292 s
+filling sys matrix: 0.000542 s
+(vector) linear sys solve: 0.003810 s
+geom update: 0.000058 s
+evolution step total: 0.010995 s
+-------- time step ti = 27, t = 0.00421875 -----------
+step 27 L2 error: 8.23131e-06
+step 27 time log:
+surface pseudonormals: 0.003227 s, surface finite volumes: 0.003227 s
+filling sys matrix: 0.000794 s
+(vector) linear sys solve: 0.005537 s
+geom update: 0.000065 s
+evolution step total: 0.012851 s
+-------- time step ti = 28, t = 0.004375 -----------
+step 28 L2 error: 8.53545e-06
+step 28 time log:
+surface pseudonormals: 0.003689 s, surface finite volumes: 0.003689 s
+filling sys matrix: 0.000614 s
+(vector) linear sys solve: 0.005594 s
+geom update: 0.000056 s
+evolution step total: 0.013641 s
+-------- time step ti = 29, t = 0.00453125 -----------
+step 29 L2 error: 8.83969e-06
+step 29 time log:
+surface pseudonormals: 0.003350 s, surface finite volumes: 0.003350 s
+filling sys matrix: 0.000591 s
+(vector) linear sys solve: 0.004419 s
+geom update: 0.000060 s
+evolution step total: 0.011769 s
+-------- time step ti = 30, t = 0.0046875 -----------
+step 30 L2 error: 9.14383e-06
+step 30 time log:
+surface pseudonormals: 0.003260 s, surface finite volumes: 0.003260 s
+filling sys matrix: 0.000534 s
+(vector) linear sys solve: 0.004474 s
+geom update: 0.000057 s
+evolution step total: 0.011585 s
+-------- time step ti = 31, t = 0.00484375 -----------
+step 31 L2 error: 9.44782e-06
+step 31 time log:
+surface pseudonormals: 0.003509 s, surface finite volumes: 0.003509 s
+filling sys matrix: 0.000530 s
+(vector) linear sys solve: 0.007310 s
+geom update: 0.000059 s
+evolution step total: 0.014916 s
+-------- time step ti = 32, t = 0.005 -----------
+step 32 L2 error: 9.75177e-06
+step 32 time log:
+surface pseudonormals: 0.003459 s, surface finite volumes: 0.003459 s
+filling sys matrix: 0.000849 s
+(vector) linear sys solve: 0.006620 s
+geom update: 0.000061 s
+evolution step total: 0.014448 s
+-------- time step ti = 33, t = 0.00515625 -----------
+step 33 L2 error: 1.00558e-05
+step 33 time log:
+surface pseudonormals: 0.004052 s, surface finite volumes: 0.004052 s
+filling sys matrix: 0.000583 s
+(vector) linear sys solve: 0.006513 s
+geom update: 0.000054 s
+evolution step total: 0.015254 s
+-------- time step ti = 34, t = 0.0053125 -----------
+step 34 L2 error: 1.03597e-05
+step 34 time log:
+surface pseudonormals: 0.003363 s, surface finite volumes: 0.003363 s
+filling sys matrix: 0.000667 s
+(vector) linear sys solve: 0.006060 s
+geom update: 0.000061 s
+evolution step total: 0.013514 s
+-------- time step ti = 35, t = 0.00546875 -----------
+step 35 L2 error: 1.06637e-05
+step 35 time log:
+surface pseudonormals: 0.003131 s, surface finite volumes: 0.003131 s
+filling sys matrix: 0.000572 s
+(vector) linear sys solve: 0.003518 s
+geom update: 0.000064 s
+evolution step total: 0.010416 s
+-------- time step ti = 36, t = 0.005625 -----------
+step 36 L2 error: 1.09674e-05
+step 36 time log:
+surface pseudonormals: 0.003233 s, surface finite volumes: 0.003233 s
+filling sys matrix: 0.000585 s
+(vector) linear sys solve: 0.004400 s
+geom update: 0.000061 s
+evolution step total: 0.011511 s
+-------- time step ti = 37, t = 0.00578125 -----------
+step 37 L2 error: 1.12712e-05
+step 37 time log:
+surface pseudonormals: 0.003270 s, surface finite volumes: 0.003270 s
+filling sys matrix: 0.000586 s
+(vector) linear sys solve: 0.005055 s
+geom update: 0.000056 s
+evolution step total: 0.012237 s
+-------- time step ti = 38, t = 0.0059375 -----------
+step 38 L2 error: 1.1575e-05
+step 38 time log:
+surface pseudonormals: 0.003680 s, surface finite volumes: 0.003680 s
+filling sys matrix: 0.000679 s
+(vector) linear sys solve: 0.004869 s
+geom update: 0.000062 s
+evolution step total: 0.012970 s
+-------- time step ti = 39, t = 0.00609375 -----------
+step 39 L2 error: 1.18787e-05
+step 39 time log:
+surface pseudonormals: 0.003185 s, surface finite volumes: 0.003185 s
+filling sys matrix: 0.000510 s
+(vector) linear sys solve: 0.004005 s
+geom update: 0.000060 s
+evolution step total: 0.010946 s
+-------- time step ti = 40, t = 0.00625 -----------
+step 40 L2 error: 1.21823e-05
+step 40 time log:
+surface pseudonormals: 0.003130 s, surface finite volumes: 0.003130 s
+filling sys matrix: 0.000508 s
+(vector) linear sys solve: 0.004774 s
+geom update: 0.000076 s
+evolution step total: 0.011618 s
+-------- time step ti = 41, t = 0.00640625 -----------
+step 41 L2 error: 1.24859e-05
+step 41 time log:
+surface pseudonormals: 0.003141 s, surface finite volumes: 0.003141 s
+filling sys matrix: 0.000580 s
+(vector) linear sys solve: 0.004041 s
+geom update: 0.000065 s
+evolution step total: 0.010969 s
+-------- time step ti = 42, t = 0.0065625 -----------
+step 42 L2 error: 1.27894e-05
+step 42 time log:
+surface pseudonormals: 0.003193 s, surface finite volumes: 0.003193 s
+filling sys matrix: 0.000531 s
+(vector) linear sys solve: 0.005328 s
+geom update: 0.000063 s
+evolution step total: 0.012308 s
+-------- time step ti = 43, t = 0.00671875 -----------
+step 43 L2 error: 1.30929e-05
+step 43 time log:
+surface pseudonormals: 0.003101 s, surface finite volumes: 0.003101 s
+filling sys matrix: 0.000480 s
+(vector) linear sys solve: 0.004782 s
+geom update: 0.000053 s
+evolution step total: 0.011517 s
+-------- time step ti = 44, t = 0.006875 -----------
+step 44 L2 error: 1.33964e-05
+step 44 time log:
+surface pseudonormals: 0.003342 s, surface finite volumes: 0.003342 s
+filling sys matrix: 0.000522 s
+(vector) linear sys solve: 0.004353 s
+geom update: 0.000052 s
+evolution step total: 0.011612 s
+-------- time step ti = 45, t = 0.00703125 -----------
+step 45 L2 error: 1.36998e-05
+step 45 time log:
+surface pseudonormals: 0.003378 s, surface finite volumes: 0.003378 s
+filling sys matrix: 0.000636 s
+(vector) linear sys solve: 0.006110 s
+geom update: 0.000060 s
+evolution step total: 0.013563 s
+-------- time step ti = 46, t = 0.0071875 -----------
+step 46 L2 error: 1.40031e-05
+step 46 time log:
+surface pseudonormals: 0.003515 s, surface finite volumes: 0.003515 s
+filling sys matrix: 0.000553 s
+(vector) linear sys solve: 0.005130 s
+geom update: 0.000066 s
+evolution step total: 0.012779 s
+-------- time step ti = 47, t = 0.00734375 -----------
+step 47 L2 error: 1.43064e-05
+step 47 time log:
+surface pseudonormals: 0.003389 s, surface finite volumes: 0.003389 s
+filling sys matrix: 0.000538 s
+(vector) linear sys solve: 0.005103 s
+geom update: 0.000068 s
+evolution step total: 0.012486 s
+-------- time step ti = 48, t = 0.0075 -----------
+step 48 L2 error: 1.46097e-05
+step 48 time log:
+surface pseudonormals: 0.003378 s, surface finite volumes: 0.003378 s
+filling sys matrix: 0.000592 s
+(vector) linear sys solve: 0.007021 s
+geom update: 0.000058 s
+evolution step total: 0.014427 s
+-------- time step ti = 49, t = 0.00765625 -----------
+step 49 L2 error: 1.49129e-05
+step 49 time log:
+surface pseudonormals: 0.003445 s, surface finite volumes: 0.003445 s
+filling sys matrix: 0.000709 s
+(vector) linear sys solve: 0.006074 s
+geom update: 0.000060 s
+evolution step total: 0.013733 s
+-------- time step ti = 50, t = 0.0078125 -----------
+step 50 L2 error: 1.52161e-05
+step 50 time log:
+surface pseudonormals: 0.003600 s, surface finite volumes: 0.003600 s
+filling sys matrix: 0.000546 s
+(vector) linear sys solve: 0.009249 s
+geom update: 0.000065 s
+evolution step total: 0.017059 s
+-------- time step ti = 51, t = 0.00796875 -----------
+step 51 L2 error: 1.55192e-05
+step 51 time log:
+surface pseudonormals: 0.003375 s, surface finite volumes: 0.003375 s
+filling sys matrix: 0.000552 s
+(vector) linear sys solve: 0.006298 s
+geom update: 0.000062 s
+evolution step total: 0.013663 s
+-------- time step ti = 52, t = 0.008125 -----------
+step 52 L2 error: 1.58224e-05
+step 52 time log:
+surface pseudonormals: 0.003179 s, surface finite volumes: 0.003179 s
+filling sys matrix: 0.000533 s
+(vector) linear sys solve: 0.003445 s
+geom update: 0.000061 s
+evolution step total: 0.010397 s
+-------- time step ti = 53, t = 0.00828125 -----------
+step 53 L2 error: 1.61254e-05
+step 53 time log:
+surface pseudonormals: 0.003942 s, surface finite volumes: 0.003942 s
+filling sys matrix: 0.000622 s
+(vector) linear sys solve: 0.006349 s
+geom update: 0.000413 s
+evolution step total: 0.015268 s
+-------- time step ti = 54, t = 0.0084375 -----------
+step 54 L2 error: 1.64283e-05
+step 54 time log:
+surface pseudonormals: 0.003357 s, surface finite volumes: 0.003357 s
+filling sys matrix: 0.000536 s
+(vector) linear sys solve: 0.005917 s
+geom update: 0.000063 s
+evolution step total: 0.013229 s
+-------- time step ti = 55, t = 0.00859375 -----------
+step 55 L2 error: 1.67313e-05
+step 55 time log:
+surface pseudonormals: 0.003355 s, surface finite volumes: 0.003355 s
+filling sys matrix: 0.000594 s
+(vector) linear sys solve: 0.007197 s
+geom update: 0.000085 s
+evolution step total: 0.014587 s
+-------- time step ti = 56, t = 0.00875 -----------
+step 56 L2 error: 1.70342e-05
+step 56 time log:
+surface pseudonormals: 0.004967 s, surface finite volumes: 0.004967 s
+filling sys matrix: 0.000571 s
+(vector) linear sys solve: 0.005159 s
+geom update: 0.000071 s
+evolution step total: 0.015734 s
+-------- time step ti = 57, t = 0.00890625 -----------
+step 57 L2 error: 1.7337e-05
+step 57 time log:
+surface pseudonormals: 0.003519 s, surface finite volumes: 0.003519 s
+filling sys matrix: 0.000822 s
+(vector) linear sys solve: 0.007315 s
+geom update: 0.000068 s
+evolution step total: 0.015243 s
+-------- time step ti = 58, t = 0.0090625 -----------
+step 58 L2 error: 1.76399e-05
+step 58 time log:
+surface pseudonormals: 0.003328 s, surface finite volumes: 0.003328 s
+filling sys matrix: 0.000542 s
+(vector) linear sys solve: 0.004546 s
+geom update: 0.000066 s
+evolution step total: 0.011810 s
+-------- time step ti = 59, t = 0.00921875 -----------
+step 59 L2 error: 1.79426e-05
+step 59 time log:
+surface pseudonormals: 0.003295 s, surface finite volumes: 0.003295 s
+filling sys matrix: 0.000648 s
+(vector) linear sys solve: 0.004538 s
+geom update: 0.000062 s
+evolution step total: 0.011838 s
+-------- time step ti = 60, t = 0.009375 -----------
+step 60 L2 error: 1.82455e-05
+step 60 time log:
+surface pseudonormals: 0.003371 s, surface finite volumes: 0.003371 s
+filling sys matrix: 0.000860 s
+(vector) linear sys solve: 0.011313 s
+geom update: 0.000062 s
+evolution step total: 0.018977 s
+-------- time step ti = 61, t = 0.00953125 -----------
+step 61 L2 error: 1.8548e-05
+step 61 time log:
+surface pseudonormals: 0.003354 s, surface finite volumes: 0.003354 s
+filling sys matrix: 0.000584 s
+(vector) linear sys solve: 0.006287 s
+geom update: 0.000062 s
+evolution step total: 0.013640 s
+-------- time step ti = 62, t = 0.0096875 -----------
+step 62 L2 error: 1.88507e-05
+step 62 time log:
+surface pseudonormals: 0.005089 s, surface finite volumes: 0.005089 s
+filling sys matrix: 0.000723 s
+(vector) linear sys solve: 0.006800 s
+geom update: 0.000059 s
+evolution step total: 0.017761 s
+-------- time step ti = 63, t = 0.00984375 -----------
+step 63 L2 error: 1.91533e-05
+step 63 time log:
+surface pseudonormals: 0.004586 s, surface finite volumes: 0.004586 s
+filling sys matrix: 0.000567 s
+(vector) linear sys solve: 0.007880 s
+geom update: 0.000061 s
+evolution step total: 0.017680 s
+-------- time step ti = 64, t = 0.01 -----------
+step 64 L2 error: 1.94558e-05
+step 64 time log:
+surface pseudonormals: 0.003392 s, surface finite volumes: 0.003392 s
+filling sys matrix: 0.000534 s
+(vector) linear sys solve: 0.008584 s
+geom update: 0.000068 s
+evolution step total: 0.015970 s
+-------- time step ti = 65, t = 0.0101562 -----------
+step 65 L2 error: 1.97582e-05
+step 65 time log:
+surface pseudonormals: 0.005565 s, surface finite volumes: 0.005565 s
+filling sys matrix: 0.000543 s
+(vector) linear sys solve: 0.005736 s
+geom update: 0.000059 s
+evolution step total: 0.017468 s
+-------- time step ti = 66, t = 0.0103125 -----------
+step 66 L2 error: 2.00607e-05
+step 66 time log:
+surface pseudonormals: 0.003357 s, surface finite volumes: 0.003357 s
+filling sys matrix: 0.000531 s
+(vector) linear sys solve: 0.007326 s
+geom update: 0.000064 s
+evolution step total: 0.014637 s
+-------- time step ti = 67, t = 0.0104688 -----------
+step 67 L2 error: 2.0363e-05
+step 67 time log:
+surface pseudonormals: 0.003468 s, surface finite volumes: 0.003468 s
+filling sys matrix: 0.000588 s
+(vector) linear sys solve: 0.005647 s
+geom update: 0.000064 s
+evolution step total: 0.013234 s
+-------- time step ti = 68, t = 0.010625 -----------
+step 68 L2 error: 2.06654e-05
+step 68 time log:
+surface pseudonormals: 0.003221 s, surface finite volumes: 0.003221 s
+filling sys matrix: 0.001004 s
+(vector) linear sys solve: 0.005505 s
+geom update: 0.000062 s
+evolution step total: 0.013014 s
+-------- time step ti = 69, t = 0.0107812 -----------
+step 69 L2 error: 2.09676e-05
+step 69 time log:
+surface pseudonormals: 0.003271 s, surface finite volumes: 0.003271 s
+filling sys matrix: 0.000830 s
+(vector) linear sys solve: 0.005054 s
+geom update: 0.000062 s
+evolution step total: 0.012488 s
+-------- time step ti = 70, t = 0.0109375 -----------
+step 70 L2 error: 2.12699e-05
+step 70 time log:
+surface pseudonormals: 0.003607 s, surface finite volumes: 0.003607 s
+filling sys matrix: 0.000720 s
+(vector) linear sys solve: 0.005836 s
+geom update: 0.000066 s
+evolution step total: 0.013836 s
+-------- time step ti = 71, t = 0.0110937 -----------
+step 71 L2 error: 2.15721e-05
+step 71 time log:
+surface pseudonormals: 0.003979 s, surface finite volumes: 0.003979 s
+filling sys matrix: 0.000590 s
+(vector) linear sys solve: 0.010168 s
+geom update: 0.000070 s
+evolution step total: 0.018786 s
+-------- time step ti = 72, t = 0.01125 -----------
+step 72 L2 error: 2.18743e-05
+step 72 time log:
+surface pseudonormals: 0.003476 s, surface finite volumes: 0.003476 s
+filling sys matrix: 0.000600 s
+(vector) linear sys solve: 0.008943 s
+geom update: 0.000076 s
+evolution step total: 0.016570 s
+-------- time step ti = 73, t = 0.0114063 -----------
+step 73 L2 error: 2.21763e-05
+step 73 time log:
+surface pseudonormals: 0.003360 s, surface finite volumes: 0.003360 s
+filling sys matrix: 0.000582 s
+(vector) linear sys solve: 0.004628 s
+geom update: 0.000065 s
+evolution step total: 0.011995 s
+-------- time step ti = 74, t = 0.0115625 -----------
+step 74 L2 error: 2.24784e-05
+step 74 time log:
+surface pseudonormals: 0.003554 s, surface finite volumes: 0.003554 s
+filling sys matrix: 0.000556 s
+(vector) linear sys solve: 0.011231 s
+geom update: 0.000068 s
+evolution step total: 0.018963 s
+-------- time step ti = 75, t = 0.0117188 -----------
+step 75 L2 error: 2.27804e-05
+step 75 time log:
+surface pseudonormals: 0.003584 s, surface finite volumes: 0.003584 s
+filling sys matrix: 0.000650 s
+(vector) linear sys solve: 0.010020 s
+geom update: 0.000062 s
+evolution step total: 0.017900 s
+-------- time step ti = 76, t = 0.011875 -----------
+step 76 L2 error: 2.30825e-05
+step 76 time log:
+surface pseudonormals: 0.003100 s, surface finite volumes: 0.003100 s
+filling sys matrix: 0.000542 s
+(vector) linear sys solve: 0.004457 s
+geom update: 0.000061 s
+evolution step total: 0.011261 s
+-------- time step ti = 77, t = 0.0120312 -----------
+step 77 L2 error: 2.33844e-05
+step 77 time log:
+surface pseudonormals: 0.003388 s, surface finite volumes: 0.003388 s
+filling sys matrix: 0.000544 s
+(vector) linear sys solve: 0.003682 s
+geom update: 0.000057 s
+evolution step total: 0.011058 s
+-------- time step ti = 78, t = 0.0121875 -----------
+step 78 L2 error: 2.36862e-05
+step 78 time log:
+surface pseudonormals: 0.003773 s, surface finite volumes: 0.003773 s
+filling sys matrix: 0.000662 s
+(vector) linear sys solve: 0.008164 s
+geom update: 0.000107 s
+evolution step total: 0.016479 s
+-------- time step ti = 79, t = 0.0123438 -----------
+step 79 L2 error: 2.3988e-05
+step 79 time log:
+surface pseudonormals: 0.004272 s, surface finite volumes: 0.004272 s
+filling sys matrix: 0.000559 s
+(vector) linear sys solve: 0.026840 s
+geom update: 0.000073 s
+evolution step total: 0.036015 s
+-------- time step ti = 80, t = 0.0125 -----------
+step 80 L2 error: 2.42899e-05
+step 80 time log:
+surface pseudonormals: 0.003423 s, surface finite volumes: 0.003423 s
+filling sys matrix: 0.000514 s
+(vector) linear sys solve: 0.005027 s
+geom update: 0.000103 s
+evolution step total: 0.012490 s
+-------- time step ti = 81, t = 0.0126563 -----------
+step 81 L2 error: 2.45917e-05
+step 81 time log:
+surface pseudonormals: 0.003261 s, surface finite volumes: 0.003261 s
+filling sys matrix: 0.000518 s
+(vector) linear sys solve: 0.005787 s
+geom update: 0.000062 s
+evolution step total: 0.012889 s
+-------- time step ti = 82, t = 0.0128125 -----------
+step 82 L2 error: 2.48933e-05
+step 82 time log:
+surface pseudonormals: 0.003244 s, surface finite volumes: 0.003244 s
+filling sys matrix: 0.000539 s
+(vector) linear sys solve: 0.004140 s
+geom update: 0.000063 s
+evolution step total: 0.011231 s
+-------- time step ti = 83, t = 0.0129687 -----------
+step 83 L2 error: 2.5195e-05
+step 83 time log:
+surface pseudonormals: 0.003327 s, surface finite volumes: 0.003327 s
+filling sys matrix: 0.000548 s
+(vector) linear sys solve: 0.005912 s
+geom update: 0.000064 s
+evolution step total: 0.013178 s
+-------- time step ti = 84, t = 0.013125 -----------
+step 84 L2 error: 2.54966e-05
+step 84 time log:
+surface pseudonormals: 0.003063 s, surface finite volumes: 0.003063 s
+filling sys matrix: 0.000593 s
+(vector) linear sys solve: 0.004142 s
+geom update: 0.000060 s
+evolution step total: 0.010921 s
+-------- time step ti = 85, t = 0.0132813 -----------
+step 85 L2 error: 2.57982e-05
+step 85 time log:
+surface pseudonormals: 0.003402 s, surface finite volumes: 0.003402 s
+filling sys matrix: 0.000483 s
+(vector) linear sys solve: 0.004137 s
+geom update: 0.000083 s
+evolution step total: 0.011506 s
+-------- time step ti = 86, t = 0.0134375 -----------
+step 86 L2 error: 2.60997e-05
+step 86 time log:
+surface pseudonormals: 0.003353 s, surface finite volumes: 0.003353 s
+filling sys matrix: 0.000539 s
+(vector) linear sys solve: 0.004247 s
+geom update: 0.000060 s
+evolution step total: 0.011551 s
+-------- time step ti = 87, t = 0.0135938 -----------
+step 87 L2 error: 2.64012e-05
+step 87 time log:
+surface pseudonormals: 0.003252 s, surface finite volumes: 0.003252 s
+filling sys matrix: 0.000533 s
+(vector) linear sys solve: 0.004805 s
+geom update: 0.000062 s
+evolution step total: 0.011906 s
+-------- time step ti = 88, t = 0.01375 -----------
+step 88 L2 error: 2.67027e-05
+step 88 time log:
+surface pseudonormals: 0.003243 s, surface finite volumes: 0.003243 s
+filling sys matrix: 0.000621 s
+(vector) linear sys solve: 0.003989 s
+geom update: 0.000061 s
+evolution step total: 0.011157 s
+-------- time step ti = 89, t = 0.0139062 -----------
+step 89 L2 error: 2.7004e-05
+step 89 time log:
+surface pseudonormals: 0.003278 s, surface finite volumes: 0.003278 s
+filling sys matrix: 0.000524 s
+(vector) linear sys solve: 0.005733 s
+geom update: 0.000098 s
+evolution step total: 0.012910 s
+-------- time step ti = 90, t = 0.0140625 -----------
+step 90 L2 error: 2.73053e-05
+step 90 time log:
+surface pseudonormals: 0.003494 s, surface finite volumes: 0.003494 s
+filling sys matrix: 0.000704 s
+(vector) linear sys solve: 0.004905 s
+geom update: 0.000060 s
+evolution step total: 0.012657 s
+-------- time step ti = 91, t = 0.0142188 -----------
+step 91 L2 error: 2.76066e-05
+step 91 time log:
+surface pseudonormals: 0.003249 s, surface finite volumes: 0.003249 s
+filling sys matrix: 0.000492 s
+(vector) linear sys solve: 0.003144 s
+geom update: 0.000058 s
+evolution step total: 0.010192 s
+-------- time step ti = 92, t = 0.014375 -----------
+step 92 L2 error: 2.7908e-05
+step 92 time log:
+surface pseudonormals: 0.003107 s, surface finite volumes: 0.003107 s
+filling sys matrix: 0.000614 s
+(vector) linear sys solve: 0.002983 s
+geom update: 0.000064 s
+evolution step total: 0.009875 s
+-------- time step ti = 93, t = 0.0145313 -----------
+step 93 L2 error: 2.82091e-05
+step 93 time log:
+surface pseudonormals: 0.003143 s, surface finite volumes: 0.003143 s
+filling sys matrix: 0.000495 s
+(vector) linear sys solve: 0.003085 s
+geom update: 0.000059 s
+evolution step total: 0.009926 s
+-------- time step ti = 94, t = 0.0146875 -----------
+step 94 L2 error: 2.85102e-05
+step 94 time log:
+surface pseudonormals: 0.003320 s, surface finite volumes: 0.003320 s
+filling sys matrix: 0.000454 s
+(vector) linear sys solve: 0.002852 s
+geom update: 0.000061 s
+evolution step total: 0.010007 s
+-------- time step ti = 95, t = 0.0148437 -----------
+step 95 L2 error: 2.88114e-05
+step 95 time log:
+surface pseudonormals: 0.003373 s, surface finite volumes: 0.003373 s
+filling sys matrix: 0.000521 s
+(vector) linear sys solve: 0.005301 s
+geom update: 0.000056 s
+evolution step total: 0.012625 s
+-------- time step ti = 96, t = 0.015 -----------
+step 96 L2 error: 2.91125e-05
+step 96 time log:
+surface pseudonormals: 0.003312 s, surface finite volumes: 0.003312 s
+filling sys matrix: 0.000467 s
+(vector) linear sys solve: 0.003110 s
+geom update: 0.000058 s
+evolution step total: 0.010260 s
+-------- time step ti = 97, t = 0.0151562 -----------
+step 97 L2 error: 2.94134e-05
+step 97 time log:
+surface pseudonormals: 0.003269 s, surface finite volumes: 0.003269 s
+filling sys matrix: 0.000476 s
+(vector) linear sys solve: 0.002815 s
+geom update: 0.000064 s
+evolution step total: 0.009893 s
+-------- time step ti = 98, t = 0.0153125 -----------
+step 98 L2 error: 2.97144e-05
+step 98 time log:
+surface pseudonormals: 0.003137 s, surface finite volumes: 0.003137 s
+filling sys matrix: 0.000484 s
+(vector) linear sys solve: 0.003696 s
+geom update: 0.000059 s
+evolution step total: 0.010514 s
+-------- time step ti = 99, t = 0.0154687 -----------
+step 99 L2 error: 3.00152e-05
+step 99 time log:
+surface pseudonormals: 0.003159 s, surface finite volumes: 0.003159 s
+filling sys matrix: 0.000463 s
+(vector) linear sys solve: 0.003548 s
+geom update: 0.000061 s
+evolution step total: 0.010390 s
+-------- time step ti = 100, t = 0.015625 -----------
+step 100 L2 error: 3.03161e-05
+step 100 time log:
+surface pseudonormals: 0.003289 s, surface finite volumes: 0.003289 s
+filling sys matrix: 0.000454 s
+(vector) linear sys solve: 0.002872 s
+geom update: 0.000064 s
+evolution step total: 0.009968 s
+-------- time step ti = 101, t = 0.0157812 -----------
+step 101 L2 error: 3.0617e-05
+step 101 time log:
+surface pseudonormals: 0.003046 s, surface finite volumes: 0.003046 s
+filling sys matrix: 0.000474 s
+(vector) linear sys solve: 0.002818 s
+geom update: 0.000064 s
+evolution step total: 0.009448 s
+-------- time step ti = 102, t = 0.0159375 -----------
+step 102 L2 error: 3.09179e-05
+step 102 time log:
+surface pseudonormals: 0.003144 s, surface finite volumes: 0.003144 s
+filling sys matrix: 0.000472 s
+(vector) linear sys solve: 0.003001 s
+geom update: 0.000058 s
+evolution step total: 0.009818 s
+-------- time step ti = 103, t = 0.0160937 -----------
+step 103 L2 error: 3.12187e-05
+step 103 time log:
+surface pseudonormals: 0.003092 s, surface finite volumes: 0.003092 s
+filling sys matrix: 0.000476 s
+(vector) linear sys solve: 0.004098 s
+geom update: 0.000063 s
+evolution step total: 0.010821 s
+-------- time step ti = 104, t = 0.01625 -----------
+step 104 L2 error: 3.15193e-05
+step 104 time log:
+surface pseudonormals: 0.003043 s, surface finite volumes: 0.003043 s
+filling sys matrix: 0.000527 s
+(vector) linear sys solve: 0.003315 s
+geom update: 0.000066 s
+evolution step total: 0.009994 s
+-------- time step ti = 105, t = 0.0164062 -----------
+step 105 L2 error: 3.182e-05
+step 105 time log:
+surface pseudonormals: 0.003258 s, surface finite volumes: 0.003258 s
+filling sys matrix: 0.000544 s
+(vector) linear sys solve: 0.004633 s
+geom update: 0.000064 s
+evolution step total: 0.011756 s
+-------- time step ti = 106, t = 0.0165625 -----------
+step 106 L2 error: 3.21206e-05
+step 106 time log:
+surface pseudonormals: 0.003303 s, surface finite volumes: 0.003303 s
+filling sys matrix: 0.000477 s
+(vector) linear sys solve: 0.002426 s
+geom update: 0.000056 s
+evolution step total: 0.009565 s
+-------- time step ti = 107, t = 0.0167188 -----------
+step 107 L2 error: 3.24211e-05
+step 107 time log:
+surface pseudonormals: 0.003366 s, surface finite volumes: 0.003366 s
+filling sys matrix: 0.000480 s
+(vector) linear sys solve: 0.002530 s
+geom update: 0.000099 s
+evolution step total: 0.009841 s
+-------- time step ti = 108, t = 0.016875 -----------
+step 108 L2 error: 3.27217e-05
+step 108 time log:
+surface pseudonormals: 0.003040 s, surface finite volumes: 0.003040 s
+filling sys matrix: 0.000499 s
+(vector) linear sys solve: 0.003211 s
+geom update: 0.000062 s
+evolution step total: 0.009852 s
+-------- time step ti = 109, t = 0.0170312 -----------
+step 109 L2 error: 3.30222e-05
+step 109 time log:
+surface pseudonormals: 0.002927 s, surface finite volumes: 0.002927 s
+filling sys matrix: 0.000496 s
+(vector) linear sys solve: 0.002841 s
+geom update: 0.000056 s
+evolution step total: 0.009248 s
+-------- time step ti = 110, t = 0.0171875 -----------
+step 110 L2 error: 3.33226e-05
+step 110 time log:
+surface pseudonormals: 0.003121 s, surface finite volumes: 0.003121 s
+filling sys matrix: 0.000488 s
+(vector) linear sys solve: 0.002704 s
+geom update: 0.000058 s
+evolution step total: 0.009491 s
+-------- time step ti = 111, t = 0.0173438 -----------
+step 111 L2 error: 3.36231e-05
+step 111 time log:
+surface pseudonormals: 0.003135 s, surface finite volumes: 0.003135 s
+filling sys matrix: 0.000468 s
+(vector) linear sys solve: 0.002788 s
+geom update: 0.000057 s
+evolution step total: 0.009582 s
+-------- time step ti = 112, t = 0.0175 -----------
+step 112 L2 error: 3.39235e-05
+step 112 time log:
+surface pseudonormals: 0.003044 s, surface finite volumes: 0.003044 s
+filling sys matrix: 0.000465 s
+(vector) linear sys solve: 0.002779 s
+geom update: 0.000060 s
+evolution step total: 0.009393 s
+-------- time step ti = 113, t = 0.0176562 -----------
+step 113 L2 error: 3.42236e-05
+step 113 time log:
+surface pseudonormals: 0.002924 s, surface finite volumes: 0.002924 s
+filling sys matrix: 0.000682 s
+(vector) linear sys solve: 0.002918 s
+geom update: 0.000059 s
+evolution step total: 0.009507 s
+-------- time step ti = 114, t = 0.0178125 -----------
+step 114 L2 error: 3.45241e-05
+step 114 time log:
+surface pseudonormals: 0.002907 s, surface finite volumes: 0.002907 s
+filling sys matrix: 0.000464 s
+(vector) linear sys solve: 0.002981 s
+geom update: 0.000058 s
+evolution step total: 0.009316 s
+-------- time step ti = 115, t = 0.0179687 -----------
+step 115 L2 error: 3.48243e-05
+step 115 time log:
+surface pseudonormals: 0.003188 s, surface finite volumes: 0.003188 s
+filling sys matrix: 0.000440 s
+(vector) linear sys solve: 0.002555 s
+geom update: 0.000056 s
+evolution step total: 0.009427 s
+-------- time step ti = 116, t = 0.018125 -----------
+step 116 L2 error: 3.51243e-05
+step 116 time log:
+surface pseudonormals: 0.003191 s, surface finite volumes: 0.003191 s
+filling sys matrix: 0.000460 s
+(vector) linear sys solve: 0.002809 s
+geom update: 0.000058 s
+evolution step total: 0.009710 s
+-------- time step ti = 117, t = 0.0182812 -----------
+step 117 L2 error: 3.54246e-05
+step 117 time log:
+surface pseudonormals: 0.003102 s, surface finite volumes: 0.003102 s
+filling sys matrix: 0.000492 s
+(vector) linear sys solve: 0.035745 s
+geom update: 0.000061 s
+evolution step total: 0.042502 s
+-------- time step ti = 118, t = 0.0184375 -----------
+step 118 L2 error: 3.57246e-05
+step 118 time log:
+surface pseudonormals: 0.003224 s, surface finite volumes: 0.003224 s
+filling sys matrix: 0.000728 s
+(vector) linear sys solve: 0.009675 s
+geom update: 0.000086 s
+evolution step total: 0.016937 s
+-------- time step ti = 119, t = 0.0185938 -----------
+step 119 L2 error: 3.60247e-05
+step 119 time log:
+surface pseudonormals: 0.003243 s, surface finite volumes: 0.003243 s
+filling sys matrix: 0.001083 s
+(vector) linear sys solve: 0.008217 s
+geom update: 0.000063 s
+evolution step total: 0.015848 s
+-------- time step ti = 120, t = 0.01875 -----------
+step 120 L2 error: 3.63246e-05
+step 120 time log:
+surface pseudonormals: 0.003003 s, surface finite volumes: 0.003003 s
+filling sys matrix: 0.000472 s
+(vector) linear sys solve: 0.002775 s
+geom update: 0.000068 s
+evolution step total: 0.009321 s
+-------- time step ti = 121, t = 0.0189062 -----------
+step 121 L2 error: 3.66246e-05
+step 121 time log:
+surface pseudonormals: 0.003035 s, surface finite volumes: 0.003035 s
+filling sys matrix: 0.000523 s
+(vector) linear sys solve: 0.003493 s
+geom update: 0.000063 s
+evolution step total: 0.010149 s
+-------- time step ti = 122, t = 0.0190625 -----------
+step 122 L2 error: 3.69245e-05
+step 122 time log:
+surface pseudonormals: 0.002991 s, surface finite volumes: 0.002991 s
+filling sys matrix: 0.000530 s
+(vector) linear sys solve: 0.002905 s
+geom update: 0.000059 s
+evolution step total: 0.009475 s
+-------- time step ti = 123, t = 0.0192188 -----------
+step 123 L2 error: 3.72244e-05
+step 123 time log:
+surface pseudonormals: 0.003004 s, surface finite volumes: 0.003004 s
+filling sys matrix: 0.000459 s
+(vector) linear sys solve: 0.002796 s
+geom update: 0.000060 s
+evolution step total: 0.009323 s
+-------- time step ti = 124, t = 0.019375 -----------
+step 124 L2 error: 3.75241e-05
+step 124 time log:
+surface pseudonormals: 0.002893 s, surface finite volumes: 0.002893 s
+filling sys matrix: 0.000477 s
+(vector) linear sys solve: 0.002549 s
+geom update: 0.000059 s
+evolution step total: 0.008871 s
+-------- time step ti = 125, t = 0.0195313 -----------
+step 125 L2 error: 3.78239e-05
+step 125 time log:
+surface pseudonormals: 0.003310 s, surface finite volumes: 0.003310 s
+filling sys matrix: 0.000468 s
+(vector) linear sys solve: 0.003065 s
+geom update: 0.000059 s
+evolution step total: 0.010210 s
+-------- time step ti = 126, t = 0.0196875 -----------
+step 126 L2 error: 3.81237e-05
+step 126 time log:
+surface pseudonormals: 0.002953 s, surface finite volumes: 0.002953 s
+filling sys matrix: 0.000472 s
+(vector) linear sys solve: 0.002765 s
+geom update: 0.000055 s
+evolution step total: 0.009198 s
+-------- time step ti = 127, t = 0.0198437 -----------
+step 127 L2 error: 3.84233e-05
+step 127 time log:
+surface pseudonormals: 0.002957 s, surface finite volumes: 0.002957 s
+filling sys matrix: 0.000472 s
+(vector) linear sys solve: 0.002771 s
+geom update: 0.000065 s
+evolution step total: 0.009222 s
+-------- time step ti = 128, t = 0.02 -----------
+step 128 L2 error: 3.87229e-05
+step 128 time log:
+surface pseudonormals: 0.002908 s, surface finite volumes: 0.002908 s
+filling sys matrix: 0.000438 s
+(vector) linear sys solve: 0.002588 s
+geom update: 0.000057 s
+evolution step total: 0.008900 s
+-------- time step ti = 129, t = 0.0201562 -----------
+step 129 L2 error: 3.90225e-05
+step 129 time log:
+surface pseudonormals: 0.003100 s, surface finite volumes: 0.003100 s
+filling sys matrix: 0.000449 s
+(vector) linear sys solve: 0.002765 s
+geom update: 0.000057 s
+evolution step total: 0.009471 s
+-------- time step ti = 130, t = 0.0203125 -----------
+step 130 L2 error: 3.93222e-05
+step 130 time log:
+surface pseudonormals: 0.003018 s, surface finite volumes: 0.003018 s
+filling sys matrix: 0.000465 s
+(vector) linear sys solve: 0.002793 s
+geom update: 0.000054 s
+evolution step total: 0.009347 s
+-------- time step ti = 131, t = 0.0204688 -----------
+step 131 L2 error: 3.96216e-05
+step 131 time log:
+surface pseudonormals: 0.002952 s, surface finite volumes: 0.002952 s
+filling sys matrix: 0.000453 s
+(vector) linear sys solve: 0.002077 s
+geom update: 0.000056 s
+evolution step total: 0.008489 s
+-------- time step ti = 132, t = 0.020625 -----------
+step 132 L2 error: 3.9921e-05
+step 132 time log:
+surface pseudonormals: 0.003087 s, surface finite volumes: 0.003087 s
+filling sys matrix: 0.000466 s
+(vector) linear sys solve: 0.002731 s
+geom update: 0.000064 s
+evolution step total: 0.009435 s
+-------- time step ti = 133, t = 0.0207812 -----------
+step 133 L2 error: 4.02204e-05
+step 133 time log:
+surface pseudonormals: 0.002928 s, surface finite volumes: 0.002928 s
+filling sys matrix: 0.000739 s
+(vector) linear sys solve: 0.003656 s
+geom update: 0.000059 s
+evolution step total: 0.010309 s
+-------- time step ti = 134, t = 0.0209375 -----------
+step 134 L2 error: 4.05199e-05
+step 134 time log:
+surface pseudonormals: 0.003125 s, surface finite volumes: 0.003125 s
+filling sys matrix: 0.000469 s
+(vector) linear sys solve: 0.005239 s
+geom update: 0.000064 s
+evolution step total: 0.012021 s
+-------- time step ti = 135, t = 0.0210938 -----------
+step 135 L2 error: 4.08192e-05
+step 135 time log:
+surface pseudonormals: 0.004324 s, surface finite volumes: 0.004324 s
+filling sys matrix: 0.000510 s
+(vector) linear sys solve: 0.002841 s
+geom update: 0.000059 s
+evolution step total: 0.012058 s
+-------- time step ti = 136, t = 0.02125 -----------
+step 136 L2 error: 4.11184e-05
+step 136 time log:
+surface pseudonormals: 0.003182 s, surface finite volumes: 0.003182 s
+filling sys matrix: 0.000462 s
+(vector) linear sys solve: 0.002948 s
+geom update: 0.000064 s
+evolution step total: 0.009837 s
+-------- time step ti = 137, t = 0.0214063 -----------
+step 137 L2 error: 4.14176e-05
+step 137 time log:
+surface pseudonormals: 0.003028 s, surface finite volumes: 0.003028 s
+filling sys matrix: 0.000484 s
+(vector) linear sys solve: 0.002830 s
+geom update: 0.000056 s
+evolution step total: 0.009426 s
+-------- time step ti = 138, t = 0.0215625 -----------
+step 138 L2 error: 4.1717e-05
+step 138 time log:
+surface pseudonormals: 0.002923 s, surface finite volumes: 0.002923 s
+filling sys matrix: 0.000481 s
+(vector) linear sys solve: 0.003038 s
+geom update: 0.000058 s
+evolution step total: 0.009422 s
+-------- time step ti = 139, t = 0.0217187 -----------
+step 139 L2 error: 4.20162e-05
+step 139 time log:
+surface pseudonormals: 0.002957 s, surface finite volumes: 0.002957 s
+filling sys matrix: 0.000460 s
+(vector) linear sys solve: 0.002807 s
+geom update: 0.000057 s
+evolution step total: 0.009238 s
+-------- time step ti = 140, t = 0.021875 -----------
+step 140 L2 error: 4.23153e-05
+step 140 time log:
+surface pseudonormals: 0.002964 s, surface finite volumes: 0.002964 s
+filling sys matrix: 0.000459 s
+(vector) linear sys solve: 0.002613 s
+geom update: 0.000057 s
+evolution step total: 0.009057 s
+-------- time step ti = 141, t = 0.0220312 -----------
+step 141 L2 error: 4.26144e-05
+step 141 time log:
+surface pseudonormals: 0.002898 s, surface finite volumes: 0.002898 s
+filling sys matrix: 0.000459 s
+(vector) linear sys solve: 0.002863 s
+geom update: 0.000062 s
+evolution step total: 0.009179 s
+-------- time step ti = 142, t = 0.0221875 -----------
+step 142 L2 error: 4.29134e-05
+step 142 time log:
+surface pseudonormals: 0.002999 s, surface finite volumes: 0.002999 s
+filling sys matrix: 0.000461 s
+(vector) linear sys solve: 0.003232 s
+geom update: 0.000079 s
+evolution step total: 0.009769 s
+-------- time step ti = 143, t = 0.0223437 -----------
+step 143 L2 error: 4.32123e-05
+step 143 time log:
+surface pseudonormals: 0.002982 s, surface finite volumes: 0.002982 s
+filling sys matrix: 0.000461 s
+(vector) linear sys solve: 0.002806 s
+geom update: 0.000059 s
+evolution step total: 0.009290 s
+-------- time step ti = 144, t = 0.0225 -----------
+step 144 L2 error: 4.35114e-05
+step 144 time log:
+surface pseudonormals: 0.002971 s, surface finite volumes: 0.002971 s
+filling sys matrix: 0.000453 s
+(vector) linear sys solve: 0.002424 s
+geom update: 0.000057 s
+evolution step total: 0.008876 s
+-------- time step ti = 145, t = 0.0226562 -----------
+step 145 L2 error: 4.38102e-05
+step 145 time log:
+surface pseudonormals: 0.002965 s, surface finite volumes: 0.002965 s
+filling sys matrix: 0.000453 s
+(vector) linear sys solve: 0.003136 s
+geom update: 0.000056 s
+evolution step total: 0.009576 s
+-------- time step ti = 146, t = 0.0228125 -----------
+step 146 L2 error: 4.4109e-05
+step 146 time log:
+surface pseudonormals: 0.002976 s, surface finite volumes: 0.002976 s
+filling sys matrix: 0.000457 s
+(vector) linear sys solve: 0.002568 s
+geom update: 0.000057 s
+evolution step total: 0.009034 s
+-------- time step ti = 147, t = 0.0229687 -----------
+step 147 L2 error: 4.4408e-05
+step 147 time log:
+surface pseudonormals: 0.002941 s, surface finite volumes: 0.002941 s
+filling sys matrix: 0.000460 s
+(vector) linear sys solve: 0.003160 s
+geom update: 0.000061 s
+evolution step total: 0.009562 s
+-------- time step ti = 148, t = 0.023125 -----------
+step 148 L2 error: 4.47066e-05
+step 148 time log:
+surface pseudonormals: 0.003038 s, surface finite volumes: 0.003038 s
+filling sys matrix: 0.000560 s
+(vector) linear sys solve: 0.004655 s
+geom update: 0.000100 s
+evolution step total: 0.011391 s
+-------- time step ti = 149, t = 0.0232813 -----------
+step 149 L2 error: 4.50053e-05
+step 149 time log:
+surface pseudonormals: 0.004994 s, surface finite volumes: 0.004994 s
+filling sys matrix: 0.000578 s
+(vector) linear sys solve: 0.010741 s
+geom update: 0.000060 s
+evolution step total: 0.021367 s
+-------- time step ti = 150, t = 0.0234375 -----------
+step 150 L2 error: 4.5304e-05
+step 150 time log:
+surface pseudonormals: 0.003010 s, surface finite volumes: 0.003010 s
+filling sys matrix: 0.000505 s
+(vector) linear sys solve: 0.004252 s
+geom update: 0.000065 s
+evolution step total: 0.010842 s
+-------- time step ti = 151, t = 0.0235937 -----------
+step 151 L2 error: 4.56026e-05
+step 151 time log:
+surface pseudonormals: 0.003027 s, surface finite volumes: 0.003027 s
+filling sys matrix: 0.000505 s
+(vector) linear sys solve: 0.003008 s
+geom update: 0.000058 s
+evolution step total: 0.009624 s
+-------- time step ti = 152, t = 0.02375 -----------
+step 152 L2 error: 4.59012e-05
+step 152 time log:
+surface pseudonormals: 0.003015 s, surface finite volumes: 0.003015 s
+filling sys matrix: 0.000474 s
+(vector) linear sys solve: 0.002799 s
+geom update: 0.000061 s
+evolution step total: 0.009364 s
+-------- time step ti = 153, t = 0.0239062 -----------
+step 153 L2 error: 4.61998e-05
+step 153 time log:
+surface pseudonormals: 0.002973 s, surface finite volumes: 0.002973 s
+filling sys matrix: 0.000468 s
+(vector) linear sys solve: 0.002822 s
+geom update: 0.000061 s
+evolution step total: 0.009297 s
+-------- time step ti = 154, t = 0.0240625 -----------
+step 154 L2 error: 4.64982e-05
+step 154 time log:
+surface pseudonormals: 0.003193 s, surface finite volumes: 0.003193 s
+filling sys matrix: 0.000538 s
+(vector) linear sys solve: 0.003510 s
+geom update: 0.000060 s
+evolution step total: 0.010494 s
+-------- time step ti = 155, t = 0.0242187 -----------
+step 155 L2 error: 4.67967e-05
+step 155 time log:
+surface pseudonormals: 0.002943 s, surface finite volumes: 0.002943 s
+filling sys matrix: 0.000454 s
+(vector) linear sys solve: 0.002782 s
+geom update: 0.000058 s
+evolution step total: 0.009178 s
+-------- time step ti = 156, t = 0.024375 -----------
+step 156 L2 error: 4.70951e-05
+step 156 time log:
+surface pseudonormals: 0.002919 s, surface finite volumes: 0.002919 s
+filling sys matrix: 0.000492 s
+(vector) linear sys solve: 0.002938 s
+geom update: 0.000090 s
+evolution step total: 0.009358 s
+-------- time step ti = 157, t = 0.0245312 -----------
+step 157 L2 error: 4.73933e-05
+step 157 time log:
+surface pseudonormals: 0.003012 s, surface finite volumes: 0.003012 s
+filling sys matrix: 0.000576 s
+(vector) linear sys solve: 0.002763 s
+geom update: 0.000058 s
+evolution step total: 0.009421 s
+-------- time step ti = 158, t = 0.0246875 -----------
+step 158 L2 error: 4.76917e-05
+step 158 time log:
+surface pseudonormals: 0.002904 s, surface finite volumes: 0.002904 s
+filling sys matrix: 0.000485 s
+(vector) linear sys solve: 0.002823 s
+geom update: 0.000058 s
+evolution step total: 0.009175 s
+-------- time step ti = 159, t = 0.0248437 -----------
+step 159 L2 error: 4.799e-05
+step 159 time log:
+surface pseudonormals: 0.003100 s, surface finite volumes: 0.003100 s
+filling sys matrix: 0.000447 s
+(vector) linear sys solve: 0.002984 s
+geom update: 0.000058 s
+evolution step total: 0.009688 s
+-------- time step ti = 160, t = 0.025 -----------
+step 160 L2 error: 4.82886e-05
+step 160 time log:
+surface pseudonormals: 0.002945 s, surface finite volumes: 0.002945 s
+filling sys matrix: 0.000434 s
+(vector) linear sys solve: 0.002833 s
+geom update: 0.000057 s
+evolution step total: 0.009215 s
+-------- time step ti = 161, t = 0.0251563 -----------
+step 161 L2 error: 4.85866e-05
+step 161 time log:
+surface pseudonormals: 0.003041 s, surface finite volumes: 0.003041 s
+filling sys matrix: 0.000461 s
+(vector) linear sys solve: 0.002982 s
+geom update: 0.000055 s
+evolution step total: 0.009580 s
+-------- time step ti = 162, t = 0.0253125 -----------
+step 162 L2 error: 4.88846e-05
+step 162 time log:
+surface pseudonormals: 0.002948 s, surface finite volumes: 0.002948 s
+filling sys matrix: 0.000468 s
+(vector) linear sys solve: 0.002880 s
+geom update: 0.000057 s
+evolution step total: 0.009301 s
+-------- time step ti = 163, t = 0.0254687 -----------
+step 163 L2 error: 4.91827e-05
+step 163 time log:
+surface pseudonormals: 0.002900 s, surface finite volumes: 0.002900 s
+filling sys matrix: 0.000733 s
+(vector) linear sys solve: 0.005486 s
+geom update: 0.000059 s
+evolution step total: 0.012078 s
+-------- time step ti = 164, t = 0.025625 -----------
+step 164 L2 error: 4.94809e-05
+step 164 time log:
+surface pseudonormals: 0.002898 s, surface finite volumes: 0.002898 s
+filling sys matrix: 0.000832 s
+(vector) linear sys solve: 0.003468 s
+geom update: 0.000060 s
+evolution step total: 0.010156 s
+-------- time step ti = 165, t = 0.0257812 -----------
+step 165 L2 error: 4.97788e-05
+step 165 time log:
+surface pseudonormals: 0.002997 s, surface finite volumes: 0.002997 s
+filling sys matrix: 0.000478 s
+(vector) linear sys solve: 0.002971 s
+geom update: 0.000098 s
+evolution step total: 0.009540 s
+-------- time step ti = 166, t = 0.0259375 -----------
+step 166 L2 error: 5.00768e-05
+step 166 time log:
+surface pseudonormals: 0.003639 s, surface finite volumes: 0.003639 s
+filling sys matrix: 0.000472 s
+(vector) linear sys solve: 0.003149 s
+geom update: 0.000059 s
+evolution step total: 0.010957 s
+-------- time step ti = 167, t = 0.0260937 -----------
+step 167 L2 error: 5.03749e-05
+step 167 time log:
+surface pseudonormals: 0.003107 s, surface finite volumes: 0.003107 s
+filling sys matrix: 0.000502 s
+(vector) linear sys solve: 0.002428 s
+geom update: 0.000061 s
+evolution step total: 0.009203 s
+-------- time step ti = 168, t = 0.02625 -----------
+step 168 L2 error: 5.06726e-05
+step 168 time log:
+surface pseudonormals: 0.002905 s, surface finite volumes: 0.002905 s
+filling sys matrix: 0.000483 s
+(vector) linear sys solve: 0.002566 s
+geom update: 0.000057 s
+evolution step total: 0.008915 s
+-------- time step ti = 169, t = 0.0264062 -----------
+step 169 L2 error: 5.09704e-05
+step 169 time log:
+surface pseudonormals: 0.003024 s, surface finite volumes: 0.003024 s
+filling sys matrix: 0.000457 s
+(vector) linear sys solve: 0.003656 s
+geom update: 0.000059 s
+evolution step total: 0.010219 s
+-------- time step ti = 170, t = 0.0265625 -----------
+step 170 L2 error: 5.12684e-05
+step 170 time log:
+surface pseudonormals: 0.002907 s, surface finite volumes: 0.002907 s
+filling sys matrix: 0.000489 s
+(vector) linear sys solve: 0.002861 s
+geom update: 0.000093 s
+evolution step total: 0.009256 s
+-------- time step ti = 171, t = 0.0267187 -----------
+step 171 L2 error: 5.1566e-05
+step 171 time log:
+surface pseudonormals: 0.003069 s, surface finite volumes: 0.003069 s
+filling sys matrix: 0.000458 s
+(vector) linear sys solve: 0.002770 s
+geom update: 0.000056 s
+evolution step total: 0.009423 s
+-------- time step ti = 172, t = 0.026875 -----------
+step 172 L2 error: 5.18639e-05
+step 172 time log:
+surface pseudonormals: 0.002908 s, surface finite volumes: 0.002908 s
+filling sys matrix: 0.000458 s
+(vector) linear sys solve: 0.003277 s
+geom update: 0.000079 s
+evolution step total: 0.009629 s
+-------- time step ti = 173, t = 0.0270313 -----------
+step 173 L2 error: 5.21615e-05
+step 173 time log:
+surface pseudonormals: 0.002947 s, surface finite volumes: 0.002947 s
+filling sys matrix: 0.000457 s
+(vector) linear sys solve: 0.003073 s
+geom update: 0.000061 s
+evolution step total: 0.009484 s
+-------- time step ti = 174, t = 0.0271875 -----------
+step 174 L2 error: 5.24591e-05
+step 174 time log:
+surface pseudonormals: 0.003101 s, surface finite volumes: 0.003101 s
+filling sys matrix: 0.000479 s
+(vector) linear sys solve: 0.003053 s
+geom update: 0.000057 s
+evolution step total: 0.009791 s
+-------- time step ti = 175, t = 0.0273437 -----------
+step 175 L2 error: 5.27567e-05
+step 175 time log:
+surface pseudonormals: 0.002998 s, surface finite volumes: 0.002998 s
+filling sys matrix: 0.000454 s
+(vector) linear sys solve: 0.002797 s
+geom update: 0.000057 s
+evolution step total: 0.009304 s
+-------- time step ti = 176, t = 0.0275 -----------
+step 176 L2 error: 5.30543e-05
+step 176 time log:
+surface pseudonormals: 0.002974 s, surface finite volumes: 0.002974 s
+filling sys matrix: 0.000494 s
+(vector) linear sys solve: 0.003010 s
+geom update: 0.000057 s
+evolution step total: 0.009509 s
+-------- time step ti = 177, t = 0.0276562 -----------
+step 177 L2 error: 5.3352e-05
+step 177 time log:
+surface pseudonormals: 0.002897 s, surface finite volumes: 0.002897 s
+filling sys matrix: 0.000472 s
+(vector) linear sys solve: 0.002377 s
+geom update: 0.000058 s
+evolution step total: 0.008699 s
+-------- time step ti = 178, t = 0.0278125 -----------
+step 178 L2 error: 5.36493e-05
+step 178 time log:
+surface pseudonormals: 0.003047 s, surface finite volumes: 0.003047 s
+filling sys matrix: 0.000444 s
+(vector) linear sys solve: 0.002951 s
+geom update: 0.000056 s
+evolution step total: 0.009544 s
+-------- time step ti = 179, t = 0.0279687 -----------
+step 179 L2 error: 5.39468e-05
+step 179 time log:
+surface pseudonormals: 0.003125 s, surface finite volumes: 0.003125 s
+filling sys matrix: 0.000460 s
+(vector) linear sys solve: 0.002866 s
+geom update: 0.000060 s
+evolution step total: 0.009636 s
+-------- time step ti = 180, t = 0.028125 -----------
+step 180 L2 error: 5.42442e-05
+step 180 time log:
+surface pseudonormals: 0.003102 s, surface finite volumes: 0.003102 s
+filling sys matrix: 0.000968 s
+(vector) linear sys solve: 0.005294 s
+geom update: 0.000065 s
+evolution step total: 0.012531 s
+-------- time step ti = 181, t = 0.0282812 -----------
+step 181 L2 error: 5.45414e-05
+step 181 time log:
+surface pseudonormals: 0.003898 s, surface finite volumes: 0.003898 s
+filling sys matrix: 0.000512 s
+(vector) linear sys solve: 0.004692 s
+geom update: 0.000060 s
+evolution step total: 0.013060 s
+-------- time step ti = 182, t = 0.0284375 -----------
+step 182 L2 error: 5.48388e-05
+step 182 time log:
+surface pseudonormals: 0.003244 s, surface finite volumes: 0.003244 s
+filling sys matrix: 0.000479 s
+(vector) linear sys solve: 0.003865 s
+geom update: 0.000062 s
+evolution step total: 0.010893 s
+-------- time step ti = 183, t = 0.0285937 -----------
+step 183 L2 error: 5.51361e-05
+step 183 time log:
+surface pseudonormals: 0.002940 s, surface finite volumes: 0.002940 s
+filling sys matrix: 0.000487 s
+(vector) linear sys solve: 0.002539 s
+geom update: 0.000058 s
+evolution step total: 0.008965 s
+-------- time step ti = 184, t = 0.02875 -----------
+step 184 L2 error: 5.54333e-05
+step 184 time log:
+surface pseudonormals: 0.003004 s, surface finite volumes: 0.003004 s
+filling sys matrix: 0.000484 s
+(vector) linear sys solve: 0.002732 s
+geom update: 0.000060 s
+evolution step total: 0.009285 s
+-------- time step ti = 185, t = 0.0289063 -----------
+step 185 L2 error: 5.57304e-05
+step 185 time log:
+surface pseudonormals: 0.002998 s, surface finite volumes: 0.002998 s
+filling sys matrix: 0.000467 s
+(vector) linear sys solve: 0.002742 s
+geom update: 0.000054 s
+evolution step total: 0.009257 s
+-------- time step ti = 186, t = 0.0290625 -----------
+step 186 L2 error: 5.60275e-05
+step 186 time log:
+surface pseudonormals: 0.002971 s, surface finite volumes: 0.002971 s
+filling sys matrix: 0.000456 s
+(vector) linear sys solve: 0.002775 s
+geom update: 0.000057 s
+evolution step total: 0.009229 s
+-------- time step ti = 187, t = 0.0292187 -----------
+step 187 L2 error: 5.63245e-05
+step 187 time log:
+surface pseudonormals: 0.002973 s, surface finite volumes: 0.002973 s
+filling sys matrix: 0.000469 s
+(vector) linear sys solve: 0.002913 s
+geom update: 0.000066 s
+evolution step total: 0.009394 s
+-------- time step ti = 188, t = 0.029375 -----------
+step 188 L2 error: 5.66219e-05
+step 188 time log:
+surface pseudonormals: 0.002954 s, surface finite volumes: 0.002954 s
+filling sys matrix: 0.000500 s
+(vector) linear sys solve: 0.002966 s
+geom update: 0.000064 s
+evolution step total: 0.009438 s
+-------- time step ti = 189, t = 0.0295312 -----------
+step 189 L2 error: 5.69188e-05
+step 189 time log:
+surface pseudonormals: 0.003066 s, surface finite volumes: 0.003066 s
+filling sys matrix: 0.000494 s
+(vector) linear sys solve: 0.003135 s
+geom update: 0.000057 s
+evolution step total: 0.009817 s
+-------- time step ti = 190, t = 0.0296875 -----------
+step 190 L2 error: 5.72156e-05
+step 190 time log:
+surface pseudonormals: 0.002952 s, surface finite volumes: 0.002952 s
+filling sys matrix: 0.000451 s
+(vector) linear sys solve: 0.002831 s
+geom update: 0.000090 s
+evolution step total: 0.009276 s
+-------- time step ti = 191, t = 0.0298437 -----------
+step 191 L2 error: 5.75128e-05
+step 191 time log:
+surface pseudonormals: 0.002971 s, surface finite volumes: 0.002971 s
+filling sys matrix: 0.000459 s
+(vector) linear sys solve: 0.003032 s
+geom update: 0.000056 s
+evolution step total: 0.009488 s
+-------- time step ti = 192, t = 0.03 -----------
+step 192 L2 error: 5.78095e-05
+step 192 time log:
+surface pseudonormals: 0.003084 s, surface finite volumes: 0.003084 s
+filling sys matrix: 0.000537 s
+(vector) linear sys solve: 0.005226 s
+geom update: 0.000058 s
+evolution step total: 0.011989 s
+-------- time step ti = 193, t = 0.0301563 -----------
+step 193 L2 error: 5.81064e-05
+step 193 time log:
+surface pseudonormals: 0.002952 s, surface finite volumes: 0.002952 s
+filling sys matrix: 0.000465 s
+(vector) linear sys solve: 0.003656 s
+geom update: 0.000074 s
+evolution step total: 0.010099 s
+-------- time step ti = 194, t = 0.0303125 -----------
+step 194 L2 error: 5.84032e-05
+step 194 time log:
+surface pseudonormals: 0.003189 s, surface finite volumes: 0.003189 s
+filling sys matrix: 0.000498 s
+(vector) linear sys solve: 0.004449 s
+geom update: 0.000063 s
+evolution step total: 0.011389 s
+-------- time step ti = 195, t = 0.0304687 -----------
+step 195 L2 error: 5.86999e-05
+step 195 time log:
+surface pseudonormals: 0.003224 s, surface finite volumes: 0.003224 s
+filling sys matrix: 0.000462 s
+(vector) linear sys solve: 0.003942 s
+geom update: 0.000063 s
+evolution step total: 0.010916 s
+-------- time step ti = 196, t = 0.030625 -----------
+step 196 L2 error: 5.89965e-05
+step 196 time log:
+surface pseudonormals: 0.004022 s, surface finite volumes: 0.004022 s
+filling sys matrix: 0.000543 s
+(vector) linear sys solve: 0.002855 s
+geom update: 0.000059 s
+evolution step total: 0.011501 s
+-------- time step ti = 197, t = 0.0307812 -----------
+step 197 L2 error: 5.92932e-05
+step 197 time log:
+surface pseudonormals: 0.003255 s, surface finite volumes: 0.003255 s
+filling sys matrix: 0.000524 s
+(vector) linear sys solve: 0.002800 s
+geom update: 0.000061 s
+evolution step total: 0.009894 s
+-------- time step ti = 198, t = 0.0309375 -----------
+step 198 L2 error: 5.95897e-05
+step 198 time log:
+surface pseudonormals: 0.002961 s, surface finite volumes: 0.002961 s
+filling sys matrix: 0.000472 s
+(vector) linear sys solve: 0.004575 s
+geom update: 0.000061 s
+evolution step total: 0.011030 s
+-------- time step ti = 199, t = 0.0310938 -----------
+step 199 L2 error: 5.98864e-05
+step 199 time log:
+surface pseudonormals: 0.002977 s, surface finite volumes: 0.002977 s
+filling sys matrix: 0.000488 s
+(vector) linear sys solve: 0.003030 s
+geom update: 0.000060 s
+evolution step total: 0.009533 s
+-------- time step ti = 200, t = 0.03125 -----------
+step 200 L2 error: 6.01828e-05
+step 200 time log:
+surface pseudonormals: 0.002952 s, surface finite volumes: 0.002952 s
+filling sys matrix: 0.000747 s
+(vector) linear sys solve: 0.003726 s
+geom update: 0.000060 s
+evolution step total: 0.010438 s
+-------- time step ti = 201, t = 0.0314062 -----------
+step 201 L2 error: 6.04796e-05
+step 201 time log:
+surface pseudonormals: 0.002927 s, surface finite volumes: 0.002927 s
+filling sys matrix: 0.000454 s
+(vector) linear sys solve: 0.003094 s
+geom update: 0.000060 s
+evolution step total: 0.009462 s
+-------- time step ti = 202, t = 0.0315625 -----------
+step 202 L2 error: 6.07759e-05
+step 202 time log:
+surface pseudonormals: 0.003032 s, surface finite volumes: 0.003032 s
+filling sys matrix: 0.000464 s
+(vector) linear sys solve: 0.002799 s
+geom update: 0.000057 s
+evolution step total: 0.009385 s
+-------- time step ti = 203, t = 0.0317187 -----------
+step 203 L2 error: 6.10725e-05
+step 203 time log:
+surface pseudonormals: 0.003031 s, surface finite volumes: 0.003031 s
+filling sys matrix: 0.000457 s
+(vector) linear sys solve: 0.002617 s
+geom update: 0.000058 s
+evolution step total: 0.009193 s
+-------- time step ti = 204, t = 0.031875 -----------
+step 204 L2 error: 6.13686e-05
+step 204 time log:
+surface pseudonormals: 0.002986 s, surface finite volumes: 0.002986 s
+filling sys matrix: 0.000489 s
+(vector) linear sys solve: 0.002849 s
+geom update: 0.000061 s
+evolution step total: 0.009370 s
+-------- time step ti = 205, t = 0.0320312 -----------
+step 205 L2 error: 6.16653e-05
+step 205 time log:
+surface pseudonormals: 0.002906 s, surface finite volumes: 0.002906 s
+filling sys matrix: 0.000442 s
+(vector) linear sys solve: 0.002493 s
+geom update: 0.000057 s
+evolution step total: 0.008804 s
+-------- time step ti = 206, t = 0.0321875 -----------
+step 206 L2 error: 6.19614e-05
+step 206 time log:
+surface pseudonormals: 0.002931 s, surface finite volumes: 0.002931 s
+filling sys matrix: 0.000441 s
+(vector) linear sys solve: 0.003306 s
+geom update: 0.000054 s
+evolution step total: 0.009662 s
+-------- time step ti = 207, t = 0.0323437 -----------
+step 207 L2 error: 6.22579e-05
+step 207 time log:
+surface pseudonormals: 0.003022 s, surface finite volumes: 0.003022 s
+filling sys matrix: 0.000475 s
+(vector) linear sys solve: 0.002932 s
+geom update: 0.000058 s
+evolution step total: 0.009509 s
+-------- time step ti = 208, t = 0.0325 -----------
+step 208 L2 error: 6.25539e-05
+step 208 time log:
+surface pseudonormals: 0.002901 s, surface finite volumes: 0.002901 s
+filling sys matrix: 0.000456 s
+(vector) linear sys solve: 0.003208 s
+geom update: 0.000059 s
+evolution step total: 0.009525 s
+-------- time step ti = 209, t = 0.0326562 -----------
+step 209 L2 error: 6.28499e-05
+step 209 time log:
+surface pseudonormals: 0.002899 s, surface finite volumes: 0.002899 s
+filling sys matrix: 0.000496 s
+(vector) linear sys solve: 0.003578 s
+geom update: 0.000067 s
+evolution step total: 0.009939 s
+-------- time step ti = 210, t = 0.0328125 -----------
+step 210 L2 error: 6.31464e-05
+step 210 time log:
+surface pseudonormals: 0.004374 s, surface finite volumes: 0.004374 s
+filling sys matrix: 0.000488 s
+(vector) linear sys solve: 0.003686 s
+geom update: 0.000060 s
+evolution step total: 0.012981 s
+-------- time step ti = 211, t = 0.0329688 -----------
+step 211 L2 error: 6.34424e-05
+step 211 time log:
+surface pseudonormals: 0.002956 s, surface finite volumes: 0.002956 s
+filling sys matrix: 0.000520 s
+(vector) linear sys solve: 0.002919 s
+geom update: 0.000058 s
+evolution step total: 0.009410 s
+-------- time step ti = 212, t = 0.033125 -----------
+step 212 L2 error: 6.37384e-05
+step 212 time log:
+surface pseudonormals: 0.003078 s, surface finite volumes: 0.003078 s
+filling sys matrix: 0.000494 s
+(vector) linear sys solve: 0.002487 s
+geom update: 0.000059 s
+evolution step total: 0.009197 s
+-------- time step ti = 213, t = 0.0332812 -----------
+step 213 L2 error: 6.40343e-05
+step 213 time log:
+surface pseudonormals: 0.002982 s, surface finite volumes: 0.002982 s
+filling sys matrix: 0.000458 s
+(vector) linear sys solve: 0.002935 s
+geom update: 0.000059 s
+evolution step total: 0.009416 s
+-------- time step ti = 214, t = 0.0334375 -----------
+step 214 L2 error: 6.43303e-05
+step 214 time log:
+surface pseudonormals: 0.002933 s, surface finite volumes: 0.002933 s
+filling sys matrix: 0.000710 s
+(vector) linear sys solve: 0.002492 s
+geom update: 0.000056 s
+evolution step total: 0.009124 s
+-------- time step ti = 215, t = 0.0335937 -----------
+step 215 L2 error: 6.46262e-05
+step 215 time log:
+surface pseudonormals: 0.002887 s, surface finite volumes: 0.002887 s
+filling sys matrix: 0.000455 s
+(vector) linear sys solve: 0.002704 s
+geom update: 0.000054 s
+evolution step total: 0.008987 s
+-------- time step ti = 216, t = 0.03375 -----------
+step 216 L2 error: 6.49222e-05
+step 216 time log:
+surface pseudonormals: 0.002932 s, surface finite volumes: 0.002932 s
+filling sys matrix: 0.000476 s
+(vector) linear sys solve: 0.002830 s
+geom update: 0.000056 s
+evolution step total: 0.009226 s
+-------- time step ti = 217, t = 0.0339063 -----------
+step 217 L2 error: 6.5218e-05
+step 217 time log:
+surface pseudonormals: 0.002953 s, surface finite volumes: 0.002953 s
+filling sys matrix: 0.000527 s
+(vector) linear sys solve: 0.002601 s
+geom update: 0.000059 s
+evolution step total: 0.009093 s
+-------- time step ti = 218, t = 0.0340625 -----------
+step 218 L2 error: 6.55138e-05
+step 218 time log:
+surface pseudonormals: 0.002922 s, surface finite volumes: 0.002922 s
+filling sys matrix: 0.000490 s
+(vector) linear sys solve: 0.003005 s
+geom update: 0.000056 s
+evolution step total: 0.009395 s
+-------- time step ti = 219, t = 0.0342188 -----------
+step 219 L2 error: 6.58098e-05
+step 219 time log:
+surface pseudonormals: 0.002889 s, surface finite volumes: 0.002889 s
+filling sys matrix: 0.000600 s
+(vector) linear sys solve: 0.003866 s
+geom update: 0.000054 s
+evolution step total: 0.010298 s
+-------- time step ti = 220, t = 0.034375 -----------
+step 220 L2 error: 6.61053e-05
+step 220 time log:
+surface pseudonormals: 0.002896 s, surface finite volumes: 0.002896 s
+filling sys matrix: 0.000439 s
+(vector) linear sys solve: 0.002756 s
+geom update: 0.000053 s
+evolution step total: 0.009040 s
+-------- time step ti = 221, t = 0.0345312 -----------
+step 221 L2 error: 6.64009e-05
+step 221 time log:
+surface pseudonormals: 0.002973 s, surface finite volumes: 0.002973 s
+filling sys matrix: 0.000463 s
+(vector) linear sys solve: 0.002941 s
+geom update: 0.000055 s
+evolution step total: 0.009406 s
+-------- time step ti = 222, t = 0.0346875 -----------
+step 222 L2 error: 6.66969e-05
+step 222 time log:
+surface pseudonormals: 0.003057 s, surface finite volumes: 0.003057 s
+filling sys matrix: 0.000472 s
+(vector) linear sys solve: 0.002925 s
+geom update: 0.000150 s
+evolution step total: 0.009662 s
+-------- time step ti = 223, t = 0.0348438 -----------
+step 223 L2 error: 6.69923e-05
+step 223 time log:
+surface pseudonormals: 0.003034 s, surface finite volumes: 0.003034 s
+filling sys matrix: 0.000510 s
+(vector) linear sys solve: 0.002834 s
+geom update: 0.000057 s
+evolution step total: 0.009469 s
+-------- time step ti = 224, t = 0.035 -----------
+step 224 L2 error: 6.7288e-05
+step 224 time log:
+surface pseudonormals: 0.002910 s, surface finite volumes: 0.002910 s
+filling sys matrix: 0.000602 s
+(vector) linear sys solve: 0.006028 s
+geom update: 0.000059 s
+evolution step total: 0.012510 s
+-------- time step ti = 225, t = 0.0351563 -----------
+step 225 L2 error: 6.75834e-05
+step 225 time log:
+surface pseudonormals: 0.002897 s, surface finite volumes: 0.002897 s
+filling sys matrix: 0.000735 s
+(vector) linear sys solve: 0.005550 s
+geom update: 0.000087 s
+evolution step total: 0.012166 s
+-------- time step ti = 226, t = 0.0353125 -----------
+step 226 L2 error: 6.7879e-05
+step 226 time log:
+surface pseudonormals: 0.003355 s, surface finite volumes: 0.003355 s
+filling sys matrix: 0.000673 s
+(vector) linear sys solve: 0.005401 s
+geom update: 0.000066 s
+evolution step total: 0.012849 s
+-------- time step ti = 227, t = 0.0354687 -----------
+step 227 L2 error: 6.81742e-05
+step 227 time log:
+surface pseudonormals: 0.003143 s, surface finite volumes: 0.003143 s
+filling sys matrix: 0.000498 s
+(vector) linear sys solve: 0.005452 s
+geom update: 0.000064 s
+evolution step total: 0.012299 s
+-------- time step ti = 228, t = 0.035625 -----------
+step 228 L2 error: 6.84698e-05
+step 228 time log:
+surface pseudonormals: 0.002989 s, surface finite volumes: 0.002989 s
+filling sys matrix: 0.000779 s
+(vector) linear sys solve: 0.002934 s
+geom update: 0.000061 s
+evolution step total: 0.009752 s
+-------- time step ti = 229, t = 0.0357812 -----------
+step 229 L2 error: 6.87651e-05
+step 229 time log:
+surface pseudonormals: 0.003013 s, surface finite volumes: 0.003013 s
+filling sys matrix: 0.000501 s
+(vector) linear sys solve: 0.002907 s
+geom update: 0.000058 s
+evolution step total: 0.009493 s
+-------- time step ti = 230, t = 0.0359375 -----------
+step 230 L2 error: 6.90605e-05
+step 230 time log:
+surface pseudonormals: 0.002968 s, surface finite volumes: 0.002968 s
+filling sys matrix: 0.000455 s
+(vector) linear sys solve: 0.003294 s
+geom update: 0.000061 s
+evolution step total: 0.009746 s
+-------- time step ti = 231, t = 0.0360937 -----------
+step 231 L2 error: 6.93558e-05
+step 231 time log:
+surface pseudonormals: 0.002898 s, surface finite volumes: 0.002898 s
+filling sys matrix: 0.000607 s
+(vector) linear sys solve: 0.003218 s
+geom update: 0.000058 s
+evolution step total: 0.009680 s
+-------- time step ti = 232, t = 0.03625 -----------
+step 232 L2 error: 6.96509e-05
+step 232 time log:
+surface pseudonormals: 0.003023 s, surface finite volumes: 0.003023 s
+filling sys matrix: 0.000458 s
+(vector) linear sys solve: 0.002641 s
+geom update: 0.000056 s
+evolution step total: 0.009201 s
+-------- time step ti = 233, t = 0.0364062 -----------
+step 233 L2 error: 6.9946e-05
+step 233 time log:
+surface pseudonormals: 0.002998 s, surface finite volumes: 0.002998 s
+filling sys matrix: 0.000474 s
+(vector) linear sys solve: 0.003221 s
+geom update: 0.000057 s
+evolution step total: 0.009749 s
+-------- time step ti = 234, t = 0.0365625 -----------
+step 234 L2 error: 7.02413e-05
+step 234 time log:
+surface pseudonormals: 0.002915 s, surface finite volumes: 0.002915 s
+filling sys matrix: 0.000472 s
+(vector) linear sys solve: 0.003142 s
+geom update: 0.000064 s
+evolution step total: 0.009508 s
+-------- time step ti = 235, t = 0.0367187 -----------
+step 235 L2 error: 7.05364e-05
+step 235 time log:
+surface pseudonormals: 0.002902 s, surface finite volumes: 0.002902 s
+filling sys matrix: 0.000477 s
+(vector) linear sys solve: 0.002917 s
+geom update: 0.000060 s
+evolution step total: 0.009259 s
+-------- time step ti = 236, t = 0.036875 -----------
+step 236 L2 error: 7.08315e-05
+step 236 time log:
+surface pseudonormals: 0.003114 s, surface finite volumes: 0.003114 s
+filling sys matrix: 0.000467 s
+(vector) linear sys solve: 0.004637 s
+geom update: 0.000070 s
+evolution step total: 0.011401 s
+-------- time step ti = 237, t = 0.0370312 -----------
+step 237 L2 error: 7.11265e-05
+step 237 time log:
+surface pseudonormals: 0.002951 s, surface finite volumes: 0.002951 s
+filling sys matrix: 0.000492 s
+(vector) linear sys solve: 0.003573 s
+geom update: 0.000059 s
+evolution step total: 0.010027 s
+-------- time step ti = 238, t = 0.0371875 -----------
+step 238 L2 error: 7.14214e-05
+step 238 time log:
+surface pseudonormals: 0.003015 s, surface finite volumes: 0.003015 s
+filling sys matrix: 0.000527 s
+(vector) linear sys solve: 0.003259 s
+geom update: 0.000057 s
+evolution step total: 0.009872 s
+-------- time step ti = 239, t = 0.0373437 -----------
+step 239 L2 error: 7.17164e-05
+step 239 time log:
+surface pseudonormals: 0.003525 s, surface finite volumes: 0.003525 s
+filling sys matrix: 0.000514 s
+(vector) linear sys solve: 0.003791 s
+geom update: 0.000064 s
+evolution step total: 0.011419 s
+-------- time step ti = 240, t = 0.0375 -----------
+step 240 L2 error: 7.20113e-05
+step 240 time log:
+surface pseudonormals: 0.003094 s, surface finite volumes: 0.003094 s
+filling sys matrix: 0.000531 s
+(vector) linear sys solve: 0.003349 s
+geom update: 0.000063 s
+evolution step total: 0.010130 s
+-------- time step ti = 241, t = 0.0376563 -----------
+step 241 L2 error: 7.23062e-05
+step 241 time log:
+surface pseudonormals: 0.003009 s, surface finite volumes: 0.003009 s
+filling sys matrix: 0.000495 s
+(vector) linear sys solve: 0.002770 s
+geom update: 0.000061 s
+evolution step total: 0.009345 s
+-------- time step ti = 242, t = 0.0378125 -----------
+step 242 L2 error: 7.26012e-05
+step 242 time log:
+surface pseudonormals: 0.002946 s, surface finite volumes: 0.002946 s
+filling sys matrix: 0.000734 s
+(vector) linear sys solve: 0.003611 s
+geom update: 0.000059 s
+evolution step total: 0.010297 s
+-------- time step ti = 243, t = 0.0379687 -----------
+step 243 L2 error: 7.28961e-05
+step 243 time log:
+surface pseudonormals: 0.003030 s, surface finite volumes: 0.003030 s
+filling sys matrix: 0.000488 s
+(vector) linear sys solve: 0.003597 s
+geom update: 0.000058 s
+evolution step total: 0.010203 s
+-------- time step ti = 244, t = 0.038125 -----------
+step 244 L2 error: 7.3191e-05
+step 244 time log:
+surface pseudonormals: 0.002952 s, surface finite volumes: 0.002952 s
+filling sys matrix: 0.000502 s
+(vector) linear sys solve: 0.003770 s
+geom update: 0.000061 s
+evolution step total: 0.010236 s
+-------- time step ti = 245, t = 0.0382812 -----------
+step 245 L2 error: 7.34855e-05
+step 245 time log:
+surface pseudonormals: 0.003153 s, surface finite volumes: 0.003153 s
+filling sys matrix: 0.000528 s
+(vector) linear sys solve: 0.003025 s
+geom update: 0.000059 s
+evolution step total: 0.009918 s
+-------- time step ti = 246, t = 0.0384375 -----------
+step 246 L2 error: 7.37802e-05
+step 246 time log:
+surface pseudonormals: 0.003051 s, surface finite volumes: 0.003051 s
+filling sys matrix: 0.000485 s
+(vector) linear sys solve: 0.003420 s
+geom update: 0.000064 s
+evolution step total: 0.010071 s
+-------- time step ti = 247, t = 0.0385938 -----------
+step 247 L2 error: 7.4075e-05
+step 247 time log:
+surface pseudonormals: 0.002908 s, surface finite volumes: 0.002908 s
+filling sys matrix: 0.000475 s
+(vector) linear sys solve: 0.003966 s
+geom update: 0.000057 s
+evolution step total: 0.010314 s
+-------- time step ti = 248, t = 0.03875 -----------
+step 248 L2 error: 7.43694e-05
+step 248 time log:
+surface pseudonormals: 0.002905 s, surface finite volumes: 0.002905 s
+filling sys matrix: 0.000511 s
+(vector) linear sys solve: 0.004166 s
+geom update: 0.000063 s
+evolution step total: 0.010549 s
+-------- time step ti = 249, t = 0.0389063 -----------
+step 249 L2 error: 7.46641e-05
+step 249 time log:
+surface pseudonormals: 0.003218 s, surface finite volumes: 0.003218 s
+filling sys matrix: 0.000548 s
+(vector) linear sys solve: 0.004264 s
+geom update: 0.000066 s
+evolution step total: 0.011314 s
+-------- time step ti = 250, t = 0.0390625 -----------
+step 250 L2 error: 7.49584e-05
+step 250 time log:
+surface pseudonormals: 0.003284 s, surface finite volumes: 0.003284 s
+filling sys matrix: 0.000495 s
+(vector) linear sys solve: 0.003136 s
+geom update: 0.000060 s
+evolution step total: 0.010259 s
+-------- time step ti = 251, t = 0.0392187 -----------
+step 251 L2 error: 7.5253e-05
+step 251 time log:
+surface pseudonormals: 0.003079 s, surface finite volumes: 0.003079 s
+filling sys matrix: 0.000516 s
+(vector) linear sys solve: 0.002926 s
+geom update: 0.000110 s
+evolution step total: 0.009710 s
+-------- time step ti = 252, t = 0.039375 -----------
+step 252 L2 error: 7.55475e-05
+step 252 time log:
+surface pseudonormals: 0.003002 s, surface finite volumes: 0.003002 s
+filling sys matrix: 0.000525 s
+(vector) linear sys solve: 0.004184 s
+geom update: 0.000062 s
+evolution step total: 0.010774 s
+-------- time step ti = 253, t = 0.0395312 -----------
+step 253 L2 error: 7.58416e-05
+step 253 time log:
+surface pseudonormals: 0.003005 s, surface finite volumes: 0.003005 s
+filling sys matrix: 0.000705 s
+(vector) linear sys solve: 0.004593 s
+geom update: 0.000062 s
+evolution step total: 0.011371 s
+-------- time step ti = 254, t = 0.0396875 -----------
+step 254 L2 error: 7.61361e-05
+step 254 time log:
+surface pseudonormals: 0.002918 s, surface finite volumes: 0.002918 s
+filling sys matrix: 0.000938 s
+(vector) linear sys solve: 0.005366 s
+geom update: 0.000058 s
+evolution step total: 0.012199 s
+-------- time step ti = 255, t = 0.0398437 -----------
+step 255 L2 error: 7.64306e-05
+step 255 time log:
+surface pseudonormals: 0.003007 s, surface finite volumes: 0.003007 s
+filling sys matrix: 0.000609 s
+(vector) linear sys solve: 0.003477 s
+geom update: 0.000065 s
+evolution step total: 0.010165 s
+-------- time step ti = 256, t = 0.04 -----------
+step 256 L2 error: 7.67248e-05
+step 256 time log:
+surface pseudonormals: 0.003019 s, surface finite volumes: 0.003019 s
+filling sys matrix: 0.000508 s
+(vector) linear sys solve: 0.003764 s
+geom update: 0.000061 s
+evolution step total: 0.010371 s
+-------- time step ti = 257, t = 0.0401562 -----------
+step 257 L2 error: 7.70191e-05
+step 257 time log:
+surface pseudonormals: 0.003064 s, surface finite volumes: 0.003064 s
+filling sys matrix: 0.000554 s
+(vector) linear sys solve: 0.002910 s
+geom update: 0.000066 s
+evolution step total: 0.009658 s
+-------- time step ti = 258, t = 0.0403125 -----------
+step 258 L2 error: 7.73133e-05
+step 258 time log:
+surface pseudonormals: 0.003004 s, surface finite volumes: 0.003004 s
+filling sys matrix: 0.000493 s
+(vector) linear sys solve: 0.003240 s
+geom update: 0.000059 s
+evolution step total: 0.009799 s
+-------- time step ti = 259, t = 0.0404687 -----------
+step 259 L2 error: 7.76079e-05
+step 259 time log:
+surface pseudonormals: 0.002950 s, surface finite volumes: 0.002950 s
+filling sys matrix: 0.000468 s
+(vector) linear sys solve: 0.002944 s
+geom update: 0.000059 s
+evolution step total: 0.009371 s
+-------- time step ti = 260, t = 0.040625 -----------
+step 260 L2 error: 7.79019e-05
+step 260 time log:
+surface pseudonormals: 0.003045 s, surface finite volumes: 0.003045 s
+filling sys matrix: 0.000517 s
+(vector) linear sys solve: 0.002814 s
+geom update: 0.000057 s
+evolution step total: 0.009478 s
+-------- time step ti = 261, t = 0.0407812 -----------
+step 261 L2 error: 7.81956e-05
+step 261 time log:
+surface pseudonormals: 0.003037 s, surface finite volumes: 0.003037 s
+filling sys matrix: 0.000479 s
+(vector) linear sys solve: 0.002647 s
+geom update: 0.000057 s
+evolution step total: 0.009257 s
+-------- time step ti = 262, t = 0.0409375 -----------
+step 262 L2 error: 7.849e-05
+step 262 time log:
+surface pseudonormals: 0.003026 s, surface finite volumes: 0.003026 s
+filling sys matrix: 0.000512 s
+(vector) linear sys solve: 0.003063 s
+geom update: 0.000057 s
+evolution step total: 0.009684 s
+-------- time step ti = 263, t = 0.0410937 -----------
+step 263 L2 error: 7.87836e-05
+step 263 time log:
+surface pseudonormals: 0.002973 s, surface finite volumes: 0.002973 s
+filling sys matrix: 0.000461 s
+(vector) linear sys solve: 0.002873 s
+geom update: 0.000057 s
+evolution step total: 0.009337 s
+-------- time step ti = 264, t = 0.04125 -----------
+step 264 L2 error: 7.90777e-05
+step 264 time log:
+surface pseudonormals: 0.002956 s, surface finite volumes: 0.002956 s
+filling sys matrix: 0.000510 s
+(vector) linear sys solve: 0.002510 s
+geom update: 0.000058 s
+evolution step total: 0.008990 s
+-------- time step ti = 265, t = 0.0414063 -----------
+step 265 L2 error: 7.93716e-05
+step 265 time log:
+surface pseudonormals: 0.002914 s, surface finite volumes: 0.002914 s
+filling sys matrix: 0.000469 s
+(vector) linear sys solve: 0.005224 s
+geom update: 0.000056 s
+evolution step total: 0.011578 s
+-------- time step ti = 266, t = 0.0415625 -----------
+step 266 L2 error: 7.96654e-05
+step 266 time log:
+surface pseudonormals: 0.004114 s, surface finite volumes: 0.004114 s
+filling sys matrix: 0.000466 s
+(vector) linear sys solve: 0.003131 s
+geom update: 0.000064 s
+evolution step total: 0.011888 s
+-------- time step ti = 267, t = 0.0417187 -----------
+step 267 L2 error: 7.99595e-05
+step 267 time log:
+surface pseudonormals: 0.002923 s, surface finite volumes: 0.002923 s
+filling sys matrix: 0.000458 s
+(vector) linear sys solve: 0.002164 s
+geom update: 0.000073 s
+evolution step total: 0.008539 s
+-------- time step ti = 268, t = 0.041875 -----------
+step 268 L2 error: 8.02535e-05
+step 268 time log:
+surface pseudonormals: 0.003026 s, surface finite volumes: 0.003026 s
+filling sys matrix: 0.000689 s
+(vector) linear sys solve: 0.004939 s
+geom update: 0.000058 s
+evolution step total: 0.011738 s
+-------- time step ti = 269, t = 0.0420312 -----------
+step 269 L2 error: 8.0547e-05
+step 269 time log:
+surface pseudonormals: 0.003145 s, surface finite volumes: 0.003145 s
+filling sys matrix: 0.000563 s
+(vector) linear sys solve: 0.005833 s
+geom update: 0.000060 s
+evolution step total: 0.012746 s
+-------- time step ti = 270, t = 0.0421875 -----------
+step 270 L2 error: 8.0841e-05
+step 270 time log:
+surface pseudonormals: 0.003867 s, surface finite volumes: 0.003867 s
+filling sys matrix: 0.000509 s
+(vector) linear sys solve: 0.002518 s
+geom update: 0.000059 s
+evolution step total: 0.010820 s
+-------- time step ti = 271, t = 0.0423438 -----------
+step 271 L2 error: 8.11346e-05
+step 271 time log:
+surface pseudonormals: 0.002921 s, surface finite volumes: 0.002921 s
+filling sys matrix: 0.000495 s
+(vector) linear sys solve: 0.003418 s
+geom update: 0.000059 s
+evolution step total: 0.009813 s
+-------- time step ti = 272, t = 0.0425 -----------
+step 272 L2 error: 8.14281e-05
+step 272 time log:
+surface pseudonormals: 0.003032 s, surface finite volumes: 0.003032 s
+filling sys matrix: 0.000489 s
+(vector) linear sys solve: 0.002427 s
+geom update: 0.000054 s
+evolution step total: 0.009034 s
+-------- time step ti = 273, t = 0.0426563 -----------
+step 273 L2 error: 8.17217e-05
+step 273 time log:
+surface pseudonormals: 0.003053 s, surface finite volumes: 0.003053 s
+filling sys matrix: 0.000497 s
+(vector) linear sys solve: 0.003467 s
+geom update: 0.000080 s
+evolution step total: 0.010150 s
+-------- time step ti = 274, t = 0.0428125 -----------
+step 274 L2 error: 8.20157e-05
+step 274 time log:
+surface pseudonormals: 0.002980 s, surface finite volumes: 0.002980 s
+filling sys matrix: 0.000468 s
+(vector) linear sys solve: 0.003189 s
+geom update: 0.000075 s
+evolution step total: 0.009692 s
+-------- time step ti = 275, t = 0.0429687 -----------
+step 275 L2 error: 8.23091e-05
+step 275 time log:
+surface pseudonormals: 0.003020 s, surface finite volumes: 0.003020 s
+filling sys matrix: 0.000503 s
+(vector) linear sys solve: 0.003124 s
+geom update: 0.000059 s
+evolution step total: 0.009727 s
+-------- time step ti = 276, t = 0.043125 -----------
+step 276 L2 error: 8.26028e-05
+step 276 time log:
+surface pseudonormals: 0.003053 s, surface finite volumes: 0.003053 s
+filling sys matrix: 0.000478 s
+(vector) linear sys solve: 0.002928 s
+geom update: 0.000058 s
+evolution step total: 0.009569 s
+-------- time step ti = 277, t = 0.0432812 -----------
+step 277 L2 error: 8.28958e-05
+step 277 time log:
+surface pseudonormals: 0.002988 s, surface finite volumes: 0.002988 s
+filling sys matrix: 0.000463 s
+(vector) linear sys solve: 0.002604 s
+geom update: 0.000058 s
+evolution step total: 0.009101 s
+-------- time step ti = 278, t = 0.0434375 -----------
+step 278 L2 error: 8.31897e-05
+step 278 time log:
+surface pseudonormals: 0.002931 s, surface finite volumes: 0.002931 s
+filling sys matrix: 0.000449 s
+(vector) linear sys solve: 0.003204 s
+geom update: 0.000058 s
+evolution step total: 0.009573 s
+-------- time step ti = 279, t = 0.0435937 -----------
+step 279 L2 error: 8.3483e-05
+step 279 time log:
+surface pseudonormals: 0.002985 s, surface finite volumes: 0.002985 s
+filling sys matrix: 0.000443 s
+(vector) linear sys solve: 0.002376 s
+geom update: 0.000053 s
+evolution step total: 0.008844 s
+-------- time step ti = 280, t = 0.04375 -----------
+step 280 L2 error: 8.37761e-05
+step 280 time log:
+surface pseudonormals: 0.003153 s, surface finite volumes: 0.003153 s
+filling sys matrix: 0.000497 s
+(vector) linear sys solve: 0.002969 s
+geom update: 0.000060 s
+evolution step total: 0.009831 s
+-------- time step ti = 281, t = 0.0439062 -----------
+step 281 L2 error: 8.40695e-05
+step 281 time log:
+surface pseudonormals: 0.003038 s, surface finite volumes: 0.003038 s
+filling sys matrix: 0.000476 s
+(vector) linear sys solve: 0.002739 s
+geom update: 0.000059 s
+evolution step total: 0.009350 s
+-------- time step ti = 282, t = 0.0440625 -----------
+step 282 L2 error: 8.43629e-05
+step 282 time log:
+surface pseudonormals: 0.003147 s, surface finite volumes: 0.003147 s
+filling sys matrix: 0.000505 s
+(vector) linear sys solve: 0.003604 s
+geom update: 0.000059 s
+evolution step total: 0.010463 s
+-------- time step ti = 283, t = 0.0442187 -----------
+step 283 L2 error: 8.4656e-05
+step 283 time log:
+surface pseudonormals: 0.002981 s, surface finite volumes: 0.002981 s
+filling sys matrix: 0.001074 s
+(vector) linear sys solve: 0.004794 s
+geom update: 0.000060 s
+evolution step total: 0.011890 s
+-------- time step ti = 284, t = 0.044375 -----------
+step 284 L2 error: 8.49493e-05
+step 284 time log:
+surface pseudonormals: 0.002952 s, surface finite volumes: 0.002952 s
+filling sys matrix: 0.000613 s
+(vector) linear sys solve: 0.004786 s
+geom update: 0.000072 s
+evolution step total: 0.011376 s
+-------- time step ti = 285, t = 0.0445312 -----------
+step 285 L2 error: 8.52426e-05
+step 285 time log:
+surface pseudonormals: 0.003065 s, surface finite volumes: 0.003065 s
+filling sys matrix: 0.000528 s
+(vector) linear sys solve: 0.004798 s
+geom update: 0.000061 s
+evolution step total: 0.011516 s
+-------- time step ti = 286, t = 0.0446875 -----------
+step 286 L2 error: 8.55357e-05
+step 286 time log:
+surface pseudonormals: 0.003120 s, surface finite volumes: 0.003120 s
+filling sys matrix: 0.000532 s
+(vector) linear sys solve: 0.003834 s
+geom update: 0.000062 s
+evolution step total: 0.010667 s
+-------- time step ti = 287, t = 0.0448437 -----------
+step 287 L2 error: 8.58288e-05
+step 287 time log:
+surface pseudonormals: 0.003092 s, surface finite volumes: 0.003092 s
+filling sys matrix: 0.000488 s
+(vector) linear sys solve: 0.002900 s
+geom update: 0.000059 s
+evolution step total: 0.009630 s
+-------- time step ti = 288, t = 0.045 -----------
+step 288 L2 error: 8.61218e-05
+step 288 time log:
+surface pseudonormals: 0.003029 s, surface finite volumes: 0.003029 s
+filling sys matrix: 0.000455 s
+(vector) linear sys solve: 0.002711 s
+geom update: 0.000157 s
+evolution step total: 0.009382 s
+-------- time step ti = 289, t = 0.0451563 -----------
+step 289 L2 error: 8.6415e-05
+step 289 time log:
+surface pseudonormals: 0.002937 s, surface finite volumes: 0.002937 s
+filling sys matrix: 0.000473 s
+(vector) linear sys solve: 0.002031 s
+geom update: 0.000055 s
+evolution step total: 0.008433 s
+-------- time step ti = 290, t = 0.0453125 -----------
+step 290 L2 error: 8.67082e-05
+step 290 time log:
+surface pseudonormals: 0.002949 s, surface finite volumes: 0.002949 s
+filling sys matrix: 0.000491 s
+(vector) linear sys solve: 0.003179 s
+geom update: 0.000093 s
+evolution step total: 0.009660 s
+-------- time step ti = 291, t = 0.0454687 -----------
+step 291 L2 error: 8.70008e-05
+step 291 time log:
+surface pseudonormals: 0.003090 s, surface finite volumes: 0.003090 s
+filling sys matrix: 0.000464 s
+(vector) linear sys solve: 0.002842 s
+geom update: 0.000057 s
+evolution step total: 0.009544 s
+-------- time step ti = 292, t = 0.045625 -----------
+step 292 L2 error: 8.72938e-05
+step 292 time log:
+surface pseudonormals: 0.002912 s, surface finite volumes: 0.002912 s
+filling sys matrix: 0.000502 s
+(vector) linear sys solve: 0.002586 s
+geom update: 0.000061 s
+evolution step total: 0.008973 s
+-------- time step ti = 293, t = 0.0457812 -----------
+step 293 L2 error: 8.75871e-05
+step 293 time log:
+surface pseudonormals: 0.002945 s, surface finite volumes: 0.002945 s
+filling sys matrix: 0.000479 s
+(vector) linear sys solve: 0.002997 s
+geom update: 0.000065 s
+evolution step total: 0.009433 s
+-------- time step ti = 294, t = 0.0459375 -----------
+step 294 L2 error: 8.78795e-05
+step 294 time log:
+surface pseudonormals: 0.002968 s, surface finite volumes: 0.002968 s
+filling sys matrix: 0.000480 s
+(vector) linear sys solve: 0.004046 s
+geom update: 0.000062 s
+evolution step total: 0.010524 s
+-------- time step ti = 295, t = 0.0460938 -----------
+step 295 L2 error: 8.81725e-05
+step 295 time log:
+surface pseudonormals: 0.002944 s, surface finite volumes: 0.002944 s
+filling sys matrix: 0.000475 s
+(vector) linear sys solve: 0.002802 s
+geom update: 0.000054 s
+evolution step total: 0.009218 s
+-------- time step ti = 296, t = 0.04625 -----------
+step 296 L2 error: 8.8465e-05
+step 296 time log:
+surface pseudonormals: 0.003027 s, surface finite volumes: 0.003027 s
+filling sys matrix: 0.000452 s
+(vector) linear sys solve: 0.002895 s
+geom update: 0.000055 s
+evolution step total: 0.009456 s
+-------- time step ti = 297, t = 0.0464063 -----------
+step 297 L2 error: 8.8758e-05
+step 297 time log:
+surface pseudonormals: 0.002965 s, surface finite volumes: 0.002965 s
+filling sys matrix: 0.000459 s
+(vector) linear sys solve: 0.002464 s
+geom update: 0.000056 s
+evolution step total: 0.008910 s
+-------- time step ti = 298, t = 0.0465625 -----------
+step 298 L2 error: 8.90505e-05
+step 298 time log:
+surface pseudonormals: 0.003008 s, surface finite volumes: 0.003008 s
+filling sys matrix: 0.000748 s
+(vector) linear sys solve: 0.003969 s
+geom update: 0.000060 s
+evolution step total: 0.010793 s
+-------- time step ti = 299, t = 0.0467187 -----------
+step 299 L2 error: 8.9343e-05
+step 299 time log:
+surface pseudonormals: 0.002966 s, surface finite volumes: 0.002966 s
+filling sys matrix: 0.000549 s
+(vector) linear sys solve: 0.003516 s
+geom update: 0.000059 s
+evolution step total: 0.010054 s
+-------- time step ti = 300, t = 0.046875 -----------
+step 300 L2 error: 8.96358e-05
+step 300 time log:
+surface pseudonormals: 0.002896 s, surface finite volumes: 0.002896 s
+filling sys matrix: 0.000559 s
+(vector) linear sys solve: 0.003571 s
+geom update: 0.000143 s
+evolution step total: 0.010064 s
+-------- time step ti = 301, t = 0.0470312 -----------
+step 301 L2 error: 8.99283e-05
+step 301 time log:
+surface pseudonormals: 0.003014 s, surface finite volumes: 0.003014 s
+filling sys matrix: 0.000472 s
+(vector) linear sys solve: 0.003355 s
+geom update: 0.000073 s
+evolution step total: 0.009929 s
+-------- time step ti = 302, t = 0.0471875 -----------
+step 302 L2 error: 9.02212e-05
+step 302 time log:
+surface pseudonormals: 0.003481 s, surface finite volumes: 0.003481 s
+filling sys matrix: 0.000649 s
+(vector) linear sys solve: 0.005550 s
+geom update: 0.000091 s
+evolution step total: 0.013251 s
+-------- time step ti = 303, t = 0.0473437 -----------
+step 303 L2 error: 9.05133e-05
+step 303 time log:
+surface pseudonormals: 0.003466 s, surface finite volumes: 0.003466 s
+filling sys matrix: 0.000527 s
+(vector) linear sys solve: 0.003851 s
+geom update: 0.000058 s
+evolution step total: 0.011370 s
+-------- time step ti = 304, t = 0.0475 -----------
+step 304 L2 error: 9.08062e-05
+step 304 time log:
+surface pseudonormals: 0.002963 s, surface finite volumes: 0.002963 s
+filling sys matrix: 0.000499 s
+(vector) linear sys solve: 0.003772 s
+geom update: 0.000062 s
+evolution step total: 0.010258 s
+-------- time step ti = 305, t = 0.0476562 -----------
+step 305 L2 error: 9.10984e-05
+step 305 time log:
+surface pseudonormals: 0.003113 s, surface finite volumes: 0.003113 s
+filling sys matrix: 0.000486 s
+(vector) linear sys solve: 0.002802 s
+geom update: 0.000072 s
+evolution step total: 0.009587 s
+-------- time step ti = 306, t = 0.0478125 -----------
+step 306 L2 error: 9.13908e-05
+step 306 time log:
+surface pseudonormals: 0.002945 s, surface finite volumes: 0.002945 s
+filling sys matrix: 0.000456 s
+(vector) linear sys solve: 0.002999 s
+geom update: 0.000064 s
+evolution step total: 0.009410 s
+-------- time step ti = 307, t = 0.0479687 -----------
+step 307 L2 error: 9.16835e-05
+step 307 time log:
+surface pseudonormals: 0.003048 s, surface finite volumes: 0.003048 s
+filling sys matrix: 0.000435 s
+(vector) linear sys solve: 0.002798 s
+geom update: 0.000062 s
+evolution step total: 0.009391 s
+-------- time step ti = 308, t = 0.048125 -----------
+step 308 L2 error: 9.19756e-05
+step 308 time log:
+surface pseudonormals: 0.002977 s, surface finite volumes: 0.002977 s
+filling sys matrix: 0.000454 s
+(vector) linear sys solve: 0.002673 s
+geom update: 0.000059 s
+evolution step total: 0.009139 s
+-------- time step ti = 309, t = 0.0482812 -----------
+step 309 L2 error: 9.22679e-05
+step 309 time log:
+surface pseudonormals: 0.002953 s, surface finite volumes: 0.002953 s
+filling sys matrix: 0.000462 s
+(vector) linear sys solve: 0.002843 s
+geom update: 0.000056 s
+evolution step total: 0.009266 s
+-------- time step ti = 310, t = 0.0484375 -----------
+step 310 L2 error: 9.25603e-05
+step 310 time log:
+surface pseudonormals: 0.002894 s, surface finite volumes: 0.002894 s
+filling sys matrix: 0.000519 s
+(vector) linear sys solve: 0.003426 s
+geom update: 0.000059 s
+evolution step total: 0.009793 s
+-------- time step ti = 311, t = 0.0485937 -----------
+step 311 L2 error: 9.28524e-05
+step 311 time log:
+surface pseudonormals: 0.003076 s, surface finite volumes: 0.003076 s
+filling sys matrix: 0.000454 s
+(vector) linear sys solve: 0.003260 s
+geom update: 0.000066 s
+evolution step total: 0.009932 s
+-------- time step ti = 312, t = 0.04875 -----------
+step 312 L2 error: 9.31445e-05
+step 312 time log:
+surface pseudonormals: 0.002955 s, surface finite volumes: 0.002955 s
+filling sys matrix: 0.000520 s
+(vector) linear sys solve: 0.002415 s
+geom update: 0.000066 s
+evolution step total: 0.008910 s
+-------- time step ti = 313, t = 0.0489063 -----------
+step 313 L2 error: 9.34367e-05
+step 313 time log:
+surface pseudonormals: 0.003023 s, surface finite volumes: 0.003023 s
+filling sys matrix: 0.000490 s
+(vector) linear sys solve: 0.003034 s
+geom update: 0.000058 s
+evolution step total: 0.009627 s
+-------- time step ti = 314, t = 0.0490625 -----------
+step 314 L2 error: 9.37288e-05
+step 314 time log:
+surface pseudonormals: 0.002943 s, surface finite volumes: 0.002943 s
+filling sys matrix: 0.000493 s
+(vector) linear sys solve: 0.002889 s
+geom update: 0.000063 s
+evolution step total: 0.009330 s
+-------- time step ti = 315, t = 0.0492187 -----------
+step 315 L2 error: 9.40207e-05
+step 315 time log:
+surface pseudonormals: 0.002893 s, surface finite volumes: 0.002893 s
+filling sys matrix: 0.000537 s
+(vector) linear sys solve: 0.004611 s
+geom update: 0.000061 s
+evolution step total: 0.010995 s
+-------- time step ti = 316, t = 0.049375 -----------
+step 316 L2 error: 9.43128e-05
+step 316 time log:
+surface pseudonormals: 0.002902 s, surface finite volumes: 0.002902 s
+filling sys matrix: 0.000466 s
+(vector) linear sys solve: 0.003982 s
+geom update: 0.000060 s
+evolution step total: 0.010312 s
+-------- time step ti = 317, t = 0.0495312 -----------
+step 317 L2 error: 9.46047e-05
+step 317 time log:
+surface pseudonormals: 0.002942 s, surface finite volumes: 0.002942 s
+filling sys matrix: 0.000486 s
+(vector) linear sys solve: 0.002918 s
+geom update: 0.000056 s
+evolution step total: 0.009343 s
+-------- time step ti = 318, t = 0.0496875 -----------
+step 318 L2 error: 9.48969e-05
+step 318 time log:
+surface pseudonormals: 0.003004 s, surface finite volumes: 0.003004 s
+filling sys matrix: 0.000480 s
+(vector) linear sys solve: 0.002984 s
+geom update: 0.000057 s
+evolution step total: 0.009529 s
+-------- time step ti = 319, t = 0.0498438 -----------
+step 319 L2 error: 9.51887e-05
+step 319 time log:
+surface pseudonormals: 0.002890 s, surface finite volumes: 0.002890 s
+filling sys matrix: 0.000459 s
+(vector) linear sys solve: 0.002168 s
+geom update: 0.000053 s
+evolution step total: 0.008459 s
+-------- time step ti = 320, t = 0.05 -----------
+step 320 L2 error: 9.54804e-05
+step 320 time log:
+surface pseudonormals: 0.003023 s, surface finite volumes: 0.003023 s
+filling sys matrix: 0.000452 s
+(vector) linear sys solve: 0.003006 s
+geom update: 0.000063 s
+evolution step total: 0.009567 s
+-------- time step ti = 321, t = 0.0501563 -----------
+step 321 L2 error: 9.57724e-05
+step 321 time log:
+surface pseudonormals: 0.002953 s, surface finite volumes: 0.002953 s
+filling sys matrix: 0.000519 s
+(vector) linear sys solve: 0.003848 s
+geom update: 0.000059 s
+evolution step total: 0.010333 s
+-------- time step ti = 322, t = 0.0503125 -----------
+step 322 L2 error: 9.60642e-05
+step 322 time log:
+surface pseudonormals: 0.003205 s, surface finite volumes: 0.003205 s
+filling sys matrix: 0.000482 s
+(vector) linear sys solve: 0.002527 s
+geom update: 0.000061 s
+evolution step total: 0.009480 s
+-------- time step ti = 323, t = 0.0504687 -----------
+step 323 L2 error: 9.63559e-05
+step 323 time log:
+surface pseudonormals: 0.003018 s, surface finite volumes: 0.003018 s
+filling sys matrix: 0.000501 s
+(vector) linear sys solve: 0.002807 s
+geom update: 0.000056 s
+evolution step total: 0.009401 s
+-------- time step ti = 324, t = 0.050625 -----------
+step 324 L2 error: 9.66477e-05
+step 324 time log:
+surface pseudonormals: 0.003077 s, surface finite volumes: 0.003077 s
+filling sys matrix: 0.000457 s
+(vector) linear sys solve: 0.002711 s
+geom update: 0.000058 s
+evolution step total: 0.009380 s
+-------- time step ti = 325, t = 0.0507813 -----------
+step 325 L2 error: 9.69396e-05
+step 325 time log:
+surface pseudonormals: 0.002954 s, surface finite volumes: 0.002954 s
+filling sys matrix: 0.000461 s
+(vector) linear sys solve: 0.002416 s
+geom update: 0.000060 s
+evolution step total: 0.008846 s
+-------- time step ti = 326, t = 0.0509375 -----------
+step 326 L2 error: 9.72314e-05
+step 326 time log:
+surface pseudonormals: 0.003001 s, surface finite volumes: 0.003001 s
+filling sys matrix: 0.000458 s
+(vector) linear sys solve: 0.002818 s
+geom update: 0.000055 s
+evolution step total: 0.009333 s
+-------- time step ti = 327, t = 0.0510937 -----------
+step 327 L2 error: 9.75231e-05
+step 327 time log:
+surface pseudonormals: 0.002917 s, surface finite volumes: 0.002917 s
+filling sys matrix: 0.000449 s
+(vector) linear sys solve: 0.002780 s
+geom update: 0.000054 s
+evolution step total: 0.009118 s
+-------- time step ti = 328, t = 0.05125 -----------
+step 328 L2 error: 9.78147e-05
+step 328 time log:
+surface pseudonormals: 0.002915 s, surface finite volumes: 0.002915 s
+filling sys matrix: 0.000472 s
+(vector) linear sys solve: 0.004327 s
+geom update: 0.000059 s
+evolution step total: 0.010687 s
+-------- time step ti = 329, t = 0.0514062 -----------
+step 329 L2 error: 9.81062e-05
+step 329 time log:
+surface pseudonormals: 0.002980 s, surface finite volumes: 0.002980 s
+filling sys matrix: 0.000468 s
+(vector) linear sys solve: 0.005284 s
+geom update: 0.000073 s
+evolution step total: 0.011784 s
+-------- time step ti = 330, t = 0.0515625 -----------
+step 330 L2 error: 9.83975e-05
+step 330 time log:
+surface pseudonormals: 0.003105 s, surface finite volumes: 0.003105 s
+filling sys matrix: 0.000463 s
+(vector) linear sys solve: 0.004405 s
+geom update: 0.000066 s
+evolution step total: 0.011143 s
+-------- time step ti = 331, t = 0.0517187 -----------
+step 331 L2 error: 9.86889e-05
+step 331 time log:
+surface pseudonormals: 0.002920 s, surface finite volumes: 0.002920 s
+filling sys matrix: 0.000494 s
+(vector) linear sys solve: 0.003995 s
+geom update: 0.000069 s
+evolution step total: 0.010398 s
+-------- time step ti = 332, t = 0.051875 -----------
+step 332 L2 error: 9.89805e-05
+step 332 time log:
+surface pseudonormals: 0.003151 s, surface finite volumes: 0.003151 s
+filling sys matrix: 0.000474 s
+(vector) linear sys solve: 0.002939 s
+geom update: 0.000062 s
+evolution step total: 0.009777 s
+-------- time step ti = 333, t = 0.0520312 -----------
+step 333 L2 error: 9.92717e-05
+step 333 time log:
+surface pseudonormals: 0.002918 s, surface finite volumes: 0.002918 s
+filling sys matrix: 0.000478 s
+(vector) linear sys solve: 0.003187 s
+geom update: 0.000060 s
+evolution step total: 0.009561 s
+-------- time step ti = 334, t = 0.0521875 -----------
+step 334 L2 error: 9.95633e-05
+step 334 time log:
+surface pseudonormals: 0.002902 s, surface finite volumes: 0.002902 s
+filling sys matrix: 0.000471 s
+(vector) linear sys solve: 0.002068 s
+geom update: 0.000056 s
+evolution step total: 0.008398 s
+-------- time step ti = 335, t = 0.0523437 -----------
+step 335 L2 error: 9.9855e-05
+step 335 time log:
+surface pseudonormals: 0.002903 s, surface finite volumes: 0.002903 s
+filling sys matrix: 0.000429 s
+(vector) linear sys solve: 0.003281 s
+geom update: 0.000054 s
+evolution step total: 0.009570 s
+-------- time step ti = 336, t = 0.0525 -----------
+step 336 L2 error: 0.000100146
+step 336 time log:
+surface pseudonormals: 0.002936 s, surface finite volumes: 0.002936 s
+filling sys matrix: 0.000462 s
+(vector) linear sys solve: 0.002496 s
+geom update: 0.000067 s
+evolution step total: 0.008897 s
+-------- time step ti = 337, t = 0.0526562 -----------
+step 337 L2 error: 0.000100437
+step 337 time log:
+surface pseudonormals: 0.002956 s, surface finite volumes: 0.002956 s
+filling sys matrix: 0.000460 s
+(vector) linear sys solve: 0.002945 s
+geom update: 0.000055 s
+evolution step total: 0.009371 s
+-------- time step ti = 338, t = 0.0528125 -----------
+step 338 L2 error: 0.000100729
+step 338 time log:
+surface pseudonormals: 0.002911 s, surface finite volumes: 0.002911 s
+filling sys matrix: 0.000461 s
+(vector) linear sys solve: 0.002885 s
+geom update: 0.000058 s
+evolution step total: 0.009225 s
+-------- time step ti = 339, t = 0.0529687 -----------
+step 339 L2 error: 0.00010102
+step 339 time log:
+surface pseudonormals: 0.003085 s, surface finite volumes: 0.003085 s
+filling sys matrix: 0.000439 s
+(vector) linear sys solve: 0.003418 s
+geom update: 0.000056 s
+evolution step total: 0.010084 s
+-------- time step ti = 340, t = 0.053125 -----------
+step 340 L2 error: 0.000101311
+step 340 time log:
+surface pseudonormals: 0.003588 s, surface finite volumes: 0.003588 s
+filling sys matrix: 0.000495 s
+(vector) linear sys solve: 0.003085 s
+geom update: 0.000054 s
+evolution step total: 0.010812 s
+-------- time step ti = 341, t = 0.0532812 -----------
+step 341 L2 error: 0.000101603
+step 341 time log:
+surface pseudonormals: 0.003085 s, surface finite volumes: 0.003085 s
+filling sys matrix: 0.000474 s
+(vector) linear sys solve: 0.002768 s
+geom update: 0.000055 s
+evolution step total: 0.009468 s
+-------- time step ti = 342, t = 0.0534375 -----------
+step 342 L2 error: 0.000101894
+step 342 time log:
+surface pseudonormals: 0.002909 s, surface finite volumes: 0.002909 s
+filling sys matrix: 0.000718 s
+(vector) linear sys solve: 0.002777 s
+geom update: 0.000070 s
+evolution step total: 0.009383 s
+-------- time step ti = 343, t = 0.0535938 -----------
+step 343 L2 error: 0.000102184
+step 343 time log:
+surface pseudonormals: 0.002919 s, surface finite volumes: 0.002919 s
+filling sys matrix: 0.000466 s
+(vector) linear sys solve: 0.003431 s
+geom update: 0.000059 s
+evolution step total: 0.009795 s
+-------- time step ti = 344, t = 0.05375 -----------
+step 344 L2 error: 0.000102475
+step 344 time log:
+surface pseudonormals: 0.002982 s, surface finite volumes: 0.002982 s
+filling sys matrix: 0.000453 s
+(vector) linear sys solve: 0.003595 s
+geom update: 0.000097 s
+evolution step total: 0.010109 s
+-------- time step ti = 345, t = 0.0539062 -----------
+step 345 L2 error: 0.000102767
+step 345 time log:
+surface pseudonormals: 0.003292 s, surface finite volumes: 0.003292 s
+filling sys matrix: 0.000508 s
+(vector) linear sys solve: 0.002908 s
+geom update: 0.000059 s
+evolution step total: 0.010060 s
+-------- time step ti = 346, t = 0.0540625 -----------
+step 346 L2 error: 0.000103058
+step 346 time log:
+surface pseudonormals: 0.003186 s, surface finite volumes: 0.003186 s
+filling sys matrix: 0.000508 s
+(vector) linear sys solve: 0.005875 s
+geom update: 0.000075 s
+evolution step total: 0.012830 s
+-------- time step ti = 347, t = 0.0542187 -----------
+step 347 L2 error: 0.000103348
+step 347 time log:
+surface pseudonormals: 0.003289 s, surface finite volumes: 0.003289 s
+filling sys matrix: 0.000474 s
+(vector) linear sys solve: 0.003573 s
+geom update: 0.000060 s
+evolution step total: 0.010685 s
+-------- time step ti = 348, t = 0.054375 -----------
+step 348 L2 error: 0.000103639
+step 348 time log:
+surface pseudonormals: 0.002950 s, surface finite volumes: 0.002950 s
+filling sys matrix: 0.000476 s
+(vector) linear sys solve: 0.003240 s
+geom update: 0.000059 s
+evolution step total: 0.009675 s
+-------- time step ti = 349, t = 0.0545313 -----------
+step 349 L2 error: 0.00010393
+step 349 time log:
+surface pseudonormals: 0.002914 s, surface finite volumes: 0.002914 s
+filling sys matrix: 0.000488 s
+(vector) linear sys solve: 0.002422 s
+geom update: 0.000058 s
+evolution step total: 0.008796 s
+-------- time step ti = 350, t = 0.0546875 -----------
+step 350 L2 error: 0.000104221
+step 350 time log:
+surface pseudonormals: 0.002972 s, surface finite volumes: 0.002972 s
+filling sys matrix: 0.000485 s
+(vector) linear sys solve: 0.002769 s
+geom update: 0.000058 s
+evolution step total: 0.009256 s
+-------- time step ti = 351, t = 0.0548437 -----------
+step 351 L2 error: 0.000104512
+step 351 time log:
+surface pseudonormals: 0.003074 s, surface finite volumes: 0.003074 s
+filling sys matrix: 0.000550 s
+(vector) linear sys solve: 0.003135 s
+geom update: 0.000065 s
+evolution step total: 0.009899 s
+-------- time step ti = 352, t = 0.055 -----------
+step 352 L2 error: 0.000104803
+step 352 time log:
+surface pseudonormals: 0.002941 s, surface finite volumes: 0.002941 s
+filling sys matrix: 0.000478 s
+(vector) linear sys solve: 0.002950 s
+geom update: 0.000059 s
+evolution step total: 0.009369 s
+-------- time step ti = 353, t = 0.0551562 -----------
+step 353 L2 error: 0.000105093
+step 353 time log:
+surface pseudonormals: 0.002924 s, surface finite volumes: 0.002924 s
+filling sys matrix: 0.000488 s
+(vector) linear sys solve: 0.002853 s
+geom update: 0.000062 s
+evolution step total: 0.009250 s
+-------- time step ti = 354, t = 0.0553125 -----------
+step 354 L2 error: 0.000105384
+step 354 time log:
+surface pseudonormals: 0.002954 s, surface finite volumes: 0.002954 s
+filling sys matrix: 0.000482 s
+(vector) linear sys solve: 0.002766 s
+geom update: 0.000057 s
+evolution step total: 0.009212 s
+-------- time step ti = 355, t = 0.0554687 -----------
+step 355 L2 error: 0.000105675
+step 355 time log:
+surface pseudonormals: 0.002986 s, surface finite volumes: 0.002986 s
+filling sys matrix: 0.000457 s
+(vector) linear sys solve: 0.002775 s
+geom update: 0.000059 s
+evolution step total: 0.009263 s
+-------- time step ti = 356, t = 0.055625 -----------
+step 356 L2 error: 0.000105965
+step 356 time log:
+surface pseudonormals: 0.002954 s, surface finite volumes: 0.002954 s
+filling sys matrix: 0.000468 s
+(vector) linear sys solve: 0.002115 s
+geom update: 0.000056 s
+evolution step total: 0.008546 s
+-------- time step ti = 357, t = 0.0557812 -----------
+step 357 L2 error: 0.000106256
+step 357 time log:
+surface pseudonormals: 0.002898 s, surface finite volumes: 0.002898 s
+filling sys matrix: 0.000463 s
+(vector) linear sys solve: 0.002815 s
+geom update: 0.000058 s
+evolution step total: 0.009132 s
+-------- time step ti = 358, t = 0.0559375 -----------
+step 358 L2 error: 0.000106547
+step 358 time log:
+surface pseudonormals: 0.002985 s, surface finite volumes: 0.002985 s
+filling sys matrix: 0.000436 s
+(vector) linear sys solve: 0.002246 s
+geom update: 0.000056 s
+evolution step total: 0.008709 s
+-------- time step ti = 359, t = 0.0560937 -----------
+step 359 L2 error: 0.000106837
+step 359 time log:
+surface pseudonormals: 0.002999 s, surface finite volumes: 0.002999 s
+filling sys matrix: 0.000452 s
+(vector) linear sys solve: 0.002601 s
+geom update: 0.000060 s
+evolution step total: 0.009112 s
+-------- time step ti = 360, t = 0.05625 -----------
+step 360 L2 error: 0.000107128
+step 360 time log:
+surface pseudonormals: 0.002944 s, surface finite volumes: 0.002944 s
+filling sys matrix: 0.000471 s
+(vector) linear sys solve: 0.003089 s
+geom update: 0.000056 s
+evolution step total: 0.009504 s
+-------- time step ti = 361, t = 0.0564062 -----------
+step 361 L2 error: 0.000107419
+step 361 time log:
+surface pseudonormals: 0.002909 s, surface finite volumes: 0.002909 s
+filling sys matrix: 0.000594 s
+(vector) linear sys solve: 0.005258 s
+geom update: 0.000062 s
+evolution step total: 0.011733 s
+-------- time step ti = 362, t = 0.0565625 -----------
+step 362 L2 error: 0.000107708
+step 362 time log:
+surface pseudonormals: 0.002979 s, surface finite volumes: 0.002979 s
+filling sys matrix: 0.000568 s
+(vector) linear sys solve: 0.003273 s
+geom update: 0.000059 s
+evolution step total: 0.009859 s
+-------- time step ti = 363, t = 0.0567187 -----------
+step 363 L2 error: 0.000107999
+step 363 time log:
+surface pseudonormals: 0.002967 s, surface finite volumes: 0.002967 s
+filling sys matrix: 0.000461 s
+(vector) linear sys solve: 0.003539 s
+geom update: 0.000057 s
+evolution step total: 0.009991 s
+-------- time step ti = 364, t = 0.056875 -----------
+step 364 L2 error: 0.00010829
+step 364 time log:
+surface pseudonormals: 0.002945 s, surface finite volumes: 0.002945 s
+filling sys matrix: 0.000456 s
+(vector) linear sys solve: 0.002913 s
+geom update: 0.000055 s
+evolution step total: 0.009315 s
+-------- time step ti = 365, t = 0.0570312 -----------
+step 365 L2 error: 0.00010858
+step 365 time log:
+surface pseudonormals: 0.003145 s, surface finite volumes: 0.003145 s
+filling sys matrix: 0.000478 s
+(vector) linear sys solve: 0.003120 s
+geom update: 0.000059 s
+evolution step total: 0.009948 s
+-------- time step ti = 366, t = 0.0571875 -----------
+step 366 L2 error: 0.00010887
+step 366 time log:
+surface pseudonormals: 0.003072 s, surface finite volumes: 0.003072 s
+filling sys matrix: 0.000447 s
+(vector) linear sys solve: 0.002440 s
+geom update: 0.000071 s
+evolution step total: 0.009101 s
+-------- time step ti = 367, t = 0.0573438 -----------
+step 367 L2 error: 0.00010916
+step 367 time log:
+surface pseudonormals: 0.003109 s, surface finite volumes: 0.003109 s
+filling sys matrix: 0.000474 s
+(vector) linear sys solve: 0.002891 s
+geom update: 0.000056 s
+evolution step total: 0.009638 s
+-------- time step ti = 368, t = 0.0575 -----------
+step 368 L2 error: 0.00010945
+step 368 time log:
+surface pseudonormals: 0.002909 s, surface finite volumes: 0.002909 s
+filling sys matrix: 0.000431 s
+(vector) linear sys solve: 0.002430 s
+geom update: 0.000053 s
+evolution step total: 0.008734 s
+-------- time step ti = 369, t = 0.0576562 -----------
+step 369 L2 error: 0.000109741
+step 369 time log:
+surface pseudonormals: 0.003094 s, surface finite volumes: 0.003094 s
+filling sys matrix: 0.000455 s
+(vector) linear sys solve: 0.002369 s
+geom update: 0.000055 s
+evolution step total: 0.009067 s
+-------- time step ti = 370, t = 0.0578125 -----------
+step 370 L2 error: 0.000110031
+step 370 time log:
+surface pseudonormals: 0.002939 s, surface finite volumes: 0.002939 s
+filling sys matrix: 0.000468 s
+(vector) linear sys solve: 0.002426 s
+geom update: 0.000058 s
+evolution step total: 0.008830 s
+-------- time step ti = 371, t = 0.0579687 -----------
+step 371 L2 error: 0.000110321
+step 371 time log:
+surface pseudonormals: 0.002965 s, surface finite volumes: 0.002965 s
+filling sys matrix: 0.000509 s
+(vector) linear sys solve: 0.002899 s
+geom update: 0.000056 s
+evolution step total: 0.009393 s
+-------- time step ti = 372, t = 0.058125 -----------
+step 372 L2 error: 0.000110611
+step 372 time log:
+surface pseudonormals: 0.002961 s, surface finite volumes: 0.002961 s
+filling sys matrix: 0.000447 s
+(vector) linear sys solve: 0.003012 s
+geom update: 0.000061 s
+evolution step total: 0.009441 s
+-------- time step ti = 373, t = 0.0582813 -----------
+step 373 L2 error: 0.000110902
+step 373 time log:
+surface pseudonormals: 0.003008 s, surface finite volumes: 0.003008 s
+filling sys matrix: 0.000452 s
+(vector) linear sys solve: 0.003042 s
+geom update: 0.000060 s
+evolution step total: 0.009570 s
+-------- time step ti = 374, t = 0.0584375 -----------
+step 374 L2 error: 0.000111191
+step 374 time log:
+surface pseudonormals: 0.002985 s, surface finite volumes: 0.002985 s
+filling sys matrix: 0.000445 s
+(vector) linear sys solve: 0.002711 s
+geom update: 0.000058 s
+evolution step total: 0.009183 s
+-------- time step ti = 375, t = 0.0585938 -----------
+step 375 L2 error: 0.000111482
+step 375 time log:
+surface pseudonormals: 0.003058 s, surface finite volumes: 0.003058 s
+filling sys matrix: 0.000460 s
+(vector) linear sys solve: 0.002753 s
+geom update: 0.000055 s
+evolution step total: 0.009384 s
+-------- time step ti = 376, t = 0.05875 -----------
+step 376 L2 error: 0.000111771
+step 376 time log:
+surface pseudonormals: 0.002940 s, surface finite volumes: 0.002940 s
+filling sys matrix: 0.000430 s
+(vector) linear sys solve: 0.002817 s
+geom update: 0.000058 s
+evolution step total: 0.009185 s
+-------- time step ti = 377, t = 0.0589062 -----------
+step 377 L2 error: 0.000112061
+step 377 time log:
+surface pseudonormals: 0.003083 s, surface finite volumes: 0.003083 s
+filling sys matrix: 0.000480 s
+(vector) linear sys solve: 0.002768 s
+geom update: 0.000058 s
+evolution step total: 0.009471 s
+-------- time step ti = 378, t = 0.0590625 -----------
+step 378 L2 error: 0.000112352
+step 378 time log:
+surface pseudonormals: 0.003391 s, surface finite volumes: 0.003391 s
+filling sys matrix: 0.000470 s
+(vector) linear sys solve: 0.002880 s
+geom update: 0.000067 s
+evolution step total: 0.010198 s
+-------- time step ti = 379, t = 0.0592187 -----------
+step 379 L2 error: 0.000112641
+step 379 time log:
+surface pseudonormals: 0.003135 s, surface finite volumes: 0.003135 s
+filling sys matrix: 0.000504 s
+(vector) linear sys solve: 0.002868 s
+geom update: 0.000062 s
+evolution step total: 0.009703 s
+-------- time step ti = 380, t = 0.059375 -----------
+step 380 L2 error: 0.000112931
+step 380 time log:
+surface pseudonormals: 0.002994 s, surface finite volumes: 0.002994 s
+filling sys matrix: 0.000636 s
+(vector) linear sys solve: 0.003086 s
+geom update: 0.000084 s
+evolution step total: 0.009794 s
+-------- time step ti = 381, t = 0.0595312 -----------
+step 381 L2 error: 0.000113221
+step 381 time log:
+surface pseudonormals: 0.002925 s, surface finite volumes: 0.002925 s
+filling sys matrix: 0.000598 s
+(vector) linear sys solve: 0.004303 s
+geom update: 0.000069 s
+evolution step total: 0.010820 s
+-------- time step ti = 382, t = 0.0596875 -----------
+step 382 L2 error: 0.000113511
+step 382 time log:
+surface pseudonormals: 0.003112 s, surface finite volumes: 0.003112 s
+filling sys matrix: 0.000642 s
+(vector) linear sys solve: 0.004836 s
+geom update: 0.000059 s
+evolution step total: 0.011761 s
+-------- time step ti = 383, t = 0.0598437 -----------
+step 383 L2 error: 0.0001138
+step 383 time log:
+surface pseudonormals: 0.002959 s, surface finite volumes: 0.002959 s
+filling sys matrix: 0.000491 s
+(vector) linear sys solve: 0.003900 s
+geom update: 0.000067 s
+evolution step total: 0.010374 s
+-------- time step ti = 384, t = 0.06 -----------
+step 384 L2 error: 0.00011409
+step 384 time log:
+surface pseudonormals: 0.003371 s, surface finite volumes: 0.003371 s
+filling sys matrix: 0.000473 s
+(vector) linear sys solve: 0.003018 s
+geom update: 0.000061 s
+evolution step total: 0.010294 s
+total L2 Error: 0.0221577

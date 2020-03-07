@@ -227,8 +227,24 @@ int main()
 	e.exportGeometryVertexNormals(&bunny, "bunnyNormals");
 	e.exportGeometryFiniteVolumeGrid(&bunny, "bunnyFVs");*/
 
+	/*
+	float errPrev, err, EOC;
+	for (uint i = 1; i < 4; i++) {
+		if (i > 1) errPrev = err;
 
-	SurfaceEvolutionSolver sphereTest(0.000625f, 0.06f, -1, ElementType::tri, nullptr, "testSphere", true, true);
+		float dt = 0.01f / pow(4, i);
+		SurfaceEvolutionSolver sphereTest(dt, 0.06f, i, ElementType::tri, "testSphere(" + std::to_string(i) + ")");
+		err = sphereTest.sphereTestL2Error;
+
+		if (i > 1) {
+			EOC = log2(err / errPrev);
+			std::cout << "EOC = " << EOC << std::endl;
+		}
+	}*/
+	
+	uint i = 3;
+	float dt = 0.01f / pow(4, i);
+	SurfaceEvolutionSolver sphereTest(dt, 0.06f, i, ElementType::tri, "testSphere");
 
 	/*
 	IcoSphere is = IcoSphere(1, 50);
