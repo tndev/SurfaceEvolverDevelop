@@ -40,6 +40,7 @@
 // - test if grid gradient is computed correctly by exporting to a vtk vector file.
 // - finite volume normal derivatives (Laplace-Beltrami)
 // - compose a linear system for evolution from CubeSphere to PrimitiveBox of the same subdivision level
+// - mean curvature flow for sphere test (cotan scheme)
 
 //  POSTPONED:
 //
@@ -62,11 +63,12 @@
 
 //   WIP:
 // 
-// - mean curvature flow for sphere test (cotan scheme)
+// - fix lagging numerical solution for sphere test
 
 
 //   TODO:
 //
+// - clear all generated files & keep only those relevant for the thesis
 // - quad co-volume scheme
 // - mean curvature flow for sphere test (quad scheme)
 // - mean curvature flow for sphere test (tri interp scheme)
@@ -128,6 +130,31 @@ void performSDFTest(uint res, Geometry& g, std::fstream& timing, VTKExporter& e)
 	FSerror_r.exportToVTI("voxField_" + g.name + std::to_string(res) + "FS_ERROR_resized");
 	FSerror.exportToVTI("voxField_" + g.name + std::to_string(res) + "FS_ERROR");
 	AABBerror.exportToVTI("voxField_" + g.name + std::to_string(res) + "AABB_ERROR");
+}
+
+
+void performUnitSphereTest() {
+	std::fstream errLog("testSphere_errorLog.txt", std::fstream::out);
+	errLog << "================================\n";
+	errLog << ">>> Evolution error log ........\n";
+	float errPrev, err, EOC;
+	for (uint i = 0; i < 4; i++) {
+		if (i > 0) errPrev = err;
+
+		float dt = 0.01f / pow(4, i);
+		SurfaceEvolutionSolver sphereTest(dt, 0.06f, i + 1, ElementType::tri, "testSphere(" + std::to_string(i) + ")");
+		err = sphereTest.sphereTestL2Error;
+
+		errLog << "dt = " << dt << ", Nsteps = " << sphereTest.NSteps << ", Nverts = " << sphereTest.N << std::endl;
+		errLog << "L2Error = " << err;
+		if (i > 0) {
+			EOC = log2(errPrev / err);
+			std::cout << "EOC = " << EOC << std::endl;
+			errLog << ", EOC = " << EOC;
+		}
+		errLog << std::endl;
+	}
+	errLog.close();
 }
 
 
@@ -227,24 +254,12 @@ int main()
 	e.exportGeometryVertexNormals(&bunny, "bunnyNormals");
 	e.exportGeometryFiniteVolumeGrid(&bunny, "bunnyFVs");*/
 
-	/*
-	float errPrev, err, EOC;
-	for (uint i = 1; i < 4; i++) {
-		if (i > 1) errPrev = err;
+	// performUnitSphereTest();
 
-		float dt = 0.01f / pow(4, i);
-		SurfaceEvolutionSolver sphereTest(dt, 0.06f, i, ElementType::tri, "testSphere(" + std::to_string(i) + ")");
-		err = sphereTest.sphereTestL2Error;
-
-		if (i > 1) {
-			EOC = log2(err / errPrev);
-			std::cout << "EOC = " << EOC << std::endl;
-		}
-	}*/
-	
-	uint i = 3;
+	/**/
+	uint i = 2;
 	float dt = 0.01f / pow(4, i);
-	SurfaceEvolutionSolver sphereTest(dt, 0.06f, i, ElementType::tri, "testSphere");
+	SurfaceEvolutionSolver sphereTest(dt, 0.06f, i, ElementType::tri, "testSphere", false, false, true);
 
 	/*
 	IcoSphere is = IcoSphere(1, 50);

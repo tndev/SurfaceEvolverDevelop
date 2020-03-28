@@ -102,7 +102,7 @@ void SurfaceEvolutionSolver::getTriangleEvolutionSystem(
 			evolvedSurface->uniqueVertices[i].z
 		);
 
-		float eps = 1.0f;
+		double eps = 1.0;
 		// SDF interpolation from values surrounding V
 		std::vector<Vector3> positionBuffer = {};
 		std::vector<float> valueBuffer = {};
@@ -156,10 +156,10 @@ void SurfaceEvolutionSolver::getTriangleEvolutionSystem(
 		}
 
 		// diag:
-		SysMatrix[i][i] *= (dt * eps) / (2.0 * coVolArea); 
+		SysMatrix[i][i] *= ((double)dt * eps) / (2.0 * coVolArea); 
 		SysMatrix[i][i] += 1.0;
 		// off-diag:
-		for (uint p = 0; p < m; p++) SysMatrix[i][adjacentPolys[i][p][1]] *= -(dt * eps) / (2.0 * coVolArea);
+		for (uint p = 0; p < m; p++) SysMatrix[i][adjacentPolys[i][p][1]] *= -((double)dt * eps) / (2.0 * coVolArea);
 
 		// tangential redist:
 		float vT = this->tangentialVelocitForVertex(Fi, i);
@@ -584,6 +584,13 @@ void SurfaceEvolutionSolver::init()
 	if (type == ElementType::tri) {
 		uint n = subdiv;
 		evolvedSurface = new IcoSphere(n, r);
+
+		/*
+		// Test cube
+		float a = 2.0f / sqrt(3.0f);
+		evolvedSurface = new PrimitiveBox(a, a, a, 1, 1, 1, false);
+		Matrix4 M0 = Matrix4().makeTranslation(-0.5f * a, -0.5f * a, -0.5f * a);
+		evolvedSurface->applyMatrix(M0);*/
 	}
 	else {
 		uint n = std::ceil(1.5 * subdiv);
@@ -653,7 +660,6 @@ void SurfaceEvolutionSolver::evolve()
 		std::chrono::duration<float> elapsedPseudoNormals = (endPseudoNormals - startPseudoNormals);
 		// ========================================>
 		
-
 
 		fvAreas.clear();
 		std::vector<std::vector<Vector3>> fvVerts = {};
@@ -734,9 +740,9 @@ void SurfaceEvolutionSolver::evolve()
 		}
 
 		if (sphereTest) {
-			float stepError = dt * this->getSphereStepL2Error(t);
-			if (printStepOutput) std::cout << "step " << ti << " L2 error: " << stepError << std::endl;
-			log << "step " << ti << " L2 error: " << stepError << std::endl;
+			float stepError = this->getSphereStepL2Error(t);
+			if (printStepOutput) std::cout << "step " << ti << " error: " << sqrt(stepError) << std::endl;
+			log << "step " << ti << " error: " << sqrt(stepError) << std::endl;
 			sphereTestL2Error += stepError;
 		}
 
@@ -754,9 +760,13 @@ void SurfaceEvolutionSolver::evolve()
 			"evolution step total: " + std::to_string(elapsedPseudoNormals.count() + elapsedPseudoNormals.count() + elapsedFillMatrix.count() + elapsedLinSolve.count() + elapsedUpdate.count()) + " s\n";
 		if (printStepOutput) std::cout << time_log << std::endl;
 		log << time_log;
+
+		// ========= E N D =========================
 	}
 
 	if (sphereTest) {
+		sphereTestL2Error *= dt;
+		sphereTestL2Error = sqrt(sphereTestL2Error);
 		std::cout << "total L2 Error: " << sphereTestL2Error << std::endl;
 		log << "total L2 Error: " << sphereTestL2Error << std::endl;
 	}
@@ -764,18 +774,35 @@ void SurfaceEvolutionSolver::evolve()
 	log.close();
 }
 
-float SurfaceEvolutionSolver::getSphereStepL2Error(float t)
+
+float SurfaceEvolutionSolver::getSphereStepError(float t)
 {
 	// r(t) = sqrt(r0 * r0 - 4 * t);
 	// error for step t is the norm of the difference (Fi - center) - r(t), weighted by the vertex co-volume area
 	// summed through all vertices, of course
 
-	float FRadius;
+	float FRadius, rt = sqrt(r0 * r0 - 4 * t);
 	float result = 0.0f;
 
 	for (uint i = 0; i < N; i++) {
 		FRadius = (evolvedSurface->uniqueVertices[i] - center).length();
-		result += fabs(FRadius - sqrt(r0 * r0 - 4 * t)) * fvAreas[i];
+		result += fabs(FRadius - rt) * fvAreas[i];
+	}
+	return result;
+}
+
+float SurfaceEvolutionSolver::getSphereStepL2Error(float t)
+{
+	// r(t) = sqrt(r0 * r0 - 4 * t);
+	// error for step t is the square of the difference ((Fi - center) - r(t)), weighted by the vertex co-volume area
+	// summed through all vertices, of course
+
+	float FRadius, rt = sqrt(r0 * r0 - 4 * t);
+	float result = 0.0f;
+
+	for (uint i = 0; i < N; i++) {
+		FRadius = (evolvedSurface->uniqueVertices[i] - center).length();
+		result += (FRadius - rt) * (FRadius - rt) * fvAreas[i];
 	}
 	return result;
 }

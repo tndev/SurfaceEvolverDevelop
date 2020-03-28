@@ -57,9 +57,10 @@ private:
 	void exportGeometry(int step);
 	void exportTestGeometry(int step, float t); // exports an ico/quad sphere determined by r(t) = sqrt(r0 * r0 - 4 * t) for comparison
 
-	// returns a specialized L2error compared to a mean-curvature contracting sphere
+	// returns a specialized error compared to a mean-curvature contracting sphere
 	// with radius r(t) = sqrt(r0 * r0 - 4 * t)
 	float getSphereStepL2Error(float t);
+	float getSphereStepError(float t);
 public:
 	// params:
 	uint subdiv = 2; // initial sphere subdivision detail
