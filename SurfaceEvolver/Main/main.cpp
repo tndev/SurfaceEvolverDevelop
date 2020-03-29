@@ -142,7 +142,7 @@ void performUnitSphereTest() {
 		if (i > 0) errPrev = err;
 
 		float dt = 0.01f / pow(4, i);
-		SurfaceEvolutionSolver sphereTest(dt, 0.06f, i + 1, ElementType::tri, "testSphere(" + std::to_string(i) + ")");
+		SurfaceEvolutionSolver sphereTest(dt, 0.06f, i + 1, ElementType::tri, "testSphere", i, true);
 		err = sphereTest.sphereTestL2Error;
 
 		errLog << "dt = " << dt << ", Nsteps = " << sphereTest.NSteps << ", Nverts = " << sphereTest.N << std::endl;
@@ -254,21 +254,34 @@ int main()
 	e.exportGeometryVertexNormals(&bunny, "bunnyNormals");
 	e.exportGeometryFiniteVolumeGrid(&bunny, "bunnyFVs");*/
 
-	// performUnitSphereTest();
-
-	/**/
-	uint i = 2;
-	float dt = 0.01f / pow(4, i);
-	SurfaceEvolutionSolver sphereTest(dt, 0.06f, i, ElementType::tri, "testSphere", false, false, true);
+	performUnitSphereTest();
 
 	/*
-	IcoSphere is = IcoSphere(1, 50);
+	IcoSphere is(1, 1.0f);
 	e.initExport(&is, "icoSphere");
-	e.exportGeometryFiniteVolumeGrid(&is, "icoSphereFVs");
-	
-	CubeSphere cs = CubeSphere(3, 50);
-	e.initExport(&cs, "cubeSphere");
-	e.exportGeometryFiniteVolumeGrid(&cs, "cubeSphereFVs");*/
+	std::vector<std::vector<Vector3>> fvVerts = {};
+	std::vector<std::vector<std::vector<uint>>> adjacentPolys = {};
+	is.getVertexFiniteVolumes(&fvVerts, &adjacentPolys);
+	uint geomId = 0;
+	for (int i = 0; i < is.uniqueVertices.size(); i++) {
+		for (int j = 0; j < fvVerts[i].size(); j++) {
+			e.exportGeometryFiniteVolumeGrid(&is, fvVerts, adjacentPolys, "icoSphereFV_" + std::to_string(geomId), i, j);
+			if (i > 0) {
+				e.exportGeometryFiniteVolumeGrid(&is, fvVerts, adjacentPolys, "icoSphereFVs_" + std::to_string(geomId), i - 1, -1, true);
+			}
+			else {
+				Geometry empty = Geometry();
+				e.initExport(&empty, "icoSphereFVs_" + std::to_string(geomId));
+			}
+			std::cout << "triangle " << geomId << " exported" << std::endl;
+			geomId++;
+		}
+	}*/		
+
+	/*
+	uint i = 0;
+	float dt = 0.01f / pow(4, i);
+	SurfaceEvolutionSolver sphereTest(dt, 0.06f, i, ElementType::tri, "testSphere", false, false, true);*/
 
 	/*
 	Matrix4 sdfTransform = Matrix4().makeTranslation(0.5, 0.5, 0.5).multiply(Matrix4().setToScale(2.0f, 2.0f, 2.0f));

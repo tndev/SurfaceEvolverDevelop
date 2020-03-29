@@ -90,6 +90,9 @@ public:
 	// L2 error for numerical tests:
 	float sphereTestL2Error = 0.0f;
 
+	// id of the sphere test
+	int testId = -1;
+
 	std::string geomName = "";
 	std::string log_header = "";
 	std::string time_log = "";
@@ -100,7 +103,7 @@ public:
 	// ----- test and applied variants of evolver constructor respectively ---------
 	// sphere test evolution variant:
 	SurfaceEvolutionSolver(
-		float dt = 0.01f, float tStop = 1.0f, uint subdiv = 2, ElementType type = ElementType::tri, std::string name = "Sphere", 
+		float dt = 0.01f, float tStop = 1.0f, uint subdiv = 2, ElementType type = ElementType::tri, std::string name = "Sphere", int testId = -1,
 		bool saveStates = false, bool printHappenings = false, bool printStepOutput = false, bool printSolution = false);
 
 	// applied variant:

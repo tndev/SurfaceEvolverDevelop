@@ -154,32 +154,55 @@ void VTKExporter::exportGeometryVertexNormals(Geometry* object, std::string file
 	vtk.close();
 }
 
-void VTKExporter::exportGeometryFiniteVolumeGrid(Geometry* object, std::string filename)
+void VTKExporter::exportGeometryFiniteVolumeGrid(
+	Geometry* object, 
+	std::vector<std::vector<Vector3>>& fvVerts, std::vector<std::vector<std::vector<uint>>>& adjacentPolys, 
+	std::string filename, int vertId, int triId, bool fromStartToVertId)
 {
-	std::vector<std::vector<Vector3>> fvVerts = {};
-	std::vector<std::vector<std::vector<uint>>> adjacentPolys = {};
-	object->getVertexFiniteVolumes(&fvVerts, &adjacentPolys);
-
 	std::vector<Vector3>* uniqueVertices = &object->uniqueVertices;
 	size_t pointCount = uniqueVertices->size();
 	std::vector<Geometry> fvGeometries = {};
-	for (uint i = 0; i < fvVerts.size(); i++) {
+
+	uint i_min = ((vertId == -1 || fromStartToVertId) ? 0 : std::min(vertId, (int)fvVerts.size()));
+	uint i_max = (vertId == -1 ? fvVerts.size() : std::min(vertId + 1, (int)fvVerts.size()));
+
+	for (uint i = i_min; i < i_max; i++) {
 		Geometry fvGeom = Geometry();
 
 		fvGeom.uniqueVertices = { object->uniqueVertices[i] };
-		for (uint j = 0; j < fvVerts[i].size(); j += 2) {
-			fvGeom.uniqueVertices.push_back(fvVerts[i][j]);
-			fvGeom.uniqueVertices.push_back(fvVerts[i][j + 1]);
+		if (triId == -1 || triId == fvVerts[i].size() - 1) {
+			for (uint j = 0; j < fvVerts[i].size(); j += 2) {
+				fvGeom.uniqueVertices.push_back(fvVerts[i][j]);
+				fvGeom.uniqueVertices.push_back(fvVerts[i][j + 1]);
 
-			fvGeom.vertexIndices.push_back(0);
-			fvGeom.vertexIndices.push_back(j + 1);
-			fvGeom.vertexIndices.push_back(j + 2);
+				fvGeom.vertexIndices.push_back(0);
+				fvGeom.vertexIndices.push_back(j + 1);
+				fvGeom.vertexIndices.push_back(j + 2);
 
-			fvGeom.vertexIndices.push_back(0);
-			fvGeom.vertexIndices.push_back(j + 2);
-			fvGeom.vertexIndices.push_back((j + 3) % fvVerts[i].size());
+				fvGeom.vertexIndices.push_back(0);
+				fvGeom.vertexIndices.push_back(j + 2);
+				fvGeom.vertexIndices.push_back((j + 3) % fvVerts[i].size());
 
-			fvGeom.triangulations.push_back({ j, j + 1 });
+				if (triId == -1) {
+					fvGeom.triangulations.push_back({ j, j + 1 });
+				}
+				else {
+					fvGeom.triangulations.push_back({ j });
+					fvGeom.triangulations.push_back({ j + 1 });
+				}
+			}
+		}
+		else {
+			fvGeom.uniqueVertices.push_back(fvVerts[i][0]);
+			for (uint j = 0; j <= triId; j++) {
+				fvGeom.uniqueVertices.push_back(fvVerts[i][j + 1]);
+
+				fvGeom.vertexIndices.push_back(0);
+				fvGeom.vertexIndices.push_back(j + 1);
+				fvGeom.vertexIndices.push_back(j + 2);
+
+				fvGeom.triangulations.push_back({ j });
+			}
 		}
 
 		fvGeom.vertices = std::vector<float>(3 * fvGeom.vertexIndices.size());

@@ -150,16 +150,18 @@ void SurfaceEvolutionSolver::getTriangleEvolutionSystem(
 			// cotans:
 			float cotan1 = dot(*F1prev - Fi, *F1prev - *F2prev) / Area1;
 			float cotan2 = dot(Fi - *F2, *F1 - *F2) / Area2;
+			float cotan1main = dot(Fi - *F1, *F2 - *F1) / Area2;
+			float cotan2main = dot(*F1 - *F2, Fi - *F2) / Area2;
 
-			SysMatrix[i][i] += 0.5 * ((double)cotan1 + (double)cotan2);
+			SysMatrix[i][i] += 0.5 * ((double)cotan1main + (double)cotan2main);
 			SysMatrix[i][adjacentPolys[i][p][1]] += 0.5 * ((double)cotan1 + (double)cotan2);
 		}
 
 		// diag:
-		SysMatrix[i][i] *= ((double)dt * eps) / (2.0 * coVolArea); 
+		SysMatrix[i][i] *= ((double)dt * eps) / coVolArea; 
 		SysMatrix[i][i] += 1.0;
 		// off-diag:
-		for (uint p = 0; p < m; p++) SysMatrix[i][adjacentPolys[i][p][1]] *= -((double)dt * eps) / (2.0 * coVolArea);
+		for (uint p = 0; p < m; p++) SysMatrix[i][adjacentPolys[i][p][1]] *= -((double)dt * eps) / coVolArea;
 
 		// tangential redist:
 		float vT = this->tangentialVelocitForVertex(Fi, i);
@@ -494,7 +496,7 @@ void SurfaceEvolutionSolver::updateGeometry(double* Fx, double* Fy, double* Fz)
 void SurfaceEvolutionSolver::exportGeometry(int step)
 {
 	VTKExporter e = VTKExporter();
-	e.initExport(evolvedSurface, geomName + "_" + std::to_string(step));
+	e.initExport(evolvedSurface, geomName + (testId == -1 ? ""  : ("(" + std::to_string(testId) + ")")) + "_" + std::to_string(step));
 }
 
 void SurfaceEvolutionSolver::exportTestGeometry(int step, float t)
@@ -510,7 +512,7 @@ void SurfaceEvolutionSolver::exportTestGeometry(int step, float t)
 		uint n = 5;
 		sg = CubeSphere(n, r);
 	}
-	e.initExport(&sg, "exactSphere_" + std::to_string(step));
+	e.initExport(&sg, "exactSphere_" + (testId == -1 ? "" : ("(" + std::to_string(testId) + ")")) + "_" + std::to_string(step));
 }
 
 // ====== end solver stuff ================================
@@ -523,7 +525,7 @@ SurfaceEvolutionSolver::SurfaceEvolutionSolver()
 //
 SurfaceEvolutionSolver::SurfaceEvolutionSolver(
 	float dt, float tStop, uint subdiv, ElementType type, 
-	std::string name, bool saveStates, bool printHappenings, bool printStepOutput, bool printSolution)
+	std::string name, int testId, bool saveStates, bool printHappenings, bool printStepOutput, bool printSolution)
 {
 	// ===== Evolution params ==============================
 	this->saveStates = saveStates; this->printSolution = printSolution;
@@ -531,6 +533,7 @@ SurfaceEvolutionSolver::SurfaceEvolutionSolver(
 	this->sphereTest = true; 
 	this->meanCurvatureFlow = true;
 	this->geomName = name;
+	this->testId = testId;
 
 	this->subdiv = subdiv;
 	this->NSteps = std::floor(tStop / dt);	
@@ -584,13 +587,6 @@ void SurfaceEvolutionSolver::init()
 	if (type == ElementType::tri) {
 		uint n = subdiv;
 		evolvedSurface = new IcoSphere(n, r);
-
-		/*
-		// Test cube
-		float a = 2.0f / sqrt(3.0f);
-		evolvedSurface = new PrimitiveBox(a, a, a, 1, 1, 1, false);
-		Matrix4 M0 = Matrix4().makeTranslation(-0.5f * a, -0.5f * a, -0.5f * a);
-		evolvedSurface->applyMatrix(M0);*/
 	}
 	else {
 		uint n = std::ceil(1.5 * subdiv);
