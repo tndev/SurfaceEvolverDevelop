@@ -41,6 +41,8 @@
 // - finite volume normal derivatives (Laplace-Beltrami)
 // - compose a linear system for evolution from CubeSphere to PrimitiveBox of the same subdivision level
 // - mean curvature flow for sphere test (cotan scheme)
+// - fix lagging numerical solution for sphere test
+// - test evolution without tangential redistribution on different objects
 
 //  POSTPONED:
 //
@@ -63,7 +65,7 @@
 
 //   WIP:
 // 
-// - fix lagging numerical solution for sphere test
+// - test a non-convex model (e.g.: bunny)
 
 
 //   TODO:
@@ -254,7 +256,38 @@ int main()
 	e.exportGeometryVertexNormals(&bunny, "bunnyNormals");
 	e.exportGeometryFiniteVolumeGrid(&bunny, "bunnyFVs");*/
 
-	performUnitSphereTest();
+	// performUnitSphereTest();
+
+	/**/
+	std::string name = "testBox";
+	PrimitiveBox b = PrimitiveBox(100, 100, 100, 3, 3, 3, true, name);
+	Vector3 axis = Vector3(1, 1, 1);
+	axis.normalize();
+	Matrix4 M = Matrix4().makeRotationAxis(axis.x, axis.y, axis.z, M_PI / 6);
+	b.applyMatrix(M);
+	e.initExport(&b, name);
+	uint res = 27; // octree resolution
+	SDF boxSDF = SDF(&b, res, true, true);
+	boxSDF.exportGrid(&e, "boxSDF");
+	boxSDF.exportGradientField(&e, "boxSDF_Grad");
+
+	float dt = 0.03f;
+	SurfaceEvolutionSolver evolver(dt, 50, (uint)4, ElementType::tri, &b, boxSDF.grid, name, true, true, true, true, true);	
+
+	/*
+	std::string name = "testEllipsoid";
+	// CubeSphere cs = CubeSphere(10, 50.0f, true, name);
+	IcoSphere is = IcoSphere(3, 50.0f, name);
+	Matrix4 M = Matrix4().setToScale(1.5f, 1.0f, 1.0f);
+	//cs.applyMatrix(M);
+	e.initExport(&is, name);
+	uint res = 60; // octree resolution
+	SDF csSDF = SDF(&is, res, true, true);
+	//csSDF.exportGrid(&e, name + "SDF");
+	//csSDF.exportGradientField(&e, name + "SDF_Grad");
+
+	float dt = 0.03f;
+	SurfaceEvolutionSolver evolver(dt, 120, (uint)3, ElementType::tri, &is, csSDF.grid, name, true, true, true, true, true);*/
 
 	/*
 	IcoSphere is(1, 1.0f);

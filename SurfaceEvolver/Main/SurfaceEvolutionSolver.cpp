@@ -37,7 +37,7 @@ void SurfaceEvolutionSolver::getInterpolatedSDFValuesforVertex(
 	Vector3* V, float* SDF_V, Vector3* gradSDF_V, std::vector<Vector3>& positionBuffer, std::vector<float>& valueBuffer)
 {
 	const uint Nx = sdfGrid->Nx, Ny = sdfGrid->Ny, Nz = sdfGrid->Nz;
-	float gradSDFx_V, gradSDFy_V, gradSDFz_V;
+	float gradSDFx_V, gradSDFy_V, gradSDFz_V, norm;
 	// SDF value
 	positionBuffer.clear(); // for old min and max positions
 	valueBuffer.clear(); // for SDF cell vertex values
@@ -63,7 +63,9 @@ void SurfaceEvolutionSolver::getInterpolatedSDFValuesforVertex(
 	sdfGrid->getSurroundingCells(*V, Nx - 2, Ny - 2, Nz - 2, sdfGrid->gradFieldZ, &positionBuffer, &valueBuffer);
 	gradSDFz_V = trilinearInterpolate(*V, positionBuffer, valueBuffer);
 
-	gradSDF_V->set(gradSDFx_V, gradSDFy_V, gradSDFz_V);
+	norm = sqrt(gradSDFx_V * gradSDFx_V + gradSDFy_V * gradSDFy_V + gradSDFz_V * gradSDFz_V);
+
+	gradSDF_V->set(gradSDFx_V / norm, gradSDFy_V / norm, gradSDFz_V / norm);
 }
 
 float SurfaceEvolutionSolver::tangentialVelocitForVertex(Vector3& V, uint i)
@@ -73,14 +75,14 @@ float SurfaceEvolutionSolver::tangentialVelocitForVertex(Vector3& V, uint i)
 
 float SurfaceEvolutionSolver::laplaceBeltramiCtrlFunc(float& SDF_V)
 {
-	// C1 = 1.0f; C2 = 1.0f;
-	// return C1 * (1.0f - exp(SDF_V * SDF_V / C2);
-	return 1.0f;
+	float C1 = 1.0f, C2 = 1.0f;
+	return C1 * (1.0f - exp(-(SDF_V * SDF_V) / C2));
+	// return 1.0f;
 }
 
 float SurfaceEvolutionSolver::etaCtrlFunc(float& SDF_V, Vector3& gradSDF_V, Vector3& nV)
 {
-	float C = 0.0f;
+	float C = -1.0f;
 	float gradDotN = dot(gradSDF_V, nV);
 	return SDF_V * (fabs(gradDotN) + sqrt(1 - gradDotN * gradDotN)) * C;
 }
@@ -106,7 +108,7 @@ void SurfaceEvolutionSolver::getTriangleEvolutionSystem(
 		// SDF interpolation from values surrounding V
 		std::vector<Vector3> positionBuffer = {};
 		std::vector<float> valueBuffer = {};
-		float SDF_V, gradSDFx_V, gradSDFy_V, gradSDFz_V; Vector3 gradSDF_V = Vector3();
+		float SDF_V; Vector3 gradSDF_V = Vector3();
 
 		if (!meanCurvatureFlow) {
 			this->getInterpolatedSDFValuesforVertex(&Fi, &SDF_V, &gradSDF_V, positionBuffer, valueBuffer);
@@ -169,9 +171,9 @@ void SurfaceEvolutionSolver::getTriangleEvolutionSystem(
 		// grad dist func:
 		float eta = ( meanCurvatureFlow ? 0.0f : this->etaCtrlFunc(SDF_V, gradSDF_V, vNormals[i]) );
 
-		sysRhsX[i] = (double)Fi.x + (double)dt * eta + (double)dt * vT;
-		sysRhsY[i] = (double)Fi.y + (double)dt * eta + (double)dt * vT;
-		sysRhsZ[i] = (double)Fi.z + (double)dt * eta + (double)dt * vT;
+		sysRhsX[i] = (double)Fi.x + (double)dt * eta * vNormals[i].x + (double)dt * vT;
+		sysRhsY[i] = (double)Fi.y + (double)dt * eta * vNormals[i].y + (double)dt * vT;
+		sysRhsZ[i] = (double)Fi.z + (double)dt * eta * vNormals[i].z + (double)dt * vT;
 
 		if (sphereTest) fvAreas.push_back(coVolArea); // save areas as weights for numerical tests
 	}
@@ -222,9 +224,9 @@ void SurfaceEvolutionSolver::getQuadEvolutionSystem(
 		// grad dist func:
 		float eta = this->etaCtrlFunc(SDF_V, gradSDF_V, vNormals[i]);
 
-		sysRhsX[i] += (double)Fi.x + (double)dt * eta + (double)dt * vT;
-		sysRhsY[i] += (double)Fi.y + (double)dt * eta + (double)dt * vT;
-		sysRhsZ[i] += (double)Fi.z + (double)dt * eta + (double)dt * vT;
+		sysRhsX[i] += (double)Fi.x + (double)dt * eta * vNormals[i].x + (double)dt * vT;
+		sysRhsY[i] += (double)Fi.y + (double)dt * eta * vNormals[i].y + (double)dt * vT;
+		sysRhsZ[i] += (double)Fi.z + (double)dt * eta * vNormals[i].z + (double)dt * vT;
 	}
 }
 
@@ -549,23 +551,28 @@ SurfaceEvolutionSolver::SurfaceEvolutionSolver(
 // ========= applied evolve constructor ============
 //
 SurfaceEvolutionSolver::SurfaceEvolutionSolver(
-	float dt, float tStop, int NSteps, uint subdiv, ElementType type,
-	Grid* sdfGrid, std::string name, bool saveStates, bool printHappenings, bool printStepOutput, bool printSolution)
+	float dt, int NSteps, uint subdiv, ElementType type,
+	Geometry* targetGeom, Grid* sdfGrid, std::string name, float r0, 
+	bool saveStates, bool printHappenings, bool printStepOutput, bool printSolution)
 {
 	// ===== Evolution params ==============================
-	this->saveStates = saveStates; this->printSolution = printSolution;
-	this->printHappenings = printHappenings; this->printStepOutput = printStepOutput;
+	this->saveStates = saveStates;
+	this->printHappenings = printHappenings;
+	this->printStepOutput = printStepOutput; 
+	this->printSolution = printSolution;
 	this->sphereTest = false;
 	this->meanCurvatureFlow = (sdfGrid == nullptr);
 	this->geomName = name;
 	
 	this->subdiv = subdiv;
-	if (NSteps < 0) this->NSteps = std::floor(tStop / dt);
-	else this->NSteps = NSteps;	
+	this->NSteps = NSteps;	
 
-	this->dt = dt; this->tStop = tStop;
+	this->dt = dt; 
+	this->tStop = NSteps * dt;
 	this->sdfGrid = sdfGrid;
+	this->targetGeom = targetGeom;
 	this->type = type;
+	this->r0 = r0;
 	// -----------------------------------------------------
 
 	this->init();
@@ -583,7 +590,7 @@ void SurfaceEvolutionSolver::init()
 	// ===== Preparing a source geometry for immersion =====
 	// -----------------------------------------------------
 	// radius
-	float r = (meanCurvatureFlow ? r0 : 0.499f * std::min({ sdfGrid->scale.x, sdfGrid->scale.y, sdfGrid->scale.z }));
+	float r = (meanCurvatureFlow ? r0 : 0.4f * std::min({ sdfGrid->scale.x, sdfGrid->scale.y, sdfGrid->scale.z }));
 	if (type == ElementType::tri) {
 		uint n = subdiv;
 		evolvedSurface = new IcoSphere(n, r);
@@ -592,7 +599,7 @@ void SurfaceEvolutionSolver::init()
 		uint n = std::ceil(1.5 * subdiv);
 		evolvedSurface = new CubeSphere(n, r);
 	}
-	Box3 bbox = (meanCurvatureFlow ? evolvedSurface->getBoundingBox() : sdfGrid->bbox);
+	Box3 bbox = (meanCurvatureFlow || targetGeom != nullptr ? targetGeom->getBoundingBox() : sdfGrid->bbox);
 	this->center = bbox.getCenter();
 	Matrix4 M = Matrix4().makeTranslation(center.x, center.y, center.z);
 	evolvedSurface->applyMatrix(M);

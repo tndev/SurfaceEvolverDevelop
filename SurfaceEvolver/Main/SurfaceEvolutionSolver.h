@@ -84,6 +84,7 @@ public:
 	Grid* sdfGrid = nullptr; // signed distance function grid
 	ElementType type = ElementType::tri;
 
+	Geometry* targetGeom = nullptr;
 	// result (iterated):
 	Geometry* evolvedSurface = nullptr;
 
@@ -107,11 +108,11 @@ public:
 		bool saveStates = false, bool printHappenings = false, bool printStepOutput = false, bool printSolution = false);
 
 	// applied variant:
-	// ( NSteps = -1 implies determining NSteps from tStop and dt )
 	SurfaceEvolutionSolver(
-		float dt = 0.01f, float tStop = 1.0f, int NSteps = -1, uint subdiv = 2, ElementType type = ElementType::tri,
-		Grid* sdfGrid = nullptr, std::string name = "Sphere",
+		float dt, int NSteps, uint subdiv, ElementType type = ElementType::tri,
+		Geometry* targetGeom = nullptr, Grid* sdfGrid = nullptr, std::string name = "Sphere", float r0 = 1.0f,
 		bool saveStates = false, bool printHappenings = false, bool printStepOutput = false, bool printSolution = false);
+
 	~SurfaceEvolutionSolver();
 
 	void init();

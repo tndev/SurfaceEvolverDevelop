@@ -47,6 +47,7 @@ public:
 	OctreeNode* root = nullptr;
 	AABBTree* aabbTree = nullptr;
 	Box3 cubeBox;
+	Box3 bbox;
 
 	uint depth = 0;
 	float leafSize = 1.0f;

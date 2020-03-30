@@ -30,13 +30,14 @@ public:
 	uint Nx, Ny, Nz; // index dims
 	Vector3 scale = Vector3(1.0f, 1.0f, 1.0f);
 	Box3 bbox;
+	Box3 cubeBox;
 
 	float min = 0.0f;
 	float max = 100.0f;
 
 	Grid();
 	Grid(const Grid& other);
-	Grid(uint Nx, uint Ny, uint Nz, Box3 bbox, bool addOffset = true, float initVal = LARGE_VAL);
+	Grid(uint Nx, uint Ny, uint Nz, Box3 bbox, Box3 cubeBox, float initVal = LARGE_VAL);
 	~Grid();
 	bool equalInDimTo(Grid& other);
 
@@ -53,6 +54,8 @@ public:
 	void negate();
 	void computeSignField(AABBTree* aabb);
 	void computeGradient();
+	void expand(float initVal = LARGE_VAL);
+	void clip(Box3& targetBox);
 
 	bool hasGradient();
 
@@ -64,7 +67,7 @@ public:
 	void scaleBy(Vector3& s);
 
 	// fraction of the scale with which the grid should exceed the mesh bbox
-	float max_offset_factor = 0.25;
+	float max_offset_factor = 1.0f;
 	void getSurroundingCells(Vector3& pos,
 		uint oldNx, uint oldNy, uint oldNz, float* oldField,
 		std::vector<Vector3>* positionBuffer, std::vector<float>* valueBuffer);

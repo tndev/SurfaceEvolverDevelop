@@ -192,11 +192,14 @@ Octree::Octree(const Octree& other)
 
 Octree::Octree(AABBTree* aabbTree, Box3 bbox, uint resolution)
 {
+	this->bbox = bbox;
 	Vector3 size = bbox.getSize();
 	float maxDim = std::max({ size.x, size.y, size.z });
 
 	// this cube box will be subdivided
 	Box3 cubeBox = Box3(bbox.min, bbox.min + Vector3(maxDim, maxDim, maxDim));
+	cubeBox.expandByFactor(1.1f);
+	this->bbox.expandByFactor(1.1f);
 
 	this->leafSize = maxDim / resolution;
 	this->cubeBox = cubeBox;
@@ -313,7 +316,7 @@ void Octree::setLeafValueToScalarGrid(Grid* grid)
 	size_t NLeaves = boxBuffer.size();
 	uint Nx = grid->Nx, Ny = grid->Ny, Nz = grid->Nz;
 	float scaleX = grid->scale.x, scaleY = grid->scale.y, scaleZ = grid->scale.z;
-	float gMinX = grid->bbox.min.x, gMinY = grid->bbox.min.y, gMinZ = grid->bbox.min.z;
+	float gMinX = grid->cubeBox.min.x, gMinY = grid->cubeBox.min.y, gMinZ = grid->cubeBox.min.z;
 	
 	uint ix, iy, iz, gridPos;
 
@@ -327,6 +330,9 @@ void Octree::setLeafValueToScalarGrid(Grid* grid)
 		grid->field[gridPos] = valueBuffer[i];
 		grid->frozenCells[gridPos] = true; // freeze initial condition
 	}
+
+	Box3 targetBox = bbox;
+	grid->clip(targetBox);
 }
 
 void Octree::setConstantValueToScalarGrid(Grid* grid, float value)
@@ -342,7 +348,7 @@ void Octree::setConstantValueToScalarGrid(Grid* grid, float value)
 
 	uint Nx = grid->Nx, Ny = grid->Ny, Nz = grid->Nz;
 	float scaleX = grid->scale.x, scaleY = grid->scale.y, scaleZ = grid->scale.z;
-	float gMinX = grid->bbox.min.x, gMinY = grid->bbox.min.y, gMinZ = grid->bbox.min.z;
+	float gMinX = grid->cubeBox.min.x, gMinY = grid->cubeBox.min.y, gMinZ = grid->cubeBox.min.z;
 
 	grid->max = grid->max < value ? value + 1 : grid->max;
 
@@ -358,6 +364,9 @@ void Octree::setConstantValueToScalarGrid(Grid* grid, float value)
 		grid->field[gridPos] = value;
 		grid->frozenCells[gridPos] = true; // freeze initial condition
 	}
+
+	Box3 targetBox = bbox;
+	grid->clip(targetBox);
 }
 
 void Octree::applyMatrix(Matrix4& m)

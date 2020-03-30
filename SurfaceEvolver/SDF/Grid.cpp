@@ -43,24 +43,12 @@ Grid::Grid(const Grid& other)
 	this->max = other.max;
 }
 
-Grid::Grid(uint Nx, uint Ny, uint Nz, Box3 bbox, bool addOffset, float initVal)
+Grid::Grid(uint Nx, uint Ny, uint Nz, Box3 bbox, Box3 cubeBox, float initVal)
 {
-	// re-scale to fit the rest of the field
+	this->cubeBox = cubeBox;
 	this->bbox = bbox;
-	if (addOffset) {
-		Vector3 origScale = bbox.getSize();
-		float offset = max_offset_factor * std::fmaxf(origScale.x, std::fmaxf(origScale.y, origScale.z));
-		this->bbox.expandByOffset(offset);
-		Vector3 newScale = this->bbox.getSize();
-		this->Nx = (uint)std::floor((1.0f + 2.0f * max_offset_factor) * Nx);
-		this->Ny = (uint)std::floor((1.0f + 2.0f * max_offset_factor) * Ny);
-		this->Nz = (uint)std::floor((1.0f + 2.0f * max_offset_factor) * Nz);
-		this->scale = newScale;
-	}
-	else {
-		this->scale = bbox.getSize();
-		this->Nx = Nx; this->Ny = Ny; this->Nz = Nz;
-	}
+	this->scale = this->cubeBox.getSize();
+	this->Nx = Nx; this->Ny = Ny; this->Nz = Nz;
 
 	uint i; this->gridExtent = this->Nx * this->Ny * this->Nz;
 	this->field = new float[gridExtent];
@@ -439,6 +427,135 @@ void Grid::computeGradient()
 	}
 }
 
+void Grid::expand(float initVal)
+{
+	// re-scale to fit the rest of the field
+	Vector3 origScale = bbox.getSize();
+	float offset = max_offset_factor * std::fmaxf(origScale.x, std::fmaxf(origScale.y, origScale.z));
+	Box3 newBBox = Box3(this->bbox);
+	newBBox.expandByOffset(offset);
+	Vector3 newScale = newBBox.getSize();
+
+	float cellSize = origScale.x / Nx;
+	uint Nx_new = (uint)std::floor(newScale.x / cellSize);
+	uint Ny_new = (uint)std::floor(newScale.y / cellSize);
+	uint Nz_new = (uint)std::floor(newScale.z / cellSize);
+
+	uint gridExtent_new = Nx_new * Ny_new * Nz_new;
+
+	int ix, iy, iz, i, j, k, gridPosOld, gridPosNew;
+
+	float* newField = new float[gridExtent_new];
+	bool* newFrozenCells = new bool[gridExtent_new];
+
+	// initialize larger grid
+	for (i = 0; i < gridExtent_new; i++) {
+		newField[i] = initVal;
+		newFrozenCells[i] = false;
+	}
+
+	// find bounds of the old grid:
+	uint ix_min = (uint)std::floor(offset * Nx_new / newScale.x);
+	uint iy_min = (uint)std::floor(offset * Ny_new / newScale.y);
+	uint iz_min = (uint)std::floor(offset * Nz_new / newScale.z);
+
+	uint ix_Max = ix_min + Nx;
+	uint iy_Max = iy_min + Ny;
+	uint iz_Max = iz_min + Nz;
+
+	i = 0;
+	for (iz = iz_min; iz < iz_Max; iz++) {
+		j = 0;
+		for (iy = iy_min; iy < iy_Max; iy++) {
+			k = 0;
+			for (ix = ix_min; ix < ix_Max; ix++) {
+
+				gridPosOld = Nx * Ny * i + Nx * j + k;
+				gridPosNew = Nx_new * Ny_new * iz + Nx_new * iy + ix;
+
+				newField[gridPosNew] = this->field[gridPosOld];
+				newFrozenCells[gridPosNew] = this->frozenCells[gridPosOld];
+				k++;
+			}
+			j++;
+		}
+		i++;
+	}
+
+	this->scale = newScale;
+
+	clearField();
+	clearFrozenCells();
+
+	this->Nx = Nx_new; this->Ny = Ny_new; this->Nz = Nz_new;
+	this->gridExtent = Nx * Ny * Nz;
+	this->bbox = newBBox;
+
+	this->field = new float[gridExtent];
+	this->frozenCells = new bool[gridExtent];
+
+	for (i = 0; i < gridExtent; i++) {
+		field[i] = newField[i]; frozenCells[i] = newFrozenCells[i];
+	}
+
+	delete[] newField;
+	delete[] newFrozenCells;
+}
+
+void Grid::clip(Box3& targetBox)
+{
+	Vector3 size = targetBox.getSize();
+	// resize within bounds
+	size.x = std::fminf(size.x, scale.x);
+	size.y = std::fminf(size.y, scale.y);
+	size.z = std::fminf(size.z, scale.z);
+	targetBox.setToSize(&size);
+
+	float cellSize = scale.x / Nx;
+
+	uint Nx_new = std::floor(size.x / cellSize);
+	uint Ny_new = std::floor(size.y / cellSize);
+	uint Nz_new = std::floor(size.z / cellSize);
+	uint gridExtent_new = Nx_new * Ny_new * Nz_new;
+
+	int ix, iy, iz, i, gridPosOld, gridPosNew;
+
+	float* newField = new float[gridExtent_new];
+	bool* newFrozenCells = new bool[gridExtent_new];
+
+	for (iz = 0; iz < Nz_new; iz++) {
+		for (iy = 0; iy < Ny_new; iy++) {
+			for (ix = 0; ix < Nx_new; ix++) {
+
+				gridPosOld = Nx * Ny * iz + Nx * iy + ix;
+				gridPosNew = Nx_new * Ny_new * iz + Nx_new * iy + ix;
+
+				newField[gridPosNew] = this->field[gridPosOld];
+				newFrozenCells[gridPosNew] = this->frozenCells[gridPosOld];
+			}
+		}
+	}
+
+	clearField();
+	clearFrozenCells();
+
+	this->Nx = Nx_new; this->Ny = Ny_new; this->Nz = Nz_new;
+	this->gridExtent = Nx * Ny * Nz;
+	this->bbox = Box3(targetBox);
+
+	this->field = new float[gridExtent];
+	this->frozenCells = new bool[gridExtent];
+
+	for (i = 0; i < gridExtent; i++) {
+		field[i] = newField[i]; frozenCells[i] = newFrozenCells[i];
+	}
+
+	this->scale = size;
+
+	delete[] newField;
+	delete[] newFrozenCells;
+}
+
 bool Grid::hasGradient()
 {
 	return (gradFieldX != nullptr && gradFieldY != nullptr && gradFieldZ != nullptr && gradExtent > 0);
@@ -700,8 +817,6 @@ Vector3 Grid::grad(Vector3& p, Vector3& dXYZ, std::vector<Vector3>* positionBuff
 	valueBuffer->push_back(field[i101]);
 	valueBuffer->push_back(field[i011]);
 	valueBuffer->push_back(field[i111]);
-
-
 
 	return gradf_p;
 }

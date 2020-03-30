@@ -57,8 +57,9 @@ SDF::SDF(Geometry* geom, uint resolution, bool computeSign, bool computeGradient
 		if (scaleAndInterpolate && resolution > this->resolution_limit) {
 			auto startSDF_FS = std::chrono::high_resolution_clock::now();
 
-			this->grid = new Grid(this->resolution_limit, this->resolution_limit, this->resolution_limit, this->octree->cubeBox);
+			this->grid = new Grid(this->resolution_limit, this->resolution_limit, this->resolution_limit, this->octree->bbox, this->octree->cubeBox);
 			this->octree->setLeafValueToScalarGrid(this->grid);
+			this->grid->expand();
 			this->fastSweep = new FastSweep3D(this->grid, 8, saveGridStates);
 
 			auto endSDF_FS = std::chrono::high_resolution_clock::now();
@@ -86,9 +87,13 @@ SDF::SDF(Geometry* geom, uint resolution, bool computeSign, bool computeGradient
 		}
 		else {
 			auto startSDF_FS = std::chrono::high_resolution_clock::now();
+			
+			VTKExporter exporter = VTKExporter();
 
-			this->grid = new Grid(resolution, resolution, resolution, this->octree->cubeBox);
+			this->grid = new Grid(resolution, resolution, resolution, this->octree->bbox, this->octree->cubeBox);
 			this->octree->setLeafValueToScalarGrid(this->grid);
+			
+			this->grid->expand();
 			this->fastSweep = new FastSweep3D(this->grid, 8, saveGridStates);
 
 			auto endSDF_FS = std::chrono::high_resolution_clock::now();
@@ -133,8 +138,9 @@ SDF::SDF(Geometry* geom, uint resolution, bool computeSign, bool computeGradient
 		float maxDim = std::max({ size.x, size.y, size.z });
 		Box3 cubeBox = Box3(bbox.min, bbox.min + Vector3(maxDim, maxDim, maxDim));
 
-		this->grid = new Grid(resolution, resolution, resolution, cubeBox);
+		this->grid = new Grid(resolution, resolution, resolution, bbox, cubeBox);
 		auto startSDF_Lookup = std::chrono::high_resolution_clock::now();
+		this->grid->expand();
 		this->grid->aabbDistanceField(this->tri_aabb);
 		auto endSDF_Lookup = std::chrono::high_resolution_clock::now();
 		std::chrono::duration<float> elapsedSDF_Lookup = (endSDF_Lookup - startSDF_Lookup);
@@ -157,7 +163,8 @@ SDF::SDF(Geometry* geom, uint resolution, bool computeSign, bool computeGradient
 		float maxDim = std::max({ size.x, size.y, size.z });
 		Box3 cubeBox = Box3(bbox.min, bbox.min + Vector3(maxDim, maxDim, maxDim));
 
-		this->grid = new Grid(resolution, resolution, resolution, cubeBox);
+		this->grid = new Grid(resolution, resolution, resolution, bbox, cubeBox);
+		this->grid->expand();
 		this->grid->bruteForceDistanceField(geom);
 
 		auto endSDF = std::chrono::high_resolution_clock::now();
@@ -238,7 +245,7 @@ void SDF::applyMatrix(Matrix4& m)
 	this->octree = new Octree(this->tri_aabb, this->tri_aabb->bbox, resolution);
 
 	delete this->grid;
-	this->grid = new Grid(resolution, resolution, resolution, this->octree->cubeBox);
+	this->grid = new Grid(resolution, resolution, resolution, this->octree->bbox, this->octree->cubeBox);
 
 	this->octree->setLeafValueToScalarGrid(this->grid);
 	

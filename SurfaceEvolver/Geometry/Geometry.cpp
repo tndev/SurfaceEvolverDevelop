@@ -277,7 +277,7 @@ std::vector<Vector3> Geometry::getAngleWeightedVertexPseudoNormals()
 			vertexToTriangles.erase(it);
 			it = vertexToTriangles.find(*v);
 		}
-		result.push_back(pseudoNormal / (2 * M_PI));
+		result.push_back(normalize(pseudoNormal / (2 * M_PI)));
 	}
 
 	return result;
