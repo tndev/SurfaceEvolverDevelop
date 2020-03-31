@@ -229,8 +229,8 @@ int main()
 
 	// ===== BUNNY SDF tests =============================
 
-	/*
-	uint res = 27; // octree resolution
+	/**/
+	uint res = 50; // octree resolution
 
 	Vector3 axis = normalize(Vector3(1, 1, 1));
 	
@@ -253,12 +253,17 @@ int main()
 	bunny_sdf.exportGrid(&e, "bunnySDF");
 	bunny_sdf.exportGradientField(&e, "bunnySDF_grad");
 
+	// ====== BUNNY Evolution =============================
+	float dt = 0.03f;
+	SurfaceEvolutionSolver evolver(dt, 50, (uint)4, ElementType::tri, &bunny, bunny_sdf.grid, "evolvingBunny", true, true, true, true, true);
+	
+	/*
 	e.exportGeometryVertexNormals(&bunny, "bunnyNormals");
 	e.exportGeometryFiniteVolumeGrid(&bunny, "bunnyFVs");*/
 
 	// performUnitSphereTest();
 
-	/**/
+	/*
 	std::string name = "testBox";
 	PrimitiveBox b = PrimitiveBox(100, 100, 100, 3, 3, 3, true, name);
 	Vector3 axis = Vector3(1, 1, 1);
@@ -266,13 +271,14 @@ int main()
 	Matrix4 M = Matrix4().makeRotationAxis(axis.x, axis.y, axis.z, M_PI / 6);
 	b.applyMatrix(M);
 	e.initExport(&b, name);
-	uint res = 27; // octree resolution
+	uint res = 50; // octree resolution
 	SDF boxSDF = SDF(&b, res, true, true);
 	boxSDF.exportGrid(&e, "boxSDF");
 	boxSDF.exportGradientField(&e, "boxSDF_Grad");
 
 	float dt = 0.03f;
-	SurfaceEvolutionSolver evolver(dt, 50, (uint)4, ElementType::tri, &b, boxSDF.grid, name, true, true, true, true, true);	
+	SurfaceEvolutionSolver evolver(dt, 100, (uint)4, ElementType::tri, &b, boxSDF.grid, name, true, true, true, true, true);*/
+	
 
 	/*
 	std::string name = "testEllipsoid";
