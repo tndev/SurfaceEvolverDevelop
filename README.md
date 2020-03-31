@@ -42,7 +42,24 @@ Current WIP:
 ![bunnyDirection](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/EvolutionInBunyDirection3D.jpg)
 
 # 1.2 Evolution in the Normal Direction - Finite Volume Scheme for Laplace-Beltrami Operator and Mean Curvature Flow
+### Finite Volumes (cotan scheme)
 ![icoFVs](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/IcoSphereFVBuilding.gif)
-Finite Volumes (cotan scheme)
+
 #### Sphere Test:
 ![sphereTest](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/ShrinkingSphere.gif)
+
+# 1.3 Evolution in the Normal Direction - Using -grad(d(x)) to Control Evolution:
+### Ellipsoid:
+![sphereToEllipsoid](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/SphereToEllipsoidStatic.gif)
+
+### Cube:
+![sphereToCube](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/SphereToCubeEvolutionStatic.gif)
+
+### Rotated Cube:
+![sphereToRotatedCube](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/SphereToRotatedBox.gif)
+
+### Sphere to Sphere (Same tesselation):
+![sphereToSphere](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/SphereToSphereStatic.gif)
+
+### Bunny:
+![sphereToBunny](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/SphereToBunny.gif)
