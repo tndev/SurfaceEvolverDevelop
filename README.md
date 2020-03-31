@@ -11,7 +11,7 @@ Current WIP:
 
 ### ============ Progress So far ===============:
 
-# 1 Evolution In the Normal Direction - Distance Function
+# 1.1 Evolution In the Normal Direction - Distance Function
 
 #### 1. Take the input geometry & construct an AABB Tree
 ![AABBFull](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/BunnyAABBNodes.jpg)
@@ -40,5 +40,8 @@ Current WIP:
 #### Evolution will be carried out in the direction of `-grad(SDF(x,y,z))`:
 ![bunnyDirection](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/EvolutionInBunyDirection3D.jpg)
 
-## Time computation results for primitives:
-![primRes](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/primResultsAnim.gif)
+# 1.2 Evolution in the Normal Direction - Finite Volume Scheme for Laplace-Beltrami Operator and Mean Curvature Flow
+### Finite Volumes (cotan scheme):
+![icoFVs](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/IcoSphereFVBuilding.gif)
+#### Sphere Test:
+![sphereTest](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/ShrinkingSphere.gif)
