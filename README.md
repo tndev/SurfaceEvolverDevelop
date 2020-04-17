@@ -11,7 +11,7 @@ Current WIP:
 
 ### ============ Progress So far ===============:
 
-# 1 Evolution In the Normal Direction - Distance Function
+# 1.1 Evolution In the Normal Direction - Distance Function
 
 #### 1. Take the input geometry & construct an AABB Tree
 ![AABBFull](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/BunnyAABBNodes.jpg)
@@ -30,6 +30,7 @@ Current WIP:
 ![DF](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/BunnySDF_FS.jpg)
 ### Error :
 |MyMethodGrid(x,y,z) - BruteForceGrid(x,y,z)|
+
 ![error](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/BunnySDF_FS_Error.jpg)
 
 #### Sign is computed by negating the grid field d(x,y,z) and flood filling "unfrozen" voxels to set external sign > 0:
@@ -40,5 +41,39 @@ Current WIP:
 #### Evolution will be carried out in the direction of `-grad(SDF(x,y,z))`:
 ![bunnyDirection](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/EvolutionInBunyDirection3D.jpg)
 
-## Time computation results for primitives:
-![primRes](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/primResultsAnim.gif)
+# 1.2 Evolution in the Normal Direction - Finite Volume Scheme for Laplace-Beltrami Operator and Mean Curvature Flow
+### Finite Volumes (cotan scheme)
+![icoFVs](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/IcoSphereFVBuilding.gif)
+
+#### Sphere Test:
+```
+================================
+>>> Evolution error log ........
+dt = 0.01, Nsteps = 6, Nverts = 42
+L2Error = 0.00306691
+dt = 0.0025, Nsteps = 24, Nverts = 162
+L2Error = 0.000867556, EOC = 1.82176
+dt = 0.000625, Nsteps = 96, Nverts = 642
+L2Error = 0.000210643, EOC = 2.04216
+dt = 0.00015625, Nsteps = 384, Nverts = 2562
+L2Error = 5.1363e-05, EOC = 2.036
+```
+
+##### 
+![sphereTest](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/ShrinkingSphere.gif)
+
+# 1.3 Evolution in the Normal Direction - Using -grad(d(x)) to Control Evolution:
+### Ellipsoid:
+![sphereToEllipsoid](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/SphereToEllipsoidStatic.gif)
+
+### Cube:
+![sphereToCube](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/SphereToCubeEvolutionStatic.gif)
+
+### Rotated Cube:
+![sphereToRotatedCube](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/SphereToRotatedBox.gif)
+
+### Sphere to Sphere (Same tesselation):
+![sphereToSphere](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/SphereToSphereStatic.gif)
+
+### Bunny:
+![sphereToBunny](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/SphereToBunny.gif)
