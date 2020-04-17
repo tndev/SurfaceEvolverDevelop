@@ -24,24 +24,39 @@ private:
 	double* sysRhsY = nullptr;
 	double* sysRhsZ = nullptr;
 
-	// finite volume areas per vertex (vertices)
-	std::vector<float> fvAreas = {};
 	Vector3 center = Vector3(); // center of a test sphere geometry
+	
+	// mesh data
+	std::vector<float> fvAreas = {}; // vertex finite volume areas
+	std::vector<float> vCurvatures = {}; // vertex curvature scalars
+	std::vector<Vector3> vNormals = {}; // vertex normals
+	std::vector<float> vDistances = {}; // vertex distances to target mesh
+	std::vector<Vector3> vGradients = {}; // vertex gradients of distance func to target mesh
+	std::vector<float> vDotProducts = {}; // dot(-grad(SDF), N) for each vertex
+
+	// ====== evolution methods ==========
+	void init();
+	void evolve();
 
 	void clearSystem();
 	void initSystem();
 
 	void getInterpolatedSDFValuesforVertex(Vector3* V, float* SDF_V, Vector3* gradSDF_V, std::vector<Vector3>& positionBuffer, std::vector<float>& valueBuffer);
-	// TODO: Add redistribution terms (low prio)
 	float tangentialVelocitForVertex(Vector3& V, uint i);
+
+	void saveFVAreaScalars();
+	void saveInterpolatedSDFValues();
+	void saveInterpolatedDotValues();
+	void saveInterpolatedSDFGradients();
+
 	float laplaceBeltramiCtrlFunc(float& SDF_V);
 	float etaCtrlFunc(float& SDF_V, Vector3& gradSDF_V, Vector3& nV);
 
 	void getTriangleEvolutionSystem(
-		std::vector<Vector3>& vNormals,	std::vector<std::vector<Vector3>>& fvVerts, std::vector<std::vector<std::vector<uint>>>& adjacentPolys
+		std::vector<std::vector<Vector3>>& fvVerts, std::vector<std::vector<std::vector<uint>>>& adjacentPolys, float& meanArea
 	);
 	void getQuadEvolutionSystem(
-		std::vector<Vector3>& vNormals, std::vector<std::vector<Vector3>>& fvVerts, std::vector<std::vector<std::vector<uint>>>& adjacentPolys
+		std::vector<std::vector<Vector3>>& fvVerts, std::vector<std::vector<std::vector<uint>>>& adjacentPolys, float& meanArea
 	);
 	// solver helpers
 	void printArray1(std::string name, double* a, int printLim, bool inRow = true);
@@ -55,6 +70,7 @@ private:
 	// postproc
 	void updateGeometry(double* Fx, double* Fy, double* Fz);
 	void exportGeometry(int step);
+	void exportVectorStates(int step);
 	void exportTestGeometry(int step, float t); // exports an ico/quad sphere determined by r(t) = sqrt(r0 * r0 - 4 * t) for comparison
 
 	// returns a specialized error compared to a mean-curvature contracting sphere
@@ -67,10 +83,17 @@ public:
 	uint NSteps = 10; 
 	size_t N = 0;
 
-	bool saveStates = false;
+	// output flags:
+	bool saveStates = false; 
+	bool saveAreaStates = false;  
+	bool saveDistanceStates = false; 
+	bool saveGradientStates = false; 
+	bool saveCurvatureStates = false;
+
 	bool printHappenings = true; // general things happening output
 	bool printSolution = false; // whether to print Bi-CGStab solution output for each (xyz) component
 	bool printStepOutput = true; // time step output with time measurements etc.
+	bool timeLog = true; // whether to write a time log
 
 	// whether to compare evolution result with a mean-curvature contracting sphere and return an L2 error:
 	bool sphereTest = false;
@@ -78,6 +101,7 @@ public:
 
 	// flag whether to consider a signed distance function for evolution equation (automatically true when performing sphere test)
 	bool meanCurvatureFlow = false;
+	float rDecay = 1.0f; // radius for the mean curvature flow exponential decay parameter (C2 in eta(SDF))
 
 	float dt = 0.01f; // time step
 	float tStop = 1.0f; // evolution stopping time
@@ -104,19 +128,20 @@ public:
 	// ----- test and applied variants of evolver constructor respectively ---------
 	// sphere test evolution variant:
 	SurfaceEvolutionSolver(
-		float dt = 0.01f, float tStop = 1.0f, uint subdiv = 2, ElementType type = ElementType::tri, std::string name = "Sphere", int testId = -1,
-		bool saveStates = false, bool printHappenings = false, bool printStepOutput = false, bool printSolution = false);
+		float dt = 0.01f, float tStop = 1.0f, uint subdiv = 2, ElementType type = ElementType::tri, std::string name = "Sphere", 
+		float r0 = 1.0f, int testId = -1,
+		bool saveStates = false, bool printHappenings = false, bool printStepOutput = false, bool printSolution = false, bool timeLog = false
+	);
 
 	// applied variant:
 	SurfaceEvolutionSolver(
 		float dt, int NSteps, uint subdiv, ElementType type = ElementType::tri,
-		Geometry* targetGeom = nullptr, Grid* sdfGrid = nullptr, std::string name = "Sphere", float r0 = 1.0f,
-		bool saveStates = false, bool printHappenings = false, bool printStepOutput = false, bool printSolution = false);
+		Geometry* targetGeom = nullptr, Grid* sdfGrid = nullptr, std::string name = "Sphere",
+		bool saveStates = false, bool saveAreaStates = false, bool saveDistanceStates = false, bool saveGradientStates = false, bool saveCurvatureStates = false, 
+		bool printHappenings = false, bool printStepOutput = false,	bool printSolution = false, bool timeLog = false
+	);
 
 	~SurfaceEvolutionSolver();
-
-	void init();
-	void evolve();
 };
 
 #endif

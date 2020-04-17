@@ -58,6 +58,16 @@ struct Primitive {
 	float getMaxById(uint id); // returns coord of the highest feature vertex
 };
 
+struct VertexScalarData {
+	std::string name = "scalar_data";
+	std::vector<float> data = {};
+
+	VertexScalarData(std::vector<float>* data, std::string name = "scalar_data");
+	~VertexScalarData();
+
+	float& operator[](int i);
+};
+
 class Geometry
 {
 public:
@@ -71,6 +81,8 @@ public:
 	// [0, 1, 2, 0, 2, 3, ... ] (e.g.: quads are made of 2 consecutive triplets of vert indices)
 	std::vector<unsigned int> vertexIndices; // values correspond to the positions in uniqueVertices array;
 	std::vector<BufferGeom::Triangulation> triangulations; // each contains ids of triangles inside a polygon
+	std::vector<VertexScalarData> scalarTables = {}; // tables containing scalar data;
+
 
 	// TODO: tangents and uvs
 
@@ -83,12 +95,17 @@ public:
 	bool hasVertexIndices();
 	bool hasNormals();
 	bool hasTriangulations();
+	bool hasScalarData();
 
 	Box3 getBoundingBox(Box3 bbox = Box3(), Matrix4 matrix = Matrix4());
 	void computeNormals();
 	void computeTriangulations();
 	void fillVerticesFromUniqueVertices();
 
+	void setScalarData(std::vector<float>* data, std::string name = "scalar_data");
+	void clearScalarData();
+
+	// getters
 	std::vector<uint> getPolygonIndicesFromTriangulation(BufferGeom::Triangulation t);
 	std::vector<Vector3> getProjectionsAlongNormal(BufferGeom::Face& vertices); // TODO: use Vector2
 	std::vector<std::vector<uint>> getTriangulatedIndices(BufferGeom::Face& vertices);
@@ -107,10 +124,9 @@ public:
 	void getVertexToPolygonMap(std::multimap<Vector3, BufferGeom::TriWithMarkedVertex>* buffer);
 	// returns vertex ring corresponding to finite volume partitions of a ring of adjacent polygons
 	void getVertexFiniteVolumes(std::vector<std::vector<Vector3>>* vVolVerts, std::vector<std::vector<std::vector<uint>>>* adjacentPolyIds);
-
-	void applyMatrix(Matrix4 m);
 	Vector3 getNormal(BufferGeom::Face f);
 
+	void applyMatrix(Matrix4 m);
 protected:
 	void clear();
 private:

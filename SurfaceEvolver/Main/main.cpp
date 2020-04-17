@@ -43,6 +43,12 @@
 // - mean curvature flow for sphere test (cotan scheme)
 // - fix lagging numerical solution for sphere test
 // - test evolution without tangential redistribution on different objects
+// - compute mean area for finite volumes in each time step
+// - test a non-convex model (e.g.: bunny)
+// - make separate outputs for mean co-volume measure
+// - implement cutoff offset for the bounding cube to compute the field on minimum necessary subset (box)
+// - visualize angle-weighted pseudo-normals with interpolated -grad(SDF) vectors
+// - add scalar data (fvAreas, distances, curvatures) to mesh vertices
 
 //  POSTPONED:
 //
@@ -57,6 +63,7 @@
 //		- split position matters, yet sometimes a less precise estimate yields better result than quad min. Trying 8 sample positions could help
 //		- still no idea why the near/far cycle's written this way. Sometimes it leads the traversal to only one intersection, ignoring the rest, because they're "far"
 // - flat AABB and Octree (we can try, but this would require dynamic arrays (i.e.: std::vectors) which would be slower than allocation)
+// - fix apparent interpolation bug for SDF values and gradients (is there one?)
 
 //   DONE, BUT MIGHT BE IMPROVED:
 //
@@ -65,18 +72,22 @@
 
 //   WIP:
 // 
-// - test a non-convex model (e.g.: bunny)
 
 
 //   TODO:
 //
-// - clear all generated files & keep only those relevant for the thesis
+// - Special types: SEvolverParams, SDFParams,...
+// - SurfaceEvolutionSolver -> Evolver, LinearSolver
+// - catch all NaNs as exceptions
+// - test evolution for extremal cases: MCF dominant (eta = 0.01, eps = 1.0) and SDF dominant (eta = 1, eps = 0.01)
+// - co-volume measure-driven time step: dt ~ m(V)
+//
+// - fix SDF coordinates (use global grid indexing)
+// - implement global grid and cellSize-based Octree & SDF (just like in Vctr Engine Meta Object)
+//
 // - quad co-volume scheme
 // - mean curvature flow for sphere test (quad scheme)
 // - mean curvature flow for sphere test (tri interp scheme)
-// - implement a VTK window form using a working example for mesh rendering and SDF volume rendering
-// - implement global grid and cellSize-based Octree & SDF (just like in Vctr Engine Meta Object)
-// - implement cutoff offset for the bounding cube to compute the field on minimum necessary subset (box)
 
 void performSDFTest(uint res, Geometry& g, std::fstream& timing, VTKExporter& e) {
 	std::cout << "init SDF..." << std::endl;
@@ -229,8 +240,8 @@ int main()
 
 	// ===== BUNNY SDF tests =============================
 
-	/**/
-	uint res = 50; // octree resolution
+	/*
+	uint res = 40; // octree resolution
 
 	Vector3 axis = normalize(Vector3(1, 1, 1));
 	
@@ -238,7 +249,7 @@ int main()
 	// === Timed code ============
 	OBJImporter obj = OBJImporter();
 	Geometry bunny = obj.importOBJGeometry("bunny_no_holes.obj");
-	// bunny.applyMatrix(Matrix4().setToScale(100.0f, 100.0f, 100.0f));
+	bunny.applyMatrix(Matrix4().setToScale(0.2f, 0.2f, 0.2f));
 	e.initExport(&bunny, "sfBunny");
 	// === Timed code ============
 	auto endObjLoad = std::chrono::high_resolution_clock::now();
@@ -250,13 +261,50 @@ int main()
 
 	std::cout << bunny_sdf.getComputationProperties();
 
-	bunny_sdf.exportGrid(&e, "bunnySDF");
-	bunny_sdf.exportGradientField(&e, "bunnySDF_grad");
+	//bunny_sdf.exportGrid(&e, "bunnySDF");
+	//bunny_sdf.exportGradientField(&e, "bunnySDF_grad");
 
 	// ====== BUNNY Evolution =============================
-	float dt = 0.03f;
-	SurfaceEvolutionSolver evolver(dt, 50, (uint)4, ElementType::tri, &bunny, bunny_sdf.grid, "evolvingBunny", true, true, true, true, true);
+	float dt = 0.018f;
+	SurfaceEvolutionSolver evolver(dt, 100, (uint)5, ElementType::tri, &bunny, bunny_sdf.grid, "evolvingBunny", true, true, true, true, true);*/
+
+	// cube with holes
+	/**/
+	OBJImporter obj = OBJImporter();
+	Geometry cwh = obj.importOBJGeometry("cubeWithHoles.obj");
+	cwh.applyMatrix(Matrix4().setToScale(0.02f, 0.02f, 0.02f));
+	std::string name = "evolvingCubeWithHoles";
+	e.initExport(&cwh, "cubeWithHoles");
+
+	uint res = 80; // octree resolution
+	SDF cwh_sdf = SDF(&cwh, res);
+	// cwh_sdf.exportGrid(&e, "cubeWithHoles_SDF");
+	// cwh_sdf.exportGradientField(&e, "cubeWithHoles_SDF_grad");
+
+	std::cout << cwh_sdf.getComputationProperties();
+
+	float dt = 0.018f;
+	SurfaceEvolutionSolver evolver(dt, 130, (uint)4, ElementType::tri, &cwh, cwh_sdf.grid, name, true, true, true, true, false, false, true);
 	
+
+	// arc
+	/*
+	OBJImporter obj = OBJImporter();
+	Geometry arc = obj.importOBJGeometry("arc.obj");
+	arc.applyMatrix(Matrix4().setToScale(0.02f, 0.02f, 0.02f));
+	std::string name = "evolvingArc";
+	e.initExport(&arc, "arc");
+
+	uint res = 40; // octree resolution
+	SDF arc_sdf = SDF(&arc, res);
+	// cwh_sdf.exportGrid(&e, "cubeWithHoles_SDF");
+	// cwh_sdf.exportGradientField(&e, "cubeWithHoles_SDF_grad");
+
+	std::cout << arc_sdf.getComputationProperties();
+
+	float dt = 0.013f;
+	SurfaceEvolutionSolver evolver(dt, 120, (uint)4, ElementType::tri, &arc, arc_sdf.grid, name, true, false, true);*/
+
 	/*
 	e.exportGeometryVertexNormals(&bunny, "bunnyNormals");
 	e.exportGeometryFiniteVolumeGrid(&bunny, "bunnyFVs");*/
@@ -265,36 +313,35 @@ int main()
 
 	/*
 	std::string name = "testBox";
-	PrimitiveBox b = PrimitiveBox(100, 100, 100, 3, 3, 3, true, name);
+	PrimitiveBox b = PrimitiveBox(1, 1, 1, 3, 3, 3, true, name);
 	Vector3 axis = Vector3(1, 1, 1);
 	axis.normalize();
 	Matrix4 M = Matrix4().makeRotationAxis(axis.x, axis.y, axis.z, M_PI / 6);
 	b.applyMatrix(M);
 	e.initExport(&b, name);
-	uint res = 50; // octree resolution
+	uint res = 80; // octree resolution
 	SDF boxSDF = SDF(&b, res, true, true);
-	boxSDF.exportGrid(&e, "boxSDF");
-	boxSDF.exportGradientField(&e, "boxSDF_Grad");
+	//boxSDF.exportGrid(&e, "boxSDF");
+	//boxSDF.exportGradientField(&e, "boxSDF_Grad");
 
 	float dt = 0.03f;
-	SurfaceEvolutionSolver evolver(dt, 100, (uint)4, ElementType::tri, &b, boxSDF.grid, name, true, true, true, true, true);*/
+	SurfaceEvolutionSolver evolver(dt, 100, (uint)2, ElementType::tri, &b, boxSDF.grid, name, true, true, true, true, false, false, true);*/
 	
 
 	/*
 	std::string name = "testEllipsoid";
 	// CubeSphere cs = CubeSphere(10, 50.0f, true, name);
-	IcoSphere is = IcoSphere(3, 50.0f, name);
+	IcoSphere is = IcoSphere(0, 1.0f, name);
 	Matrix4 M = Matrix4().setToScale(1.5f, 1.0f, 1.0f);
-	//cs.applyMatrix(M);
+	is.applyMatrix(M);
 	e.initExport(&is, name);
-	uint res = 60; // octree resolution
-	SDF csSDF = SDF(&is, res, true, true);
-	//csSDF.exportGrid(&e, name + "SDF");
-	//csSDF.exportGradientField(&e, name + "SDF_Grad");
+	uint res = 40; // octree resolution
+	SDF isSDF = SDF(&is, res, true, true);
+	//isSDF.exportGrid(&e, name + "SDF");
+	//isSDF.exportGradientField(&e, name + "SDF_Grad");
 
-	float dt = 0.03f;
-	SurfaceEvolutionSolver evolver(dt, 120, (uint)3, ElementType::tri, &is, csSDF.grid, name, true, true, true, true, true);*/
-
+	float dt = 0.018f;
+	SurfaceEvolutionSolver evolver(dt, 200, (uint)2, ElementType::tri, &is, isSDF.grid, name, true, true, true, true, false, false, true);*/
 	/*
 	IcoSphere is(1, 1.0f);
 	e.initExport(&is, "icoSphere");

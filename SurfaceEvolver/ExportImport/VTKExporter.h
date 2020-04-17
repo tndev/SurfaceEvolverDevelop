@@ -22,6 +22,7 @@ public:
 	void exportGeometryFiniteVolumeGrid(
 		Geometry* object, std::vector<std::vector<Vector3>>& fvVerts, std::vector<std::vector<std::vector<uint>>>& adjacentPolys, 
 		std::string filename, int vertId = -1, int triId = -1, bool fromStartToVertId = false);
+	void exportVectorDataOnGeometry(Geometry* object, std::vector<Vector3>* data, std::string filename);
 private:
 	size_t countTriangulationIndices(std::vector<BufferGeom::Triangulation>& triangulations);
 };

@@ -92,10 +92,29 @@ void VTKExporter::initExport(Geometry* object, std::string filename)
 		}
 	};
 
+	auto writeScalarData = [&]() {
+		size_t NTables = object->scalarTables.size();
+		vtk << std::endl;
+		vtk << "POINT_DATA " << pointCount << std::endl;
+
+		for (unsigned int t = 0; t < NTables; t++) {
+			vtk << "SCALARS " << object->scalarTables[t].name << " float 1" << std::endl;
+			vtk << "LOOKUP_TABLE default" << std::endl;
+
+			for (unsigned int i = 0; i < pointCount; i++) {
+				vtk << object->scalarTables[t][i] << std::endl;
+			}
+		}
+	};
+
 	std::string cellType = (this->outputType == "POLYDATA" ? "POLYGONS" : (this->outputType == "UNSTRUCTURED_GRID" ? "CELLS" : ""));
 
 	if (object->hasTriangulations()) {
 		writePolygonIndices(cellType);
+	}
+
+	if (object->hasScalarData()) {
+		writeScalarData();
 	}
 
 	vtk.close();
@@ -216,6 +235,38 @@ void VTKExporter::exportGeometryFiniteVolumeGrid(
 
 	Geometry result = mergeGeometries(fvGeometries);
 	this->initExport(&result, filename);
+}
+
+void VTKExporter::exportVectorDataOnGeometry(Geometry* object, std::vector<Vector3>* data, std::string filename)
+{
+	std::string suffix = ".vtk";
+
+	std::fstream vtk(pathPrefix + filename + suffix, std::fstream::out);
+
+	std::vector<Vector3> uniqueVertices = object->uniqueVertices;
+	size_t pointCount = uniqueVertices.size();
+
+	vtk << "# vtk DataFile Version 4.2" << std::endl;
+	vtk << "vtk output" << std::endl;
+	vtk << "ASCII" << std::endl;
+	vtk << "DATASET UNSTRUCTURED_GRID" << std::endl;
+	vtk << "POINTS " << pointCount << " float" << std::endl;
+
+	if (pointCount > 0) {
+		for (int i = 0; i < pointCount; i++) {
+			vtk << uniqueVertices[i].x << " " << uniqueVertices[i].y << " " << uniqueVertices[i].z << std::endl;
+		}
+	}
+
+	vtk << "POINT_DATA " << pointCount << std::endl;
+	vtk << "VECTORS normals float" << std::endl;
+	if (pointCount > 0) {
+		for (auto&& v : *data) {
+			vtk << v.x << " " << v.y << " " << v.z << std::endl;
+		}
+	}
+
+	vtk.close();
 }
 
 size_t VTKExporter::countTriangulationIndices(std::vector<BufferGeom::Triangulation>& triangulations)

@@ -48,6 +48,11 @@ bool Geometry::hasTriangulations()
 	return this->triangulations.size() > 0;
 }
 
+bool Geometry::hasScalarData()
+{
+	return scalarTables.size();
+}
+
 Box3 Geometry::getBoundingBox(Box3 bbox, Matrix4 matrix)
 {
 	Vector3 helperVector = Vector3();
@@ -106,6 +111,18 @@ void Geometry::fillVerticesFromUniqueVertices()
 			this->vertices[(size_t)3 * i + 2] = this->uniqueVertices[this->vertexIndices[i]].z;
 		}
 	}
+}
+
+void Geometry::setScalarData(std::vector<float>* data, std::string name)
+{
+	if (!this->hasVertices() || this->uniqueVertices.size() != data->size()) return;
+
+	this->scalarTables.push_back(VertexScalarData(data, name));
+}
+
+void Geometry::clearScalarData()
+{
+	scalarTables.clear();
 }
 
 std::vector<unsigned int> Geometry::getPolygonIndicesFromTriangulation(BufferGeom::Triangulation t)
@@ -633,6 +650,7 @@ void Geometry::clear()
 	normals.clear();
 	vertexIndices.clear();
 	triangulations.clear();
+	clearScalarData();
 }
 
 std::pair<std::vector<BufferGeom::Triangulation>, std::vector<size_t>> Geometry::getSortedPolygonTriangulationsAndSizes()
@@ -1451,3 +1469,17 @@ float Primitive::getMaxById(uint id)
 	return 0.0f;
 }
 
+VertexScalarData::VertexScalarData(std::vector<float>* data, std::string name)
+{
+	this->data = std::vector<float>(*data);
+	this->name = name;
+}
+
+VertexScalarData::~VertexScalarData()
+{
+}
+
+float& VertexScalarData::operator[](int i)
+{
+	return data[i];
+}

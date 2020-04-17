@@ -1,5 +1,252 @@
 #include "SurfaceEvolutionSolver.h"
 
+
+void SurfaceEvolutionSolver::init()
+{
+	// ===== Preparing a source geometry for immersion =====
+	// -----------------------------------------------------
+	// radius
+	float r = (meanCurvatureFlow ? r0 : 0.4f * std::min({ sdfGrid->scale.x, sdfGrid->scale.y, sdfGrid->scale.z }));
+	rDecay = r;
+	if (type == ElementType::tri) {
+		uint n = subdiv;
+		evolvedSurface = new IcoSphere(n, r);
+	}
+	else {
+		uint n = std::ceil(1.5 * subdiv);
+		evolvedSurface = new CubeSphere(n, r);
+	}
+	Box3 bbox = (meanCurvatureFlow || targetGeom != nullptr ? targetGeom->getBoundingBox() : sdfGrid->bbox);
+	this->center = bbox.getCenter();
+	Matrix4 M = Matrix4().makeTranslation(center.x, center.y, center.z);
+	evolvedSurface->applyMatrix(M);
+	this->N = evolvedSurface->uniqueVertices.size();
+
+	log_header.clear();
+	log_header += "=============================================================\n";
+	log_header += "----------------------- Initializing ------------------------\n";
+	log_header += "------------ S U R F A C E    E V O L U T I O N -------------\n";
+	log_header += ">> NSteps = " + std::to_string(NSteps) + ", dt = " + std::to_string(dt) + ", tStop = " + std::to_string(tStop) + "\n";
+	log_header += ">> Model: " + geomName + ", NVerts = " + std::to_string(N) + "\n";
+	if (!meanCurvatureFlow) {
+		log_header += ">> SDF grid bounds: min = (" + std::to_string(sdfGrid->bbox.min.x) + ", " + std::to_string(sdfGrid->bbox.min.y) + ", " + std::to_string(sdfGrid->bbox.min.z)
+			+ "), max = (" + std::to_string(sdfGrid->bbox.max.x) + ", " + std::to_string(sdfGrid->bbox.max.y) + ", " + std::to_string(sdfGrid->bbox.max.z) + ")\n";
+		log_header += ">> SDF resolution: " + std::to_string(sdfGrid->Nx) + " x " + std::to_string(sdfGrid->Ny) + " x " + std::to_string(sdfGrid->Nz) + "\n";
+	}
+	else {
+		log_header += ">> Performing mean curvature flow test on sphere with r0 = " + std::to_string(r0) + "\n";
+	}
+
+	log_header += "-------------------------------------------------------------\n";
+	log_header += "starting evolution ...\n";
+
+
+	std::cout << log_header;
+
+	if (saveStates) {
+		if (!sphereTest) {
+			evolvedSurface->clearScalarData();
+			// save first distance state:
+			if (saveDistanceStates) saveInterpolatedSDFValues();
+			// save first fvState:
+			if (saveAreaStates) saveFVAreaScalars();
+			// save first dot(-grad(SDF), N)  state
+			if (saveGradientStates) saveInterpolatedDotValues();
+		}
+		exportGeometry(0);
+	}
+
+	// -------------------------------------------------------
+}
+
+void SurfaceEvolutionSolver::evolve()
+{
+	if (!meanCurvatureFlow) {
+		if (!sdfGrid->hasGradient()) {
+			sdfGrid->computeGradient();
+		}
+	}
+
+	sphereTestL2Error = 0.0f;
+
+	std::fstream log(geomName + "_evolutionLog.txt", std::fstream::out);
+	std::fstream timingLog;
+	log << log_header;
+
+	if (timeLog) {
+		timingLog = std::fstream(geomName + "_timingLog.txt", std::fstream::out);
+		timingLog << log_header;
+	}
+
+	for (int ti = 1; ti <= NSteps; ti++) {
+
+		float t = (float)ti / (float)NSteps * tStop;
+		if (printStepOutput) std::cout << "-------- time step ti = " << ti << ", t = " << t << " -----------" << std::endl;
+		log << "-------- time step ti = " << ti << ", t = " << t << " -----------" << std::endl;
+
+		// <===== P S E U D O N O R M A L S ========
+		auto startPseudoNormals = std::chrono::high_resolution_clock::now();
+
+		if (printHappenings) std::cout << "computing surface pseudonormals ..." << std::endl;
+		vNormals.clear();
+		vNormals = evolvedSurface->getAngleWeightedVertexPseudoNormals();
+		if (printHappenings) std::cout << "... pseudonormals computed" << std::endl;
+
+		auto endPseudoNormals = std::chrono::high_resolution_clock::now();
+		std::chrono::duration<float> elapsedPseudoNormals = (endPseudoNormals - startPseudoNormals);
+		// ========================================>
+
+
+		fvAreas.clear();
+		std::vector<std::vector<Vector3>> fvVerts = {};
+		std::vector<std::vector<std::vector<uint>>> adjacentPolys = {};
+
+		// <===== F I N I T E   V O L U M E S ========
+		auto startFiniteVolumes = std::chrono::high_resolution_clock::now();
+
+		if (printHappenings) std::cout << "computing surf. finite volumes ..." << std::endl;
+		evolvedSurface->getVertexFiniteVolumes(&fvVerts, &adjacentPolys);
+		if (saveAreaStates || saveDistanceStates || saveCurvatureStates) evolvedSurface->clearScalarData();
+		if (printHappenings) std::cout << "... finite vols computed" << std::endl;
+
+		auto endFiniteVolumes = std::chrono::high_resolution_clock::now();
+		std::chrono::duration<float> elapsedFiniteVolumes = (endFiniteVolumes - startFiniteVolumes);
+		// ========================================>
+
+
+
+		this->initSystem(); // prep linear system of dim NVerts * NVerts
+
+
+
+		// <===== M A T R I X    F I L L ==========
+		auto startFillMatrix = std::chrono::high_resolution_clock::now();
+
+		if (printHappenings) std::cout << "filling sys matrix & rhs ..." << std::endl;
+		float meanArea;
+		if (this->type == ElementType::tri) {
+			this->getTriangleEvolutionSystem(fvVerts, adjacentPolys, meanArea);
+		}
+		else {
+			this->getQuadEvolutionSystem(fvVerts, adjacentPolys, meanArea);
+		}
+		if (std::isnan(meanArea)) {
+			std::cout << "meanArea = NaN!\n";
+			break;
+		}
+		if (printHappenings) {
+			std::cout << "... matrix & rhs filled" << std::endl;
+			std::cout << "finite volume mean area: " << meanArea << std::endl;
+		}
+		log << "finite volume mean area: " << meanArea << std::endl;
+
+		auto endFillMatrix = std::chrono::high_resolution_clock::now();
+		std::chrono::duration<float> elapsedFillMatrix = (endFillMatrix - startFillMatrix);
+		// ========================================>
+
+
+
+		// <===== S A V E   V E C T O R   S T A T E ========
+		double saveVectTime = 0.0;
+		if (saveGradientStates) {
+			auto startSaveVectors = std::chrono::high_resolution_clock::now();
+
+			exportVectorStates(ti - 1);
+			saveInterpolatedDotValues();
+			auto endSaveVectors = std::chrono::high_resolution_clock::now();
+			std::chrono::duration<float> elapsedSaveVectors = (endSaveVectors - startSaveVectors);
+			saveVectTime = elapsedSaveVectors.count();
+		}
+		// ================================================>
+
+
+
+
+		// ------------ sys alloc ------------
+		double* FnextX = new double[N];
+		double* FnextY = new double[N];
+		double* FnextZ = new double[N];
+		// -----------------------------------
+
+
+
+		// <===== L I N   S Y S   S O L V E ========
+		auto startLinSolve = std::chrono::high_resolution_clock::now();
+
+		if (printHappenings) std::cout << "3 x " << N << " x " << N << "-sys Bi CGSTAB solve ..." << std::endl;
+		Bi_CGSTAB_solve(SysMatrix, sysRhsX, FnextX, printSolution);
+		Bi_CGSTAB_solve(SysMatrix, sysRhsY, FnextY, printSolution);
+		Bi_CGSTAB_solve(SysMatrix, sysRhsZ, FnextZ, printSolution);
+		if (printSolution) {
+			printArray1("Fx", FnextX, 6);
+			printArray1("Fy", FnextY, 6);
+			printArray1("Fz", FnextZ, 6);
+		}
+
+		if (printHappenings) std::cout << "... done" << std::endl;
+
+		auto endLinSolve = std::chrono::high_resolution_clock::now();
+		std::chrono::duration<float> elapsedLinSolve = (endLinSolve - startLinSolve);
+		// ========================================>
+
+
+
+		// <====== G E O M   U P D A T E ==========
+		auto startUpdate = std::chrono::high_resolution_clock::now();
+
+		if (printHappenings) std::cout << "updating surface geometry ..." << std::endl;
+		updateGeometry(FnextX, FnextY, FnextZ);
+		if (printHappenings) std::cout << "... done" << std::endl;
+		if (saveStates) {
+			std::cout << "exporting step to VTK..." << std::endl;
+			exportGeometry(ti);
+			if (sphereTest) exportTestGeometry(ti, t);
+			std::cout << "... done" << std::endl;
+		}
+
+		if (sphereTest) {
+			float stepError = this->getSphereStepL2Error(t);
+			if (printStepOutput) std::cout << "step " << ti << " error: " << sqrt(stepError) << std::endl;
+			log << "step " << ti << " error: " << sqrt(stepError) << std::endl;
+			sphereTestL2Error += stepError;
+		}
+
+
+		auto endUpdate = std::chrono::high_resolution_clock::now();
+		std::chrono::duration<float> elapsedUpdate = (endUpdate - startUpdate);
+		// ========================================>
+
+		std::string time_log =
+			"step " + std::to_string(ti) + " time log:\n" +
+			"surface pseudonormals: " + std::to_string(elapsedPseudoNormals.count()) + " s, surface finite volumes: " + std::to_string(elapsedPseudoNormals.count()) + " s\n" +
+			(saveGradientStates ? "export normals and gradients: " + std::to_string(saveVectTime) + "s\n" : "") +
+			"filling sys matrix: " + std::to_string(elapsedFillMatrix.count()) + " s\n" +
+			"(vector) linear sys solve: " + std::to_string(elapsedLinSolve.count()) + " s\n" +
+			"geom update: " + std::to_string(elapsedUpdate.count()) + " s\n" +
+			"evolution step total: " + std::to_string(elapsedPseudoNormals.count() + elapsedPseudoNormals.count() + elapsedFillMatrix.count() + elapsedLinSolve.count() + elapsedUpdate.count()) + " s\n";
+		if (printStepOutput) std::cout << time_log << std::endl;
+		if (timeLog) timingLog << time_log;
+
+		// ========= E N D =========================
+	}
+
+	if (sphereTest) {
+		sphereTestL2Error *= dt;
+		sphereTestL2Error = sqrt(sphereTestL2Error);
+		std::cout << "total L2 Error: " << sphereTestL2Error << std::endl;
+		log << "total L2 Error: " << sphereTestL2Error << std::endl;
+	}
+
+	// save last distance gradient state:
+	if (saveGradientStates) {
+		saveInterpolatedSDFGradients();
+		exportVectorStates(N);
+	}
+
+	log.close();
+	timingLog.close();
+}
+
 void SurfaceEvolutionSolver::clearSystem()
 {
 	if (SysMatrix != nullptr) {
@@ -73,9 +320,132 @@ float SurfaceEvolutionSolver::tangentialVelocitForVertex(Vector3& V, uint i)
 	return 0.0f;
 }
 
+void SurfaceEvolutionSolver::saveFVAreaScalars()
+{
+	fvAreas.clear();
+	fvAreas = std::vector<float>(N);
+	std::vector<std::vector<Vector3>> fvVerts = {};
+	std::vector<std::vector<std::vector<uint>>> adjacentPolys = {};
+	evolvedSurface->getVertexFiniteVolumes(&fvVerts, &adjacentPolys);
+
+	for (uint i = 0; i < N; i++) {
+		uint m = adjacentPolys[i].size();
+		// =====================================================================>
+
+		float coVolArea = 0.0f;
+
+		for (uint p = 0; p < m; p++) {
+			// vertex
+			Vector3 Fi = Vector3(
+				evolvedSurface->uniqueVertices[i].x,
+				evolvedSurface->uniqueVertices[i].y,
+				evolvedSurface->uniqueVertices[i].z
+			);
+
+			// midpoints:
+			Vector3* M0 = &fvVerts[i][(size_t)2 * p];
+			Vector3* baryCenter = &fvVerts[i][(size_t)2 * p + 1];
+			Vector3* M1 = &fvVerts[i][((size_t)2 * p + 2) % fvVerts[i].size()];
+
+			// co-vol areas:
+			float cV2Area0 = cross(*M0 - Fi, *baryCenter - Fi).length();
+			float cV2Area1 = cross(*baryCenter - Fi, *M1 - Fi).length();
+			coVolArea += (0.5f * cV2Area0 + 0.5f * cV2Area1);
+		}
+
+		fvAreas[i] = coVolArea;
+	}
+
+	evolvedSurface->setScalarData(&fvAreas, "CoVolArea");
+}
+
+void SurfaceEvolutionSolver::saveInterpolatedSDFValues()
+{
+	vDistances.clear();
+	vDistances = std::vector<float>(N);
+	const uint Nx = sdfGrid->Nx, Ny = sdfGrid->Ny, Nz = sdfGrid->Nz;
+	for (uint i = 0; i < N; i++) {
+		// vertex
+		Vector3 Fi = Vector3(
+			evolvedSurface->uniqueVertices[i].x,
+			evolvedSurface->uniqueVertices[i].y,
+			evolvedSurface->uniqueVertices[i].z
+		);
+
+		// SDF interpolation from values surrounding V
+		std::vector<Vector3> positionBuffer = {};
+		std::vector<float> valueBuffer = {};
+		float SDF_V;
+
+		// SDF value
+		positionBuffer.clear(); // for old min and max positions
+		valueBuffer.clear(); // for SDF cell vertex values
+		sdfGrid->getSurroundingCells(Fi, Nx, Ny, Nz, sdfGrid->field, &positionBuffer, &valueBuffer);
+		SDF_V = trilinearInterpolate(Fi, positionBuffer, valueBuffer);
+
+		vDistances[i] = SDF_V;
+	}
+
+	evolvedSurface->setScalarData(&vDistances, "SignedDistance");
+}
+
+void SurfaceEvolutionSolver::saveInterpolatedDotValues()
+{
+	if (vNormals.empty()) vNormals = evolvedSurface->getAngleWeightedVertexPseudoNormals();
+
+	vDotProducts.clear();
+	vDotProducts = std::vector<float>(N);
+	const uint Nx = sdfGrid->Nx, Ny = sdfGrid->Ny, Nz = sdfGrid->Nz;
+	for (uint i = 0; i < N; i++) {
+		// vertex
+		Vector3 Fi = Vector3(
+			evolvedSurface->uniqueVertices[i].x,
+			evolvedSurface->uniqueVertices[i].y,
+			evolvedSurface->uniqueVertices[i].z
+		);
+
+		// SDF interpolation from values surrounding V
+		std::vector<Vector3> positionBuffer = {};
+		std::vector<float> valueBuffer = {};
+		float SDF_V; Vector3 gradSDF_V = Vector3();
+		this->getInterpolatedSDFValuesforVertex(&Fi, &SDF_V, &gradSDF_V, positionBuffer, valueBuffer);
+
+		vDotProducts[i] = dot(gradSDF_V, vNormals[i]);
+	}
+
+	evolvedSurface->setScalarData(&vDotProducts, "negGradDotN");
+}
+
+void SurfaceEvolutionSolver::saveInterpolatedSDFGradients()
+{
+	vNormals.clear();
+	vNormals = evolvedSurface->getAngleWeightedVertexPseudoNormals();
+
+	// clear and allocate the gradient buffer
+	vGradients.clear();
+	vGradients = std::vector<Vector3>(N);
+
+	for (int i = 0; i < N; i++) {
+		// vertex
+		Vector3 Fi = Vector3(
+			evolvedSurface->uniqueVertices[i].x,
+			evolvedSurface->uniqueVertices[i].y,
+			evolvedSurface->uniqueVertices[i].z
+		);
+
+		// SDF interpolation from values surrounding V
+		std::vector<Vector3> positionBuffer = {};
+		std::vector<float> valueBuffer = {};
+		float SDF_V; Vector3 gradSDF_V = Vector3();
+		this->getInterpolatedSDFValuesforVertex(&Fi, &SDF_V, &gradSDF_V, positionBuffer, valueBuffer);
+
+		vGradients[i] = gradSDF_V;
+	}
+}
+
 float SurfaceEvolutionSolver::laplaceBeltramiCtrlFunc(float& SDF_V)
 {
-	float C1 = 1.0f, C2 = 1.0f;
+	float C1 = 1.0f, C2 = rDecay;
 	return C1 * (1.0f - exp(-(SDF_V * SDF_V) / C2));
 	// return 1.0f;
 }
@@ -93,8 +463,22 @@ float SurfaceEvolutionSolver::etaCtrlFunc(float& SDF_V, Vector3& gradSDF_V, Vect
 // [3] Tomek, Mikula - DISCRETE DUALITY FINITE VOLUME METHOD WITH TANGENTIAL REDISTRIBUTION OF POINTS FOR SURFACES EVOLVING BY MEAN CURVATURE (p. 1808)
 //
 void SurfaceEvolutionSolver::getTriangleEvolutionSystem(
-	std::vector<Vector3>& vNormals, std::vector<std::vector<Vector3>>& fvVerts, std::vector<std::vector<std::vector<uint>>>& adjacentPolys)
+	std::vector<std::vector<Vector3>>& fvVerts, std::vector<std::vector<std::vector<uint>>>& adjacentPolys, float& meanArea)
 {
+	if (saveDistanceStates) {
+		// clear and allocate the distance buffer
+		vDistances.clear();
+		vDistances = std::vector<float>(N);
+	}
+
+	if (saveGradientStates) {
+		// clear and allocate the gradient buffer
+		vGradients.clear();
+		vGradients = std::vector<Vector3>(N);
+	}
+
+	meanArea = 0.0f;
+
 	for (uint i = 0; i < N; i++) {
 		// <=== part identical to getTriangleEvolutionSystem based on [4] =======
 		// vertex
@@ -113,7 +497,10 @@ void SurfaceEvolutionSolver::getTriangleEvolutionSystem(
 		if (!meanCurvatureFlow) {
 			this->getInterpolatedSDFValuesforVertex(&Fi, &SDF_V, &gradSDF_V, positionBuffer, valueBuffer);
 			eps = laplaceBeltramiCtrlFunc(SDF_V);
-		}		
+		}
+
+		if (saveGradientStates) vGradients[i] = gradSDF_V;
+		if (saveDistanceStates) vDistances[i] = SDF_V;
 
 		uint m = adjacentPolys[i].size();
 		// =====================================================================>
@@ -159,6 +546,8 @@ void SurfaceEvolutionSolver::getTriangleEvolutionSystem(
 			SysMatrix[i][adjacentPolys[i][p][1]] += 0.5 * ((double)cotan1 + (double)cotan2);
 		}
 
+		meanArea += coVolArea;
+
 		// diag:
 		SysMatrix[i][i] *= ((double)dt * eps) / coVolArea; 
 		SysMatrix[i][i] += 1.0;
@@ -175,15 +564,20 @@ void SurfaceEvolutionSolver::getTriangleEvolutionSystem(
 		sysRhsY[i] = (double)Fi.y + (double)dt * eta * vNormals[i].y + (double)dt * vT;
 		sysRhsZ[i] = (double)Fi.z + (double)dt * eta * vNormals[i].z + (double)dt * vT;
 
-		if (sphereTest) fvAreas.push_back(coVolArea); // save areas as weights for numerical tests
+		if (sphereTest || saveAreaStates) fvAreas.push_back(coVolArea); // save areas as weights for numerical tests
 	}
+
+	if (saveAreaStates) evolvedSurface->setScalarData(&fvAreas, "CoVolArea");
+	if (saveDistanceStates) evolvedSurface->setScalarData(&vDistances, "SignedDistance");
+
+	meanArea /= N;
 }
 
 //
 // [4] M. Medla - SOLVING PARTIAL DIFFERENTIAL EQUATIONS USING FINITE VOLUME METHOD ON NON-UNIFORM GRIDS (PhD Thesis, p. 29)
 //
 void SurfaceEvolutionSolver::getQuadEvolutionSystem(
-	std::vector<Vector3>& vNormals, std::vector<std::vector<Vector3>>& fvVerts, std::vector<std::vector<std::vector<uint>>>& adjacentPolys)
+	std::vector<std::vector<Vector3>>& fvVerts, std::vector<std::vector<std::vector<uint>>>& adjacentPolys, float& meanArea)
 {
 	for (uint i = 0; i < N; i++) {
 		// <=== part identical to getQuadEvolutionSystem based on [1], [2], [3] =======
@@ -329,6 +723,8 @@ void SurfaceEvolutionSolver::Bi_CGSTAB_solve(double** A, double* b, double* x, b
 	// iter scalars
 	double omega, alpha, beta, norm;
 
+	bool hasNaNs = false;
+
 	// x0 = (1000,1000,...,1000)
 #pragma omp parallel for
 	for (int i = 0; i < N; i++) x_curr[i] = 1000.;
@@ -382,8 +778,9 @@ void SurfaceEvolutionSolver::Bi_CGSTAB_solve(double** A, double* b, double* x, b
 		}
 
 		norm = vectorNorm(s);
+		if (std::isnan(norm)) hasNaNs = true;
 		if (print) std::cout << "||s|| = " << norm << std::endl;
-		if (norm < tol) {
+		if (norm < tol || hasNaNs) {
 			// x[k + 1] = x[k] + alpha[k] * p[k]
 #pragma omp parallel for
 			for (int i = 0; i < N; i++) {
@@ -421,10 +818,11 @@ void SurfaceEvolutionSolver::Bi_CGSTAB_solve(double** A, double* b, double* x, b
 		}
 
 		norm = vectorNorm(r_next);
+		if (std::isnan(norm)) hasNaNs = true;
 #pragma omp parallel
 #pragma omp single
 		if (print) std::cout << "||r[k + 1]|| = " << norm << std::endl;
-		if (norm < tol) {
+		if (norm < tol || hasNaNs) {
 #pragma omp parallel
 #pragma omp single
 			if (print) std::cout << "||r[k + 1]|| < tol = " << tol << ", exiting iterations" << std::endl;
@@ -453,6 +851,7 @@ void SurfaceEvolutionSolver::Bi_CGSTAB_solve(double** A, double* b, double* x, b
 		}
 
 		norm = fabs(vectorDot(r_next, rp0));
+		if (std::isnan(norm)) hasNaNs = true;
 #pragma omp parallel
 #pragma omp single
 		if (print) std::cout << "|< r[k + 1], rp0 >| = " << norm << std::endl;
@@ -501,6 +900,13 @@ void SurfaceEvolutionSolver::exportGeometry(int step)
 	e.initExport(evolvedSurface, geomName + (testId == -1 ? ""  : ("(" + std::to_string(testId) + ")")) + "_" + std::to_string(step));
 }
 
+void SurfaceEvolutionSolver::exportVectorStates(int step)
+{
+	VTKExporter e = VTKExporter();
+	e.exportVectorDataOnGeometry(evolvedSurface, &vNormals, geomName + "_vNormals_" + std::to_string(step));
+	e.exportVectorDataOnGeometry(evolvedSurface, &vGradients, geomName + "_vGrads_" + std::to_string(step));
+}
+
 void SurfaceEvolutionSolver::exportTestGeometry(int step, float t)
 {
 	VTKExporter e = VTKExporter();
@@ -526,16 +932,18 @@ SurfaceEvolutionSolver::SurfaceEvolutionSolver()
 // ========== sphere test constructor ========
 //
 SurfaceEvolutionSolver::SurfaceEvolutionSolver(
-	float dt, float tStop, uint subdiv, ElementType type, 
-	std::string name, int testId, bool saveStates, bool printHappenings, bool printStepOutput, bool printSolution)
+	float dt, float tStop, uint subdiv, ElementType type , std::string name, float r0, int testId, 
+	bool saveStates, bool printHappenings, bool printStepOutput, bool printSolution, bool timeLog)
 {
 	// ===== Evolution params ==============================
 	this->saveStates = saveStates; this->printSolution = printSolution;
 	this->printHappenings = printHappenings; this->printStepOutput = printStepOutput;
+	this->timeLog = timeLog;
 	this->sphereTest = true; 
 	this->meanCurvatureFlow = true;
 	this->geomName = name;
 	this->testId = testId;
+	this->r0 = r0;
 
 	this->subdiv = subdiv;
 	this->NSteps = std::floor(tStop / dt);	
@@ -552,16 +960,27 @@ SurfaceEvolutionSolver::SurfaceEvolutionSolver(
 //
 SurfaceEvolutionSolver::SurfaceEvolutionSolver(
 	float dt, int NSteps, uint subdiv, ElementType type,
-	Geometry* targetGeom, Grid* sdfGrid, std::string name, float r0, 
-	bool saveStates, bool printHappenings, bool printStepOutput, bool printSolution)
+	Geometry* targetGeom, Grid* sdfGrid, std::string name, 
+	bool saveStates, bool saveAreaStates, bool saveDistanceStates, bool saveGradientStates, bool saveCurvatureStates,
+	bool printHappenings, bool printStepOutput, bool printSolution, bool timeLog)
 {
 	// ===== Evolution params ==============================
-	this->saveStates = saveStates;
+	// save flags
+	this->saveStates = saveStates; 
+	this->saveAreaStates = saveAreaStates;
+	this->saveDistanceStates = saveDistanceStates;
+	this->saveGradientStates = saveGradientStates;
+	this->saveCurvatureStates = saveCurvatureStates;
+	// console flags
 	this->printHappenings = printHappenings;
 	this->printStepOutput = printStepOutput; 
 	this->printSolution = printSolution;
+	// log flags
+	this->timeLog = timeLog;
+	// evolution type
 	this->sphereTest = false;
 	this->meanCurvatureFlow = (sdfGrid == nullptr);
+
 	this->geomName = name;
 	
 	this->subdiv = subdiv;
@@ -572,7 +991,6 @@ SurfaceEvolutionSolver::SurfaceEvolutionSolver(
 	this->sdfGrid = sdfGrid;
 	this->targetGeom = targetGeom;
 	this->type = type;
-	this->r0 = r0;
 	// -----------------------------------------------------
 
 	this->init();
@@ -583,198 +1001,6 @@ SurfaceEvolutionSolver::~SurfaceEvolutionSolver()
 {
 	this->clearSystem();
 	this->fvAreas.clear();
-}
-
-void SurfaceEvolutionSolver::init()
-{
-	// ===== Preparing a source geometry for immersion =====
-	// -----------------------------------------------------
-	// radius
-	float r = (meanCurvatureFlow ? r0 : 0.4f * std::min({ sdfGrid->scale.x, sdfGrid->scale.y, sdfGrid->scale.z }));
-	if (type == ElementType::tri) {
-		uint n = subdiv;
-		evolvedSurface = new IcoSphere(n, r);
-	}
-	else {
-		uint n = std::ceil(1.5 * subdiv);
-		evolvedSurface = new CubeSphere(n, r);
-	}
-	Box3 bbox = (meanCurvatureFlow || targetGeom != nullptr ? targetGeom->getBoundingBox() : sdfGrid->bbox);
-	this->center = bbox.getCenter();
-	Matrix4 M = Matrix4().makeTranslation(center.x, center.y, center.z);
-	evolvedSurface->applyMatrix(M);
-	this->N = evolvedSurface->uniqueVertices.size();
-
-	log_header.clear();
-	log_header += "=============================================================\n";
-	log_header += "----------------------- Initializing ------------------------\n";
-	log_header += "------------ S U R F A C E    E V O L U T I O N -------------\n";
-	log_header += ">> NSteps = " + std::to_string(NSteps) + ", dt = " + std::to_string(dt) + ", tStop = " + std::to_string(tStop) + "\n";
-	log_header += ">> Model: " + geomName + ", NVerts = " + std::to_string(N) + "\n";
-	if (!meanCurvatureFlow) {
-		log_header += ">> SDF grid bounds: min = (" + std::to_string(sdfGrid->bbox.min.x) + ", " + std::to_string(sdfGrid->bbox.min.y) + ", " + std::to_string(sdfGrid->bbox.min.z)
-			+ "), max = (" + std::to_string(sdfGrid->bbox.min.x) + ", " + std::to_string(sdfGrid->bbox.min.y) + ", " + std::to_string(sdfGrid->bbox.min.z) + "\n";
-		log_header += ">> SDF resolution: " + std::to_string(sdfGrid->Nx) + " x " + std::to_string(sdfGrid->Ny) + " x " + std::to_string(sdfGrid->Nz) + "\n";
-	}
-	else {
-		log_header += ">> Performing mean curvature flow test on sphere with r0 = " + std::to_string(r0) + "\n";
-	}
-
-	log_header += "-------------------------------------------------------------\n";
-	log_header += "starting evolution ...\n";
-
-
-	std::cout << log_header;
-
-	if (saveStates) {
-		exportGeometry(0);
-	}
-
-	// -------------------------------------------------------
-}
-
-void SurfaceEvolutionSolver::evolve()
-{
-	if (!meanCurvatureFlow) {
-		if (!sdfGrid->hasGradient()) {
-			sdfGrid->computeGradient();
-		}
-	}
-
-	sphereTestL2Error = 0.0f;
-
-	std::fstream log(geomName + "_evolutionLog.txt", std::fstream::out);
-	log << log_header;
-
-	for (int ti = 1; ti <= NSteps; ti++) {
-		
-		float t = (float)ti / (float)NSteps * tStop;
-		if (printStepOutput) std::cout << "-------- time step ti = " << ti << ", t = " << t << " -----------" << std::endl;
-		log << "-------- time step ti = " << ti << ", t = " << t << " -----------" << std::endl;
-
-		// <===== P S E U D O N O R M A L S ========
-		auto startPseudoNormals = std::chrono::high_resolution_clock::now();
-
-		if (printHappenings) std::cout << "computing surface pseudonormals ..." << std::endl;
-		std::vector<Vector3> vNormals = evolvedSurface->getAngleWeightedVertexPseudoNormals();
-		if (printHappenings) std::cout << "... pseudonormals computed" << std::endl;
-
-		auto endPseudoNormals = std::chrono::high_resolution_clock::now();
-		std::chrono::duration<float> elapsedPseudoNormals = (endPseudoNormals - startPseudoNormals);
-		// ========================================>
-		
-
-		fvAreas.clear();
-		std::vector<std::vector<Vector3>> fvVerts = {};
-		std::vector<std::vector<std::vector<uint>>> adjacentPolys = {};
-
-		// <===== F I N I T E   V O L U M E S ========
-		auto startFiniteVolumes = std::chrono::high_resolution_clock::now();
-
-		if (printHappenings) std::cout << "computing surf. finite volumes ..." << std::endl;
-		evolvedSurface->getVertexFiniteVolumes(&fvVerts, &adjacentPolys);
-		if (printHappenings) std::cout << "... finite vols computed" << std::endl;
-
-		auto endFiniteVolumes = std::chrono::high_resolution_clock::now();
-		std::chrono::duration<float> elapsedFiniteVolumes = (endFiniteVolumes - startFiniteVolumes);
-		// ========================================>
-
-
-		
-		this->initSystem(); // prep linear system of dim NVerts * NVerts
-
-
-
-		// <===== M A T R I X    F I L L ==========
-		auto startFillMatrix = std::chrono::high_resolution_clock::now();
-
-		if (printHappenings) std::cout << "filling sys matrix & rhs ..." << std::endl;
-		if (this->type == ElementType::tri) {
-			this->getTriangleEvolutionSystem(vNormals, fvVerts, adjacentPolys);
-		} else {
-			this->getQuadEvolutionSystem(vNormals, fvVerts, adjacentPolys);
-		}
-		if (printHappenings) std::cout << "... matrix & rhs filled" << std::endl;
-
-		auto endFillMatrix = std::chrono::high_resolution_clock::now();
-		std::chrono::duration<float> elapsedFillMatrix = (endFillMatrix - startFillMatrix);
-		// ========================================>
-
-
-
-		double* FnextX = new double[N];
-		double* FnextY = new double[N];
-		double* FnextZ = new double[N];
-
-
-
-		// <===== L I N   S Y S   S O L V E ========
-		auto startLinSolve = std::chrono::high_resolution_clock::now();
-
-		if (printHappenings) std::cout << "3 x " << N << " x " << N << "-sys Bi CGSTAB solve ..." << std::endl;
-		Bi_CGSTAB_solve(SysMatrix, sysRhsX, FnextX, printSolution);
-		Bi_CGSTAB_solve(SysMatrix, sysRhsY, FnextY, printSolution);
-		Bi_CGSTAB_solve(SysMatrix, sysRhsZ, FnextZ, printSolution);
-		if (printSolution) {
-			printArray1("Fx", FnextX, 6);
-			printArray1("Fy", FnextY, 6);
-			printArray1("Fz", FnextZ, 6);
-		}
-
-		if (printHappenings) std::cout << "... done" << std::endl;
-
-		auto endLinSolve = std::chrono::high_resolution_clock::now();
-		std::chrono::duration<float> elapsedLinSolve = (endLinSolve - startLinSolve);
-		// ========================================>
-
-
-
-		// <====== G E O M   U P D A T E ==========
-		auto startUpdate = std::chrono::high_resolution_clock::now();
-
-		if (printHappenings) std::cout << "updating surface geometry ..." << std::endl;
-		updateGeometry(FnextX, FnextY, FnextZ);
-		if (printHappenings) std::cout << "... done" << std::endl;
-		if (saveStates) {
-			std::cout << "exporting step to VTK..." << std::endl;
-			exportGeometry(ti);
-			if (sphereTest) exportTestGeometry(ti, t);
-			std::cout << "... done" << std::endl;
-		}
-
-		if (sphereTest) {
-			float stepError = this->getSphereStepL2Error(t);
-			if (printStepOutput) std::cout << "step " << ti << " error: " << sqrt(stepError) << std::endl;
-			log << "step " << ti << " error: " << sqrt(stepError) << std::endl;
-			sphereTestL2Error += stepError;
-		}
-
-
-		auto endUpdate = std::chrono::high_resolution_clock::now();
-		std::chrono::duration<float> elapsedUpdate = (endUpdate - startUpdate);
-		// ========================================>
-
-		std::string time_log =
-			"step " + std::to_string(ti) + " time log:\n" +
-			"surface pseudonormals: " + std::to_string(elapsedPseudoNormals.count()) + " s, surface finite volumes: " + std::to_string(elapsedPseudoNormals.count()) + " s\n" +
-			"filling sys matrix: " + std::to_string(elapsedFillMatrix.count()) + " s\n" +
-			"(vector) linear sys solve: " + std::to_string(elapsedLinSolve.count()) + " s\n" +
-			"geom update: " + std::to_string(elapsedUpdate.count()) + " s\n" +
-			"evolution step total: " + std::to_string(elapsedPseudoNormals.count() + elapsedPseudoNormals.count() + elapsedFillMatrix.count() + elapsedLinSolve.count() + elapsedUpdate.count()) + " s\n";
-		if (printStepOutput) std::cout << time_log << std::endl;
-		log << time_log;
-
-		// ========= E N D =========================
-	}
-
-	if (sphereTest) {
-		sphereTestL2Error *= dt;
-		sphereTestL2Error = sqrt(sphereTestL2Error);
-		std::cout << "total L2 Error: " << sphereTestL2Error << std::endl;
-		log << "total L2 Error: " << sphereTestL2Error << std::endl;
-	}
-
-	log.close();
 }
 
 
