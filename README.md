@@ -63,17 +63,17 @@ L2Error = 5.1363e-05, EOC = 2.036
 ![sphereTest](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/ShrinkingSphere.gif)
 
 # 1.3 Evolution in the Normal Direction - Using -grad(d(x)) to Control Evolution:
-### Ellipsoid:
-![sphereToEllipsoid](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/SphereToEllipsoidStatic.gif)
+### Scaled Icosahedron
+octreeResolution = 40^3, SDF_gridResolution = 120 x 106 x 106
+NTimeSteps = 200, dt = 0.018
+NVerts = 162
+scalars: dot(grad(distance), vNormal)
+![icoEllipsoid](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/ToIcoEllipsoidWDotProducts.gif)
 
-### Cube:
-![sphereToCube](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/SphereToCubeEvolutionStatic.gif)
+### Cube
+scalars: dot(grad(distance), vNormal)
+![cube](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/ToIcoCubeWDotProducts.gif)
 
-### Rotated Cube:
-![sphereToRotatedCube](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/SphereToRotatedBox.gif)
+### Cube With Holes
+scalars: dot(grad(distance), vNormal)
 
-### Sphere to Sphere (Same tesselation):
-![sphereToSphere](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/SphereToSphereStatic.gif)
-
-### Bunny:
-![sphereToBunny](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/SphereToBunny.gif)
