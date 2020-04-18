@@ -129,3 +129,12 @@ Vector3* Box3::getBoundById(unsigned int id)
 	}
 	return &max;
 }
+
+bool Box3::isInside(Vector3& pt)
+{
+	return (
+		(pt.x >= this->min.x && pt.x <= this->max.x) &&
+		(pt.y >= this->min.y && pt.y <= this->max.y) &&
+		(pt.z >= this->min.z && pt.z <= this->max.z)
+	);
+}

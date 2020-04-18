@@ -419,9 +419,16 @@ void Grid::computeGradient()
 				// Eikonal gradient |grad(d)|=1 has to be normalized
 				norm = sqrt(grad_f_x * grad_f_x + grad_f_y * grad_f_y + grad_f_z * grad_f_z);
 
-				gradFieldX[gradPos] = grad_f_x / norm;
-				gradFieldY[gradPos] = grad_f_y / norm;
-				gradFieldZ[gradPos] = grad_f_z / norm;
+				if (norm > 10 * FLT_EPSILON) {
+					gradFieldX[gradPos] = grad_f_x / norm;
+					gradFieldY[gradPos] = grad_f_y / norm;
+					gradFieldZ[gradPos] = grad_f_z / norm;
+				}
+				else {
+					gradFieldX[gradPos] = grad_f_x;
+					gradFieldY[gradPos] = grad_f_y;
+					gradFieldZ[gradPos] = grad_f_z;
+				}
 			}
 		}
 	}

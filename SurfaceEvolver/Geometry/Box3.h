@@ -28,6 +28,8 @@ public:
 	bool equals(Box3& other);
 
 	Vector3* getBoundById(unsigned int id);
+
+	bool isInside(Vector3& pt);
 };
 
 #endif

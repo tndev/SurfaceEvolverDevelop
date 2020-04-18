@@ -224,6 +224,12 @@ void Evolver::evolve()
 		if (printHappenings) std::cout << "updating surface geometry ..." << std::endl;
 		updateGeometry(FnextX, FnextY, FnextZ);
 		if (printHappenings) std::cout << "... done" << std::endl;
+
+		if (interruptEvolution) {
+			std::cout << "ERROR! Solution explosion outside of SDF bounds! - INTERRUPTING EVOLUTION\n";
+			break;
+		}
+
 		if (saveStates) {
 			std::cout << "exporting step to VTK..." << std::endl;
 			exportGeometry(ti);
@@ -681,6 +687,8 @@ void Evolver::updateGeometry(double* Fx, double* Fy, double* Fz)
 	evolvedSurface->normals.clear();
 	for (uint i = 0; i < N; i++) {
 		evolvedSurface->uniqueVertices[i].set(Fx[i], Fy[i], Fz[i]);
+		// interrupt if solution explodes
+		this->interruptEvolution = !this->sdfGrid->bbox.isInside(evolvedSurface->uniqueVertices[i]);
 	}
 	evolvedSurface->fillVerticesFromUniqueVertices();
 }

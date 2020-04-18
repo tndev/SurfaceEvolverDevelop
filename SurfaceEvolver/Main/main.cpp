@@ -54,6 +54,7 @@
 // - Special types: SEvolverParams, SDFParams,...
 // - SurfaceEvolutionSolver -> Evolver, LinearSolver
 // - refactor and separate console and log outputs for specific situations
+// - catch all NaNs as exceptions (breaks)
 
 //  POSTPONED:
 //
@@ -77,12 +78,11 @@
 
 //   WIP:
 // 
-// - catch all NaNs as exceptions
+// - test evolution for extremal cases: MCF dominant (eta = 0.01, eps = 1.0) and SDF dominant (eta = 1, eps = 0.01)
 
 
 //   TODO:
 //
-// - test evolution for extremal cases: MCF dominant (eta = 0.01, eps = 1.0) and SDF dominant (eta = 1, eps = 0.01)
 // - co-volume measure-driven time step: dt ~ m(V)
 //
 // - fix SDF coordinates (use global grid indexing)
@@ -256,7 +256,7 @@ int main()
 	/*
 	uint res = 40; // octree resolution
 
-	Vector3 axis = normalize(Vector3(1, 1, 1));
+	// Vector3 axis = normalize(Vector3(1, 1, 1));
 	
 	auto startObjLoad = std::chrono::high_resolution_clock::now();
 	// === Timed code ============
@@ -278,18 +278,28 @@ int main()
 	//bunny_sdf.exportGradientField(&e, "bunnySDF_grad");
 
 	// ====== BUNNY Evolution =============================
-	float dt = 0.018f;
-	Evolver evolver(dt, 100, (uint)5, ElementType::tri, &bunny, bunny_sdf.grid, "evolvingBunny", true, true, true, true, true);*/
+	EvolutionParams eParams;
+	eParams.name = "Bunny";
+	eParams.dt = 0.03f; eParams.NSteps = 50; eParams.subdiv = (uint)4; eParams.elType = ElementType::tri;
+	eParams.saveStates = true; eParams.printStepOutput = true; eParams.writeTimeLog = true;
+	MeanCurvatureParams mcfParams;
+	mcfParams.saveAreaStates = true; mcfParams.writeMeanAreaLog = true;
+	GradDistanceParams sdfParams;
+	sdfParams.targetGeom = &bunny; sdfParams.sdfGrid = bunny_sdf.grid;
+	sdfParams.saveDistanceStates = true;
+	sdfParams.saveGradientStates = true;
+
+	Evolver evolver(eParams, mcfParams, sdfParams);*/
 
 	// cube with holes
-	/**/
+	/*
 	OBJImporter obj = OBJImporter();
 	Geometry cwh = obj.importOBJGeometry("cubeWithHoles.obj");
 	cwh.applyMatrix(Matrix4().setToScale(0.02f, 0.02f, 0.02f));
 	std::string name = "evolvingCubeWithHoles";
 	e.initExport(&cwh, "cubeWithHoles");
 
-	uint res = 60; // octree resolution
+	uint res = 40; // octree resolution
 	SDF cwh_sdf = SDF(&cwh, res);
 	// cwh_sdf.exportGrid(&e, "cubeWithHoles_SDF");
 	// cwh_sdf.exportGradientField(&e, "cubeWithHoles_SDF_grad");
@@ -298,7 +308,7 @@ int main()
 
 	EvolutionParams eParams;
 	eParams.name = name;
-	eParams.dt = 0.018f; eParams.NSteps = 130; eParams.subdiv = (uint)4; eParams.elType = ElementType::tri;
+	eParams.dt = 0.058f; eParams.NSteps = 100; eParams.subdiv = (uint)4; eParams.elType = ElementType::tri;
 	eParams.saveStates = true; eParams.printStepOutput = true; eParams.writeTimeLog = true;
 	MeanCurvatureParams mcfParams;
 	mcfParams.saveAreaStates = true; mcfParams.writeMeanAreaLog = true;
@@ -307,7 +317,7 @@ int main()
 	sdfParams.saveDistanceStates = true;
 	sdfParams.saveGradientStates = true;
 
-	Evolver evolver(eParams, mcfParams, sdfParams);
+	Evolver evolver(eParams, mcfParams, sdfParams);*/
 	
 
 	// arc
@@ -334,7 +344,7 @@ int main()
 
 	// performUnitSphereTest();
 
-	/*
+	/**/
 	std::string name = "testBox";
 	PrimitiveBox b = PrimitiveBox(1, 1, 1, 3, 3, 3, true, name);
 	Vector3 axis = Vector3(1, 1, 1);
@@ -342,14 +352,25 @@ int main()
 	Matrix4 M = Matrix4().makeRotationAxis(axis.x, axis.y, axis.z, M_PI / 6);
 	b.applyMatrix(M);
 	e.initExport(&b, name);
-	uint res = 80; // octree resolution
+	uint res = 40; // octree resolution
 	SDF boxSDF = SDF(&b, res, true, true);
 	//boxSDF.exportGrid(&e, "boxSDF");
 	//boxSDF.exportGradientField(&e, "boxSDF_Grad");
 
-	float dt = 0.03f;
-	Evolver evolver(dt, 100, (uint)2, ElementType::tri, &b, boxSDF.grid, name, true, true, true, true, false, false, true);*/
+	EvolutionParams eParams;
+	eParams.name = name;
+	eParams.dt = 0.03f; eParams.NSteps = 100; eParams.subdiv = (uint)2; eParams.elType = ElementType::tri;
+	//eParams.saveStates = true; 
+	eParams.printStepOutput = true; eParams.writeTimeLog = true;
+	MeanCurvatureParams mcfParams;
+	//mcfParams.saveAreaStates = true; 
+	mcfParams.writeMeanAreaLog = true;
+	GradDistanceParams sdfParams;
+	sdfParams.targetGeom = &b; sdfParams.sdfGrid = boxSDF.grid;
+	//sdfParams.saveDistanceStates = true;
+	//sdfParams.saveGradientStates = true;
 	
+	Evolver evolver(eParams, mcfParams, sdfParams);
 
 	/*
 	std::string name = "testEllipsoid";

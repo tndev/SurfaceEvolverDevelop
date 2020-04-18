@@ -44,6 +44,8 @@ private:
 	bool epsConstant = false; // Laplace-Beltrami func admits a constant value C1;
 	bool etaConstant = false; // eta ctrl func (SDF) admits a constant value C;
 
+	bool interruptEvolution = false;
+
 	// ====== evolution methods ==========
 	void init();
 	void evolve();

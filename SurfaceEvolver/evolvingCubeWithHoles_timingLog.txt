@@ -1,0 +1,641 @@
+=============================================================
+----------------------- Initializing ------------------------
+------------ S U R F A C E    E V O L U T I O N -------------
+>> NSteps = 100, dt = 0.058000, tStop = 5.800000
+>> Model: evolvingCubeWithHoles, NVerts = 2562
+>> SDF grid bounds: min = (-3.303300, -2.303300, -3.303300), max = (3.303300, 4.303300, 3.303300)
+>> SDF resolution: 120 x 119 x 120
+-------------------------------------------------------------
+starting evolution ...
+step 1 time log:
+surface pseudonormals: 0.016158 s, surface finite volumes: 0.016158 s
+export normals and gradients: 0.084186s
+filling sys matrix: 0.006589 s
+(vector) linear sys solve: 1.214692 s
+geom update: 0.059883 s
+evolution step total: 1.313479 s
+step 2 time log:
+surface pseudonormals: 0.015497 s, surface finite volumes: 0.015497 s
+export normals and gradients: 0.088406s
+filling sys matrix: 0.011412 s
+(vector) linear sys solve: 0.763659 s
+geom update: 0.060980 s
+evolution step total: 0.867044 s
+step 3 time log:
+surface pseudonormals: 0.014369 s, surface finite volumes: 0.014369 s
+export normals and gradients: 0.076735s
+filling sys matrix: 0.012121 s
+(vector) linear sys solve: 0.760122 s
+geom update: 0.091762 s
+evolution step total: 0.892744 s
+step 4 time log:
+surface pseudonormals: 0.021879 s, surface finite volumes: 0.021879 s
+export normals and gradients: 0.095482s
+filling sys matrix: 0.009616 s
+(vector) linear sys solve: 0.837748 s
+geom update: 0.060324 s
+evolution step total: 0.951446 s
+step 5 time log:
+surface pseudonormals: 0.013502 s, surface finite volumes: 0.013502 s
+export normals and gradients: 0.073424s
+filling sys matrix: 0.007011 s
+(vector) linear sys solve: 0.768083 s
+geom update: 0.063543 s
+evolution step total: 0.865642 s
+step 6 time log:
+surface pseudonormals: 0.012995 s, surface finite volumes: 0.012995 s
+export normals and gradients: 0.080319s
+filling sys matrix: 0.007200 s
+(vector) linear sys solve: 0.716849 s
+geom update: 0.059688 s
+evolution step total: 0.809727 s
+step 7 time log:
+surface pseudonormals: 0.015566 s, surface finite volumes: 0.015566 s
+export normals and gradients: 0.072755s
+filling sys matrix: 0.007128 s
+(vector) linear sys solve: 0.515694 s
+geom update: 0.055931 s
+evolution step total: 0.609886 s
+step 8 time log:
+surface pseudonormals: 0.012128 s, surface finite volumes: 0.012128 s
+export normals and gradients: 0.077862s
+filling sys matrix: 0.007735 s
+(vector) linear sys solve: 0.655848 s
+geom update: 0.086411 s
+evolution step total: 0.774249 s
+step 9 time log:
+surface pseudonormals: 0.014891 s, surface finite volumes: 0.014891 s
+export normals and gradients: 0.076199s
+filling sys matrix: 0.007273 s
+(vector) linear sys solve: 0.698470 s
+geom update: 0.085888 s
+evolution step total: 0.821413 s
+step 10 time log:
+surface pseudonormals: 0.025847 s, surface finite volumes: 0.025847 s
+export normals and gradients: 0.143110s
+filling sys matrix: 0.007756 s
+(vector) linear sys solve: 0.675858 s
+geom update: 0.089296 s
+evolution step total: 0.824605 s
+step 11 time log:
+surface pseudonormals: 0.025144 s, surface finite volumes: 0.025144 s
+export normals and gradients: 0.077787s
+filling sys matrix: 0.006820 s
+(vector) linear sys solve: 0.680639 s
+geom update: 0.071074 s
+evolution step total: 0.808820 s
+step 12 time log:
+surface pseudonormals: 0.017915 s, surface finite volumes: 0.017915 s
+export normals and gradients: 0.080028s
+filling sys matrix: 0.007758 s
+(vector) linear sys solve: 0.589204 s
+geom update: 0.059221 s
+evolution step total: 0.692012 s
+step 13 time log:
+surface pseudonormals: 0.013740 s, surface finite volumes: 0.013740 s
+export normals and gradients: 0.120294s
+filling sys matrix: 0.007124 s
+(vector) linear sys solve: 0.764953 s
+geom update: 0.097224 s
+evolution step total: 0.896781 s
+step 14 time log:
+surface pseudonormals: 0.071158 s, surface finite volumes: 0.071158 s
+export normals and gradients: 0.100216s
+filling sys matrix: 0.007969 s
+(vector) linear sys solve: 1.369339 s
+geom update: 0.147248 s
+evolution step total: 1.666871 s
+step 15 time log:
+surface pseudonormals: 0.019212 s, surface finite volumes: 0.019212 s
+export normals and gradients: 0.145707s
+filling sys matrix: 0.012289 s
+(vector) linear sys solve: 0.812441 s
+geom update: 0.066836 s
+evolution step total: 0.929991 s
+step 16 time log:
+surface pseudonormals: 0.055965 s, surface finite volumes: 0.055965 s
+export normals and gradients: 0.212146s
+filling sys matrix: 0.010634 s
+(vector) linear sys solve: 0.932214 s
+geom update: 0.059713 s
+evolution step total: 1.114490 s
+step 17 time log:
+surface pseudonormals: 0.013656 s, surface finite volumes: 0.013656 s
+export normals and gradients: 0.108267s
+filling sys matrix: 0.014075 s
+(vector) linear sys solve: 0.587940 s
+geom update: 0.058376 s
+evolution step total: 0.687704 s
+step 18 time log:
+surface pseudonormals: 0.013042 s, surface finite volumes: 0.013042 s
+export normals and gradients: 0.114873s
+filling sys matrix: 0.010637 s
+(vector) linear sys solve: 0.519613 s
+geom update: 0.069133 s
+evolution step total: 0.625468 s
+step 19 time log:
+surface pseudonormals: 0.020191 s, surface finite volumes: 0.020191 s
+export normals and gradients: 0.078354s
+filling sys matrix: 0.006748 s
+(vector) linear sys solve: 0.496120 s
+geom update: 0.059409 s
+evolution step total: 0.602659 s
+step 20 time log:
+surface pseudonormals: 0.014496 s, surface finite volumes: 0.014496 s
+export normals and gradients: 0.081580s
+filling sys matrix: 0.015386 s
+(vector) linear sys solve: 0.355239 s
+geom update: 0.060232 s
+evolution step total: 0.459849 s
+step 21 time log:
+surface pseudonormals: 0.016496 s, surface finite volumes: 0.016496 s
+export normals and gradients: 0.078496s
+filling sys matrix: 0.006696 s
+(vector) linear sys solve: 0.360782 s
+geom update: 0.058709 s
+evolution step total: 0.459179 s
+step 22 time log:
+surface pseudonormals: 0.021306 s, surface finite volumes: 0.021306 s
+export normals and gradients: 0.073912s
+filling sys matrix: 0.006821 s
+(vector) linear sys solve: 0.485876 s
+geom update: 0.056886 s
+evolution step total: 0.592194 s
+step 23 time log:
+surface pseudonormals: 0.012775 s, surface finite volumes: 0.012775 s
+export normals and gradients: 0.188163s
+filling sys matrix: 0.021001 s
+(vector) linear sys solve: 1.306375 s
+geom update: 0.135989 s
+evolution step total: 1.488915 s
+step 24 time log:
+surface pseudonormals: 0.014107 s, surface finite volumes: 0.014107 s
+export normals and gradients: 0.076386s
+filling sys matrix: 0.007622 s
+(vector) linear sys solve: 0.330113 s
+geom update: 0.056889 s
+evolution step total: 0.422838 s
+step 25 time log:
+surface pseudonormals: 0.014685 s, surface finite volumes: 0.014685 s
+export normals and gradients: 0.079726s
+filling sys matrix: 0.006481 s
+(vector) linear sys solve: 2.257728 s
+geom update: 0.063781 s
+evolution step total: 2.357360 s
+step 26 time log:
+surface pseudonormals: 0.016084 s, surface finite volumes: 0.016084 s
+export normals and gradients: 0.113914s
+filling sys matrix: 0.007987 s
+(vector) linear sys solve: 0.394484 s
+geom update: 0.058922 s
+evolution step total: 0.493560 s
+step 27 time log:
+surface pseudonormals: 0.015010 s, surface finite volumes: 0.015010 s
+export normals and gradients: 0.076968s
+filling sys matrix: 0.011771 s
+(vector) linear sys solve: 0.375415 s
+geom update: 0.058964 s
+evolution step total: 0.476170 s
+step 28 time log:
+surface pseudonormals: 0.013698 s, surface finite volumes: 0.013698 s
+export normals and gradients: 0.076136s
+filling sys matrix: 0.006844 s
+(vector) linear sys solve: 0.353631 s
+geom update: 0.058164 s
+evolution step total: 0.446036 s
+step 29 time log:
+surface pseudonormals: 0.013954 s, surface finite volumes: 0.013954 s
+export normals and gradients: 0.101872s
+filling sys matrix: 0.010147 s
+(vector) linear sys solve: 0.734210 s
+geom update: 0.061442 s
+evolution step total: 0.833706 s
+step 30 time log:
+surface pseudonormals: 0.018322 s, surface finite volumes: 0.018322 s
+export normals and gradients: 0.075659s
+filling sys matrix: 0.006654 s
+(vector) linear sys solve: 1.226937 s
+geom update: 0.179509 s
+evolution step total: 1.449744 s
+step 31 time log:
+surface pseudonormals: 0.032173 s, surface finite volumes: 0.032173 s
+export normals and gradients: 0.090002s
+filling sys matrix: 0.007562 s
+(vector) linear sys solve: 0.505621 s
+geom update: 0.071921 s
+evolution step total: 0.649452 s
+step 32 time log:
+surface pseudonormals: 0.014815 s, surface finite volumes: 0.014815 s
+export normals and gradients: 0.086271s
+filling sys matrix: 0.009446 s
+(vector) linear sys solve: 0.466575 s
+geom update: 0.068795 s
+evolution step total: 0.574447 s
+step 33 time log:
+surface pseudonormals: 0.014632 s, surface finite volumes: 0.014632 s
+export normals and gradients: 0.087592s
+filling sys matrix: 0.009660 s
+(vector) linear sys solve: 1.302461 s
+geom update: 0.165797 s
+evolution step total: 1.507183 s
+step 34 time log:
+surface pseudonormals: 0.058279 s, surface finite volumes: 0.058279 s
+export normals and gradients: 0.112276s
+filling sys matrix: 0.013659 s
+(vector) linear sys solve: 0.486318 s
+geom update: 0.065773 s
+evolution step total: 0.682309 s
+step 35 time log:
+surface pseudonormals: 0.016042 s, surface finite volumes: 0.016042 s
+export normals and gradients: 0.083977s
+filling sys matrix: 0.012233 s
+(vector) linear sys solve: 0.496987 s
+geom update: 0.064043 s
+evolution step total: 0.605347 s
+step 36 time log:
+surface pseudonormals: 0.016162 s, surface finite volumes: 0.016162 s
+export normals and gradients: 0.110849s
+filling sys matrix: 0.007417 s
+(vector) linear sys solve: 0.323964 s
+geom update: 0.058331 s
+evolution step total: 0.422036 s
+step 37 time log:
+surface pseudonormals: 0.012644 s, surface finite volumes: 0.012644 s
+export normals and gradients: 0.076722s
+filling sys matrix: 0.006855 s
+(vector) linear sys solve: 0.336203 s
+geom update: 0.059549 s
+evolution step total: 0.427893 s
+step 38 time log:
+surface pseudonormals: 0.012525 s, surface finite volumes: 0.012525 s
+export normals and gradients: 0.089462s
+filling sys matrix: 0.006590 s
+(vector) linear sys solve: 0.886205 s
+geom update: 0.060187 s
+evolution step total: 0.978033 s
+step 39 time log:
+surface pseudonormals: 0.014434 s, surface finite volumes: 0.014434 s
+export normals and gradients: 0.080497s
+filling sys matrix: 0.007155 s
+(vector) linear sys solve: 0.384383 s
+geom update: 0.063002 s
+evolution step total: 0.483410 s
+step 40 time log:
+surface pseudonormals: 0.015015 s, surface finite volumes: 0.015015 s
+export normals and gradients: 0.074504s
+filling sys matrix: 0.006442 s
+(vector) linear sys solve: 0.452185 s
+geom update: 0.059848 s
+evolution step total: 0.548505 s
+step 41 time log:
+surface pseudonormals: 0.019068 s, surface finite volumes: 0.019068 s
+export normals and gradients: 0.081119s
+filling sys matrix: 0.006374 s
+(vector) linear sys solve: 0.315745 s
+geom update: 0.058424 s
+evolution step total: 0.418678 s
+step 42 time log:
+surface pseudonormals: 0.011918 s, surface finite volumes: 0.011918 s
+export normals and gradients: 0.077096s
+filling sys matrix: 0.006819 s
+(vector) linear sys solve: 0.278921 s
+geom update: 0.073816 s
+evolution step total: 0.383392 s
+step 43 time log:
+surface pseudonormals: 0.017071 s, surface finite volumes: 0.017071 s
+export normals and gradients: 0.103882s
+filling sys matrix: 0.006390 s
+(vector) linear sys solve: 0.409844 s
+geom update: 0.067227 s
+evolution step total: 0.517604 s
+step 44 time log:
+surface pseudonormals: 0.015160 s, surface finite volumes: 0.015160 s
+export normals and gradients: 0.091811s
+filling sys matrix: 0.007833 s
+(vector) linear sys solve: 0.328487 s
+geom update: 0.068475 s
+evolution step total: 0.435114 s
+step 45 time log:
+surface pseudonormals: 0.014932 s, surface finite volumes: 0.014932 s
+export normals and gradients: 0.080070s
+filling sys matrix: 0.006992 s
+(vector) linear sys solve: 0.367028 s
+geom update: 0.064517 s
+evolution step total: 0.468402 s
+step 46 time log:
+surface pseudonormals: 0.016574 s, surface finite volumes: 0.016574 s
+export normals and gradients: 0.078418s
+filling sys matrix: 0.007349 s
+(vector) linear sys solve: 0.377149 s
+geom update: 0.093260 s
+evolution step total: 0.510906 s
+step 47 time log:
+surface pseudonormals: 0.013120 s, surface finite volumes: 0.013120 s
+export normals and gradients: 0.079343s
+filling sys matrix: 0.008984 s
+(vector) linear sys solve: 0.281980 s
+geom update: 0.058853 s
+evolution step total: 0.376057 s
+step 48 time log:
+surface pseudonormals: 0.012361 s, surface finite volumes: 0.012361 s
+export normals and gradients: 0.098596s
+filling sys matrix: 0.008021 s
+(vector) linear sys solve: 0.316010 s
+geom update: 0.062095 s
+evolution step total: 0.410848 s
+step 49 time log:
+surface pseudonormals: 0.013656 s, surface finite volumes: 0.013656 s
+export normals and gradients: 0.134482s
+filling sys matrix: 0.296233 s
+(vector) linear sys solve: 0.602389 s
+geom update: 0.065356 s
+evolution step total: 0.991289 s
+step 50 time log:
+surface pseudonormals: 0.015102 s, surface finite volumes: 0.015102 s
+export normals and gradients: 0.076964s
+filling sys matrix: 0.008626 s
+(vector) linear sys solve: 0.367856 s
+geom update: 0.059862 s
+evolution step total: 0.466549 s
+step 51 time log:
+surface pseudonormals: 0.013352 s, surface finite volumes: 0.013352 s
+export normals and gradients: 0.077881s
+filling sys matrix: 0.008656 s
+(vector) linear sys solve: 0.322770 s
+geom update: 0.059790 s
+evolution step total: 0.417920 s
+step 52 time log:
+surface pseudonormals: 0.012098 s, surface finite volumes: 0.012098 s
+export normals and gradients: 0.076966s
+filling sys matrix: 0.007111 s
+(vector) linear sys solve: 0.459275 s
+geom update: 0.058947 s
+evolution step total: 0.549528 s
+step 53 time log:
+surface pseudonormals: 0.011842 s, surface finite volumes: 0.011842 s
+export normals and gradients: 0.079161s
+filling sys matrix: 0.007354 s
+(vector) linear sys solve: 0.322258 s
+geom update: 0.063911 s
+evolution step total: 0.417207 s
+step 54 time log:
+surface pseudonormals: 0.014639 s, surface finite volumes: 0.014639 s
+export normals and gradients: 0.098613s
+filling sys matrix: 0.010792 s
+(vector) linear sys solve: 0.345801 s
+geom update: 0.062263 s
+evolution step total: 0.448134 s
+step 55 time log:
+surface pseudonormals: 0.012889 s, surface finite volumes: 0.012889 s
+export normals and gradients: 0.076512s
+filling sys matrix: 0.007306 s
+(vector) linear sys solve: 0.377686 s
+geom update: 0.062482 s
+evolution step total: 0.473252 s
+step 56 time log:
+surface pseudonormals: 0.025111 s, surface finite volumes: 0.025111 s
+export normals and gradients: 0.081591s
+filling sys matrix: 0.007578 s
+(vector) linear sys solve: 0.349719 s
+geom update: 0.078138 s
+evolution step total: 0.485657 s
+step 57 time log:
+surface pseudonormals: 0.015145 s, surface finite volumes: 0.015145 s
+export normals and gradients: 0.080052s
+filling sys matrix: 0.009216 s
+(vector) linear sys solve: 0.307156 s
+geom update: 0.060461 s
+evolution step total: 0.407123 s
+step 58 time log:
+surface pseudonormals: 0.013059 s, surface finite volumes: 0.013059 s
+export normals and gradients: 0.084384s
+filling sys matrix: 0.006663 s
+(vector) linear sys solve: 0.705840 s
+geom update: 0.061271 s
+evolution step total: 0.799893 s
+step 59 time log:
+surface pseudonormals: 0.016611 s, surface finite volumes: 0.016611 s
+export normals and gradients: 0.081456s
+filling sys matrix: 0.006267 s
+(vector) linear sys solve: 0.316565 s
+geom update: 0.071344 s
+evolution step total: 0.427398 s
+step 60 time log:
+surface pseudonormals: 0.014727 s, surface finite volumes: 0.014727 s
+export normals and gradients: 0.075183s
+filling sys matrix: 0.006827 s
+(vector) linear sys solve: 0.323673 s
+geom update: 0.058316 s
+evolution step total: 0.418270 s
+step 61 time log:
+surface pseudonormals: 0.015498 s, surface finite volumes: 0.015498 s
+export normals and gradients: 0.076562s
+filling sys matrix: 0.008229 s
+(vector) linear sys solve: 0.342330 s
+geom update: 0.063840 s
+evolution step total: 0.445394 s
+step 62 time log:
+surface pseudonormals: 0.014898 s, surface finite volumes: 0.014898 s
+export normals and gradients: 0.089207s
+filling sys matrix: 0.006825 s
+(vector) linear sys solve: 0.352412 s
+geom update: 0.057615 s
+evolution step total: 0.446648 s
+step 63 time log:
+surface pseudonormals: 0.013453 s, surface finite volumes: 0.013453 s
+export normals and gradients: 0.081879s
+filling sys matrix: 0.008745 s
+(vector) linear sys solve: 0.311455 s
+geom update: 0.065062 s
+evolution step total: 0.412167 s
+step 64 time log:
+surface pseudonormals: 0.013199 s, surface finite volumes: 0.013199 s
+export normals and gradients: 0.075382s
+filling sys matrix: 0.006330 s
+(vector) linear sys solve: 0.384425 s
+geom update: 0.064273 s
+evolution step total: 0.481426 s
+step 65 time log:
+surface pseudonormals: 0.014735 s, surface finite volumes: 0.014735 s
+export normals and gradients: 0.153239s
+filling sys matrix: 0.015687 s
+(vector) linear sys solve: 0.551838 s
+geom update: 0.060752 s
+evolution step total: 0.657748 s
+step 66 time log:
+surface pseudonormals: 0.016796 s, surface finite volumes: 0.016796 s
+export normals and gradients: 0.075999s
+filling sys matrix: 0.006353 s
+(vector) linear sys solve: 0.387325 s
+geom update: 0.058686 s
+evolution step total: 0.485956 s
+step 67 time log:
+surface pseudonormals: 0.018645 s, surface finite volumes: 0.018645 s
+export normals and gradients: 0.075700s
+filling sys matrix: 0.007977 s
+(vector) linear sys solve: 0.369240 s
+geom update: 0.057967 s
+evolution step total: 0.472473 s
+step 68 time log:
+surface pseudonormals: 0.013323 s, surface finite volumes: 0.013323 s
+export normals and gradients: 0.072007s
+filling sys matrix: 0.006338 s
+(vector) linear sys solve: 0.733441 s
+geom update: 0.092004 s
+evolution step total: 0.858430 s
+step 69 time log:
+surface pseudonormals: 0.036694 s, surface finite volumes: 0.036694 s
+export normals and gradients: 0.169890s
+filling sys matrix: 0.008122 s
+(vector) linear sys solve: 0.575003 s
+geom update: 0.062142 s
+evolution step total: 0.718655 s
+step 70 time log:
+surface pseudonormals: 0.019732 s, surface finite volumes: 0.019732 s
+export normals and gradients: 0.085498s
+filling sys matrix: 0.009619 s
+(vector) linear sys solve: 0.723909 s
+geom update: 0.060350 s
+evolution step total: 0.833341 s
+step 71 time log:
+surface pseudonormals: 0.012958 s, surface finite volumes: 0.012958 s
+export normals and gradients: 0.105628s
+filling sys matrix: 0.015826 s
+(vector) linear sys solve: 0.667765 s
+geom update: 0.057739 s
+evolution step total: 0.767245 s
+step 72 time log:
+surface pseudonormals: 0.013966 s, surface finite volumes: 0.013966 s
+export normals and gradients: 0.087859s
+filling sys matrix: 0.006645 s
+(vector) linear sys solve: 1.290040 s
+geom update: 0.085416 s
+evolution step total: 1.410033 s
+step 73 time log:
+surface pseudonormals: 0.020887 s, surface finite volumes: 0.020887 s
+export normals and gradients: 0.107326s
+filling sys matrix: 0.007162 s
+(vector) linear sys solve: 1.093441 s
+geom update: 0.055827 s
+evolution step total: 1.198204 s
+step 74 time log:
+surface pseudonormals: 0.012906 s, surface finite volumes: 0.012906 s
+export normals and gradients: 0.074226s
+filling sys matrix: 0.006433 s
+(vector) linear sys solve: 1.111999 s
+geom update: 0.062144 s
+evolution step total: 1.206388 s
+step 75 time log:
+surface pseudonormals: 0.013727 s, surface finite volumes: 0.013727 s
+export normals and gradients: 0.073112s
+filling sys matrix: 0.007403 s
+(vector) linear sys solve: 1.560747 s
+geom update: 0.083251 s
+evolution step total: 1.678855 s
+step 76 time log:
+surface pseudonormals: 0.018166 s, surface finite volumes: 0.018166 s
+export normals and gradients: 0.090060s
+filling sys matrix: 0.010413 s
+(vector) linear sys solve: 1.915909 s
+geom update: 0.076027 s
+evolution step total: 2.038681 s
+step 77 time log:
+surface pseudonormals: 0.014256 s, surface finite volumes: 0.014256 s
+export normals and gradients: 0.090226s
+filling sys matrix: 0.006781 s
+(vector) linear sys solve: 2.033368 s
+geom update: 0.059198 s
+evolution step total: 2.127859 s
+step 78 time log:
+surface pseudonormals: 0.012489 s, surface finite volumes: 0.012489 s
+export normals and gradients: 0.077150s
+filling sys matrix: 0.006716 s
+(vector) linear sys solve: 2.489225 s
+geom update: 0.059599 s
+evolution step total: 2.580518 s
+step 79 time log:
+surface pseudonormals: 0.013630 s, surface finite volumes: 0.013630 s
+export normals and gradients: 0.226081s
+filling sys matrix: 0.006862 s
+(vector) linear sys solve: 2.611126 s
+geom update: 0.063483 s
+evolution step total: 2.708730 s
+step 80 time log:
+surface pseudonormals: 0.018098 s, surface finite volumes: 0.018098 s
+export normals and gradients: 0.075062s
+filling sys matrix: 0.006472 s
+(vector) linear sys solve: 3.570620 s
+geom update: 0.063468 s
+evolution step total: 3.676756 s
+step 81 time log:
+surface pseudonormals: 0.016431 s, surface finite volumes: 0.016431 s
+export normals and gradients: 0.112737s
+filling sys matrix: 0.010465 s
+(vector) linear sys solve: 3.338824 s
+geom update: 0.060840 s
+evolution step total: 3.442990 s
+step 82 time log:
+surface pseudonormals: 0.013679 s, surface finite volumes: 0.013679 s
+export normals and gradients: 0.076172s
+filling sys matrix: 0.006658 s
+(vector) linear sys solve: 3.980164 s
+geom update: 0.060608 s
+evolution step total: 4.074787 s
+step 83 time log:
+surface pseudonormals: 0.015012 s, surface finite volumes: 0.015012 s
+export normals and gradients: 0.076562s
+filling sys matrix: 0.006087 s
+(vector) linear sys solve: 4.639799 s
+geom update: 0.119258 s
+evolution step total: 4.795168 s
+step 84 time log:
+surface pseudonormals: 0.017869 s, surface finite volumes: 0.017869 s
+export normals and gradients: 0.100305s
+filling sys matrix: 0.006316 s
+(vector) linear sys solve: 9.416040 s
+geom update: 0.063223 s
+evolution step total: 9.521317 s
+step 85 time log:
+surface pseudonormals: 0.016437 s, surface finite volumes: 0.016437 s
+export normals and gradients: 0.087631s
+filling sys matrix: 0.006956 s
+(vector) linear sys solve: 7.716638 s
+geom update: 0.073398 s
+evolution step total: 7.829865 s
+step 86 time log:
+surface pseudonormals: 0.013952 s, surface finite volumes: 0.013952 s
+export normals and gradients: 0.097392s
+filling sys matrix: 0.009881 s
+(vector) linear sys solve: 6.640926 s
+geom update: 0.058105 s
+evolution step total: 6.736815 s
+step 87 time log:
+surface pseudonormals: 0.012923 s, surface finite volumes: 0.012923 s
+export normals and gradients: 0.072316s
+filling sys matrix: 0.006544 s
+(vector) linear sys solve: 5.536627 s
+geom update: 0.059476 s
+evolution step total: 5.628493 s
+step 88 time log:
+surface pseudonormals: 0.013402 s, surface finite volumes: 0.013402 s
+export normals and gradients: 0.074342s
+filling sys matrix: 0.006561 s
+(vector) linear sys solve: 5.521120 s
+geom update: 0.069254 s
+evolution step total: 5.623738 s
+step 89 time log:
+surface pseudonormals: 0.021238 s, surface finite volumes: 0.021238 s
+export normals and gradients: 0.084784s
+filling sys matrix: 0.007153 s
+(vector) linear sys solve: 5.915161 s
+geom update: 0.064534 s
+evolution step total: 6.029323 s
+step 90 time log:
+surface pseudonormals: 0.015045 s, surface finite volumes: 0.015045 s
+export normals and gradients: 0.078552s
+filling sys matrix: 0.006606 s
+(vector) linear sys solve: 5.285777 s
+geom update: 0.095515 s
+evolution step total: 5.417988 s
+
+ Total time for 100 steps: 147.368896 s
