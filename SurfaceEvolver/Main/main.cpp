@@ -14,7 +14,9 @@
 #include "../ExportImport/OBJImporter.h"
 #include "../SDF/SDF.h"
 #include "../Utils/CPUInfo.h"
-#include "SurfaceEvolutionSolver.h"
+#include "../EvolutionCore/Evolver.h"
+#include "../EvolutionCore/Parameters.h"
+#include "../EvolutionCore/EvolutionRemesher.h"
 
 //   DONE:
 //
@@ -49,6 +51,9 @@
 // - implement cutoff offset for the bounding cube to compute the field on minimum necessary subset (box)
 // - visualize angle-weighted pseudo-normals with interpolated -grad(SDF) vectors
 // - add scalar data (fvAreas, distances, curvatures) to mesh vertices
+// - Special types: SEvolverParams, SDFParams,...
+// - SurfaceEvolutionSolver -> Evolver, LinearSolver
+// - refactor and separate console and log outputs for specific situations
 
 //  POSTPONED:
 //
@@ -72,18 +77,17 @@
 
 //   WIP:
 // 
+// - catch all NaNs as exceptions
 
 
 //   TODO:
 //
-// - Special types: SEvolverParams, SDFParams,...
-// - SurfaceEvolutionSolver -> Evolver, LinearSolver
-// - catch all NaNs as exceptions
 // - test evolution for extremal cases: MCF dominant (eta = 0.01, eps = 1.0) and SDF dominant (eta = 1, eps = 0.01)
 // - co-volume measure-driven time step: dt ~ m(V)
 //
 // - fix SDF coordinates (use global grid indexing)
 // - implement global grid and cellSize-based Octree & SDF (just like in Vctr Engine Meta Object)
+// - finish class EvolutionRemesher with all params
 //
 // - quad co-volume scheme
 // - mean curvature flow for sphere test (quad scheme)
@@ -147,6 +151,12 @@ void performSDFTest(uint res, Geometry& g, std::fstream& timing, VTKExporter& e)
 
 
 void performUnitSphereTest() {
+	EvolutionParams eParams;
+	eParams.tStop = 0.06f; eParams.elType = ElementType::tri;
+	eParams.name = "testSphere"; eParams.saveStates = true;
+
+	SphereTestParams stParams;
+
 	std::fstream errLog("testSphere_errorLog.txt", std::fstream::out);
 	errLog << "================================\n";
 	errLog << ">>> Evolution error log ........\n";
@@ -155,7 +165,10 @@ void performUnitSphereTest() {
 		if (i > 0) errPrev = err;
 
 		float dt = 0.01f / pow(4, i);
-		SurfaceEvolutionSolver sphereTest(dt, 0.06f, i + 1, ElementType::tri, "testSphere", i, true);
+		eParams.dt = dt; eParams.NSteps = i + 1;
+		stParams.testId = i;
+
+		Evolver sphereTest(eParams, stParams);
 		err = sphereTest.sphereTestL2Error;
 
 		errLog << "dt = " << dt << ", Nsteps = " << sphereTest.NSteps << ", Nverts = " << sphereTest.N << std::endl;
@@ -266,25 +279,35 @@ int main()
 
 	// ====== BUNNY Evolution =============================
 	float dt = 0.018f;
-	SurfaceEvolutionSolver evolver(dt, 100, (uint)5, ElementType::tri, &bunny, bunny_sdf.grid, "evolvingBunny", true, true, true, true, true);*/
+	Evolver evolver(dt, 100, (uint)5, ElementType::tri, &bunny, bunny_sdf.grid, "evolvingBunny", true, true, true, true, true);*/
 
 	// cube with holes
-	/*
+	/**/
 	OBJImporter obj = OBJImporter();
 	Geometry cwh = obj.importOBJGeometry("cubeWithHoles.obj");
 	cwh.applyMatrix(Matrix4().setToScale(0.02f, 0.02f, 0.02f));
 	std::string name = "evolvingCubeWithHoles";
 	e.initExport(&cwh, "cubeWithHoles");
 
-	uint res = 80; // octree resolution
+	uint res = 60; // octree resolution
 	SDF cwh_sdf = SDF(&cwh, res);
 	// cwh_sdf.exportGrid(&e, "cubeWithHoles_SDF");
 	// cwh_sdf.exportGradientField(&e, "cubeWithHoles_SDF_grad");
 
 	std::cout << cwh_sdf.getComputationProperties();
 
-	float dt = 0.018f;
-	SurfaceEvolutionSolver evolver(dt, 130, (uint)4, ElementType::tri, &cwh, cwh_sdf.grid, name, true, true, true, true, false, false, true);*/
+	EvolutionParams eParams;
+	eParams.name = name;
+	eParams.dt = 0.018f; eParams.NSteps = 130; eParams.subdiv = (uint)4; eParams.elType = ElementType::tri;
+	eParams.saveStates = true; eParams.printStepOutput = true; eParams.writeTimeLog = true;
+	MeanCurvatureParams mcfParams;
+	mcfParams.saveAreaStates = true; mcfParams.writeMeanAreaLog = true;
+	GradDistanceParams sdfParams;
+	sdfParams.targetGeom = &cwh; sdfParams.sdfGrid = cwh_sdf.grid;
+	sdfParams.saveDistanceStates = true;
+	sdfParams.saveGradientStates = true;
+
+	Evolver evolver(eParams, mcfParams, sdfParams);
 	
 
 	// arc
@@ -303,7 +326,7 @@ int main()
 	std::cout << arc_sdf.getComputationProperties();
 
 	float dt = 0.013f;
-	SurfaceEvolutionSolver evolver(dt, 120, (uint)4, ElementType::tri, &arc, arc_sdf.grid, name, true, false, true);*/
+	Evolver evolver(dt, 120, (uint)4, ElementType::tri, &arc, arc_sdf.grid, name, true, false, true);*/
 
 	/*
 	e.exportGeometryVertexNormals(&bunny, "bunnyNormals");
@@ -325,7 +348,7 @@ int main()
 	//boxSDF.exportGradientField(&e, "boxSDF_Grad");
 
 	float dt = 0.03f;
-	SurfaceEvolutionSolver evolver(dt, 100, (uint)2, ElementType::tri, &b, boxSDF.grid, name, true, true, true, true, false, false, true);*/
+	Evolver evolver(dt, 100, (uint)2, ElementType::tri, &b, boxSDF.grid, name, true, true, true, true, false, false, true);*/
 	
 
 	/*
@@ -341,7 +364,7 @@ int main()
 	//isSDF.exportGradientField(&e, name + "SDF_Grad");
 
 	float dt = 0.018f;
-	SurfaceEvolutionSolver evolver(dt, 200, (uint)2, ElementType::tri, &is, isSDF.grid, name, true, true, true, true, false, false, true);*/
+	Evolver evolver(dt, 200, (uint)2, ElementType::tri, &is, isSDF.grid, name, true, true, true, true, false, false, true);*/
 	/*
 	IcoSphere is(1, 1.0f);
 	e.initExport(&is, "icoSphere");
@@ -367,7 +390,7 @@ int main()
 	/*
 	uint i = 0;
 	float dt = 0.01f / pow(4, i);
-	SurfaceEvolutionSolver sphereTest(dt, 0.06f, i, ElementType::tri, "testSphere", false, false, true);*/
+	Evolver sphereTest(dt, 0.06f, i, ElementType::tri, "testSphere", false, false, true);*/
 
 	/*
 	Matrix4 sdfTransform = Matrix4().makeTranslation(0.5, 0.5, 0.5).multiply(Matrix4().setToScale(2.0f, 2.0f, 2.0f));

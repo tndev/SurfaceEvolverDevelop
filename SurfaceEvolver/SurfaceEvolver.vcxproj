@@ -157,6 +157,8 @@
   <ItemGroup>
     <ClCompile Include="BVH\AABBTree.cpp" />
     <ClCompile Include="BVH\Octree.cpp" />
+    <ClCompile Include="EvolutionCore\EvolutionRemesher.cpp" />
+    <ClCompile Include="EvolutionCore\Evolver.cpp" />
     <ClCompile Include="ExportImport\OBJExporter.cpp" />
     <ClCompile Include="ExportImport\OBJImporter.cpp" />
     <ClCompile Include="ExportImport\VTKExporter.cpp" />
@@ -171,7 +173,6 @@
     <ClCompile Include="Geometry\Quaternion.cpp" />
     <ClCompile Include="Geometry\Vector3.cpp" />
     <ClCompile Include="Main\main.cpp" />
-    <ClCompile Include="Main\SurfaceEvolutionSolver.cpp" />
     <ClCompile Include="poly2tri\common\shapes.cc" />
     <ClCompile Include="poly2tri\sweep\advancing_front.cc" />
     <ClCompile Include="poly2tri\sweep\cdt.cc" />
@@ -180,10 +181,14 @@
     <ClCompile Include="SDF\FastSweep3D.cpp" />
     <ClCompile Include="SDF\Grid.cpp" />
     <ClCompile Include="SDF\SDF.cpp" />
+    <ClCompile Include="Utils\LinearSolver.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BVH\AABBTree.h" />
     <ClInclude Include="BVH\Octree.h" />
+    <ClInclude Include="EvolutionCore\EvolutionRemesher.h" />
+    <ClInclude Include="EvolutionCore\Evolver.h" />
+    <ClInclude Include="EvolutionCore\Parameters.h" />
     <ClInclude Include="ExportImport\OBJExporter.h" />
     <ClInclude Include="ExportImport\OBJImporter.h" />
     <ClInclude Include="ExportImport\VTKExporter.h" />
@@ -197,7 +202,6 @@
     <ClInclude Include="Geometry\Matrix4.h" />
     <ClInclude Include="Geometry\Quaternion.h" />
     <ClInclude Include="Geometry\Vector3.h" />
-    <ClInclude Include="Main\SurfaceEvolutionSolver.h" />
     <ClInclude Include="poly2tri\common\shapes.h" />
     <ClInclude Include="poly2tri\common\utils.h" />
     <ClInclude Include="poly2tri\poly2tri.h" />
@@ -209,6 +213,7 @@
     <ClInclude Include="SDF\Grid.h" />
     <ClInclude Include="SDF\SDF.h" />
     <ClInclude Include="Utils\CPUInfo.h" />
+    <ClInclude Include="Utils\LinearSolver.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

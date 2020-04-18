@@ -29,6 +29,9 @@
     <Filter Include="Utils">
       <UniqueIdentifier>{65c2913a-2035-41ac-93a5-88ce22e68b56}</UniqueIdentifier>
     </Filter>
+    <Filter Include="RemeshingCore">
+      <UniqueIdentifier>{1f6ea2d2-2af8-4dee-bf10-a728060223fd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="poly2tri\common\shapes.cc">
@@ -103,8 +106,14 @@
     <ClCompile Include="Geometry\Quaternion.cpp">
       <Filter>Geometry</Filter>
     </ClCompile>
-    <ClCompile Include="Main\SurfaceEvolutionSolver.cpp">
-      <Filter>Main</Filter>
+    <ClCompile Include="Utils\LinearSolver.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="EvolutionCore\Evolver.cpp">
+      <Filter>RemeshingCore</Filter>
+    </ClCompile>
+    <ClCompile Include="EvolutionCore\EvolutionRemesher.cpp">
+      <Filter>RemeshingCore</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -186,8 +195,17 @@
     <ClInclude Include="Utils\CPUInfo.h">
       <Filter>Utils</Filter>
     </ClInclude>
-    <ClInclude Include="Main\SurfaceEvolutionSolver.h">
-      <Filter>Main</Filter>
+    <ClInclude Include="Utils\LinearSolver.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="EvolutionCore\Evolver.h">
+      <Filter>RemeshingCore</Filter>
+    </ClInclude>
+    <ClInclude Include="EvolutionCore\Parameters.h">
+      <Filter>RemeshingCore</Filter>
+    </ClInclude>
+    <ClInclude Include="EvolutionCore\EvolutionRemesher.h">
+      <Filter>RemeshingCore</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
