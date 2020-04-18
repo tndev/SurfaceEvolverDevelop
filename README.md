@@ -63,7 +63,7 @@ L2Error = 5.1363e-05, EOC = 2.036
 ![sphereTest](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/ShrinkingSphere.gif)
 
 # 1.3 Evolution in the Normal Direction - Using -grad(d(x)) to Control Evolution:
-### Scaled Icosahedron
+## Scaled Icosahedron
 - **octreeResolution** = `40^3`, **SDF_gridResolution** = `120 x 106 x 106`
 - **NTimeSteps** = `200`, **dt** = `0.018`
 - **NVerts** = `162`
@@ -73,7 +73,7 @@ L2Error = 5.1363e-05, EOC = 2.036
 - **scalars:** dot(grad(distance), vNormal)
 ![icoEllipsoid](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/ToIcoEllipsoidWDotProducts.gif)
 
-### Cube
+## Cube
 - **octreeResolution** = `40^3`, **SDF_gridResolution** = `120^3`
 - **NTimeSteps** = `100`, **dt** = `0.03`
 - **NVerts** = `162`
@@ -83,7 +83,17 @@ L2Error = 5.1363e-05, EOC = 2.036
 - **scalars:** dot(grad(distance), vNormal)
 ![cube](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/ToIcoCubeWDotProducts.gif)
 
-### Cube With Holes
+## Cube With Holes
+- **octreeResolution** = `80^3`, **SDF_gridResolution** = `240 x 239 x 240`
+- **NTimeSteps** = `130`, **dt** = `0.018`
+- **NVerts** = `2562`
+
+**Graphics annotation:**
+- **vectors:** vertex normals (black), grad(distance) (red)
+- **scalars:** dot(grad(distance), vNormal)
+![cubeWHoles1](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/ToCubeWithHolesWDotProducts.gif)
+
+## Cube With Holes (Larger Time Step)
 - **octreeResolution** = `40^3`, **SDF_gridResolution** = `120 x 119 x 120`
 - **NTimeSteps** = `100`, **dt** = `0.058`
 - **NVerts** = `2562`
