@@ -66,15 +66,10 @@ L2Error = 5.1363e-05, EOC = 2.036
 ### Scaled Icosahedron
 
 octreeResolution = 40^3, SDF_gridResolution = 120 x 106 x 106
-
 NTimeSteps = 200, dt = 0.018
-
 NVerts = 162
-
 Graphics annotation:
-
 vectors: vertex normals (black), grad(distance) (red)
-
 scalars: dot(grad(distance), vNormal)
 ![icoEllipsoid](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/ToIcoEllipsoidWDotProducts.gif)
 
