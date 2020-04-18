@@ -74,9 +74,22 @@ L2Error = 5.1363e-05, EOC = 2.036
 ![icoEllipsoid](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/ToIcoEllipsoidWDotProducts.gif)
 
 ### Cube
-scalars: dot(grad(distance), vNormal)
+- **octreeResolution** = `40^3`, **SDF_gridResolution** = `120^3`
+- **NTimeSteps** = `100`, **dt** = `0.03`
+- **NVerts** = `162`
+
+**Graphics annotation:**
+- **vectors:** vertex normals (black), grad(distance) (red)
+- **scalars:** dot(grad(distance), vNormal)
 ![cube](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/ToIcoCubeWDotProducts.gif)
 
 ### Cube With Holes
-scalars: dot(grad(distance), vNormal)
+- **octreeResolution** = `40^3`, **SDF_gridResolution** = `120 x 119 x 120`
+- **NTimeSteps** = `100`, **dt** = `0.058`
+- **NVerts** = `2562`
+
+**Graphics annotation:**
+- **vectors:** vertex normals (black), grad(distance) (red)
+- **scalars:** dot(grad(distance), vNormal)
+![cubeWHoles](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/CubeWithHolesLargeStep.gif)
 
