@@ -269,7 +269,7 @@ int main()
 	SurfaceEvolutionSolver evolver(dt, 100, (uint)5, ElementType::tri, &bunny, bunny_sdf.grid, "evolvingBunny", true, true, true, true, true);*/
 
 	// cube with holes
-	/**/
+	/*
 	OBJImporter obj = OBJImporter();
 	Geometry cwh = obj.importOBJGeometry("cubeWithHoles.obj");
 	cwh.applyMatrix(Matrix4().setToScale(0.02f, 0.02f, 0.02f));
@@ -284,7 +284,7 @@ int main()
 	std::cout << cwh_sdf.getComputationProperties();
 
 	float dt = 0.018f;
-	SurfaceEvolutionSolver evolver(dt, 130, (uint)4, ElementType::tri, &cwh, cwh_sdf.grid, name, true, true, true, true, false, false, true);
+	SurfaceEvolutionSolver evolver(dt, 130, (uint)4, ElementType::tri, &cwh, cwh_sdf.grid, name, true, true, true, true, false, false, true);*/
 	
 
 	// arc
