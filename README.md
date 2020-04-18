@@ -63,17 +63,65 @@ L2Error = 5.1363e-05, EOC = 2.036
 ![sphereTest](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/ShrinkingSphere.gif)
 
 # 1.3 Evolution in the Normal Direction - Using -grad(d(x)) to Control Evolution:
-### Ellipsoid:
-![sphereToEllipsoid](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/SphereToEllipsoidStatic.gif)
+## Scaled Icosahedron
+- **octreeResolution** = `40^3`, **SDF_gridResolution** = `120 x 106 x 106`
+- **NTimeSteps** = `200`, **dt** = `0.018`
+- **NVerts** = `162`
 
-### Cube:
-![sphereToCube](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/SphereToCubeEvolutionStatic.gif)
+**Graphics annotation:**
+- **vectors:** vertex normals (black), grad(distance) (red)
+- **scalars:** dot(grad(distance), vNormal)
+![icoEllipsoid](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/ToIcoEllipsoidWDotProducts.gif)
 
-### Rotated Cube:
-![sphereToRotatedCube](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/SphereToRotatedBox.gif)
+## Cube
+- **octreeResolution** = `40^3`, **SDF_gridResolution** = `120^3`
+- **NTimeSteps** = `100`, **dt** = `0.03`
+- **NVerts** = `162`
 
-### Sphere to Sphere (Same tesselation):
-![sphereToSphere](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/SphereToSphereStatic.gif)
+**Graphics annotation:**
+- **vectors:** vertex normals (black), grad(distance) (red)
+- **scalars:** dot(grad(distance), vNormal)
+![cube](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/ToIcoCubeWDotProducts.gif)
 
-### Bunny:
-![sphereToBunny](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/SphereToBunny.gif)
+## Cube With Holes
+- **octreeResolution** = `80^3`, **SDF_gridResolution** = `240 x 239 x 240`
+- **NTimeSteps** = `130`, **dt** = `0.018`
+- **NVerts** = `2562`
+
+**Graphics annotation:**
+- **vectors:** vertex normals (black), grad(distance) (red)
+- **scalars:** dot(grad(distance), vNormal)
+![cubeWHoles1](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/ToCubeWithHolesWDotProducts.gif)
+
+## How Does Evolution Behave For Non-Convex Target Meshes?
+
+## Cube With Holes (Larger Time Step)
+- **octreeResolution** = `40^3`, **SDF_gridResolution** = `120 x 119 x 120`
+- **NTimeSteps** = `100`, **dt** = `0.058`
+- **NVerts** = `2562`
+
+**Graphics annotation:**
+- **vectors:** vertex normals (black), grad(distance) (red)
+- **scalars:** dot(grad(distance), vNormal)
+![cubeWHoles](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/CubeWithHolesLargeStep.gif)
+
+## Arc
+- **octreeResolution** = `40^3`, **SDF_gridResolution** = `120 x 115 x 96`
+- **NTimeSteps** = `100`, **dt** = `0.013`
+- **NVerts** = `2562`
+### Left View:
+![evolveArc1](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/evolUpdateSend1.gif)
+### Right View (strange indentation):
+![evolveArc2](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/evolUpdateSend2.gif)
+
+## Bunny
+- **octreeResolution** = `40^3`, **SDF_gridResolution** = `119 x 119 x 111`
+- **NTimeSteps** = `100`, **dt** = `0.058`
+- **NVerts** = `10242`
+### Oh Man!
+![largeBunny](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/SphereToBunny.gif)
+### What's Happening in there?
+**Graphics annotation:**
+- **vectors:** vertex normals (black), grad(distance) (red)
+- **scalars:** dot(grad(distance), vNormal)
+![closeUpBunny](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/BunnyDivergentEvolution.gif)
