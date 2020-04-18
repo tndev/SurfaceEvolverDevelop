@@ -1,11 +1,9 @@
 ﻿  main.cpp
 D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\poly2tri\sweep\sweep_context.h(161,24): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
 D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\main.cpp(167,12): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\main.cpp(352,73): warning C4305: 'argument': truncation from 'double' to 'float'
   Generating code
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(671): warning C4723: potential divide by 0
-  1347 of 1962 functions (68.7%) were compiled, the rest were copied from previous compilation.
-    2 functions were new in current compilation
-    77 functions had inline decision re-evaluated but remain unchanged
+  1 of 2548 functions (<0.1%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    7 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   SurfaceEvolver.vcxproj -> D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\x64\Release\SurfaceEvolver.exe

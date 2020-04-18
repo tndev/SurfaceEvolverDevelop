@@ -308,14 +308,30 @@ int main()
 
 	EvolutionParams eParams;
 	eParams.name = name;
-	eParams.dt = 0.058f; eParams.NSteps = 100; eParams.subdiv = (uint)4; eParams.elType = ElementType::tri;
+	eParams.dt = 0.048f; eParams.NSteps = 50; eParams.subdiv = (uint)4; eParams.elType = ElementType::tri;
 	eParams.saveStates = true; eParams.printStepOutput = true; eParams.writeTimeLog = true;
 	MeanCurvatureParams mcfParams;
 	mcfParams.saveAreaStates = true; mcfParams.writeMeanAreaLog = true;
 	GradDistanceParams sdfParams;
 	sdfParams.targetGeom = &cwh; sdfParams.sdfGrid = cwh_sdf.grid;
 	sdfParams.saveDistanceStates = true;
-	sdfParams.saveGradientStates = true;
+	sdfParams.saveGradientStates = true;*/
+
+	/*
+	// MCF dominant config (eta = 0.01, eps = 1.0)
+	sdfParams.C = -0.01f;
+	sdfParams.constant = true;
+
+	mcfParams.C1 = 1.0f;
+	mcfParams.constant = true;*/
+
+	/*
+	// SDF dominant config (eta = 1, eps = 0.01)
+	sdfParams.C = -1.0f;
+	sdfParams.constant = true;
+
+	mcfParams.C1 = 0.01f;
+	mcfParams.constant = true;
 
 	Evolver evolver(eParams, mcfParams, sdfParams);*/
 	
@@ -344,7 +360,7 @@ int main()
 
 	// performUnitSphereTest();
 
-	/**/
+	/*
 	std::string name = "testBox";
 	PrimitiveBox b = PrimitiveBox(1, 1, 1, 3, 3, 3, true, name);
 	Vector3 axis = Vector3(1, 1, 1);
@@ -370,7 +386,7 @@ int main()
 	//sdfParams.saveDistanceStates = true;
 	//sdfParams.saveGradientStates = true;
 	
-	Evolver evolver(eParams, mcfParams, sdfParams);
+	Evolver evolver(eParams, mcfParams, sdfParams);*/
 
 	/*
 	std::string name = "testEllipsoid";
