@@ -83,6 +83,8 @@ L2Error = 5.1363e-05, EOC = 2.036
 - **scalars:** dot(grad(distance), vNormal)
 ![cube](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/ToIcoCubeWDotProducts.gif)
 
+## How Does Evolution Behave For Non-Convex Target Meshes?
+
 ## Cube With Holes
 - **octreeResolution** = `80^3`, **SDF_gridResolution** = `240 x 239 x 240`
 - **NTimeSteps** = `130`, **dt** = `0.018`
@@ -92,8 +94,6 @@ L2Error = 5.1363e-05, EOC = 2.036
 - **vectors:** vertex normals (black), grad(distance) (red)
 - **scalars:** dot(grad(distance), vNormal)
 ![cubeWHoles1](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/ToCubeWithHolesWDotProducts.gif)
-
-## How Does Evolution Behave For Non-Convex Target Meshes?
 
 ## Cube With Holes (Larger Time Step)
 - **octreeResolution** = `40^3`, **SDF_gridResolution** = `120 x 119 x 120`
