@@ -6,8 +6,7 @@ Done: generate a distance field field around a mesh using the [Fast Sweeping Met
 
 Current WIP: 
 
-- optimize the construction of AABBTree and Octree. Try flat node array
-- evolve a simple primitive onto an object contained within (e.g.: `CubeSphere` -> `Cube` )
+- Implement volume-based tangential redistribution
 
 ### ============ Progress So far ===============:
 
