@@ -74,25 +74,18 @@ L2Error = 5.1363e-05, EOC = 2.036
 ![sphereTest](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/ShrinkingSphere.gif)
 
 # 1.3 Evolution in the Normal Direction - Using -grad(d(x)) to Control Evolution:
+### (original model, remeshed without tangential redistribution,  after smoothing)
 ## Scaled Icosahedron
 - **octreeResolution** = `40^3`, **SDF_gridResolution** = `120 x 106 x 106`
-- **NTimeSteps** = `200`, **dt** = `0.018`
+- **NTimeSteps** = `150`, **NSmoothingSteps** = `10`, **dt** = `0.03`
 - **NVerts** = `162`
-
-**Graphics annotation:**
-- **vectors:** vertex normals (black), grad(distance) (red)
-- **scalars:** dot(grad(distance), vNormal)
-![icoEllipsoid](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/ToIcoEllipsoidWDotProducts.gif)
+![icoEllipsoid](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/IcoSphereBasicRemesh.jpg)
 
 ## Cube
 - **octreeResolution** = `40^3`, **SDF_gridResolution** = `120^3`
-- **NTimeSteps** = `100`, **dt** = `0.03`
+- **NTimeSteps** = `100`, **NSmoothingSteps** = `10`, **dt** = `0.03`
 - **NVerts** = `162`
-
-**Graphics annotation:**
-- **vectors:** vertex normals (black), grad(distance) (red)
-- **scalars:** dot(grad(distance), vNormal)
-![cube](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/ToIcoCubeWDotProducts.gif)
+![cube](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/CubeBasicRemesh.jpg)
 
 ## How Does Evolution Behave For Non-Convex Target Meshes?
 
@@ -127,6 +120,6 @@ L2Error = 5.1363e-05, EOC = 2.036
 
 ## Stanford Bunny
 - **octreeResolution** = `40^3`, **SDF_gridResolution** = `119 x 119 x 111`
-- **NTimeSteps** = `150`, **dt** = `0.03`
-- **NVerts** = `10242`
+- **NTimeSteps** = `100` (terminates after `59` steps on a degenerate triangle), **dt** = `0.03`
+- **NVerts** = `2562`
 ![bunnyEvolGif](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/BunnyEvolution.gif)
