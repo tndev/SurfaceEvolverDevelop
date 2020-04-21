@@ -74,36 +74,16 @@ void Evolver::evolve()
 		}
 	}
 
-	std::fstream log;
-	std::fstream meanAreaLog;
-	std::fstream errorLog; // for sphereTest
-	std::fstream timingLog;
-
-	if (writeGenericLog) {
-		log = std::fstream(geomName + "_evolutionLog.txt", std::fstream::out);
-		log << log_header;
-	}
-
-	if (writeMeanAreaLog) {
-		meanAreaLog = std::fstream(geomName + "_meanAreaLog.txt", std::fstream::out);
-		//meanAreaLog << log_header;
-	}
-
-	if (writeErrorLog) {
-		errorLog = std::fstream(geomName + "_errorLog(" + std::to_string(testId) + ").txt", std::fstream::out);
-		errorLog << log_header;
-	}
-
-	if (writeTimeLog) {
-		timingLog = std::fstream(geomName + "_timingLog.txt", std::fstream::out);
-		timingLog << log_header;
-	}
-
 	sphereTestL2Error = 0.0f;
 
-	auto startGlobalTime = std::chrono::high_resolution_clock::now();
+	if (start_flag) {
+		startGlobalTime = std::chrono::high_resolution_clock::now();
+		start_flag = false;
+	}
 
-	for (int ti = 1; ti <= NSteps; ti++) {
+	uint TSteps = (smoothing_flag ? smoothSteps : NSteps);
+
+	for (int ti = tBegin; ti < tBegin + TSteps; ti++) {
 
 		float t = (float)ti / (float)NSteps * tStop;
 		std::string timeStepLine = "-------- time step ti = " + std::to_string(ti) + ", t = " + std::to_string(t) + " -----------\n";
@@ -151,10 +131,10 @@ void Evolver::evolve()
 		if (printHappenings) std::cout << "filling sys matrix & rhs ..." << std::endl;
 		float meanArea;
 		if (this->elType == ElementType::tri) {
-			this->getTriangleEvolutionSystem(fvVerts, adjacentPolys, meanArea);
+			this->getTriangleEvolutionSystem(ti - tBegin, fvVerts, adjacentPolys, meanArea);
 		}
 		else {
-			this->getQuadEvolutionSystem(fvVerts, adjacentPolys, meanArea);
+			this->getQuadEvolutionSystem(ti - tBegin, fvVerts, adjacentPolys, meanArea);
 		}
 		if (std::isnan(meanArea)) {
 			std::cout << "meanArea = NaN!\n";
@@ -268,6 +248,10 @@ void Evolver::evolve()
 		// ========= E N D =========================
 	}
 
+	if (saveResult) {
+		exportResultGeometry((smoothing_flag ? "_smoothed" : "_result"));
+	}
+
 	if (sphereTest) {
 		sphereTestL2Error *= dt;
 		sphereTestL2Error = sqrt(sphereTestL2Error);
@@ -285,16 +269,14 @@ void Evolver::evolve()
 		exportVectorStates(NSteps);
 	}
 
-	auto endGlobalTime = std::chrono::high_resolution_clock::now();
-	std::chrono::duration<float> elapsedTimeTotal = (endGlobalTime - startGlobalTime);
-	std::string total_time_message = "\n Total time for " + std::to_string(NSteps) + " steps: " + std::to_string(elapsedTimeTotal.count()) + " s\n";
-	if (writeGenericLog) log << total_time_message;
-	if (writeTimeLog) timingLog << total_time_message;
-
-	if (writeGenericLog) log.close();
-	if (writeErrorLog) errorLog.close();
-	if (writeMeanAreaLog) meanAreaLog.close();
-	if (writeTimeLog) timingLog.close();
+	if (smoothSteps < 0 || smoothing_flag) {
+		auto endGlobalTime = std::chrono::high_resolution_clock::now();
+		elapsedTimeTotal = (endGlobalTime - startGlobalTime);
+		std::string total_time_message = "\n Total time for " + std::to_string(NSteps + std::max(0, smoothSteps)) + " steps: " + std::to_string(elapsedTimeTotal.count()) + " s\n";
+		if (printStepOutput) std::cout << total_time_message;
+		if (writeGenericLog) log << total_time_message;
+		if (writeTimeLog) timingLog << total_time_message;
+	}
 }
 
 void Evolver::clearSystem()
@@ -506,12 +488,17 @@ float Evolver::laplaceBeltramiCtrlFunc(float& SDF_V)
 	return C1 * (1.0f - exp(-(SDF_V * SDF_V) / C2));
 }
 
+float Evolver::laplaceBeltramiSmoothFunc(float t)
+{
+	return initSmoothRate * exp(-smoothDecay * t);
+}
+
 float Evolver::etaCtrlFunc(float& SDF_V, Vector3& gradSDF_V, Vector3& nV)
 {
 	if (etaConstant) return C;
 
 	float gradDotN = dot(-1.0f * gradSDF_V, nV);
-	return SDF_V * (gradDotN + 0 * sqrt(1 - gradDotN * gradDotN)) * C;
+	return SDF_V * (gradDotN + D * sqrt(1 - gradDotN * gradDotN)) * C;
 }
 
 //
@@ -520,7 +507,7 @@ float Evolver::etaCtrlFunc(float& SDF_V, Vector3& gradSDF_V, Vector3& nV)
 // [3] Tomek, Mikula - DISCRETE DUALITY FINITE VOLUME METHOD WITH TANGENTIAL REDISTRIBUTION OF POINTS FOR SURFACES EVOLVING BY MEAN CURVATURE (p. 1808)
 //
 void Evolver::getTriangleEvolutionSystem(
-	std::vector<std::vector<Vector3>>& fvVerts, std::vector<std::vector<std::vector<uint>>>& adjacentPolys, float& meanArea)
+	float smoothStep, std::vector<std::vector<Vector3>>& fvVerts, std::vector<std::vector<std::vector<uint>>>& adjacentPolys, float& meanArea)
 {
 	if (saveDistanceStates) {
 		// clear and allocate the distance buffer
@@ -554,6 +541,12 @@ void Evolver::getTriangleEvolutionSystem(
 		if (!meanCurvatureFlow) {
 			this->getInterpolatedSDFValuesforVertex(&Fi, &SDF_V, &gradSDF_V, positionBuffer, valueBuffer);
 			eps = laplaceBeltramiCtrlFunc(SDF_V);
+		}
+		else if (smoothing_flag) {
+			if (sdfGrid && (saveDistanceStates || saveGradientStates)) {
+				this->getInterpolatedSDFValuesforVertex(&Fi, &SDF_V, &gradSDF_V, positionBuffer, valueBuffer);
+			}
+			eps = laplaceBeltramiSmoothFunc(smoothStep);
 		}
 
 		if (saveGradientStates) vGradients[i] = gradSDF_V;
@@ -635,7 +628,7 @@ void Evolver::getTriangleEvolutionSystem(
 // [4] M. Medla - SOLVING PARTIAL DIFFERENTIAL EQUATIONS USING FINITE VOLUME METHOD ON NON-UNIFORM GRIDS (PhD Thesis, p. 29)
 //
 void Evolver::getQuadEvolutionSystem(
-	std::vector<std::vector<Vector3>>& fvVerts, std::vector<std::vector<std::vector<uint>>>& adjacentPolys, float& meanArea)
+	float smoothStep, std::vector<std::vector<Vector3>>& fvVerts, std::vector<std::vector<std::vector<uint>>>& adjacentPolys, float& meanArea)
 {
 	for (uint i = 0; i < N; i++) {
 		// <=== part identical to getQuadEvolutionSystem based on [1], [2], [3] =======
@@ -682,6 +675,36 @@ void Evolver::getQuadEvolutionSystem(
 	}
 }
 
+void Evolver::openLogs()
+{
+	if (writeGenericLog) {
+		log = std::fstream(geomName + "_evolutionLog.txt", std::fstream::out);
+		log << log_header;
+	}
+
+	if (writeMeanAreaLog) {
+		meanAreaLog = std::fstream(geomName + "_meanAreaLog.txt", std::fstream::out);
+	}
+
+	if (writeErrorLog) {
+		errorLog = std::fstream(geomName + "_errorLog(" + std::to_string(testId) + ").txt", std::fstream::out);
+		errorLog << log_header;
+	}
+
+	if (writeTimeLog) {
+		timingLog = std::fstream(geomName + "_timingLog.txt", std::fstream::out);
+		timingLog << log_header;
+	}
+}
+
+void Evolver::closeLogs()
+{
+	if (writeGenericLog) log.close();
+	if (writeErrorLog) errorLog.close();
+	if (writeMeanAreaLog) meanAreaLog.close();
+	if (writeTimeLog) timingLog.close();
+}
+
 void Evolver::updateGeometry(double* Fx, double* Fy, double* Fz)
 {
 	evolvedSurface->normals.clear();
@@ -697,6 +720,12 @@ void Evolver::exportGeometry(int step)
 {
 	VTKExporter e = VTKExporter();
 	e.initExport(evolvedSurface, geomName + (testId == -1 ? ""  : ("(" + std::to_string(testId) + ")")) + "_" + std::to_string(step));
+}
+
+void Evolver::exportResultGeometry(std::string suffix)
+{
+	VTKExporter e = VTKExporter();
+	e.initExport(evolvedSurface, geomName + suffix);
 }
 
 void Evolver::exportVectorStates(int step)
@@ -749,6 +778,7 @@ Evolver::Evolver(EvolutionParams& eParams, SphereTestParams& stParams)
 	this->writeTimeLog = eParams.writeTimeLog;
 	// save flags
 	this->saveStates = eParams.saveStates;
+	this->saveResult = eParams.saveResult;
 	
 	// test params
 	this->testId = stParams.testId;
@@ -758,7 +788,10 @@ Evolver::Evolver(EvolutionParams& eParams, SphereTestParams& stParams)
 	// -----------------------------------------------------
 
 	this->init();
+
+	this->openLogs();
 	this->evolve();
+	this->closeLogs();
 }
 
 // ========= applied evolve constructor ============
@@ -784,6 +817,7 @@ Evolver::Evolver(EvolutionParams& eParams, MeanCurvatureParams& mcfParams, GradD
 	this->writeTimeLog = eParams.writeTimeLog;
 	// save flags
 	this->saveStates = eParams.saveStates;
+	this->saveResult = eParams.saveResult;
 	this->saveAreaStates = mcfParams.saveAreaStates;
 	this->saveDistanceStates = sdfParams.saveDistanceStates;
 	this->saveGradientStates = sdfParams.saveGradientStates;
@@ -798,13 +832,30 @@ Evolver::Evolver(EvolutionParams& eParams, MeanCurvatureParams& mcfParams, GradD
 	this->C1 = mcfParams.C1;
 	this->C2 = mcfParams.C2;
 	this->C = sdfParams.C;
+	this->D = sdfParams.D;
 
 	this->epsConstant = mcfParams.constant;
 	this->etaConstant = sdfParams.constant;
+
+	// additional MCF smoothing
+	this->smoothSteps = mcfParams.smoothSteps;
+	this->initSmoothRate = mcfParams.initSmoothRate;
+	this->smoothDecay = mcfParams.smoothDecay;
 	// -----------------------------------------------------
 
 	this->init();
+
+	this->openLogs();
 	this->evolve();
+
+	// additional MCF smooting
+	if (smoothSteps > 0) {
+		this->tBegin = this->NSteps + 1;
+		this->meanCurvatureFlow = true;
+		this->smoothing_flag = true;
+		this->evolve();
+	}
+	this->closeLogs();
 }
 
 Evolver::~Evolver()

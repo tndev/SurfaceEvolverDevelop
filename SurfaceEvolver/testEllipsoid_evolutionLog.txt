@@ -40,7 +40,7 @@ finite volume mean area: 0.084255
 -------- time step ti = 16, t = 0.480000 -----------
 finite volume mean area: 0.0801975
 -------- time step ti = 17, t = 0.510000 -----------
-finite volume mean area: 0.0763981
+finite volume mean area: 0.076398
 -------- time step ti = 18, t = 0.540000 -----------
 finite volume mean area: 0.0728446
 -------- time step ti = 19, t = 0.570000 -----------
@@ -50,7 +50,7 @@ finite volume mean area: 0.066428
 -------- time step ti = 21, t = 0.630000 -----------
 finite volume mean area: 0.0635404
 -------- time step ti = 22, t = 0.660000 -----------
-finite volume mean area: 0.0608503
+finite volume mean area: 0.0608502
 -------- time step ti = 23, t = 0.690000 -----------
 finite volume mean area: 0.0583458
 -------- time step ti = 24, t = 0.720000 -----------
@@ -118,7 +118,7 @@ finite volume mean area: 0.0276387
 -------- time step ti = 55, t = 1.650000 -----------
 finite volume mean area: 0.0273237
 -------- time step ti = 56, t = 1.680000 -----------
-finite volume mean area: 0.0270252
+finite volume mean area: 0.0270251
 -------- time step ti = 57, t = 1.710000 -----------
 finite volume mean area: 0.026742
 -------- time step ti = 58, t = 1.740000 -----------
@@ -192,7 +192,7 @@ finite volume mean area: 0.0223987
 -------- time step ti = 92, t = 2.760000 -----------
 finite volume mean area: 0.0223581
 -------- time step ti = 93, t = 2.790000 -----------
-finite volume mean area: 0.0223197
+finite volume mean area: 0.0223198
 -------- time step ti = 94, t = 2.820000 -----------
 finite volume mean area: 0.0222836
 -------- time step ti = 95, t = 2.850000 -----------
@@ -270,7 +270,7 @@ finite volume mean area: 0.0217553
 -------- time step ti = 131, t = 3.930000 -----------
 finite volume mean area: 0.0217512
 -------- time step ti = 132, t = 3.960000 -----------
-finite volume mean area: 0.0217474
+finite volume mean area: 0.0217473
 -------- time step ti = 133, t = 3.990000 -----------
 finite volume mean area: 0.0217437
 -------- time step ti = 134, t = 4.020000 -----------
@@ -307,5 +307,25 @@ finite volume mean area: 0.0217096
 finite volume mean area: 0.0217084
 -------- time step ti = 150, t = 4.500000 -----------
 finite volume mean area: 0.0217072
+-------- time step ti = 151, t = 4.530000 -----------
+finite volume mean area: 0.0217061
+-------- time step ti = 152, t = 4.560000 -----------
+finite volume mean area: 0.021238
+-------- time step ti = 153, t = 4.590000 -----------
+finite volume mean area: 0.0209128
+-------- time step ti = 154, t = 4.620000 -----------
+finite volume mean area: 0.0206739
+-------- time step ti = 155, t = 4.650000 -----------
+finite volume mean area: 0.0204884
+-------- time step ti = 156, t = 4.680000 -----------
+finite volume mean area: 0.0203379
+-------- time step ti = 157, t = 4.710000 -----------
+finite volume mean area: 0.0202119
+-------- time step ti = 158, t = 4.740000 -----------
+finite volume mean area: 0.0201042
+-------- time step ti = 159, t = 4.770000 -----------
+finite volume mean area: 0.0200108
+-------- time step ti = 160, t = 4.800000 -----------
+finite volume mean area: 0.0199291
 
- Total time for 150 steps: 6.819108 s
+ Total time for 160 steps: 3.909619 s

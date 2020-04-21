@@ -55,9 +55,11 @@
 // - SurfaceEvolutionSolver -> Evolver, LinearSolver
 // - refactor and separate console and log outputs for specific situations
 // - catch all NaNs as exceptions (breaks)
+// - test evolution for extremal cases: MCF dominant (eta = 0.01, eps = 1.0) and SDF dominant (eta = 1, eps = 0.01)
 
 //  POSTPONED:
 //
+// - co-volume measure-driven time step: dt ~ m(V)
 // - implement a method/class to get CPU instruction set, mainly whether it supports AVX, an alternate resampling method has to be implemented for CPU's that do not support AVX
 // - implement sort order function of a 256-bit AVX vector (needs a proper lookup hash)
 // - AABB update for transformations + Timing test
@@ -78,12 +80,10 @@
 
 //   WIP:
 // 
-// - test evolution for extremal cases: MCF dominant (eta = 0.01, eps = 1.0) and SDF dominant (eta = 1, eps = 0.01)
 
 
 //   TODO:
 //
-// - co-volume measure-driven time step: dt ~ m(V)
 //
 // - fix SDF coordinates (use global grid indexing)
 // - implement global grid and cellSize-based Octree & SDF (just like in Vctr Engine Meta Object)
@@ -280,14 +280,18 @@ int main()
 	// ====== BUNNY Evolution =============================
 	EvolutionParams eParams;
 	eParams.name = "Bunny";
-	eParams.dt = 0.03f; eParams.NSteps = 100; eParams.subdiv = (uint)4; eParams.elType = ElementType::tri;
-	eParams.saveStates = true; eParams.printStepOutput = true; eParams.writeTimeLog = true;
+	eParams.dt = 0.06f; eParams.NSteps = 150; eParams.subdiv = (uint)4; eParams.elType = ElementType::tri;
+	eParams.printStepOutput = true; eParams.writeTimeLog = true;
 	MeanCurvatureParams mcfParams;
 	mcfParams.saveAreaStates = true; mcfParams.writeMeanAreaLog = true;
 	GradDistanceParams sdfParams;
 	sdfParams.targetGeom = &bunny; sdfParams.sdfGrid = bunny_sdf.grid;
 	sdfParams.saveDistanceStates = true;
-	sdfParams.saveGradientStates = true;
+	//sdfParams.saveGradientStates = true;
+	sdfParams.C = 0.4f;
+	sdfParams.D = -0.2f;
+	mcfParams.initSmoothRate = 0.3f;
+	mcfParams.smoothSteps = 10;
 
 	Evolver evolver(eParams, mcfParams, sdfParams);*/
 
@@ -308,37 +312,21 @@ int main()
 
 	EvolutionParams eParams;
 	eParams.name = name;
-	eParams.dt = 0.03f; eParams.NSteps = 150; eParams.subdiv = (uint)4; eParams.elType = ElementType::tri;
-	eParams.saveStates = true; eParams.printStepOutput = true; eParams.writeTimeLog = true;
+	eParams.dt = 0.03f; eParams.NSteps = 150; eParams.subdiv = (uint)3; eParams.elType = ElementType::tri;
+	eParams.printStepOutput = true; eParams.writeTimeLog = true;
 	MeanCurvatureParams mcfParams;
 	mcfParams.saveAreaStates = true; mcfParams.writeMeanAreaLog = true;
 	GradDistanceParams sdfParams;
 	sdfParams.targetGeom = &cwh; sdfParams.sdfGrid = cwh_sdf.grid;
 	sdfParams.saveDistanceStates = true;
-	sdfParams.saveGradientStates = true;
-	*/
+	// sdfParams.saveGradientStates = true;
+	mcfParams.smoothSteps = 10;*/
 
-	/*
-	// MCF dominant config (eta = 0.01, eps = 1.0)
-	sdfParams.C = -0.01f;
-	sdfParams.constant = true;
-
-	mcfParams.C1 = 1.0f;
-	mcfParams.constant = true;*/
-
-	/*
-	// SDF dominant config (eta = 1, eps = 0.01)
-	sdfParams.C = -1.0f;
-	sdfParams.constant = false;
-
-	mcfParams.C1 = 0.01f;
-	mcfParams.constant = true;*/
-
-	// Evolver evolver(eParams, mcfParams, sdfParams);
+	//Evolver evolver(eParams, mcfParams, sdfParams);
 	
 
 	// arc
-	/*
+	/*	
 	OBJImporter obj = OBJImporter();
 	Geometry arc = obj.importOBJGeometry("arc.obj");
 	arc.applyMatrix(Matrix4().setToScale(0.02f, 0.02f, 0.02f));
@@ -355,16 +343,17 @@ int main()
 	EvolutionParams eParams;
 	eParams.name = name;
 	eParams.dt = 0.03f; eParams.NSteps = 150; eParams.subdiv = (uint)4; eParams.elType = ElementType::tri;
-	eParams.saveStates = true; eParams.printStepOutput = true; eParams.writeTimeLog = true;
+	eParams.printStepOutput = true; eParams.writeTimeLog = true;
 	MeanCurvatureParams mcfParams;
 	mcfParams.saveAreaStates = true; mcfParams.writeMeanAreaLog = true;
 	GradDistanceParams sdfParams;
 	sdfParams.targetGeom = &arc; sdfParams.sdfGrid = arc_sdf.grid;
 	sdfParams.saveDistanceStates = true;
-	sdfParams.saveGradientStates = true;
+	// sdfParams.saveGradientStates = true;
+	mcfParams.smoothSteps = 10;
 
-	Evolver evolver(eParams, mcfParams, sdfParams);
-	*/
+	Evolver evolver(eParams, mcfParams, sdfParams);*/
+
 	/*
 	e.exportGeometryVertexNormals(&bunny, "bunnyNormals");
 	e.exportGeometryFiniteVolumeGrid(&bunny, "bunnyFVs");*/
@@ -387,7 +376,6 @@ int main()
 	EvolutionParams eParams;
 	eParams.name = name;
 	eParams.dt = 0.03f; eParams.NSteps = 150; eParams.subdiv = (uint)3; eParams.elType = ElementType::tri;
-	eParams.saveStates = true; 
 	eParams.printStepOutput = true; eParams.writeTimeLog = true;
 	MeanCurvatureParams mcfParams;
 	mcfParams.saveAreaStates = true; 
@@ -396,10 +384,11 @@ int main()
 	sdfParams.targetGeom = &b; sdfParams.sdfGrid = boxSDF.grid;
 	sdfParams.saveDistanceStates = true;
 	//sdfParams.saveGradientStates = true;
+	mcfParams.smoothSteps = 10;
 	
 	Evolver evolver(eParams, mcfParams, sdfParams);*/
 
-	/**/
+	/*
 	std::string name = "testEllipsoid";
 	// CubeSphere cs = CubeSphere(10, 50.0f, true, name);
 	IcoSphere is = IcoSphere(0, 1.0f, name);
@@ -414,7 +403,6 @@ int main()
 	EvolutionParams eParams;
 	eParams.name = name;
 	eParams.dt = 0.03f; eParams.NSteps = 150; eParams.subdiv = (uint)3; eParams.elType = ElementType::tri;
-	eParams.saveStates = true;
 	eParams.printStepOutput = true; eParams.writeTimeLog = true;
 	MeanCurvatureParams mcfParams;
 	mcfParams.saveAreaStates = true; 
@@ -423,8 +411,9 @@ int main()
 	sdfParams.targetGeom = &is; sdfParams.sdfGrid = isSDF.grid;
 	sdfParams.saveDistanceStates = true;
 	//sdfParams.saveGradientStates = true;
+	mcfParams.smoothSteps = 10;
 
-	Evolver evolver(eParams, mcfParams, sdfParams);
+	Evolver evolver(eParams, mcfParams, sdfParams);*/
 	
 	
 	/*
@@ -441,7 +430,6 @@ int main()
 	EvolutionParams eParams;
 	eParams.name = name;
 	eParams.dt = 0.03f; eParams.NSteps = 150; eParams.subdiv = (uint)3; eParams.elType = ElementType::tri;
-	eParams.saveStates = true;
 	eParams.printStepOutput = true; eParams.writeTimeLog = true;
 	MeanCurvatureParams mcfParams;
 	mcfParams.saveAreaStates = true; 
@@ -450,6 +438,7 @@ int main()
 	sdfParams.targetGeom = &cs; sdfParams.sdfGrid = csSDF.grid;
 	//sdfParams.saveDistanceStates = true;
 	//sdfParams.saveGradientStates = true;
+	mcfParams.smoothSteps = 10;
 
 	Evolver evolver(eParams, mcfParams, sdfParams);*/
 

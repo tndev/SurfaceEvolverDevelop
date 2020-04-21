@@ -23,6 +23,7 @@ struct EvolutionParams {
 
 	// ===== output flags ==========
 	bool saveStates = false;
+	bool saveResult = true;
 	bool printHappenings = false;
 	bool printStepOutput = false;
 	bool printSolution = false;
@@ -55,6 +56,10 @@ struct MeanCurvatureParams {
 
 	bool writeMeanAreaLog = false;
 	// =============================
+
+	int smoothSteps = -1; // -1 - no smooth steps
+	float initSmoothRate = 0.05f;
+	float smoothDecay = 0.1f;
 };
 
 struct GradDistanceParams {
@@ -63,6 +68,7 @@ struct GradDistanceParams {
 
 	// grad SDF ctrl constants:
 	float C = 1.0f;
+	float D = 0.0f;
 
 	bool constant = false;
 

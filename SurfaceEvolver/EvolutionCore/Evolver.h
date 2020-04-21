@@ -35,16 +35,33 @@ private:
 	std::vector<Vector3> vGradients = {}; // vertex gradients of distance func to target mesh
 	std::vector<float> vDotProducts = {}; // dot(-grad(SDF), N) for each vertex
 
+	// log files:
+	std::fstream log;
+	std::fstream meanAreaLog;
+	std::fstream errorLog; // for sphereTest
+	std::fstream timingLog;
+
+	// timer
+	std::chrono::high_resolution_clock::time_point startGlobalTime;
+	std::chrono::duration<float> elapsedTimeTotal;
+
 	// ctrl params:
 	float rDecay = 1.0f; // radius for the mean curvature flow exponential decay parameter (C2 in eta(SDF))
 	float C1 = 1.0f;
 	float C2 = rDecay;
-	float C = -1.0f; // C < 0 (-grad(SDF)); C > 0 (+grad(SDF))
+	float C = -1.0f; // multiplies eta(SDF) function
+	float D = 0.0f; // multiplies sqrt(1 - dot(grad(SDF), N)^2)
+	float initSmoothRate = 0.5f;
+	float smoothDecay = 1.0f;
 
 	bool epsConstant = false; // Laplace-Beltrami func admits a constant value C1;
 	bool etaConstant = false; // eta ctrl func (SDF) admits a constant value C;
 
+	bool start_flag = true;
+	bool smoothing_flag = false;
 	bool interruptEvolution = false;
+
+	int tBegin = 1;
 
 	// ====== evolution methods ==========
 	void init();
@@ -62,18 +79,24 @@ private:
 	void saveInterpolatedSDFGradients();
 
 	float laplaceBeltramiCtrlFunc(float& SDF_V);
+	float laplaceBeltramiSmoothFunc(float t);
 	float etaCtrlFunc(float& SDF_V, Vector3& gradSDF_V, Vector3& nV);
 
 	void getTriangleEvolutionSystem(
-		std::vector<std::vector<Vector3>>& fvVerts, std::vector<std::vector<std::vector<uint>>>& adjacentPolys, float& meanArea
+		float smoothStep, std::vector<std::vector<Vector3>>& fvVerts, std::vector<std::vector<std::vector<uint>>>& adjacentPolys, float& meanArea
 	);
 	void getQuadEvolutionSystem(
-		std::vector<std::vector<Vector3>>& fvVerts, std::vector<std::vector<std::vector<uint>>>& adjacentPolys, float& meanArea
+		float smoothStep, std::vector<std::vector<Vector3>>& fvVerts, std::vector<std::vector<std::vector<uint>>>& adjacentPolys, float& meanArea
 	);
+
+	// logging
+	void openLogs();
+	void closeLogs();
 
 	// postproc
 	void updateGeometry(double* Fx, double* Fy, double* Fz);
 	void exportGeometry(int step);
+	void exportResultGeometry(std::string suffix = "_result");
 	void exportVectorStates(int step);
 	void exportTestGeometry(int step, float t); // exports an ico/quad sphere determined by r(t) = sqrt(r0 * r0 - 4 * t) for comparison
 
@@ -87,8 +110,12 @@ public:
 	uint NSteps = 10; 
 	size_t N = 0;
 
+	int smoothSteps = -1; // MCF smooth steps
+
 	// output flags:
 	bool saveStates = false; 
+	bool saveResult = true;
+
 	bool saveAreaStates = false;  
 	bool saveDistanceStates = false; 
 	bool saveGradientStates = false; 
