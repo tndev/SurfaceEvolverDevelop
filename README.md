@@ -74,7 +74,8 @@ L2Error = 5.1363e-05, EOC = 2.036
 ![sphereTest](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/ShrinkingSphere.gif)
 
 # 1.3 Evolution in the Normal Direction - Using -grad(d(x)) to Control Evolution:
-### (original model, remeshed without tangential redistribution,  after smoothing)
+### (left)  original model, (mid) remeshed without tangential redistribution,  (right) after smoothing
+
 ## Scaled Icosahedron
 - **octreeResolution** = `40^3`, **SDF_gridResolution** = `120 x 106 x 106`
 - **NTimeSteps** = `150`, **NSmoothingSteps** = `10`, **dt** = `0.03`
@@ -83,31 +84,32 @@ L2Error = 5.1363e-05, EOC = 2.036
 
 ## Cube
 - **octreeResolution** = `40^3`, **SDF_gridResolution** = `120^3`
-- **NTimeSteps** = `100`, **NSmoothingSteps** = `10`, **dt** = `0.03`
+- **NTimeSteps** = `150`, **NSmoothingSteps** = `10`, **dt** = `0.03`
 - **NVerts** = `162`
 ![cube](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/CubeBasicRemesh.jpg)
+
+## CubeSphere (Ellipsoid)
+- **octreeResolution** = `40^3`, **SDF_gridResolution** = `119 x 106 x 106`
+- **NTimeSteps** = `150`, **NSmoothingSteps** = `10`, **dt** = `0.03`
+- **NVerts** = `162`
+![cubeSphere](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/CubeSphereBasicRemesh.jpg)
 
 ## How Does Evolution Behave For Non-Convex Target Meshes?
 
 ## Cube With Holes
-- **octreeResolution** = `80^3`, **SDF_gridResolution** = `240 x 239 x 240`
-- **NTimeSteps** = `130`, **dt** = `0.018`
-- **NVerts** = `2562`
-
-**Graphics annotation:**
-- **vectors:** vertex normals (black), grad(distance) (red)
-- **scalars:** dot(grad(distance), vNormal)
-![cubeWHoles1](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/ToCubeWithHolesWDotProducts.gif)
-
-## Cube With Holes (Larger Time Step)
 - **octreeResolution** = `40^3`, **SDF_gridResolution** = `120 x 119 x 120`
-- **NTimeSteps** = `100`, **dt** = `0.058`
+- **NTimeSteps** = `150`, **dt** = `0.03`
 - **NVerts** = `2562`
-
+- **D** = `1.0`
 **Graphics annotation:**
 - **vectors:** vertex normals (black), grad(distance) (red)
 - **scalars:** dot(grad(distance), vNormal)
-![cubeWHoles](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/CubeWithHolesLargeStep.gif)
+![cubeWHoles1](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/CubeWithHolesBasicDot.gif)
+- **D** = `0.0`
+- **scalars:** dot(-grad(distance), vNormal)
+![cubeWHoles2](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/CubeWithHolesJustDot.gif)
+- **NVerts** = `162`, **NSmoothingSteps** = `10`
+![cubeWHolesRemeshed](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/CubeWithHolesBasicRemesh.jpg)
 
 ## Arc
 - **octreeResolution** = `40^3`, **SDF_gridResolution** = `120 x 115 x 96`
