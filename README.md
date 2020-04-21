@@ -113,15 +113,19 @@ L2Error = 5.1363e-05, EOC = 2.036
 
 ## Arc
 - **octreeResolution** = `40^3`, **SDF_gridResolution** = `120 x 115 x 96`
-- **NTimeSteps** = `100`, **dt** = `0.013`
+- **NTimeSteps** = `150`, **dt** = `0.03`
 - **NVerts** = `2562`
-### Left View:
-![evolveArc1](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/evolUpdateSend1.gif)
-### Right View (strange indentation):
-![evolveArc2](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/evolUpdateSend2.gif)
+![evolveArc1](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/ArcJustDot.gif)
+- **NSmoothSteps** = `10`
+![evolveArc2](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/ArcBasicRemesh.jpg)
 
 ## Stanford Bunny
 - **octreeResolution** = `40^3`, **SDF_gridResolution** = `119 x 119 x 111`
 - **NTimeSteps** = `100` (terminates after `59` steps on a degenerate triangle), **dt** = `0.03`
 - **NVerts** = `2562`
 ![bunnyEvolGif](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/BunnyEvolution.gif)
+### Pushing evolution without redistribution to the limits:
+- **C** = `0.4`, **D** = `-0.2`
+- **S0** (init smooth rate) = `0.3`
+- **NTimeSteps** = `100`, **NSmoothSteps** = `10`, **dt** = `0.06`
+![maxStretchBunny](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/BunnyBasicRemesh.jpg)
