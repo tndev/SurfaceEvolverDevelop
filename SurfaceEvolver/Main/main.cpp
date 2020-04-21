@@ -280,7 +280,7 @@ int main()
 	// ====== BUNNY Evolution =============================
 	EvolutionParams eParams;
 	eParams.name = "Bunny";
-	eParams.dt = 0.03f; eParams.NSteps = 50; eParams.subdiv = (uint)4; eParams.elType = ElementType::tri;
+	eParams.dt = 0.03f; eParams.NSteps = 100; eParams.subdiv = (uint)4; eParams.elType = ElementType::tri;
 	eParams.saveStates = true; eParams.printStepOutput = true; eParams.writeTimeLog = true;
 	MeanCurvatureParams mcfParams;
 	mcfParams.saveAreaStates = true; mcfParams.writeMeanAreaLog = true;
@@ -308,14 +308,15 @@ int main()
 
 	EvolutionParams eParams;
 	eParams.name = name;
-	eParams.dt = 0.048f; eParams.NSteps = 50; eParams.subdiv = (uint)4; eParams.elType = ElementType::tri;
+	eParams.dt = 0.03f; eParams.NSteps = 150; eParams.subdiv = (uint)4; eParams.elType = ElementType::tri;
 	eParams.saveStates = true; eParams.printStepOutput = true; eParams.writeTimeLog = true;
 	MeanCurvatureParams mcfParams;
 	mcfParams.saveAreaStates = true; mcfParams.writeMeanAreaLog = true;
 	GradDistanceParams sdfParams;
 	sdfParams.targetGeom = &cwh; sdfParams.sdfGrid = cwh_sdf.grid;
 	sdfParams.saveDistanceStates = true;
-	sdfParams.saveGradientStates = true;*/
+	sdfParams.saveGradientStates = true;
+	*/
 
 	/*
 	// MCF dominant config (eta = 0.01, eps = 1.0)
@@ -328,12 +329,12 @@ int main()
 	/*
 	// SDF dominant config (eta = 1, eps = 0.01)
 	sdfParams.C = -1.0f;
-	sdfParams.constant = true;
+	sdfParams.constant = false;
 
 	mcfParams.C1 = 0.01f;
-	mcfParams.constant = true;
+	mcfParams.constant = true;*/
 
-	Evolver evolver(eParams, mcfParams, sdfParams);*/
+	// Evolver evolver(eParams, mcfParams, sdfParams);
 	
 
 	// arc
@@ -351,9 +352,19 @@ int main()
 
 	std::cout << arc_sdf.getComputationProperties();
 
-	float dt = 0.013f;
-	Evolver evolver(dt, 120, (uint)4, ElementType::tri, &arc, arc_sdf.grid, name, true, false, true);*/
+	EvolutionParams eParams;
+	eParams.name = name;
+	eParams.dt = 0.03f; eParams.NSteps = 150; eParams.subdiv = (uint)4; eParams.elType = ElementType::tri;
+	eParams.saveStates = true; eParams.printStepOutput = true; eParams.writeTimeLog = true;
+	MeanCurvatureParams mcfParams;
+	mcfParams.saveAreaStates = true; mcfParams.writeMeanAreaLog = true;
+	GradDistanceParams sdfParams;
+	sdfParams.targetGeom = &arc; sdfParams.sdfGrid = arc_sdf.grid;
+	sdfParams.saveDistanceStates = true;
+	sdfParams.saveGradientStates = true;
 
+	Evolver evolver(eParams, mcfParams, sdfParams);
+	*/
 	/*
 	e.exportGeometryVertexNormals(&bunny, "bunnyNormals");
 	e.exportGeometryFiniteVolumeGrid(&bunny, "bunnyFVs");*/
@@ -375,20 +386,20 @@ int main()
 
 	EvolutionParams eParams;
 	eParams.name = name;
-	eParams.dt = 0.03f; eParams.NSteps = 100; eParams.subdiv = (uint)2; eParams.elType = ElementType::tri;
-	//eParams.saveStates = true; 
+	eParams.dt = 0.03f; eParams.NSteps = 150; eParams.subdiv = (uint)3; eParams.elType = ElementType::tri;
+	eParams.saveStates = true; 
 	eParams.printStepOutput = true; eParams.writeTimeLog = true;
 	MeanCurvatureParams mcfParams;
-	//mcfParams.saveAreaStates = true; 
+	mcfParams.saveAreaStates = true; 
 	mcfParams.writeMeanAreaLog = true;
 	GradDistanceParams sdfParams;
 	sdfParams.targetGeom = &b; sdfParams.sdfGrid = boxSDF.grid;
-	//sdfParams.saveDistanceStates = true;
+	sdfParams.saveDistanceStates = true;
 	//sdfParams.saveGradientStates = true;
 	
 	Evolver evolver(eParams, mcfParams, sdfParams);*/
 
-	/*
+	/**/
 	std::string name = "testEllipsoid";
 	// CubeSphere cs = CubeSphere(10, 50.0f, true, name);
 	IcoSphere is = IcoSphere(0, 1.0f, name);
@@ -400,8 +411,48 @@ int main()
 	//isSDF.exportGrid(&e, name + "SDF");
 	//isSDF.exportGradientField(&e, name + "SDF_Grad");
 
-	float dt = 0.018f;
-	Evolver evolver(dt, 200, (uint)2, ElementType::tri, &is, isSDF.grid, name, true, true, true, true, false, false, true);*/
+	EvolutionParams eParams;
+	eParams.name = name;
+	eParams.dt = 0.03f; eParams.NSteps = 150; eParams.subdiv = (uint)3; eParams.elType = ElementType::tri;
+	eParams.saveStates = true;
+	eParams.printStepOutput = true; eParams.writeTimeLog = true;
+	MeanCurvatureParams mcfParams;
+	mcfParams.saveAreaStates = true; 
+	mcfParams.writeMeanAreaLog = true;
+	GradDistanceParams sdfParams;
+	sdfParams.targetGeom = &is; sdfParams.sdfGrid = isSDF.grid;
+	sdfParams.saveDistanceStates = true;
+	//sdfParams.saveGradientStates = true;
+
+	Evolver evolver(eParams, mcfParams, sdfParams);
+	
+	
+	/*
+	std::string name = "testCubeSphere";
+	CubeSphere cs = CubeSphere(4, 1.0f, true, name);
+	Matrix4 M = Matrix4().setToScale(1.5f, 1.0f, 1.0f);
+	cs.applyMatrix(M);
+	e.initExport(&cs, name);
+	uint res = 40; // octree resolution
+	SDF csSDF = SDF(&cs, res, true, true);
+	//isSDF.exportGrid(&e, name + "SDF");
+	//isSDF.exportGradientField(&e, name + "SDF_Grad");
+
+	EvolutionParams eParams;
+	eParams.name = name;
+	eParams.dt = 0.03f; eParams.NSteps = 150; eParams.subdiv = (uint)3; eParams.elType = ElementType::tri;
+	eParams.saveStates = true;
+	eParams.printStepOutput = true; eParams.writeTimeLog = true;
+	MeanCurvatureParams mcfParams;
+	mcfParams.saveAreaStates = true; 
+	mcfParams.writeMeanAreaLog = true;
+	GradDistanceParams sdfParams;
+	sdfParams.targetGeom = &cs; sdfParams.sdfGrid = csSDF.grid;
+	//sdfParams.saveDistanceStates = true;
+	//sdfParams.saveGradientStates = true;
+
+	Evolver evolver(eParams, mcfParams, sdfParams);*/
+
 	/*
 	IcoSphere is(1, 1.0f);
 	e.initExport(&is, "icoSphere");

@@ -62,7 +62,7 @@ struct GradDistanceParams {
 	Grid* sdfGrid = nullptr;
 
 	// grad SDF ctrl constants:
-	float C = -1.0f;
+	float C = 1.0f;
 
 	bool constant = false;
 

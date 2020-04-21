@@ -362,12 +362,12 @@ void Evolver::getInterpolatedSDFValuesforVertex(
 
 	norm = sqrt(gradSDFx_V * gradSDFx_V + gradSDFy_V * gradSDFy_V + gradSDFz_V * gradSDFz_V);
 
-	if (fabs(norm) > 10e+3 * FLT_EPSILON) {
+	if (fabs(norm) > FLT_EPSILON) {
 		gradSDF_V->set(gradSDFx_V / norm, gradSDFy_V / norm, gradSDFz_V / norm);
 	}
 	else {
 		gradSDF_V->set(gradSDFx_V, gradSDFy_V, gradSDFz_V);
-		std::cout << "WARNING: ZERO GRADIENT!\n";
+		// std::cout << "WARNING: ZERO GRADIENT!\n";
 	}	
 }
 
@@ -466,7 +466,7 @@ void Evolver::saveInterpolatedDotValues()
 		float SDF_V; Vector3 gradSDF_V = Vector3();
 		this->getInterpolatedSDFValuesforVertex(&Fi, &SDF_V, &gradSDF_V, positionBuffer, valueBuffer);
 
-		vDotProducts[i] = dot(gradSDF_V, vNormals[i]);
+		vDotProducts[i] = dot(-1.0f * gradSDF_V, vNormals[i]);
 	}
 
 	evolvedSurface->setScalarData(&vDotProducts, "negGradDotN");
@@ -510,8 +510,8 @@ float Evolver::etaCtrlFunc(float& SDF_V, Vector3& gradSDF_V, Vector3& nV)
 {
 	if (etaConstant) return C;
 
-	float gradDotN = dot(gradSDF_V, nV);
-	return SDF_V * (fabs(gradDotN) + sqrt(1 - gradDotN * gradDotN)) * C;
+	float gradDotN = dot(-1.0f * gradSDF_V, nV);
+	return SDF_V * (gradDotN + 0 * sqrt(1 - gradDotN * gradDotN)) * C;
 }
 
 //
