@@ -42,6 +42,16 @@ Current WIP:
 ![bunnyDirection](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/EvolutionInBunyDirection3D.jpg)
 
 # 1.2 Evolution in the Normal Direction - Finite Volume Scheme for Laplace-Beltrami Operator and Mean Curvature Flow
+#### Model:
+![modelEqns](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/EvolutionModel.jpg)
+#### Default real parameter values:
+(see `./SurfaceEvolver/EvolutionCore/Parameters.h`)
+`C1 = 1.0, C2 = rDecay` (exp. decay radius of the initial sphere)
+`C = 1.0, D = 0.0`
+`S0 = 0.05 (initSmoothRate), lambda = 0.1 (smoothDecay)`
+Smoothing model: Follows the above evolution equation with parameters:
+![smoothEqns](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/SmoothingModel.jpg)
+
 ### Finite Volumes (cotan scheme)
 ![icoFVs](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/IcoSphereFVBuilding.gif)
 
@@ -114,14 +124,8 @@ L2Error = 5.1363e-05, EOC = 2.036
 ### Right View (strange indentation):
 ![evolveArc2](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/evolUpdateSend2.gif)
 
-## Bunny
+## Stanford Bunny
 - **octreeResolution** = `40^3`, **SDF_gridResolution** = `119 x 119 x 111`
-- **NTimeSteps** = `100`, **dt** = `0.058`
+- **NTimeSteps** = `150`, **dt** = `0.03`
 - **NVerts** = `10242`
-### Oh Man!
-![largeBunny](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/SphereToBunny.gif)
-### What's Happening in there?
-**Graphics annotation:**
-- **vectors:** vertex normals (black), grad(distance) (red)
-- **scalars:** dot(grad(distance), vNormal)
-![closeUpBunny](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/BunnyDivergentEvolution.gif)
+![bunnyEvolGif](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/BunnyEvolution.gif)
