@@ -43,6 +43,7 @@ Current WIP:
 
 # 1.2 Evolution in the Normal Direction - Finite Volume Scheme for Laplace-Beltrami Operator and Mean Curvature Flow
 #### Model:
+**X** -> evolving surface points, **N** -> ev. surface normal, **Laplace_X** -> mesh Laplace-Beltrami operator
 ![modelEqns](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/EvolutionModel.jpg)
 #### Default real parameter values:
 (see `./SurfaceEvolver/EvolutionCore/Parameters.h`)
