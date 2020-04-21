@@ -79,19 +79,19 @@ L2Error = 5.1363e-05, EOC = 2.036
 ## Scaled Icosahedron
 - **octreeResolution** = `40^3`, **SDF_gridResolution** = `120 x 106 x 106`
 - **NTimeSteps** = `150`, **NSmoothingSteps** = `10`, **dt** = `0.03`
-- **NVerts** = `162`
+- **NVerts** = `642`
 ![icoEllipsoid](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/IcoSphereBasicRemesh.jpg)
 
 ## Cube
 - **octreeResolution** = `40^3`, **SDF_gridResolution** = `120^3`
 - **NTimeSteps** = `150`, **NSmoothingSteps** = `10`, **dt** = `0.03`
-- **NVerts** = `162`
+- **NVerts** = `642`
 ![cube](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/CubeBasicRemesh.jpg)
 
 ## CubeSphere (Ellipsoid)
 - **octreeResolution** = `40^3`, **SDF_gridResolution** = `119 x 106 x 106`
 - **NTimeSteps** = `150`, **NSmoothingSteps** = `10`, **dt** = `0.03`
-- **NVerts** = `162`
+- **NVerts** = `642`
 ![cubeSphere](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/CubeSphereBasicRemesh.jpg)
 
 ## How Does Evolution Behave For Non-Convex Target Meshes?
