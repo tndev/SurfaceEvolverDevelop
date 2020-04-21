@@ -46,9 +46,10 @@ Current WIP:
 ![modelEqns](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/EvolutionModel.jpg)
 #### Default real parameter values:
 (see `./SurfaceEvolver/EvolutionCore/Parameters.h`)
-`C1 = 1.0, C2 = rDecay` (exp. decay radius of the initial sphere)
-`C = 1.0, D = 0.0`
-`S0 = 0.05 (initSmoothRate), lambda = 0.1 (smoothDecay)`
+- `C1 = 1.0, C2 = rDecay` (exp. decay radius of the initial sphere)
+- `C = 1.0, D = 0.0`
+- `S0 = 0.05 (initSmoothRate), lambda = 0.1 (smoothDecay)`
+
 Smoothing model: Follows the above evolution equation with parameters:
 ![smoothEqns](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/SmoothingModel.jpg)
 
