@@ -127,5 +127,5 @@ L2Error = 5.1363e-05, EOC = 2.036
 ### Pushing evolution without redistribution to the limits:
 - **C** = `0.4`, **D** = `-0.2`
 - **S0** (init smooth rate) = `0.3`
-- **NTimeSteps** = `100`, **NSmoothSteps** = `10`, **dt** = `0.06`
+- **NTimeSteps** = `150`, **NSmoothSteps** = `10`, **dt** = `0.06`
 ![maxStretchBunny](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/BunnyBasicRemesh.jpg)
