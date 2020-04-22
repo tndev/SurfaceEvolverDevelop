@@ -108,7 +108,7 @@ L2Error = 5.1363e-05, EOC = 2.036
 - **D** = `0.0`
 - **scalars:** dot(-grad(distance), vNormal)
 ![cubeWHoles2](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/CubeWithHolesJustDot.gif)
-- **NVerts** = `162`, **NSmoothingSteps** = `10`
+- **NVerts** = `642`, **NSmoothingSteps** = `10`
 ![cubeWHolesRemeshed](https://github.com/MCInversion/SurfaceEvolverDevelop/blob/master/SurfaceEvolver/Images/CubeWithHolesBasicRemesh.jpg)
 
 ## Arc
