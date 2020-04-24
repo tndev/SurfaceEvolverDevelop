@@ -54,6 +54,12 @@ void Evolver::init()
 			if (saveAreaStates) saveFVAreaScalars();
 			// save first dot(-grad(SDF), N)  state
 			if (saveGradientStates) saveInterpolatedDotValues();
+			// save first curvature state:
+			if (saveCurvatureStates || tangential_redist) {
+				computeSurfaceNormalsAndCoVolumes();
+				getCurvaturesAndNormalVelocities();
+				if (saveCurvatureStates) saveMeanCurvatureScalars();
+			}
 		}
 		exportGeometry(0);
 	}
@@ -90,34 +96,23 @@ void Evolver::evolve()
 		if (printStepOutput) std::cout << timeStepLine;
 		if (writeGenericLog) log << timeStepLine;
 
-		// <===== P S E U D O N O R M A L S ========
-		auto startPseudoNormals = std::chrono::high_resolution_clock::now();
-
-		if (printHappenings) std::cout << "computing surface pseudonormals ..." << std::endl;
-		vNormals.clear();
-		vNormals = evolvedSurface->getAngleWeightedVertexPseudoNormals();
-		if (printHappenings) std::cout << "... pseudonormals computed" << std::endl;
-
-		auto endPseudoNormals = std::chrono::high_resolution_clock::now();
-		std::chrono::duration<float> elapsedPseudoNormals = (endPseudoNormals - startPseudoNormals);
-		// ========================================>
-
-
-		fvAreas.clear();
-		std::vector<std::vector<Vector3>> fvVerts = {};
-		std::vector<std::vector<std::vector<uint>>> adjacentPolys = {};
-
-		// <===== F I N I T E   V O L U M E S ========
-		auto startFiniteVolumes = std::chrono::high_resolution_clock::now();
-
-		if (printHappenings) std::cout << "computing surf. finite volumes ..." << std::endl;
-		evolvedSurface->getVertexFiniteVolumes(&fvVerts, &adjacentPolys);
+		// clear scalar data from previous step
 		if (saveAreaStates || saveDistanceStates || saveCurvatureStates) evolvedSurface->clearScalarData();
-		if (printHappenings) std::cout << "... finite vols computed" << std::endl;
 
-		auto endFiniteVolumes = std::chrono::high_resolution_clock::now();
-		std::chrono::duration<float> elapsedFiniteVolumes = (endFiniteVolumes - startFiniteVolumes);
-		// ========================================>
+
+		// <===== P S E U D O N O R M A L S   &   C O - V O L U M E S ========
+		auto startNandCoVols = std::chrono::high_resolution_clock::now();
+		if (printHappenings) std::cout << "computing surface pseudonormals and finite volumes..." << std::endl;
+
+		this->computeSurfaceNormalsAndCoVolumes();
+
+		if (saveCurvatureStates || tangential_redist) this->getCurvaturesAndNormalVelocities();
+		if (saveCurvatureStates) this->saveMeanCurvatureScalars();
+
+		if (printHappenings) std::cout << "... computed" << std::endl;
+		auto endNandCoVols = std::chrono::high_resolution_clock::now();
+		std::chrono::duration<float> elapsedNandCoVols = (endNandCoVols - startNandCoVols);
+		// ===================================================================>
 
 
 
@@ -131,10 +126,15 @@ void Evolver::evolve()
 		if (printHappenings) std::cout << "filling sys matrix & rhs ..." << std::endl;
 		float meanArea;
 		if (this->elType == ElementType::tri) {
-			this->getTriangleEvolutionSystem(ti - tBegin, fvVerts, adjacentPolys, meanArea);
+			this->getTriangleEvolutionSystem(ti - tBegin, meanArea);
 		}
 		else {
-			this->getQuadEvolutionSystem(ti - tBegin, fvVerts, adjacentPolys, meanArea);
+			this->getQuadEvolutionSystem(ti - tBegin, meanArea);
+		}
+
+		if (degenerateCount > 0) {
+			degenerateCount /= 3;
+			std::cout << "WARNING: DETECTED " << degenerateCount << " DEGENERATE ELEMENTS!\n";
 		}
 		if (std::isnan(meanArea)) {
 			std::cout << "meanArea = NaN!\n";
@@ -229,19 +229,18 @@ void Evolver::evolve()
 			sphereTestL2Error += stepErrorSq;
 		}
 
-
 		auto endUpdate = std::chrono::high_resolution_clock::now();
 		std::chrono::duration<float> elapsedUpdate = (endUpdate - startUpdate);
 		// ========================================>
 
 		std::string time_log_line =
 			"step " + std::to_string(ti) + " time log:\n" +
-			"surface pseudonormals: " + std::to_string(elapsedPseudoNormals.count()) + " s, surface finite volumes: " + std::to_string(elapsedPseudoNormals.count()) + " s\n" +
+			"surface pseudonormals & finite volumes: " + std::to_string(elapsedNandCoVols.count()) + " s\n" +
 			(saveGradientStates ? "export normals and gradients: " + std::to_string(saveVectTime) + "s\n" : "") +
 			"filling sys matrix: " + std::to_string(elapsedFillMatrix.count()) + " s\n" +
 			"(vector) linear sys solve: " + std::to_string(elapsedLinSolve.count()) + " s\n" +
 			"geom update: " + std::to_string(elapsedUpdate.count()) + " s\n" +
-			"evolution step total: " + std::to_string(elapsedPseudoNormals.count() + elapsedPseudoNormals.count() + elapsedFillMatrix.count() + elapsedLinSolve.count() + elapsedUpdate.count()) + " s\n";
+			"evolution step total: " + std::to_string(elapsedNandCoVols.count() + elapsedFillMatrix.count() + elapsedLinSolve.count() + elapsedUpdate.count()) + " s\n";
 		if (printStepOutput) std::cout << time_log_line << std::endl;
 		if (writeTimeLog) timingLog << time_log_line;
 
@@ -481,6 +480,21 @@ void Evolver::saveInterpolatedSDFGradients()
 	}
 }
 
+void Evolver::saveMeanCurvatureScalars()
+{
+	evolvedSurface->setScalarData(&vCurvatures, "Mean_Curvature");
+}
+
+void Evolver::saveNormalVelocityScalars()
+{
+	evolvedSurface->setScalarData(&vNormalVelocities, "Normal_Velocity");
+}
+
+void Evolver::saveTangentialVelocityScalars()
+{
+	evolvedSurface->setScalarData(&vTangentialVelocities, "Tangential_Velocity");
+}
+
 float Evolver::laplaceBeltramiCtrlFunc(float& SDF_V)
 {
 	if (epsConstant) return C1;
@@ -501,13 +515,23 @@ float Evolver::etaCtrlFunc(float& SDF_V, Vector3& gradSDF_V, Vector3& nV)
 	return SDF_V * (gradDotN + D * sqrt(1 - gradDotN * gradDotN)) * C;
 }
 
+void Evolver::computeSurfaceNormalsAndCoVolumes()
+{
+	vNormals.clear();
+	vNormals = evolvedSurface->getAngleWeightedVertexPseudoNormals();
+
+	fvVerts.clear(); adjacentPolys.clear();
+
+	fvAreas.clear();
+	evolvedSurface->getVertexFiniteVolumes(&fvVerts, &adjacentPolys);
+}
+
 //
 // [1] Meyer, Desbrun, Schroder, Barr - Discrete Differential-Geometry Operators for Triangulated 2-Manifolds (p. 7)
 // [2] Mikula, Remesikova, Sarkoci, Sevcovic - Manifold Evolution With Tangential Redistribution of Points (SIAM Vol 36, p. A1394)
 // [3] Tomek, Mikula - DISCRETE DUALITY FINITE VOLUME METHOD WITH TANGENTIAL REDISTRIBUTION OF POINTS FOR SURFACES EVOLVING BY MEAN CURVATURE (p. 1808)
 //
-void Evolver::getTriangleEvolutionSystem(
-	float smoothStep, std::vector<std::vector<Vector3>>& fvVerts, std::vector<std::vector<std::vector<uint>>>& adjacentPolys, float& meanArea)
+void Evolver::getTriangleEvolutionSystem(float smoothStep, float& meanArea)
 {
 	if (saveDistanceStates) {
 		// clear and allocate the distance buffer
@@ -582,8 +606,9 @@ void Evolver::getTriangleEvolutionSystem(
 			float Area2 = cross(Fi - *F2, *F1 - *F2).length();
 
 			if (Area1 <= FLT_EPSILON || Area2 <= FLT_EPSILON || coVolArea <= FLT_EPSILON) {
-				// degenerate element
-				std::cout << "WARNING: DEGENERATE ELEMENT at vertex "<< i <<" !\n";
+				// count and skip degenerate element occurence
+				// std::cout << "WARNING: DEGENERATE ELEMENT at vertex " << i << " !\n";
+				degenerateCount++;
 				continue;
 			}
 
@@ -627,8 +652,7 @@ void Evolver::getTriangleEvolutionSystem(
 //
 // [4] M. Medla - SOLVING PARTIAL DIFFERENTIAL EQUATIONS USING FINITE VOLUME METHOD ON NON-UNIFORM GRIDS (PhD Thesis, p. 29)
 //
-void Evolver::getQuadEvolutionSystem(
-	float smoothStep, std::vector<std::vector<Vector3>>& fvVerts, std::vector<std::vector<std::vector<uint>>>& adjacentPolys, float& meanArea)
+void Evolver::getQuadEvolutionSystem(float smoothStep, float& meanArea)
 {
 	for (uint i = 0; i < N; i++) {
 		// <=== part identical to getQuadEvolutionSystem based on [1], [2], [3] =======
@@ -667,11 +691,85 @@ void Evolver::getQuadEvolutionSystem(
 		float vT = this->tangentialVelocitForVertex(Fi, i);
 
 		// grad dist func:
-		float eta = this->etaCtrlFunc(SDF_V, gradSDF_V, vNormals[i]);
+		float eta = (meanCurvatureFlow ? 0.0f : this->etaCtrlFunc(SDF_V, gradSDF_V, vNormals[i]));
 
 		sysRhsX[i] += (double)Fi.x + (double)dt * eta * vNormals[i].x + (double)dt * vT;
 		sysRhsY[i] += (double)Fi.y + (double)dt * eta * vNormals[i].y + (double)dt * vT;
 		sysRhsZ[i] += (double)Fi.z + (double)dt * eta * vNormals[i].z + (double)dt * vT;
+	}
+}
+
+void Evolver::getCurvaturesAndNormalVelocities()
+{
+	vCurvatures.clear(); vNormalVelocities.clear();
+	vCurvatures = std::vector<float>(N);
+	vNormalVelocities = std::vector<float>(N);
+
+	for (int i = 0; i < N; i++) {
+		// vertex
+		Vector3 Fi = Vector3(
+			evolvedSurface->uniqueVertices[i].x,
+			evolvedSurface->uniqueVertices[i].y,
+			evolvedSurface->uniqueVertices[i].z
+		);
+
+		double eps = 1.0;
+		// SDF interpolation from values surrounding V
+		std::vector<Vector3> positionBuffer = {};
+		std::vector<float> valueBuffer = {};
+		float SDF_V; Vector3 gradSDF_V = Vector3();
+
+		if (!meanCurvatureFlow) {
+			this->getInterpolatedSDFValuesforVertex(&Fi, &SDF_V, &gradSDF_V, positionBuffer, valueBuffer);
+			eps = laplaceBeltramiCtrlFunc(SDF_V);
+		}
+
+		uint m = adjacentPolys[i].size();
+		// ===========================================================================>
+
+		float coVolArea = 0.0f;
+		Vector3 vCurvatureVect = Vector3();
+
+		for (uint p = 0; p < m; p++) {
+			// midpoints:
+			Vector3* M0 = &fvVerts[i][(size_t)2 * p];
+			Vector3* baryCenter = &fvVerts[i][(size_t)2 * p + 1];
+			Vector3* M1 = &fvVerts[i][((size_t)2 * p + 2) % fvVerts[i].size()];
+
+			// co-vol areas:
+			float cV2Area0 = cross(*M0 - Fi, *baryCenter - Fi).length();
+			float cV2Area1 = cross(*baryCenter - Fi, *M1 - Fi).length();
+			coVolArea += (0.5f * cV2Area0 + 0.5f * cV2Area1);
+
+			// tri vertices:
+			Vector3* F1prev = &evolvedSurface->uniqueVertices[adjacentPolys[i][(p > 0 ? p - 1 : m - 1)][1]];
+			Vector3* F1 = &evolvedSurface->uniqueVertices[adjacentPolys[i][p][1]];
+			Vector3* F2prev = &evolvedSurface->uniqueVertices[adjacentPolys[i][(p > 0 ? p - 1 : m - 1)][2]];
+			Vector3* F2 = &evolvedSurface->uniqueVertices[adjacentPolys[i][p][2]];
+
+			// areas:
+			float Area1 = cross(*F1prev - Fi, *F1prev - *F2prev).length();
+			float Area2 = cross(Fi - *F2, *F1 - *F2).length();
+
+			if (Area2 <= FLT_EPSILON || Area1 <= FLT_EPSILON || coVolArea <= FLT_EPSILON) {
+				// skip degenerate element
+				continue;
+			}
+
+			// cotans:
+			float cotan1 = dot(*F1prev - Fi, *F1prev - *F2prev) / Area1;
+			float cotan2 = dot(Fi - *F2, *F1 - *F2) / Area2;
+
+			vCurvatureVect += 0.5 * ((double)cotan1 + (double)cotan2) * (Fi - *F1);
+		}
+
+		vCurvatures[i] = ((1.0f / coVolArea) * vCurvatureVect).length();
+
+		// grad dist func:
+		float eta = (meanCurvatureFlow ? 0.0f : this->etaCtrlFunc(SDF_V, gradSDF_V, vNormals[i]));
+
+		// normal velocity magnitude (will scale surface unit normal):
+		vNormalVelocities[i] = eps * vCurvatures[i] + eta;
 	}
 }
 
@@ -796,7 +894,7 @@ Evolver::Evolver(EvolutionParams& eParams, SphereTestParams& stParams)
 
 // ========= applied evolve constructor ============
 //
-Evolver::Evolver(EvolutionParams& eParams, MeanCurvatureParams& mcfParams, GradDistanceParams& sdfParams)
+Evolver::Evolver(EvolutionParams& eParams, MeanCurvatureParams& mcfParams, GradDistanceParams& sdfParams, TangentialRedistParams* tanParams)
 {
 	this->sphereTest = false;
 	this->meanCurvatureFlow = (sdfParams.sdfGrid == nullptr); // no sdf => only MCF
@@ -822,6 +920,7 @@ Evolver::Evolver(EvolutionParams& eParams, MeanCurvatureParams& mcfParams, GradD
 	this->saveDistanceStates = sdfParams.saveDistanceStates;
 	this->saveGradientStates = sdfParams.saveGradientStates;
 	this->saveCurvatureStates = mcfParams.saveCurvatureStates;
+	this->saveNormalVelocityStates = mcfParams.saveNormalVelocityStates;
 
 	// evolution type	
 	if (eParams.sourceGeometry) this->evolvedSurface = eParams.sourceGeometry;
@@ -841,6 +940,13 @@ Evolver::Evolver(EvolutionParams& eParams, MeanCurvatureParams& mcfParams, GradD
 	this->smoothSteps = mcfParams.smoothSteps;
 	this->initSmoothRate = mcfParams.initSmoothRate;
 	this->smoothDecay = mcfParams.smoothDecay;
+
+	// tangential redistribution
+	this->tangential_redist = tanParams != nullptr;
+	if (tangential_redist) {
+		this->omega = tanParams->omega;
+		this->saveTangentialVelocityStates = tanParams->saveTangentialVelocityStates;
+	}
 	// -----------------------------------------------------
 
 	this->init();

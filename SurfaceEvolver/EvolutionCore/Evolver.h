@@ -34,6 +34,12 @@ private:
 	std::vector<float> vDistances = {}; // vertex distances to target mesh
 	std::vector<Vector3> vGradients = {}; // vertex gradients of distance func to target mesh
 	std::vector<float> vDotProducts = {}; // dot(-grad(SDF), N) for each vertex
+	std::vector<float> vNormalVelocities = {}; // normal velocity scalars: ||v_N|| = eps(d) * H + eta(d)
+	std::vector<float> vTangentialVelocities = {}; // tangential velocity data
+
+	// essential mesh data
+	std::vector<std::vector<Vector3>> fvVerts = {};
+	std::vector<std::vector<std::vector<uint>>> adjacentPolys = {};
 
 	// log files:
 	std::fstream log;
@@ -54,6 +60,10 @@ private:
 	float initSmoothRate = 0.5f;
 	float smoothDecay = 1.0f;
 
+	// tangential redistribution:
+	float omega = 100.0f;
+	bool tangential_redist = false;
+
 	bool epsConstant = false; // Laplace-Beltrami func admits a constant value C1;
 	bool etaConstant = false; // eta ctrl func (SDF) admits a constant value C;
 
@@ -62,6 +72,7 @@ private:
 	bool interruptEvolution = false;
 
 	int tBegin = 1;
+	int degenerateCount = 0;
 
 	// ====== evolution methods ==========
 	void init();
@@ -77,17 +88,18 @@ private:
 	void saveInterpolatedSDFValues();
 	void saveInterpolatedDotValues();
 	void saveInterpolatedSDFGradients();
+	void saveMeanCurvatureScalars();
+	void saveNormalVelocityScalars();
+	void saveTangentialVelocityScalars();
 
 	float laplaceBeltramiCtrlFunc(float& SDF_V);
 	float laplaceBeltramiSmoothFunc(float t);
 	float etaCtrlFunc(float& SDF_V, Vector3& gradSDF_V, Vector3& nV);
 
-	void getTriangleEvolutionSystem(
-		float smoothStep, std::vector<std::vector<Vector3>>& fvVerts, std::vector<std::vector<std::vector<uint>>>& adjacentPolys, float& meanArea
-	);
-	void getQuadEvolutionSystem(
-		float smoothStep, std::vector<std::vector<Vector3>>& fvVerts, std::vector<std::vector<std::vector<uint>>>& adjacentPolys, float& meanArea
-	);
+	void computeSurfaceNormalsAndCoVolumes();
+	void getTriangleEvolutionSystem(float smoothStep, float& meanArea);
+	void getQuadEvolutionSystem(float smoothStep, float& meanArea);
+	void getCurvaturesAndNormalVelocities();
 
 	// logging
 	void openLogs();
@@ -120,6 +132,8 @@ public:
 	bool saveDistanceStates = false; 
 	bool saveGradientStates = false; 
 	bool saveCurvatureStates = false;
+	bool saveNormalVelocityStates = false;
+	bool saveTangentialVelocityStates = false;
 
 	bool printHappenings = true; // general things happening output
 	bool printSolution = false; // whether to print Bi-CGStab solution output for each (xyz) component
@@ -163,7 +177,7 @@ public:
 	// sphere test evolution variant:
 	Evolver(EvolutionParams& eParams, SphereTestParams& stParams);
 	// applied variant:
-	Evolver(EvolutionParams& eParams, MeanCurvatureParams& mcfParams, GradDistanceParams& sdfParams);
+	Evolver(EvolutionParams& eParams, MeanCurvatureParams& mcfParams, GradDistanceParams& sdfParams, TangentialRedistParams* tanParams = nullptr);
 	~Evolver();
 };
 

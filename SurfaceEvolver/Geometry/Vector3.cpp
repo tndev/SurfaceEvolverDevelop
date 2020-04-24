@@ -282,6 +282,18 @@ Vector3 Vector3::operator/(float scalar)
 	return Vector3(x / scalar, y / scalar, z / scalar);
 }
 
+Vector3& Vector3::operator+=(const Vector3& other)
+{
+	this->x += other.x;	this->y += other.y;	this->z += other.z;
+	return *this;
+}
+
+Vector3& Vector3::operator-=(const Vector3& other)
+{
+	this->x -= other.x;	this->y -= other.y;	this->z -= other.z;
+	return *this;
+}
+
 Vector3 operator*(Matrix3 m, Vector3 a)
 {
 	Vector3 result = a;

@@ -53,6 +53,7 @@ struct MeanCurvatureParams {
 	// ===== output flags ==========
 	bool saveAreaStates = false;
 	bool saveCurvatureStates = false;
+	bool saveNormalVelocityStates = false;
 
 	bool writeMeanAreaLog = false;
 	// =============================
@@ -76,6 +77,15 @@ struct GradDistanceParams {
 	bool saveDistanceStates = false;
 	bool saveGradientStates = false;
 	// =============================
+};
+
+struct TangentialRedistParams {
+	// ctrl param
+	float omega = 100.0f;
+
+	// ===== output flags ======
+	bool saveTangentialVelocityStates = false;
+	// ================
 };
 
 #endif

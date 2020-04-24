@@ -56,6 +56,8 @@
 // - refactor and separate console and log outputs for specific situations
 // - catch all NaNs as exceptions (breaks)
 // - test evolution for extremal cases: MCF dominant (eta = 0.01, eps = 1.0) and SDF dominant (eta = 1, eps = 0.01)
+// - previous step mean curvature values H => H N = h (mean curvature vector)
+// - previous step normal velocity term: v_N = eps(d) * h + eta(d) * N
 
 //  POSTPONED:
 //
@@ -80,6 +82,7 @@
 
 //   WIP:
 // 
+// - tangential redist. lin. system: Laplace-Beltrami(psi) = dot( v_N, h ) - mean(dot( v_N , h) + omega * (A/G - 1)
 
 
 //   TODO:
@@ -326,7 +329,7 @@ int main()
 	
 
 	// arc
-	/*	
+	/**/	
 	OBJImporter obj = OBJImporter();
 	Geometry arc = obj.importOBJGeometry("arc.obj");
 	arc.applyMatrix(Matrix4().setToScale(0.02f, 0.02f, 0.02f));
@@ -342,17 +345,19 @@ int main()
 
 	EvolutionParams eParams;
 	eParams.name = name;
-	eParams.dt = 0.03f; eParams.NSteps = 150; eParams.subdiv = (uint)4; eParams.elType = ElementType::tri;
-	eParams.printStepOutput = true; eParams.writeTimeLog = true;
+	eParams.dt = 0.03f; eParams.NSteps = 150; eParams.subdiv = (uint)3; eParams.elType = ElementType::tri;
+	eParams.saveStates = true; eParams.printStepOutput = true; eParams.writeTimeLog = true;
 	MeanCurvatureParams mcfParams;
-	mcfParams.saveAreaStates = true; mcfParams.writeMeanAreaLog = true;
+	mcfParams.saveAreaStates = true; 
+	mcfParams.saveCurvatureStates = true;
+	mcfParams.writeMeanAreaLog = true;
 	GradDistanceParams sdfParams;
 	sdfParams.targetGeom = &arc; sdfParams.sdfGrid = arc_sdf.grid;
 	sdfParams.saveDistanceStates = true;
 	// sdfParams.saveGradientStates = true;
 	mcfParams.smoothSteps = 10;
 
-	Evolver evolver(eParams, mcfParams, sdfParams);*/
+	Evolver evolver(eParams, mcfParams, sdfParams);
 
 	/*
 	e.exportGeometryVertexNormals(&bunny, "bunnyNormals");
