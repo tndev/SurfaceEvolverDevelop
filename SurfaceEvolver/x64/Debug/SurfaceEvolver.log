@@ -1,24 +1,7 @@
-﻿  Evolver.cpp
+﻿  main.cpp
 D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\poly2tri\sweep\sweep_context.h(161,24): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(17,10): warning C4244: 'initializing': conversion from 'double' to 'unsigned int', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(62,30): warning C4267: 'argument': conversion from 'size_t' to 'const unsigned int', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(63,30): warning C4267: 'argument': conversion from 'size_t' to 'const unsigned int', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(64,30): warning C4267: 'argument': conversion from 'size_t' to 'const unsigned int', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(106,22): warning C4018: '<=': signed/unsigned mismatch
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(386,35): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(560,35): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(656,35): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(650,16): warning C4101: 'gradSDFx_V': unreferenced local variable
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(650,40): warning C4101: 'gradSDFz_V': unreferenced local variable
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(650,28): warning C4101: 'gradSDFy_V': unreferenced local variable
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(687,59): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(687,52): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(687,45): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(733,27): warning C4244: '=': conversion from 'float' to 'unsigned int', possible loss of data
-  main.cpp
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\poly2tri\sweep\sweep_context.h(161,24): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\main.cpp(167,12): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-  Generating Code...
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\main.cpp(171,12): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\main.cpp(376,73): warning C4305: 'argument': truncation from 'double' to 'float'
 LINK : warning LNK4075: ignoring '/INCREMENTAL' due to '/PROFILE' specification
 AABBTree.obj : warning LNK4075: ignoring '/EDITANDCONTINUE' due to '/OPT:REF' specification
   SurfaceEvolver.vcxproj -> D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\x64\Debug\SurfaceEvolver.exe

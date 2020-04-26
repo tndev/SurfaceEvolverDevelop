@@ -197,61 +197,61 @@ void LinearSolver::Bi_CGSTAB_Solve(double** A, double* b, double* x, bool print)
 	delete[] s; delete[] tmp; delete[] tmp1;
 }
 
-void LinearSolver::printArray1(std::string name, double* a, int printLim, bool inRow)
+void LinearSolver::printArray1(std::string name, double* a, int printLim, bool inRow, std::ostream& out)
 {
 	if (inRow) {
-		std::cout << name << " = " << std::endl;
+		out << name << " = " << std::endl;
 		for (int i = 0; i < printLim; i++) {
-			std::cout << " " << a[i];
+			out << " " << a[i];
 		}
-		std::cout << "  ... ";
+		out << "  ... ";
 		for (int i = N - printLim; i < N; i++) {
-			std::cout << " " << a[i];
+			out << " " << a[i];
 		}
-		std::cout << std::endl;
+		out << std::endl;
 	}
 	else {
 		std::string offset = std::string((name + " = ").length() + 1, ' ');
-		std::cout << name << " = " << std::endl;
+		out << name << " = " << std::endl;
 		for (int i = 0; i < printLim; i++) {
-			std::cout << offset << a[i] << std::endl;
+			out << offset << a[i] << std::endl;
 		}
-		for (int i = 0; i < 3; i++) std::cout << offset << "  ." << std::endl;
+		for (int i = 0; i < 3; i++) out << offset << "  ." << std::endl;
 		for (int i = N - printLim; i < N; i++) {
-			std::cout << offset << a[i] << std::endl;
+			out << offset << a[i] << std::endl;
 		}
-		std::cout << std::endl;
+		out << std::endl;
 	}
 }
 
-void LinearSolver::printArray2(std::string name, double** A, int printLim)
+void LinearSolver::printArray2(std::string name, double** A, int printLim, std::ostream& out)
 {
 	std::string offset = std::string((name + " = ").length() + 1, ' ');
-	std::cout << name << " = " << std::endl;
+	out << name << " = " << std::endl;
 	for (int i = 0; i < printLim; i++) {
-		std::cout << offset;
+		out << offset;
 		for (int j = 0; j < printLim; j++) {
-			std::cout << A[i][j] << " ";
+			out << A[i][j] << " ";
 		}
-		std::cout << "  ...  ";
+		out << "  ...  ";
 		for (int j = N - printLim; j < N; j++) {
-			std::cout << A[i][j] << " ";
+			out << A[i][j] << " ";
 		}
-		std::cout << std::endl;
+		out << std::endl;
 	}
-	for (int i = 0; i < 3; i++) std::cout << offset << "  ." << std::endl;
+	for (int i = 0; i < 3; i++) out << offset << "  ." << std::endl;
 	for (int i = N - printLim; i < N; i++) {
-		std::cout << offset;
+		out << offset;
 		for (int j = 0; j < printLim; j++) {
-			std::cout << A[i][j] << " ";
+			out << A[i][j] << " ";
 		}
-		std::cout << "  ...  ";
+		out << "  ...  ";
 		for (int j = N - printLim; j < N; j++) {
-			std::cout << A[i][j] << " ";
+			out << A[i][j] << " ";
 		}
-		std::cout << std::endl;
+		out << std::endl;
 	}
-	std::cout << std::endl;
+	out << std::endl;
 }
 
 double LinearSolver::vectorDot(double* a, double* b)

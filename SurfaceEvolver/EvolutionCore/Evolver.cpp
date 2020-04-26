@@ -89,6 +89,11 @@ void Evolver::evolve()
 
 	uint TSteps = (smoothing_flag ? smoothSteps : NSteps);
 
+	std::fstream psi_log = std::fstream(geomName + "_psiLog.txt", std::fstream::out);
+	std::fstream psi_Sys_log = std::fstream(geomName + "_psiSysLog.txt", std::fstream::out);
+	psi_log << "psi values:\n";
+	psi_Sys_log << "psi sys matrix & rhs\n";
+
 	for (int ti = tBegin; ti < tBegin + TSteps; ti++) {
 
 		float t = (float)ti / (float)NSteps * tStop;
@@ -100,6 +105,7 @@ void Evolver::evolve()
 		if (saveAreaStates || saveDistanceStates || saveCurvatureStates) evolvedSurface->clearScalarData();
 
 
+
 		// <===== P S E U D O N O R M A L S   &   C O - V O L U M E S ========
 		auto startNandCoVols = std::chrono::high_resolution_clock::now();
 		if (printHappenings) std::cout << "computing surface pseudonormals and finite volumes..." << std::endl;
@@ -107,6 +113,11 @@ void Evolver::evolve()
 		this->computeSurfaceNormalsAndCoVolumes();
 
 		if (saveCurvatureStates || tangential_redist) this->getCurvaturesAndNormalVelocities();
+		if (saveCurvatureVectors) this->saveMeanCurvatureVectors(ti);
+		if (saveNormalVelocityStates) {
+			this->saveNormalVelocityVectors(ti);
+			this->saveNormalVelocityScalars();
+		}
 		if (saveCurvatureStates) this->saveMeanCurvatureScalars();
 
 		if (printHappenings) std::cout << "... computed" << std::endl;
@@ -115,9 +126,32 @@ void Evolver::evolve()
 		// ===================================================================>
 
 
+		
+		// <======== T A N G E N T I A L   R E D I S T R I B U T I O N ===========
+		if (tangential_redist) {
+			this->initSystem(); // prep linear system of dim NVerts * NVerts
+			if (this->elType == ElementType::tri) {
+				this->getTriangleRedistributionSystem();
+			}
+			else {
+				this->getQuadRedistributionSystem();
+			}
 
-		this->initSystem(); // prep linear system of dim NVerts * NVerts
+			// potential sys alloc
+			if (psi != nullptr) delete[] psi;
+			psi = new double[N];
+			// solve
+			solveX->Bi_CGSTAB_Solve(SysMatrix, sysRhsX, psi, printSolution);
+			if (printSolution) {
+				solveX->printArray1("psi", psi, 6);
+			}
 
+			solveX->printArray1("psi" + std::to_string(ti), psi, 10, true, psi_log);
+			solveX->printArray2("A(psi_" + std::to_string(ti) + ")", SysMatrix, 10, psi_Sys_log);
+			solveX->printArray1("b(psi_" + std::to_string(ti) + ")", sysRhsX, 10, true, psi_Sys_log);
+			this->saveRedistributionPotential();
+		}
+		// ======================================================================>
 
 
 		// <===== M A T R I X    F I L L ==========
@@ -125,12 +159,14 @@ void Evolver::evolve()
 
 		if (printHappenings) std::cout << "filling sys matrix & rhs ..." << std::endl;
 		float meanArea;
+		this->initSystem(); // prep linear system of dim NVerts * NVerts
 		if (this->elType == ElementType::tri) {
 			this->getTriangleEvolutionSystem(ti - tBegin, meanArea);
 		}
 		else {
 			this->getQuadEvolutionSystem(ti - tBegin, meanArea);
 		}
+		//this->saveFVNormals(ti);
 
 		if (degenerateCount > 0) {
 			degenerateCount /= 3;
@@ -151,6 +187,9 @@ void Evolver::evolve()
 		std::chrono::duration<float> elapsedFillMatrix = (endFillMatrix - startFillMatrix);
 		// ========================================>
 
+
+
+		if (saveTangentialVelocityStates) this->saveTangentialVelocityVectors(ti);
 
 
 		// <===== S A V E   S D F  S T A T E ==============
@@ -276,10 +315,13 @@ void Evolver::evolve()
 		if (writeGenericLog) log << total_time_message;
 		if (writeTimeLog) timingLog << total_time_message;
 	}
+
+	psi_log.close();
+	psi_Sys_log.close();
 }
 
 void Evolver::clearSystem()
-{
+{	
 	if (SysMatrix != nullptr) {
 		for (uint i = 0; i < N; i++) delete[] SysMatrix[i];
 		delete[] SysMatrix;
@@ -287,7 +329,6 @@ void Evolver::clearSystem()
 	if (sysRhsX != nullptr) delete[] sysRhsX;
 	if (sysRhsY != nullptr) delete[] sysRhsY;
 	if (sysRhsZ != nullptr) delete[] sysRhsZ;
-
 	SysMatrix = nullptr;
 	sysRhsX = nullptr;
 	sysRhsY = nullptr;
@@ -308,6 +349,7 @@ void Evolver::initSystem()
 	for (uint i = 0; i < N; i++) {
 		SysMatrix[i] = new double[N];
 		for (uint j = 0; j < N; j++) SysMatrix[i][j] = 0.0;
+		sysRhsX[i] = 0.0; sysRhsY[i] = 0.0; sysRhsZ[i] = 0.0;
 	}
 }
 
@@ -350,11 +392,6 @@ void Evolver::getInterpolatedSDFValuesforVertex(
 		gradSDF_V->set(gradSDFx_V, gradSDFy_V, gradSDFz_V);
 		// std::cout << "WARNING: ZERO GRADIENT!\n";
 	}	
-}
-
-float Evolver::tangentialVelocitForVertex(Vector3& V, uint i)
-{
-	return 0.0f;
 }
 
 void Evolver::saveFVAreaScalars()
@@ -490,10 +527,37 @@ void Evolver::saveNormalVelocityScalars()
 	evolvedSurface->setScalarData(&vNormalVelocities, "Normal_Velocity");
 }
 
-void Evolver::saveTangentialVelocityScalars()
+void Evolver::saveMeanCurvatureVectors(int step)
 {
-	evolvedSurface->setScalarData(&vTangentialVelocities, "Tangential_Velocity");
+	VTKExporter e = VTKExporter();
+	e.exportVectorDataOnGeometry(evolvedSurface, &vCurvatureVectors, geomName + "_vMeanCurvatures_" + std::to_string(step));
 }
+
+void Evolver::saveTangentialVelocityVectors(int step)
+{
+	VTKExporter e = VTKExporter();
+	e.exportVectorDataOnGeometry(evolvedSurface, &vTangentialVelocities, geomName + "_vTVelocities_" + std::to_string(step));
+}
+
+void Evolver::saveNormalVelocityVectors(int step)
+{
+	VTKExporter e = VTKExporter();
+	e.exportVectorDataOnGeometry(evolvedSurface, &vNormalVelocityVectors, geomName + "_vNormalVelocities_" + std::to_string(step));
+}
+
+void Evolver::saveRedistributionPotential()
+{
+	std::vector<float> redistPotential(N);
+	for (int i = 0; i < N; i++) redistPotential[i] = psi[i];
+	evolvedSurface->setScalarData(&redistPotential, "Redistribution_Potential");
+}
+
+/*
+void Evolver::saveFVNormals(int step)
+{
+	VTKExporter e = VTKExporter();
+	e.exportVectorDataOnGeometry(dummyFVGeom, &fvNormals, geomName + "_fvNormals_" + std::to_string(step));
+}*/
 
 float Evolver::laplaceBeltramiCtrlFunc(float& SDF_V)
 {
@@ -545,6 +609,14 @@ void Evolver::getTriangleEvolutionSystem(float smoothStep, float& meanArea)
 		vGradients = std::vector<Vector3>(N);
 	}
 
+	if (saveTangentialVelocityStates) {
+		vTangentialVelocities.clear();
+		vTangentialVelocities = std::vector<Vector3>(N);
+	}
+
+	//fvNormals.clear();
+	//dummyFVGeom->uniqueVertices = {};
+
 	meanArea = 0.0f;
 
 	for (uint i = 0; i < N; i++) {
@@ -579,6 +651,9 @@ void Evolver::getTriangleEvolutionSystem(float smoothStep, float& meanArea)
 		uint m = adjacentPolys[i].size();
 		// =====================================================================>
 		
+		if (!fvAreas.empty()) {
+			fvAreas.clear(); fvAreas = std::vector<float>(N);
+		}
 		float coVolArea = 0.0f;
 
 		for (uint p = 0; p < m; p++) {	
@@ -591,9 +666,8 @@ void Evolver::getTriangleEvolutionSystem(float smoothStep, float& meanArea)
 			Vector3* M1 = &fvVerts[i][ ((size_t)2 * p + 2) % fvVerts[i].size() ];
 
 			// co-vol areas:
-			float cV2Area0 = cross(*M0 - Fi, *baryCenter - Fi).length();
-			float cV2Area1 = cross(*baryCenter - Fi, *M1 - Fi).length();
-			coVolArea += (0.5f * cV2Area0 + 0.5f * cV2Area1);
+			float cVArea0 = cross(*M0 - Fi, *baryCenter - Fi).length();
+			float cVArea1 = cross(*baryCenter - Fi, *M1 - Fi).length();
 
 			// tri vertices:
 			Vector3* F1prev = &evolvedSurface->uniqueVertices[adjacentPolys[i][(p > 0 ? p - 1 : m - 1)][1]];
@@ -605,12 +679,13 @@ void Evolver::getTriangleEvolutionSystem(float smoothStep, float& meanArea)
 			float Area1 = cross(*F1prev - Fi, *F1prev - *F2prev).length();
 			float Area2 = cross(Fi - *F2, *F1 - *F2).length();
 
-			if (Area1 <= FLT_EPSILON || Area2 <= FLT_EPSILON || coVolArea <= FLT_EPSILON) {
+			if (Area1 <= FLT_EPSILON || Area2 <= FLT_EPSILON || cVArea0 <= FLT_EPSILON || cVArea1 <= FLT_EPSILON) {
 				// count and skip degenerate element occurence
-				// std::cout << "WARNING: DEGENERATE ELEMENT at vertex " << i << " !\n";
 				degenerateCount++;
 				continue;
 			}
+
+			coVolArea += (0.5f * cVArea0 + 0.5f * cVArea1);
 
 			// cotans:
 			float cotan1 = dot(*F1prev - Fi, *F1prev - *F2prev) / Area1;
@@ -631,16 +706,19 @@ void Evolver::getTriangleEvolutionSystem(float smoothStep, float& meanArea)
 		for (uint p = 0; p < m; p++) SysMatrix[i][adjacentPolys[i][p][1]] *= -((double)dt * eps) / coVolArea;
 
 		// tangential redist:
-		float vT = this->tangentialVelocitForVertex(Fi, i);
+		Vector3 vT = this->getTangentialVelocityForVertex(Fi, i);
+		if (saveTangentialVelocityStates) vTangentialVelocities[i] = vT;
 
 		// grad dist func:
 		float eta = ( meanCurvatureFlow ? 0.0f : this->etaCtrlFunc(SDF_V, gradSDF_V, vNormals[i]) );
 
-		sysRhsX[i] = (double)Fi.x + (double)dt * eta * vNormals[i].x + (double)dt * vT;
-		sysRhsY[i] = (double)Fi.y + (double)dt * eta * vNormals[i].y + (double)dt * vT;
-		sysRhsZ[i] = (double)Fi.z + (double)dt * eta * vNormals[i].z + (double)dt * vT;
+		sysRhsX[i] = (double)Fi.x + (double)dt * eta * vNormals[i].x + (double)dt * vT.x;
+		sysRhsY[i] = (double)Fi.y + (double)dt * eta * vNormals[i].y + (double)dt * vT.y;
+		sysRhsZ[i] = (double)Fi.z + (double)dt * eta * vNormals[i].z + (double)dt * vT.z;
 
-		if (sphereTest || saveAreaStates) fvAreas.push_back(coVolArea); // save areas as weights for numerical tests
+		if (sphereTest || saveAreaStates) {
+			fvAreas[i] = coVolArea; // save areas as weights for numerical tests
+		}
 	}
 
 	if (saveAreaStates) evolvedSurface->setScalarData(&fvAreas, "CoVolArea");
@@ -688,22 +766,85 @@ void Evolver::getQuadEvolutionSystem(float smoothStep, float& meanArea)
 		SysMatrix[i][i] *= -(dt * eps) / (2.0 * coVolArea); SysMatrix[i][i] += 1.0;
 
 		// tangential redist:
-		float vT = this->tangentialVelocitForVertex(Fi, i);
+		Vector3 vT = this->getTangentialVelocityForVertex(Fi, i);
 
 		// grad dist func:
 		float eta = (meanCurvatureFlow ? 0.0f : this->etaCtrlFunc(SDF_V, gradSDF_V, vNormals[i]));
 
-		sysRhsX[i] += (double)Fi.x + (double)dt * eta * vNormals[i].x + (double)dt * vT;
-		sysRhsY[i] += (double)Fi.y + (double)dt * eta * vNormals[i].y + (double)dt * vT;
-		sysRhsZ[i] += (double)Fi.z + (double)dt * eta * vNormals[i].z + (double)dt * vT;
+		sysRhsX[i] += (double)Fi.x + (double)dt * eta * vNormals[i].x + (double)dt * vT.x;
+		sysRhsY[i] += (double)Fi.y + (double)dt * eta * vNormals[i].y + (double)dt * vT.x;
+		sysRhsZ[i] += (double)Fi.z + (double)dt * eta * vNormals[i].z + (double)dt * vT.x;
 	}
+}
+
+void Evolver::getTriangleRedistributionSystem()
+{
+	// zero potential at first vertex  psi[0] = 0
+	SysMatrix[0][0] = 1.0;
+	sysRhsX[0] = 0.0;
+
+	for (uint i = 1; i < N; i++) {
+
+		Vector3 Fi = Vector3(
+			evolvedSurface->uniqueVertices[i].x,
+			evolvedSurface->uniqueVertices[i].y,
+			evolvedSurface->uniqueVertices[i].z
+		);
+		uint m = adjacentPolys[i].size();
+
+		float coVolArea = 0.0f;
+
+		for (uint p = 0; p < m; p++) {
+			// fill in values from cotan scheme based on [1], [2], [3]:
+			// tri vertices:
+			Vector3* F1prev = &evolvedSurface->uniqueVertices[adjacentPolys[i][(p > 0 ? p - 1 : m - 1)][1]];
+			Vector3* F1 = &evolvedSurface->uniqueVertices[adjacentPolys[i][p][1]];
+			Vector3* F2prev = &evolvedSurface->uniqueVertices[adjacentPolys[i][(p > 0 ? p - 1 : m - 1)][2]];
+			Vector3* F2 = &evolvedSurface->uniqueVertices[adjacentPolys[i][p][2]];
+
+			// areas:
+			float Area1 = cross(*F1prev - Fi, *F1prev - *F2prev).length();
+			float Area2 = cross(Fi - *F2, *F1 - *F2).length();
+
+			if (Area1 <= FLT_EPSILON || Area2 <= FLT_EPSILON) {
+				// skip degenerate element occurence
+				continue;
+			}
+
+			// cotans:
+			float cotan1 = dot(*F1prev - Fi, *F1prev - *F2prev) / Area1;
+			float cotan2 = dot(Fi - *F2, *F1 - *F2) / Area2;
+			float cotan1main = dot(Fi - *F1, *F2 - *F1) / Area2;
+			float cotan2main = dot(*F1 - *F2, Fi - *F2) / Area2;
+
+			SysMatrix[i][i] += 0.5 * ((double)cotan1main + (double)cotan2main);
+			SysMatrix[i][adjacentPolys[i][p][1]] -= 0.5 * ((double)cotan1 + (double)cotan2);
+		}
+
+		sysRhsX[i] = (double)(fvAreas[i] * dot(vNormalVelocityVectors[i], vCurvatureVectors[i])) -
+			(double)(fvAreas[i] / totalArea * totalCurvatureSqWeightedArea) +
+			(double)(fvAreas[i] * omega * (totalArea / (N * fvAreas[i]) - 1.0));
+	}
+}
+
+void Evolver::getQuadRedistributionSystem()
+{
 }
 
 void Evolver::getCurvaturesAndNormalVelocities()
 {
+	fvAreas.clear();
+	fvAreas = std::vector<float>(N);
+	vCurvatureVectors.clear();
+	vCurvatureVectors = std::vector<Vector3>(N);
 	vCurvatures.clear(); vNormalVelocities.clear();
 	vCurvatures = std::vector<float>(N);
+	vNormalVelocityVectors.clear();
+	vNormalVelocityVectors = std::vector<Vector3>(N);
 	vNormalVelocities = std::vector<float>(N);
+
+	totalArea = 0.0f;
+	totalCurvatureSqWeightedArea = 0.0f;
 
 	for (int i = 0; i < N; i++) {
 		// vertex
@@ -737,9 +878,8 @@ void Evolver::getCurvaturesAndNormalVelocities()
 			Vector3* M1 = &fvVerts[i][((size_t)2 * p + 2) % fvVerts[i].size()];
 
 			// co-vol areas:
-			float cV2Area0 = cross(*M0 - Fi, *baryCenter - Fi).length();
-			float cV2Area1 = cross(*baryCenter - Fi, *M1 - Fi).length();
-			coVolArea += (0.5f * cV2Area0 + 0.5f * cV2Area1);
+			float cVArea0 = cross(*M0 - Fi, *baryCenter - Fi).length();
+			float cVArea1 = cross(*baryCenter - Fi, *M1 - Fi).length();
 
 			// tri vertices:
 			Vector3* F1prev = &evolvedSurface->uniqueVertices[adjacentPolys[i][(p > 0 ? p - 1 : m - 1)][1]];
@@ -751,26 +891,82 @@ void Evolver::getCurvaturesAndNormalVelocities()
 			float Area1 = cross(*F1prev - Fi, *F1prev - *F2prev).length();
 			float Area2 = cross(Fi - *F2, *F1 - *F2).length();
 
-			if (Area2 <= FLT_EPSILON || Area1 <= FLT_EPSILON || coVolArea <= FLT_EPSILON) {
+			if (Area2 <= FLT_EPSILON || Area1 <= FLT_EPSILON || cVArea0 <= FLT_EPSILON || cVArea1 <= FLT_EPSILON) {
 				// skip degenerate element
 				continue;
 			}
 
+			coVolArea += (0.5f * cVArea0 + 0.5f * cVArea1);
+
 			// cotans:
 			float cotan1 = dot(*F1prev - Fi, *F1prev - *F2prev) / Area1;
 			float cotan2 = dot(Fi - *F2, *F1 - *F2) / Area2;
+			float cotan1main = dot(Fi - *F1, *F2 - *F1) / Area2;
+			float cotan2main = dot(*F1 - *F2, Fi - *F2) / Area2;
 
+			// save these as well?
 			vCurvatureVect += 0.5 * ((double)cotan1 + (double)cotan2) * (Fi - *F1);
 		}
 
-		vCurvatures[i] = ((1.0f / coVolArea) * vCurvatureVect).length();
+		fvAreas[i] = coVolArea;
+		totalArea += coVolArea;
+		vCurvatureVectors[i] = (1.0f / coVolArea) * vCurvatureVect;
+		vCurvatures[i] = vCurvatureVectors[i].length();
 
 		// grad dist func:
 		float eta = (meanCurvatureFlow ? 0.0f : this->etaCtrlFunc(SDF_V, gradSDF_V, vNormals[i]));
 
 		// normal velocity magnitude (will scale surface unit normal):
-		vNormalVelocities[i] = eps * vCurvatures[i] + eta;
+		vNormalVelocityVectors[i] = eps * vCurvatureVectors[i] + eta * vNormals[i];
+		vNormalVelocities[i] = vNormalVelocityVectors[i].length();
+		totalCurvatureSqWeightedArea += coVolArea * dot(vNormalVelocityVectors[i], vCurvatureVectors[i]);
 	}
+}
+
+Vector3 Evolver::getTangentialVelocityForVertex(Vector3& V, uint i)
+{
+	if (!tangential_redist) return Vector3();
+
+	uint m = adjacentPolys[i].size();
+	Vector3 vTanResult = Vector3();
+
+	for (uint p = 0; p < m; p++) {
+		// midpoints:
+		Vector3* M0 = &fvVerts[i][(size_t)2 * p];
+		Vector3* baryCenter = &fvVerts[i][(size_t)2 * p + 1];
+		Vector3* M1 = &fvVerts[i][((size_t)2 * p + 2) % fvVerts[i].size()];
+
+		// rays to neighboring vertices:
+		Vector3 edge0 = *M0 - V;
+		Vector3 edge1 = *M1 - V;
+
+		// co-volume tangents:
+		Vector3 fvTangent0 = (*baryCenter - *M0);
+		Vector3 fvTangent1 = (*baryCenter - *M1);
+
+		// co-volume edge lengths:
+		float fvEdge0Length = fvTangent0.length();
+		float fvEdge1Length = fvTangent1.length();
+
+		// co-volume normals:
+		Vector3 fvNormal0 = normalize(edge0 - (dot(edge0, fvTangent0) / fvTangent0.lengthSq()) * fvTangent0);
+		Vector3 fvNormal1 = normalize(edge1 - (dot(edge1, fvTangent1) / fvTangent1.lengthSq()) * fvTangent1);
+
+		/*
+		fvNormals.push_back(fvNormal0);
+		fvNormals.push_back(fvNormal1);
+
+		dummyFVGeom->uniqueVertices.push_back(0.5f * (*M0 + *baryCenter));
+		dummyFVGeom->uniqueVertices.push_back(0.5f * (*M1 + *baryCenter));*/
+
+		// interpolate tangential potential at co-volume edge midpoints:
+		float psi0 = (5.0f * psi[i] + 5.0f * psi[adjacentPolys[i][p][1]] + 2.0f * psi[adjacentPolys[i][p][2]]) / 12.0f;
+		float psi1 = (5.0f * psi[i] + 2.0f * psi[adjacentPolys[i][p][1]] + 5.0f * psi[adjacentPolys[i][p][2]]) / 12.0f;
+
+		vTanResult += ((fvEdge0Length * psi0) * fvNormal0 + (fvEdge1Length * psi1) * fvNormal1);
+	}
+
+	return (vTanResult - (fvAreas[i] * psi[i]) * vCurvatureVectors[i]);
 }
 
 void Evolver::openLogs()
@@ -921,6 +1117,7 @@ Evolver::Evolver(EvolutionParams& eParams, MeanCurvatureParams& mcfParams, GradD
 	this->saveGradientStates = sdfParams.saveGradientStates;
 	this->saveCurvatureStates = mcfParams.saveCurvatureStates;
 	this->saveNormalVelocityStates = mcfParams.saveNormalVelocityStates;
+	this->saveCurvatureVectors = mcfParams.saveCurvatureVectors;
 
 	// evolution type	
 	if (eParams.sourceGeometry) this->evolvedSurface = eParams.sourceGeometry;
@@ -976,7 +1173,6 @@ Evolver::~Evolver()
 
 	delete solveX; delete solveY; delete solveZ;
 }
-
 
 float Evolver::getSphereStepError(float t)
 {

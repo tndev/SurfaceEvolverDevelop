@@ -21,6 +21,8 @@ private:
 	double* sysRhsY = nullptr;
 	double* sysRhsZ = nullptr;
 
+	double* psi = nullptr;
+
 	LinearSolver* solveX = nullptr;
 	LinearSolver* solveY = nullptr;
 	LinearSolver* solveZ = nullptr;
@@ -30,12 +32,20 @@ private:
 	// mesh data
 	std::vector<float> fvAreas = {}; // vertex finite volume areas
 	std::vector<float> vCurvatures = {}; // vertex curvature scalars
+	std::vector<Vector3> vCurvatureVectors = {}; // vertex curvature vectors
 	std::vector<Vector3> vNormals = {}; // vertex normals
 	std::vector<float> vDistances = {}; // vertex distances to target mesh
 	std::vector<Vector3> vGradients = {}; // vertex gradients of distance func to target mesh
 	std::vector<float> vDotProducts = {}; // dot(-grad(SDF), N) for each vertex
-	std::vector<float> vNormalVelocities = {}; // normal velocity scalars: ||v_N|| = eps(d) * H + eta(d)
-	std::vector<float> vTangentialVelocities = {}; // tangential velocity data
+	std::vector<Vector3> vNormalVelocityVectors = {}; // normal velocity vectors: v_N = eps(d) * h + eta(d) * N
+	std::vector<float> vNormalVelocities = {}; // normal velocity scalars: ||v_N|| = ||eps(d) * h + eta(d) * N||
+	std::vector<Vector3> vTangentialVelocities = {}; // tangential velocity data
+	//std::vector<Vector3> fvNormals = {}; // finite volume normals
+
+	//Geometry* dummyFVGeom = new Geometry();
+
+	float totalArea;
+	float totalCurvatureSqWeightedArea;
 
 	// essential mesh data
 	std::vector<std::vector<Vector3>> fvVerts = {};
@@ -82,7 +92,7 @@ private:
 	void initSystem();
 
 	void getInterpolatedSDFValuesforVertex(Vector3* V, float* SDF_V, Vector3* gradSDF_V, std::vector<Vector3>& positionBuffer, std::vector<float>& valueBuffer);
-	float tangentialVelocitForVertex(Vector3& V, uint i);
+	Vector3 getTangentialVelocityForVertex(Vector3& V, uint i);
 
 	void saveFVAreaScalars();
 	void saveInterpolatedSDFValues();
@@ -90,7 +100,11 @@ private:
 	void saveInterpolatedSDFGradients();
 	void saveMeanCurvatureScalars();
 	void saveNormalVelocityScalars();
-	void saveTangentialVelocityScalars();
+	void saveMeanCurvatureVectors(int step);
+	void saveTangentialVelocityVectors(int step);
+	void saveNormalVelocityVectors(int step);
+	//void saveFVNormals(int step);
+	void saveRedistributionPotential();
 
 	float laplaceBeltramiCtrlFunc(float& SDF_V);
 	float laplaceBeltramiSmoothFunc(float t);
@@ -99,6 +113,8 @@ private:
 	void computeSurfaceNormalsAndCoVolumes();
 	void getTriangleEvolutionSystem(float smoothStep, float& meanArea);
 	void getQuadEvolutionSystem(float smoothStep, float& meanArea);
+	void getTriangleRedistributionSystem();
+	void getQuadRedistributionSystem();
 	void getCurvaturesAndNormalVelocities();
 
 	// logging
@@ -116,23 +132,24 @@ private:
 	// with radius r(t) = sqrt(r0 * r0 - 4 * t)
 	float getSphereStepL2Error(float t);
 	float getSphereStepError(float t);
-public:
+
 	// params:
 	uint subdiv = 2; // initial sphere subdivision detail
-	uint NSteps = 10; 
+	uint NSteps = 10;
 	size_t N = 0;
 
 	int smoothSteps = -1; // MCF smooth steps
 
 	// output flags:
-	bool saveStates = false; 
+	bool saveStates = false;
 	bool saveResult = true;
 
-	bool saveAreaStates = false;  
-	bool saveDistanceStates = false; 
-	bool saveGradientStates = false; 
+	bool saveAreaStates = false;
+	bool saveDistanceStates = false;
+	bool saveGradientStates = false;
 	bool saveCurvatureStates = false;
 	bool saveNormalVelocityStates = false;
+	bool saveCurvatureVectors = false;
 	bool saveTangentialVelocityStates = false;
 
 	bool printHappenings = true; // general things happening output
@@ -170,7 +187,7 @@ public:
 	std::string geomName = "";
 	std::string log_header = "";
 	std::string time_log = "";
-
+public:
 	Evolver();
 	// Evolver(const Evolver& other);
 	// ----- test and applied variants of evolver constructor respectively ---------
@@ -179,6 +196,11 @@ public:
 	// applied variant:
 	Evolver(EvolutionParams& eParams, MeanCurvatureParams& mcfParams, GradDistanceParams& sdfParams, TangentialRedistParams* tanParams = nullptr);
 	~Evolver();
+
+	// getters:
+	inline float testL2Error() { return sphereTestL2Error; };
+	inline uint nSteps() { return NSteps; };
+	inline uint nVerts() { return N; };
 };
 
 #endif

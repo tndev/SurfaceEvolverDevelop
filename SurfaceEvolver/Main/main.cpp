@@ -58,6 +58,7 @@
 // - test evolution for extremal cases: MCF dominant (eta = 0.01, eps = 1.0) and SDF dominant (eta = 1, eps = 0.01)
 // - previous step mean curvature values H => H N = h (mean curvature vector)
 // - previous step normal velocity term: v_N = eps(d) * h + eta(d) * N
+// - tangential redist. lin. system: Laplace-Beltrami(psi) = dot( v_N, h ) - mean(dot( v_N , h) + omega * (A/G - 1)
 
 //  POSTPONED:
 //
@@ -82,11 +83,11 @@
 
 //   WIP:
 // 
-// - tangential redist. lin. system: Laplace-Beltrami(psi) = dot( v_N, h ) - mean(dot( v_N , h) + omega * (A/G - 1)
 
 
 //   TODO:
 //
+// - bugfix tangential redistribution
 //
 // - fix SDF coordinates (use global grid indexing)
 // - implement global grid and cellSize-based Octree & SDF (just like in Vctr Engine Meta Object)
@@ -172,9 +173,9 @@ void performUnitSphereTest() {
 		stParams.testId = i;
 
 		Evolver sphereTest(eParams, stParams);
-		err = sphereTest.sphereTestL2Error;
+		err = sphereTest.testL2Error();
 
-		errLog << "dt = " << dt << ", Nsteps = " << sphereTest.NSteps << ", Nverts = " << sphereTest.N << std::endl;
+		errLog << "dt = " << dt << ", Nsteps = " << sphereTest.nSteps() << ", Nverts = " << sphereTest.nVerts() << std::endl;
 		errLog << "L2Error = " << err;
 		if (i > 0) {
 			EOC = log2(errPrev / err);
@@ -329,7 +330,7 @@ int main()
 	
 
 	// arc
-	/**/	
+	/*	
 	OBJImporter obj = OBJImporter();
 	Geometry arc = obj.importOBJGeometry("arc.obj");
 	arc.applyMatrix(Matrix4().setToScale(0.02f, 0.02f, 0.02f));
@@ -346,7 +347,7 @@ int main()
 	EvolutionParams eParams;
 	eParams.name = name;
 	eParams.dt = 0.03f; eParams.NSteps = 150; eParams.subdiv = (uint)3; eParams.elType = ElementType::tri;
-	eParams.saveStates = true; eParams.printStepOutput = true; eParams.writeTimeLog = true;
+	eParams.saveStates = true; eParams.printStepOutput = true; eParams.writeTimeLog = true; // eParams.printSolution = true;
 	MeanCurvatureParams mcfParams;
 	mcfParams.saveAreaStates = true; 
 	mcfParams.saveCurvatureStates = true;
@@ -355,9 +356,11 @@ int main()
 	sdfParams.targetGeom = &arc; sdfParams.sdfGrid = arc_sdf.grid;
 	sdfParams.saveDistanceStates = true;
 	// sdfParams.saveGradientStates = true;
-	mcfParams.smoothSteps = 10;
+	// mcfParams.smoothSteps = 10;
+	TangentialRedistParams tRedistParams;
+	tRedistParams.saveTangentialVelocityStates = true;
 
-	Evolver evolver(eParams, mcfParams, sdfParams);
+	Evolver evolver(eParams, mcfParams, sdfParams, &tRedistParams);*/
 
 	/*
 	e.exportGeometryVertexNormals(&bunny, "bunnyNormals");
@@ -365,7 +368,7 @@ int main()
 
 	// performUnitSphereTest();
 
-	/*
+	/**/
 	std::string name = "testBox";
 	PrimitiveBox b = PrimitiveBox(1, 1, 1, 3, 3, 3, true, name);
 	Vector3 axis = Vector3(1, 1, 1);
@@ -381,17 +384,22 @@ int main()
 	EvolutionParams eParams;
 	eParams.name = name;
 	eParams.dt = 0.03f; eParams.NSteps = 150; eParams.subdiv = (uint)3; eParams.elType = ElementType::tri;
-	eParams.printStepOutput = true; eParams.writeTimeLog = true;
+	eParams.saveStates = true; eParams.printStepOutput = true; // eParams.printSolution = true; eParams.printHappenings = true; //eParams.writeTimeLog = true;
 	MeanCurvatureParams mcfParams;
-	mcfParams.saveAreaStates = true; 
+	mcfParams.saveAreaStates = true;
+	mcfParams.saveCurvatureStates = true;
+	mcfParams.saveCurvatureVectors = true;
+	mcfParams.saveNormalVelocityStates = true;
 	mcfParams.writeMeanAreaLog = true;
 	GradDistanceParams sdfParams;
 	sdfParams.targetGeom = &b; sdfParams.sdfGrid = boxSDF.grid;
 	sdfParams.saveDistanceStates = true;
 	//sdfParams.saveGradientStates = true;
-	mcfParams.smoothSteps = 10;
-	
-	Evolver evolver(eParams, mcfParams, sdfParams);*/
+	// mcfParams.smoothSteps = 10;
+	TangentialRedistParams tRedistParams;
+	tRedistParams.saveTangentialVelocityStates = true;
+
+	Evolver evolver(eParams, mcfParams, sdfParams, &tRedistParams);
 
 	/*
 	std::string name = "testEllipsoid";

@@ -54,6 +54,7 @@ struct MeanCurvatureParams {
 	bool saveAreaStates = false;
 	bool saveCurvatureStates = false;
 	bool saveNormalVelocityStates = false;
+	bool saveCurvatureVectors = false;
 
 	bool writeMeanAreaLog = false;
 	// =============================
