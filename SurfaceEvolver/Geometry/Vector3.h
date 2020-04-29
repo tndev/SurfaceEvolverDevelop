@@ -57,6 +57,8 @@ public:
 	friend Vector3 operator/ (float scalar, Vector3 a);
 	Vector3& operator+=(const Vector3& other);
 	Vector3& operator-=(const Vector3& other);
+	Vector3& operator*=(const float& scalar);
+	Vector3& operator/=(const float& scalar);
 	friend std::ostream& operator<< (std::ostream& out, const Vector3& v);
 
 	friend bool operator< (const Vector3& left, const Vector3& right);

@@ -57,6 +57,9 @@ private:
 	std::fstream errorLog; // for sphereTest
 	std::fstream timingLog;
 
+	std::fstream psi_log; // for redistribution potential
+	std::fstream psi_Sys_log; // for lin. system data of the redist. potential
+
 	// timer
 	std::chrono::high_resolution_clock::time_point startGlobalTime;
 	std::chrono::duration<float> elapsedTimeTotal;
@@ -72,7 +75,7 @@ private:
 
 	// tangential redistribution:
 	float omega = 100.0f;
-	bool tangential_redist = false;
+	int redistribution_type = -1;
 
 	bool epsConstant = false; // Laplace-Beltrami func admits a constant value C1;
 	bool etaConstant = false; // eta ctrl func (SDF) admits a constant value C;
@@ -109,6 +112,7 @@ private:
 	float laplaceBeltramiCtrlFunc(float& SDF_V);
 	float laplaceBeltramiSmoothFunc(float t);
 	float etaCtrlFunc(float& SDF_V, Vector3& gradSDF_V, Vector3& nV);
+	float tangentialRedistDecayFunction(float& SDF_V);
 
 	void computeSurfaceNormalsAndCoVolumes();
 	void getTriangleEvolutionSystem(float smoothStep, float& meanArea);
@@ -177,6 +181,7 @@ private:
 	Geometry* targetGeom = nullptr;
 	// result (iterated):
 	Geometry* evolvedSurface = nullptr;
+	Box3 bbox;
 
 	// L2 error for numerical tests:
 	float sphereTestL2Error = 0.0f;
@@ -192,7 +197,7 @@ public:
 	// Evolver(const Evolver& other);
 	// ----- test and applied variants of evolver constructor respectively ---------
 	// sphere test evolution variant:
-	Evolver(EvolutionParams& eParams, SphereTestParams& stParams);
+	Evolver(EvolutionParams& eParams, SphereTestParams& stParams, TangentialRedistParams* tanParams = nullptr);
 	// applied variant:
 	Evolver(EvolutionParams& eParams, MeanCurvatureParams& mcfParams, GradDistanceParams& sdfParams, TangentialRedistParams* tanParams = nullptr);
 	~Evolver();

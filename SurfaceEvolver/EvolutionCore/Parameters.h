@@ -84,6 +84,9 @@ struct TangentialRedistParams {
 	// ctrl param
 	float omega = 100.0f;
 
+	// ===== Redistribution type =======
+	int type = 0; // -1 - none, 0 - angle-based, 1 - volume-based, 2 - length-based
+
 	// ===== output flags ======
 	bool saveTangentialVelocityStates = false;
 	// ================

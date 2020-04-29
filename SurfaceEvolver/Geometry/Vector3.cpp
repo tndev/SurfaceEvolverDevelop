@@ -294,6 +294,18 @@ Vector3& Vector3::operator-=(const Vector3& other)
 	return *this;
 }
 
+Vector3& Vector3::operator*=(const float& scalar)
+{
+	this->x *= scalar; this->y *= scalar; this->z *= scalar;
+	return *this;
+}
+
+Vector3& Vector3::operator/=(const float& scalar)
+{
+	this->x /= scalar; this->y /= scalar; this->z /= scalar;
+	return *this;
+}
+
 Vector3 operator*(Matrix3 m, Vector3 a)
 {
 	Vector3 result = a;
