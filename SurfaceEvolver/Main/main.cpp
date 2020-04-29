@@ -352,7 +352,7 @@ int main()
 	
 
 	// arc
-	/*	
+	/**/	
 	OBJImporter obj = OBJImporter();
 	Geometry arc = obj.importOBJGeometry("arc.obj");
 	arc.applyMatrix(Matrix4().setToScale(0.01f, 0.01f, 0.01f));
@@ -369,7 +369,7 @@ int main()
 	EvolutionParams eParams;
 	eParams.name = name;
 	eParams.dt = 0.02f; eParams.NSteps = 150; eParams.subdiv = (uint)3; eParams.elType = ElementType::tri;
-	eParams.saveStates = true; eParams.printStepOutput = true; eParams.writeTimeLog = true; // eParams.printSolution = true;
+	eParams.saveStates = true; //eParams.printStepOutput = true; eParams.writeTimeLog = true; // eParams.printSolution = true;
 	MeanCurvatureParams mcfParams;
 	mcfParams.saveAreaStates = true; 
 	mcfParams.saveCurvatureStates = true;
@@ -380,11 +380,12 @@ int main()
 	// sdfParams.saveGradientStates = true;
 	//mcfParams.smoothSteps = 10;
 	TangentialRedistParams tRedistParams;
-	tRedistParams.omega = 4.0f;
-	tRedistParams.type = 0;
+	tRedistParams.omega_volume = 100.0f;
+	tRedistParams.omega_angle = 5.0f;
+	tRedistParams.type = 1;
 	tRedistParams.saveTangentialVelocityStates = true;
 
-	Evolver evolver(eParams, mcfParams, sdfParams, &tRedistParams);*/
+	Evolver evolver(eParams, mcfParams, sdfParams, &tRedistParams);
 
 	/*
 	e.exportGeometryVertexNormals(&bunny, "bunnyNormals");
@@ -422,7 +423,7 @@ int main()
 	mcfParams.smoothSteps = 10;
 	mcfParams.initSmoothRate = 0.01;
 	TangentialRedistParams tRedistParams;
-	tRedistParams.omega = 100.0f;
+	tRedistParams.omega = 200.0f;
 	tRedistParams.type = 1;
 	tRedistParams.saveTangentialVelocityStates = true;
 
@@ -431,9 +432,9 @@ int main()
 	/*
 	std::string name = "testEllipsoid";
 	// CubeSphere cs = CubeSphere(10, 50.0f, true, name);
-	IcoSphere is = IcoSphere(2, 1.0f, name);
-	//Matrix4 M = Matrix4().setToScale(1.5f, 1.0f, 1.0f);
-	//is.applyMatrix(M);
+	IcoSphere is = IcoSphere(3, 1.0f, name);
+	Matrix4 M = Matrix4().setToScale(1.5f, 1.0f, 1.0f);
+	is.applyMatrix(M);
 	e.initExport(&is, name);
 	uint res = 40; // octree resolution
 	SDF isSDF = SDF(&is, res, true, true);
@@ -442,8 +443,9 @@ int main()
 
 	EvolutionParams eParams;
 	eParams.name = name;
-	eParams.dt = 0.005f; eParams.NSteps = 50; //eParams.subdiv = (uint)3; eParams.elType = ElementType::tri;
-	eParams.saveStates = true; eParams.printStepOutput = true; eParams.writeTimeLog = true;
+	eParams.dt = 0.005f; eParams.NSteps = 60; //eParams.subdiv = (uint)3; eParams.elType = ElementType::tri;
+	eParams.saveStates = true; // eParams.printStepOutput = true; eParams.writeTimeLog = true;
+	eParams.sourceGeometry = &is;
 	MeanCurvatureParams mcfParams;
 	mcfParams.saveAreaStates = true; 
 	mcfParams.writeMeanAreaLog = true;
@@ -453,7 +455,8 @@ int main()
 	//sdfParams.saveGradientStates = true;
 	//mcfParams.smoothSteps = 10;
 	TangentialRedistParams tRedistParams;
-	tRedistParams.omega = 30.0f;
+	tRedistParams.omega = 1000.0f;
+	tRedistParams.type = 1;
 	tRedistParams.saveTangentialVelocityStates = true;
 
 	Evolver evolver(eParams, mcfParams, sdfParams, &tRedistParams);*/

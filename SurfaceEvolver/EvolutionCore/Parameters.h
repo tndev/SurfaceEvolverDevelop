@@ -81,8 +81,9 @@ struct GradDistanceParams {
 };
 
 struct TangentialRedistParams {
-	// ctrl param
-	float omega = 100.0f;
+	// ctrl params
+	float omega_volume = 100.0f;
+	float omega_angle = 2.0f;
 
 	// ===== Redistribution type =======
 	int type = 0; // -1 - none, 0 - angle-based, 1 - volume-based, 2 - length-based

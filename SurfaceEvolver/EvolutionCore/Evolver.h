@@ -74,7 +74,8 @@ private:
 	float smoothDecay = 1.0f;
 
 	// tangential redistribution:
-	float omega = 100.0f;
+	float omega_volume = 100.0f;
+	float omega_angle = 2.0f;
 	int redistribution_type = -1;
 
 	bool epsConstant = false; // Laplace-Beltrami func admits a constant value C1;
@@ -95,7 +96,8 @@ private:
 	void initSystem();
 
 	void getInterpolatedSDFValuesforVertex(Vector3* V, float* SDF_V, Vector3* gradSDF_V, std::vector<Vector3>& positionBuffer, std::vector<float>& valueBuffer);
-	Vector3 getTangentialVelocityForVertex(Vector3& V, uint i);
+	Vector3 getVolumeTangentialVelocityForVertex(Vector3& V, uint i);
+	Vector3 getAngleTangentialVelocityForVertex(Vector3& V, uint i);
 
 	void saveFVAreaScalars();
 	void saveInterpolatedSDFValues();
@@ -113,6 +115,7 @@ private:
 	float laplaceBeltramiSmoothFunc(float t);
 	float etaCtrlFunc(float& SDF_V, Vector3& gradSDF_V, Vector3& nV);
 	float tangentialRedistDecayFunction(float& SDF_V);
+	float tangentialRedistCurvatureFunction(float& H);
 
 	void computeSurfaceNormalsAndCoVolumes();
 	void getTriangleEvolutionSystem(float smoothStep, float& meanArea);

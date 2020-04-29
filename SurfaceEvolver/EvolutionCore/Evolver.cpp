@@ -408,6 +408,27 @@ void Evolver::getInterpolatedSDFValuesforVertex(
 	}	
 }
 
+Vector3 Evolver::getAngleTangentialVelocityForVertex(Vector3& V, uint i)
+{
+	uint m = adjacentPolys[i].size();
+	Vector3 vTanResult = Vector3();
+
+	for (uint p = 0; p < m; p++) {
+		// rays to neighboring vertices:
+		Vector3* F1 = &evolvedSurface->uniqueVertices[adjacentPolys[i][p][1]];
+		Vector3* F2 = &evolvedSurface->uniqueVertices[adjacentPolys[i][p][2]];
+
+		// rays to neighboring vertices:
+		Vector3 edge0 = normalize(*F1 - V);
+		Vector3 edge1 = normalize(*F2 - V);
+
+		vTanResult += (1.0f + dot(edge0, edge1)) * (edge0 + edge1);
+	}
+	vTanResult *= (omega_angle / m);
+
+	return vTanResult - dot(vTanResult, vNormals[i]) * vNormals[i];
+}
+
 void Evolver::saveFVAreaScalars()
 {
 	fvAreas.clear();
@@ -598,6 +619,11 @@ float Evolver::tangentialRedistDecayFunction(float& SDF_V)
 	return (20 * SDF_V + rDecay) / (21 * rDecay);
 }
 
+float Evolver::tangentialRedistCurvatureFunction(float& H)
+{
+	return exp(- H * H / 100);
+}
+
 void Evolver::computeSurfaceNormalsAndCoVolumes()
 {
 	vNormals.clear();
@@ -728,14 +754,16 @@ void Evolver::getTriangleEvolutionSystem(float smoothStep, float& meanArea)
 		// off-diag:
 		for (uint p = 0; p < m; p++) SysMatrix[i][adjacentPolys[i][p][1]] *= -((double)dt * eps) / coVolArea;
 
+		float rho = (!meanCurvatureFlow ? this->tangentialRedistDecayFunction(SDF_V) : 0.0f);
+		float beta = (redistribution_type > -1 ? this->tangentialRedistCurvatureFunction(vCurvatures[i]) : 0.0f);
+
 		// tangential redist:
-		Vector3 vT = this->getTangentialVelocityForVertex(Fi, i);
+		Vector3 vT = (redistribution_type > -1 ? beta * getVolumeTangentialVelocityForVertex(Fi, i) + rho * getAngleTangentialVelocityForVertex(Fi, i) : Vector3());
 		// overallTangentialVelocity += vT;
 		if (saveTangentialVelocityStates) vTangentialVelocities[i] = vT;
 
 		// grad dist func:
 		float eta = ( meanCurvatureFlow ? 0.0f : this->etaCtrlFunc(SDF_V, gradSDF_V, vNormals[i]) );
-		float rho = this->tangentialRedistDecayFunction(SDF_V);
 
 		sysRhsX[i] = (double)Fi.x + (double)dt * eta * vNormals[i].x + (double)dt * vT.x * rho;
 		sysRhsY[i] = (double)Fi.y + (double)dt * eta * vNormals[i].y + (double)dt * vT.y * rho;
@@ -794,7 +822,7 @@ void Evolver::getQuadEvolutionSystem(float smoothStep, float& meanArea)
 		SysMatrix[i][i] *= -(dt * eps) / (2.0 * coVolArea); SysMatrix[i][i] += 1.0;
 
 		// tangential redist:
-		Vector3 vT = this->getTangentialVelocityForVertex(Fi, i);
+		Vector3 vT = Vector3();
 
 		// grad dist func:
 		float eta = (meanCurvatureFlow ? 0.0f : this->etaCtrlFunc(SDF_V, gradSDF_V, vNormals[i]));
@@ -852,8 +880,8 @@ void Evolver::getTriangleRedistributionSystem()
 		}
 
 		sysRhsX[i] = (double)(fvAreas[i] * dot(vNormalVelocityVectors[i], vCurvatureVectors[i])) -
-			(double)(fvAreas[i] / totalArea * totalCurvatureSqWeightedArea) +
-			(double)(fvAreas[i] * omega * (totalArea / N - fvAreas[i]));
+			(double)(fvAreas[i] / totalArea * totalCurvatureSqWeightedArea) -
+			(double)(omega_volume * (totalArea / (N - 1) - fvAreas[i]));
 		rhsSum += sysRhsX[i];
 	}
 
@@ -942,9 +970,9 @@ void Evolver::getCurvaturesAndNormalVelocities()
 		}
 
 		fvAreas[i] = coVolArea;
-		totalArea += coVolArea;
+		if (i > 0) totalArea += coVolArea;
 		vCurvatureVectors[i] = (1.0f / coVolArea) * vCurvatureVect;
-		vCurvatures[i] = vCurvatureVectors[i].length();
+		vCurvatures[i] = dot(vCurvatureVectors[i], vNormals[i]);
 
 		// grad dist func:
 		float eta = (meanCurvatureFlow ? 0.0f : this->etaCtrlFunc(SDF_V, gradSDF_V, vNormals[i]));
@@ -956,29 +984,10 @@ void Evolver::getCurvaturesAndNormalVelocities()
 	}
 }
 
-Vector3 Evolver::getTangentialVelocityForVertex(Vector3& V, uint i)
+Vector3 Evolver::getVolumeTangentialVelocityForVertex(Vector3& V, uint i)
 {
-	if (redistribution_type < 0) return Vector3();
-
 	uint m = adjacentPolys[i].size();
 	Vector3 vTanResult = Vector3();
-
-	if (redistribution_type == 0) {
-		for (uint p = 0; p < m; p++) {
-			// rays to neighboring vertices:
-			Vector3* F1 = &evolvedSurface->uniqueVertices[adjacentPolys[i][p][1]];
-			Vector3* F2 = &evolvedSurface->uniqueVertices[adjacentPolys[i][p][2]];
-
-			// rays to neighboring vertices:
-			Vector3 edge0 = normalize(*F1 - V);
-			Vector3 edge1 = normalize(*F2 - V);
-
-			vTanResult += (1.0f + dot(edge0, edge1)) * (edge0 + edge1);
-		}
-		vTanResult *= (omega / m);
-
-		return vTanResult - dot(vTanResult, vNormals[i]) * vNormals[i];
-	}
 
 	for (uint p = 0; p < m; p++) {
 		// midpoints:
@@ -1131,7 +1140,8 @@ Evolver::Evolver(EvolutionParams& eParams, SphereTestParams& stParams, Tangentia
 	// tangential redistribution
 	this->redistribution_type = (tanParams == nullptr ? -1 : tanParams->type);
 	if (redistribution_type > 0) {
-		this->omega = tanParams->omega;
+		this->omega_volume = tanParams->omega_volume;
+		this->omega_angle = tanParams->omega_angle;
 		this->saveTangentialVelocityStates = tanParams->saveTangentialVelocityStates;
 	}
 	// -----------------------------------------------------
@@ -1196,7 +1206,8 @@ Evolver::Evolver(EvolutionParams& eParams, MeanCurvatureParams& mcfParams, GradD
 	// tangential redistribution
 	this->redistribution_type = (tanParams == nullptr ? -1 : tanParams->type);
 	if (redistribution_type > -1) {
-		this->omega = tanParams->omega;
+		this->omega_volume = tanParams->omega_volume;
+		this->omega_angle = tanParams->omega_angle;
 		this->saveTangentialVelocityStates = tanParams->saveTangentialVelocityStates;
 	}
 	// -----------------------------------------------------
