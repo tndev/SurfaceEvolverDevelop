@@ -64,6 +64,7 @@
 // - MCF-TR sphere test with an inhomogeneous distribution of vertices
 // - MCF-TR(& w\o TR) evolution test on an ellipsoid
 // - Angle-Based Tangential redistribution
+// - polygon adjacency for boundary vertices
 
 //  POSTPONED:
 //
@@ -88,10 +89,13 @@
 
 //   WIP:
 // 
+// - fix cotan scheme for boundary vertices
 
 
 //   TODO:
 //
+// - fix finite volume computation for obtuse angles according to Desbrun
+// - impose Dirichlet boundary conditions on Evolver
 // - Debug volume-based TR - psi rhs has to have a zero sum
 //
 // - fix SDF coordinates (use global grid indexing)
@@ -201,9 +205,49 @@ int main()
 	float r = 50.0f;
 	unsigned int d = 3;
 	float a = 2.0f * r / sqrt(3.0f);
-	unsigned int ns = 10;
+	unsigned int ns = 4;
 
 	VTKExporter e = VTKExporter();
+
+	/**/
+	std::string name = "boxWithoutLid";
+	PrimitiveBox boxWithoutLid = PrimitiveBox(a, a, a, ns, ns, ns, true, name, false);
+	Matrix4 R = Matrix4().makeRotationAxis(1.0f, 0.0f, 0.0f, -M_PI / 2.0f);
+	Matrix4 T = Matrix4().makeTranslation(-a / 2, -a / 2, -a / 2);
+	boxWithoutLid.applyMatrix(R);
+	boxWithoutLid.applyMatrix(T);
+	Deform def = Deform(&boxWithoutLid);
+	def.spherify(1.0f);
+	Geometry result = def.result;
+
+	e.initExport(&result, name);
+
+	std::vector<std::vector<Vector3>> fvVerts = {};
+	std::vector<std::vector<std::vector<uint>>> adjacentPolys = {};
+	result.getVertexFiniteVolumes(&fvVerts, &adjacentPolys);
+
+	/*
+	uint geomId = 0;
+	for (int i = 0; i < result.uniqueVertices.size(); i++) {
+		bool fvOdd = fvVerts[i].size() % 2;
+		for (int j = 0; j < fvVerts[i].size(); j++) {			
+			if (fvOdd && j == fvVerts[i].size() - 1) {
+				continue;
+			}
+			e.exportGeometryFiniteVolumeGrid(&result, fvVerts, adjacentPolys, name + "FV_" + std::to_string(geomId), i, j);
+			if (i > 0) {
+				e.exportGeometryFiniteVolumeGrid(&result, fvVerts, adjacentPolys, name + "FVs_" + std::to_string(geomId), i - 1, -1, true);
+			}
+			else {
+				Geometry empty = Geometry();
+				e.initExport(&empty, name + "FVs_" + std::to_string(geomId));
+			}
+			std::cout << "triangle " << geomId << " exported" << std::endl;
+			geomId++;
+		}
+	}*/
+
+	e.exportGeometryFiniteVolumeGrid(&result, fvVerts, adjacentPolys, "boxWithoutLid_FVs");
 
 	/*
 	for (uint i = 0; i < 4; i++) {
@@ -352,7 +396,7 @@ int main()
 	
 
 	// arc
-	/**/	
+	/*	
 	OBJImporter obj = OBJImporter();
 	Geometry arc = obj.importOBJGeometry("arc.obj");
 	arc.applyMatrix(Matrix4().setToScale(0.01f, 0.01f, 0.01f));
@@ -378,14 +422,14 @@ int main()
 	sdfParams.targetGeom = &arc; sdfParams.sdfGrid = arc_sdf.grid;
 	sdfParams.saveDistanceStates = true;
 	// sdfParams.saveGradientStates = true;
-	//mcfParams.smoothSteps = 10;
+	mcfParams.smoothSteps = 10;
 	TangentialRedistParams tRedistParams;
 	tRedistParams.omega_volume = 100.0f;
 	tRedistParams.omega_angle = 5.0f;
 	tRedistParams.type = 1;
 	tRedistParams.saveTangentialVelocityStates = true;
 
-	Evolver evolver(eParams, mcfParams, sdfParams, &tRedistParams);
+	Evolver evolver(eParams, mcfParams, sdfParams, &tRedistParams);*/
 
 	/*
 	e.exportGeometryVertexNormals(&bunny, "bunnyNormals");

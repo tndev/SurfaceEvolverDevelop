@@ -755,7 +755,7 @@ void Evolver::getTriangleEvolutionSystem(float smoothStep, float& meanArea)
 		for (uint p = 0; p < m; p++) SysMatrix[i][adjacentPolys[i][p][1]] *= -((double)dt * eps) / coVolArea;
 
 		float rho = (!meanCurvatureFlow ? this->tangentialRedistDecayFunction(SDF_V) : 0.0f);
-		float beta = (redistribution_type > -1 ? this->tangentialRedistCurvatureFunction(vCurvatures[i]) : 0.0f);
+		float beta = (redistribution_type > 0 ? this->tangentialRedistCurvatureFunction(vCurvatures[i]) : 0.0f);
 
 		// tangential redist:
 		Vector3 vT = (redistribution_type > -1 ? beta * getVolumeTangentialVelocityForVertex(Fi, i) + rho * getAngleTangentialVelocityForVertex(Fi, i) : Vector3());
@@ -986,6 +986,8 @@ void Evolver::getCurvaturesAndNormalVelocities()
 
 Vector3 Evolver::getVolumeTangentialVelocityForVertex(Vector3& V, uint i)
 {
+	if (redistribution_type < 1) return Vector3();
+
 	uint m = adjacentPolys[i].size();
 	Vector3 vTanResult = Vector3();
 

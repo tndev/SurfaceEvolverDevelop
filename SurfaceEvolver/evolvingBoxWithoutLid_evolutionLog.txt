@@ -1,0 +1,12 @@
+=============================================================
+----------------------- Initializing ------------------------
+------------ S U R F A C E    E V O L U T I O N -------------
+>> NSteps = 60, dt = 0.005000, tStop = 0.300000
+>> Model: evolvingBoxWithoutLid, NVerts = 602
+>> Performing mean curvature flow test on sphere with r0 = 1.000000
+-------------------------------------------------------------
+starting evolution ...
+-------- time step ti = 1, t = 0.005000 -----------
+finite volume mean area: 27.9692
+
+ Total time for 60 steps: 0.559425 s

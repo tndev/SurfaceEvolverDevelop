@@ -16,7 +16,7 @@ PrimitiveBox::PrimitiveBox(const PrimitiveBox& other)
 	this->segments[1] = other.segments[2];
 }
 
-PrimitiveBox::PrimitiveBox(float x, float y, float z, unsigned int sx, unsigned int sy, unsigned int sz, bool quad, std::string name)
+PrimitiveBox::PrimitiveBox(float x, float y, float z, unsigned int sx, unsigned int sy, unsigned int sz, bool quad, std::string name, bool lastWall)
 {
 	this->dimensions[0] = x;
 	this->dimensions[2] = y;
@@ -27,6 +27,7 @@ PrimitiveBox::PrimitiveBox(float x, float y, float z, unsigned int sx, unsigned 
 	this->segments[1] = sz;
 
 	this->quad = quad;
+	this->lastWall = lastWall;
 
 	if (name.empty()) {
 		this->name = "PrimitiveBox, dimensions: (" + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) +
@@ -53,7 +54,7 @@ void PrimitiveBox::build()
 	//          : 6 :
 	//          :...:
 	//
-	// where 1 is the ground (xy) floor
+	// where 1 is the ground (xy) floor and wall 6 can be omitted
 
 	const float width = dimensions[0];
 	const float depth = dimensions[2];
@@ -70,7 +71,7 @@ void PrimitiveBox::build()
 		nw * nd + // wall 1
 		(2 * sd + nw) * sh + // walls 2, 3, and 4
 		(sw - 1) * sd + // wall 5
-		(sw - 1) * (sh - 1); // wall 6
+		(sw - 1) * (sh - 1) * lastWall; // wall 6
 
 	const unsigned int faceCount = 2 * (sw * sd + sh * sw + sd * sh);
 
@@ -355,136 +356,138 @@ void PrimitiveBox::build()
 
 	startingId += (sw - 1) * sd;
 
+	if (lastWall) {
 	// wall 6:
-	currentNormal.set(0, 1, 0);
-	for (unsigned int i = 1; i < sh; i++) {
-		if (sw > 1) {
-			for (unsigned int j = 1; j < sw; j++) {
-				vertices[3 * (startingId + (i - 1) * (sw - 1) + j - 1)] = (1 - (float)j / (float)sw) * width;
-				vertices[3 * (startingId + (i - 1) * (sw - 1) + j - 1) + 1] = depth;
-				vertices[3 * (startingId + (i - 1) * (sw - 1) + j - 1) + 2] = (1 - (float)i / (float)sh) * height;
+		currentNormal.set(0, 1, 0);
+		for (unsigned int i = 1; i < sh; i++) {
+			if (sw > 1) {
+				for (unsigned int j = 1; j < sw; j++) {
+					vertices[3 * (startingId + (i - 1) * (sw - 1) + j - 1)] = (1 - (float)j / (float)sw) * width;
+					vertices[3 * (startingId + (i - 1) * (sw - 1) + j - 1) + 1] = depth;
+					vertices[3 * (startingId + (i - 1) * (sw - 1) + j - 1) + 2] = (1 - (float)i / (float)sh) * height;
 
-				// wall 6 face: upper left corner:
-				if (i == 1 && j == 1) {
+					// wall 6 face: upper left corner:
+					if (i == 1 && j == 1) {
+						bufferQuadFromIds(
+							startingId - (sw - 1) * sd - 2 * rowLength,
+							startingId,
+							startingId - (sw - 1),
+							startingId - (sw - 1) * sd - rowLength,
+							currentNormal
+						);
+						triId += 2;
+					}
+					// wall 6 faces: first row interior:
+					else if (i == 1 && j > 1) {
+						bufferQuadFromIds(
+							startingId + j - 2,
+							startingId + j - 1,
+							startingId - (sw - 1) + j - 1,
+							startingId - (sw - 1) + j - 2,
+							currentNormal
+						);
+						triId += 2;
+					}
+					// wall 6 faces: left edge:
+					else if (i > 1 && j == 1) {
+						bufferQuadFromIds(
+							startingId - (sw - 1) * sd - 2 * rowLength - (i - 1) * rowLength,
+							startingId + (i - 1) * (sw - 1),
+							startingId + (i - 2) * (sw - 1),
+							startingId - (sw - 1) * sd - i * rowLength,
+							currentNormal
+						);
+						triId += 2;
+					}
+					// wall 6 faces: interior:
+					else if (i > 1 && j > 1) {
+						bufferQuadFromIds(
+							startingId + (i - 1) * (sw - 1) + j - 2,
+							startingId + (i - 1) * (sw - 1) + j - 1,
+							startingId + (i - 2) * (sw - 1) + j - 1,
+							startingId + (i - 2) * (sw - 1) + j - 2,
+							currentNormal
+						);
+						triId += 2;
+					}
+				}
+				// wall 6 face: upper right corner:
+				if (i == 1) {
 					bufferQuadFromIds(
-						startingId - (sw - 1) * sd - 2 * rowLength,
-						startingId,
-						startingId - (sw - 1),
-						startingId - (sw - 1) * sd - rowLength,
+						startingId + (sw - 2),
+						startingId - (sw - 1) * sd - rowLength - 1,
+						startingId - (sw - 1) * sd - 1,
+						startingId - 1,
 						currentNormal
 					);
 					triId += 2;
 				}
-				// wall 6 faces: first row interior:
-				else if (i == 1 && j > 1) {
+				// wall 6 faces: right edge:
+				else {
 					bufferQuadFromIds(
-						startingId + j - 2,
-						startingId + j - 1,
-						startingId - (sw - 1) + j - 1,
-						startingId - (sw - 1) + j - 2,
+						startingId + i * (sw - 1) - 1,
+						startingId - (sw - 1) * sd - i * rowLength - 1,
+						startingId - (sw - 1) * sd - (i - 1) * rowLength - 1,
+						startingId + (i - 1) * (sw - 1) - 1,
 						currentNormal
 					);
 					triId += 2;
 				}
-				// wall 6 faces: left edge:
-				else if (i > 1 && j == 1) {
-					bufferQuadFromIds(
-						startingId - (sw - 1) * sd - 2 * rowLength - (i - 1) * rowLength,
-						startingId + (i - 1) * (sw - 1),
-						startingId + (i - 2) * (sw - 1),
-						startingId - (sw - 1) * sd - i * rowLength,
-						currentNormal
-					);
-					triId += 2;
-				}
-				// wall 6 faces: interior:
-				else if (i > 1 && j > 1) {
-					bufferQuadFromIds(
-						startingId + (i - 1) * (sw - 1) + j - 2,
-						startingId + (i - 1) * (sw - 1) + j - 1,
-						startingId + (i - 2) * (sw - 1) + j - 1,
-						startingId + (i - 2) * (sw - 1) + j - 2,
-						currentNormal
-					);
-					triId += 2;
-				}
+				// case for sw = 1: wall 6 faces:
 			}
-			// wall 6 face: upper right corner:
-			if (i == 1) {
-				bufferQuadFromIds(
-					startingId + (sw - 2),
-					startingId - (sw - 1) * sd - rowLength - 1,
-					startingId - (sw - 1) * sd - 1,
-					startingId - 1,
-					currentNormal
-				);
-				triId += 2;
-			}
-			// wall 6 faces: right edge:
 			else {
 				bufferQuadFromIds(
-					startingId + i * (sw - 1) - 1,
+					startingId - (sw - 1) * sd - 2 * rowLength - (i - 1) * rowLength,
 					startingId - (sw - 1) * sd - i * rowLength - 1,
 					startingId - (sw - 1) * sd - (i - 1) * rowLength - 1,
-					startingId + (i - 1) * (sw - 1) - 1,
+					startingId - (sw - 1) * sd - i * rowLength,
 					currentNormal
 				);
 				triId += 2;
 			}
-			// case for sw = 1: wall 6 faces:
+		}
+
+		if (sw > 1) {
+			// wall 6 face: lower left corner:
+			bufferQuadFromIds(
+				0,
+				1,
+				startingId + (sw - 1) * (sh - 2),
+				nw * nd,
+				currentNormal
+			);
+			triId += 2;
+			// wall 6 faces: last row interior:
+			for (unsigned int j = 1; j < sw - 1; j++) {
+				bufferQuadFromIds(
+					j,
+					j + 1,
+					startingId + (sw - 1) * (sh - 2) + j,
+					startingId + (sw - 1) * (sh - 2) + j - 1,
+					currentNormal
+				);
+				triId += 2;
+			}
+			// wall 6 face: lower right corner:
+			bufferQuadFromIds(
+				sw - 1,
+				sw,
+				nw * nd + rowLength - 1,
+				vertexCount - 1,
+				currentNormal
+			);
+			// case for sw = 1: wall 6 last face:
 		}
 		else {
 			bufferQuadFromIds(
-				startingId - (sw - 1) * sd - 2 * rowLength - (i - 1) * rowLength,
-				startingId - (sw - 1) * sd - i * rowLength - 1,
-				startingId - (sw - 1) * sd - (i - 1) * rowLength - 1,
-				startingId - (sw - 1) * sd - i * rowLength,
+				0,
+				sw,
+				nw * nd + rowLength - 1,
+				nw * nd,
 				currentNormal
 			);
-			triId += 2;
 		}
-	}
-
-	if (sw > 1) {
-		// wall 6 face: lower left corner:
-		bufferQuadFromIds(
-			0,
-			1,
-			startingId + (sw - 1) * (sh - 2),
-			nw * nd,
-			currentNormal
-		);
-		triId += 2;
-		// wall 6 faces: last row interior:
-		for (unsigned int j = 1; j < sw - 1; j++) {
-			bufferQuadFromIds(
-				j,
-				j + 1,
-				startingId + (sw - 1) * (sh - 2) + j,
-				startingId + (sw - 1) * (sh - 2) + j - 1,
-				currentNormal
-			);
-			triId += 2;
-		}
-		// wall 6 face: lower right corner:
-		bufferQuadFromIds(
-			sw - 1,
-			sw,
-			nw * nd + rowLength - 1,
-			vertexCount - 1,
-			currentNormal
-		);
-		// case for sw = 1: wall 6 last face:
-	}
-	else {
-		bufferQuadFromIds(
-			0,
-			sw,
-			nw * nd + rowLength - 1,
-			nw * nd,
-			currentNormal
-		);
-	}
+	}	
 
 	// duplicate vertices into geometryVertices
 	std::vector<float> geometryVertices = std::vector<float>(3 * this->vertexIndices.size());

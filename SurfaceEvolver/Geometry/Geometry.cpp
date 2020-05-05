@@ -302,56 +302,94 @@ std::vector<Vector3> Geometry::getAngleWeightedVertexPseudoNormals()
 
 using Polygon = BufferGeom::Triangle;
 using PolyWithMarkedVertex = BufferGeom::TriWithMarkedVertex;
-void Geometry::getVertexToPolygonMap(std::multimap<Vector3, PolyWithMarkedVertex>* buffer)
+void Geometry::getVertexToPolygonMap(std::multimap<Vector3, BufferGeom::TriWithMarkedVertex>* buffer)
 {
-	std::multimap<Vector3, PolyWithMarkedVertex>::iterator it;
+	std::multimap<Vector3, BufferGeom::TriWithMarkedVertex>::iterator it;
 	for (auto&& t : triangulations) {
 		Polygon face = this->getPolygonIndicesFromTriangulation(t);
 		for (uint j = 0; j < face.size(); j++) {
 			it = buffer->insert(
-				std::pair<Vector3, PolyWithMarkedVertex>(
+				std::pair<Vector3, BufferGeom::TriWithMarkedVertex>(
 					this->uniqueVertices[face[j]],
-					PolyWithMarkedVertex(face, face[j])
+					BufferGeom::TriWithMarkedVertex(face, face[j])
 				)
 			);
 		}
 	}
 }
 
-void sortPolysWithMarkedVertexByAdjacency(std::vector<PolyWithMarkedVertex>* polys) {
-	std::vector<PolyWithMarkedVertex> result = {};
+bool sortPolysWithMarkedVertexByAdjacency(std::vector<PolyWithMarkedVertex>* polys) {
+	std::list<PolyWithMarkedVertex> result = {};
 	
-	PolyWithMarkedVertex currPoly, leftPoly;
+	PolyWithMarkedVertex currPoly, leftPoly, rightPoly;
 	// take first
-	std::vector<PolyWithMarkedVertex>::iterator currIt = polys->begin();	
+	std::vector<PolyWithMarkedVertex>::iterator currIt = polys->begin();
+	bool CCW = true; // Counter-Clock-Wise direction
+	bool closedCycle = false; // closed cycle flag
+	currPoly = *currIt;
+	// find iterator to marked vertex of first poly
+	auto firstMarkedIt = std::find(currPoly.first.begin(), currPoly.first.end(), currPoly.second);
+	// select next vertex in the first poly as the admissable edge vertex
+	auto firstEdgeIt = (std::next(firstMarkedIt) == currPoly.first.end() ? currPoly.first.begin() : std::next(firstMarkedIt));
+	uint firstEdgeId = *firstEdgeIt;
 
 	while (polys->size()) {
 		// copy current poly to the result list
 		currPoly = *currIt;
-		result.push_back(currPoly);
+		if (CCW) result.push_back(currPoly);
+		else result.push_front(currPoly);
 
 		// find right edge ids of the selected polygon
+		// iterator to marked vertex of current poly
 		auto markedIt = std::find(currPoly.first.begin(), currPoly.first.end(), currPoly.second);
+		// iterator to previous vertex of current poly's marked vertex
 		auto prevIt = (markedIt == currPoly.first.begin() ? currPoly.first.end() - 1 : std::prev(markedIt));
+		// iterator to next vertex of current poly's marked vertex (only used for CW rotation)
+		auto nextIt = (std::next(markedIt) == currPoly.first.end() ? currPoly.first.begin() : std::next(markedIt));
 
 		// erase current poly from the list
 		polys->erase(currIt);
 
-		// search through all remaining polys for left neighbor
-		for (auto it = polys->begin(); it != polys->end(); it++) {
-			leftPoly = *it;
-			// find left edge ids of the left poly candidate
-			auto markedLeftIt = std::find(leftPoly.first.begin(), leftPoly.first.end(), leftPoly.second);
-			auto nextLeftIt = (std::next(markedLeftIt) == leftPoly.first.end() ? leftPoly.first.begin() : std::next(markedLeftIt));
+		if (CCW) {
+			// search through all remaining polys for left neighbor
+			for (auto it = polys->begin(); it != polys->end(); it++) {
+				leftPoly = *it;
+				// find left edge ids of the left poly candidate
+				auto markedLeftIt = std::find(leftPoly.first.begin(), leftPoly.first.end(), leftPoly.second);
+				auto nextLeftIt = (std::next(markedLeftIt) == leftPoly.first.end() ? leftPoly.first.begin() : std::next(markedLeftIt));
 			
-			if (*prevIt == *nextLeftIt) {
-				// edges match
-				currIt = it;
-				continue;
+				if (*prevIt == *nextLeftIt) {
+					// edges match
+					currIt = it;
+					closedCycle = (firstEdgeId == *nextLeftIt);
+					break;
+				}
+
+				if (std::next(it) == polys->end()) {
+					// start from beginning circling clockwise if no shared edges found
+					currIt = polys->begin();
+					CCW = false; // start adding nodes to the front
+					break;
+				}
+			}
+		} else if (polys->size()) {
+			// search through all remaining polys for right neighbor
+			for (auto it = polys->end() - 1; it != polys->end(); it--) {
+				rightPoly = *it;
+				// find right edge ids of the right poly candidate
+				auto markedRightIt = std::find(rightPoly.first.begin(), rightPoly.first.end(), rightPoly.second);
+				auto prevRightIt = (markedRightIt == rightPoly.first.begin() ? std::prev(rightPoly.first.end()) : std::prev(markedRightIt));
+
+				if (*nextIt == *prevRightIt) {
+					// edges match
+					currIt = it;
+					break;
+				}
 			}
 		}
 	}
-	*polys = result;
+	*polys = std::vector<BufferGeom::TriWithMarkedVertex>(result.begin(), result.end());
+	return closedCycle; // closed cycle flag
 }
 
 void Geometry::getVertexFiniteVolumes(std::vector<std::vector<Vector3>>* vVolVerts, std::vector<std::vector<Polygon>>* adjacentPolyIds)
@@ -375,14 +413,15 @@ void Geometry::getVertexFiniteVolumes(std::vector<std::vector<Vector3>>* vVolVer
 			it = vertexToPolygons.find(*v);
 		}
 		// sort by adjacency within poly ring
-		sortPolysWithMarkedVertexByAdjacency(&adjacentPolys);
+		bool closedCycle = sortPolysWithMarkedVertexByAdjacency(&adjacentPolys);
 		adjacentPolyIds->push_back({ }); 
 
+		Polygon P; Polygon::iterator markedIt;
 		for (uint p = 0; p < adjacentPolys.size(); p++) {
-			Polygon P = adjacentPolys[p].first;
+			P = adjacentPolys[p].first;
 			adjacentPolyIds->at(i).push_back({ i }); // all polys will start with the central vertex F_i
 
-			Polygon::iterator markedIt = std::find(P.begin(), P.end(), adjacentPolys[p].second);
+			markedIt = std::find(P.begin(), P.end(), adjacentPolys[p].second);
 			Polygon::iterator nextIt = (std::next(markedIt) == P.end() ? P.begin() : std::next(markedIt));
 			uint leftId = *nextIt;
 
@@ -396,6 +435,13 @@ void Geometry::getVertexFiniteVolumes(std::vector<std::vector<Vector3>>* vVolVer
 
 			volRingVerts.push_back(0.5f * (*v + uniqueVertices[leftId]));
 			volRingVerts.push_back(centroid);
+		}
+		if (!closedCycle) {
+			// close ring if not closed
+			P = adjacentPolys[adjacentPolys.size() - 1].first;
+			markedIt = std::find(P.begin(), P.end(), adjacentPolys[adjacentPolys.size() - 1].second);
+			Polygon::iterator prevIt = (markedIt == P.begin() ? P.end() - 1 : std::prev(markedIt));
+			volRingVerts.push_back(0.5f * (*v + uniqueVertices[*prevIt]));
 		}
 
 		// the result should be a contour of the finite volume around v

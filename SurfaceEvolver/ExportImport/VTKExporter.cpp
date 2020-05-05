@@ -184,23 +184,29 @@ void VTKExporter::exportGeometryFiniteVolumeGrid(
 
 	uint i_min = ((vertId == -1 || fromStartToVertId) ? 0 : std::min(vertId, (int)fvVerts.size()));
 	uint i_max = (vertId == -1 ? fvVerts.size() : std::min(vertId + 1, (int)fvVerts.size()));
+	vertId = (fromStartToVertId && i_max == fvVerts.size() ? i_max : vertId);
 
 	for (uint i = i_min; i < i_max; i++) {
 		Geometry fvGeom = Geometry();
 
 		fvGeom.uniqueVertices = { object->uniqueVertices[i] };
+		int oddRingCount = fvVerts[i].size() % 2;
 		if (triId == -1 || triId == fvVerts[i].size() - 1) {
 			for (uint j = 0; j < fvVerts[i].size(); j += 2) {
 				fvGeom.uniqueVertices.push_back(fvVerts[i][j]);
+				if (oddRingCount && j == fvVerts[i].size() - 1) {
+					continue;
+				}
 				fvGeom.uniqueVertices.push_back(fvVerts[i][j + 1]);
-
+				
 				fvGeom.vertexIndices.push_back(0);
 				fvGeom.vertexIndices.push_back(j + 1);
 				fvGeom.vertexIndices.push_back(j + 2);
-
+				
 				fvGeom.vertexIndices.push_back(0);
 				fvGeom.vertexIndices.push_back(j + 2);
-				fvGeom.vertexIndices.push_back((j + 3) % fvVerts[i].size());
+				uint modLastId = (oddRingCount && j == fvVerts[i].size() - 2 ? (j + 3) % fvVerts[i].size() : j + 3);
+				fvGeom.vertexIndices.push_back(modLastId);
 
 				if (triId == -1) {
 					fvGeom.triangulations.push_back({ j, j + 1 });
