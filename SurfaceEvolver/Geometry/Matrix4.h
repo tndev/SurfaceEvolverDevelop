@@ -11,29 +11,29 @@
 class Matrix4
 {
 public:
-	float elements[16] = {
-		1.0f, 0.0f, 0.0f, 0.0f,
-		0.0f, 1.0f, 0.0f, 0.0f,
-		0.0f, 0.0f, 1.0f, 0.0f,
-		0.0f, 0.0f, 0.0f, 1.0f
+	double elements[16] = {
+		1.0, 0.0, 0.0, 0.0,
+		0.0, 1.0, 0.0, 0.0,
+		0.0, 0.0, 1.0, 0.0,
+		0.0, 0.0, 0.0, 1.0
 	};
 
 	Matrix4();
 	Matrix4(const Matrix4& other);
-	Matrix4(float* elems);
+	Matrix4(double* elems);
 	Matrix4(
-		float m00, float m01, float m02, float m03,
-		float m10, float m11, float m12, float m13,
-		float m20, float m21, float m22, float m23,
-		float m30, float m31, float m32, float m33
+		double m00, double m01, double m02, double m03,
+		double m10, double m11, double m12, double m13,
+		double m20, double m21, double m22, double m23,
+		double m30, double m31, double m32, double m33
 	);
 	~Matrix4();
 
 	void set(
-		float m00, float m01, float m02, float m03,
-		float m10, float m11, float m12, float m13,
-		float m20, float m21, float m22, float m23,
-		float m30, float m31, float m32, float m33
+		double m00, double m01, double m02, double m03,
+		double m10, double m11, double m12, double m13,
+		double m20, double m21, double m22, double m23,
+		double m30, double m31, double m32, double m33
 	);
 
 	Matrix3 getSubMatrix3();
@@ -45,26 +45,26 @@ public:
 	// the following methods do not return a value
 	// use external methods instead
 	void transpose();
-	void multiplyScalar(float scalar);
+	void multiplyScalar(double scalar);
 	void multiplyMatrices(Matrix4& a, Matrix4& b);
 	void multiply(Matrix4& m);
 	Matrix4 multiply(Matrix4 m);
 	void premultiply(Matrix4& m);
 	Matrix4 premultiply(Matrix4 m);
 
-	Matrix4 setToScale(float sx, float sy, float sz);
-	Matrix4 makeRotationAxis(float ax, float ay, float az, float angle);
-	Matrix4 makeTranslation(float tx, float ty, float tz);
+	Matrix4 setToScale(double sx, double sy, double sz);
+	Matrix4 makeRotationAxis(double ax, double ay, double az, double angle);
+	Matrix4 makeTranslation(double tx, double ty, double tz);
 
 	void decompose(Vector3* position, Quaternion* quaternion, Vector3* scale);
 
-	float determinant();
+	double determinant();
 	Matrix4 getInverse(Matrix4& from);
 
 	Matrix4 operator+ (Matrix4 other);
 	Matrix4 operator- (Matrix4 other);
 	Matrix4 operator* (Matrix4 other);
-	friend Matrix4 operator*(float scalar, Matrix4 m);
+	friend Matrix4 operator*(double scalar, Matrix4 m);
 };
 
 Matrix4 inverse(Matrix4& m);

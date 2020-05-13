@@ -8,10 +8,10 @@ class IcoSphere :
 {
 public:
 	unsigned int detail = 0;
-	float radius = 50.0f;
+	double radius = 50.0;
 	IcoSphere();
 	IcoSphere(const IcoSphere& other);
-	IcoSphere(unsigned int detail, float radius, std::string name = "");
+	IcoSphere(unsigned int detail, double radius, std::string name = "");
 	~IcoSphere();
 
 	void build();

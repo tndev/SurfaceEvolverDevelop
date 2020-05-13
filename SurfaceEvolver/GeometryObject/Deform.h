@@ -14,7 +14,7 @@ public:
 	Deform(Geometry* geom);
 	~Deform();
 
-	void spherify(float param);
+	void spherify(double param);
 };
 
 #endif

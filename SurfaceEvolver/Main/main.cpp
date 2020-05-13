@@ -109,7 +109,7 @@
 void performSDFTest(uint res, Geometry& g, std::fstream& timing, VTKExporter& e) {
 	std::cout << "init SDF..." << std::endl;
 
-	// Fast sweeping DF, resized from 20 and interpolated
+	// Fast sweeping D, resized from 20 and interpolated
 	SDF sdf_FS_r = SDF(&g, res, false, false, false, true, SDF_Method::fast_sweeping);
 
 	std::cout << sdf_FS_r.getComputationProperties();
@@ -145,7 +145,7 @@ void performSDFTest(uint res, Geometry& g, std::fstream& timing, VTKExporter& e)
 	Grid FSerror = absGrid(subGrids(*sdf_FS.grid, *sdf_Brute.grid));
 	Grid AABBerror = absGrid(subGrids(*sdf_AABB.grid, *sdf_Brute.grid));
 
-	float error = FSerror_r.getL2Norm();
+	double error = FSerror_r.getL2Norm();
 	std::cout << "FS_ERROR_resized L2 Norm: " << error << std::endl;
 	timing << "FS_ERROR_resized L2 Norm: " << error << std::endl;
 
@@ -165,21 +165,21 @@ void performSDFTest(uint res, Geometry& g, std::fstream& timing, VTKExporter& e)
 
 void performUnitSphereTest(bool tan_redistribute = false) {
 	EvolutionParams eParams;
-	eParams.tStop = 0.06f; eParams.elType = ElementType::tri;
+	eParams.tStop = 0.06; eParams.elType = ElementType::tri;
 	eParams.name = "testSphere"; eParams.saveStates = false;
 
 	SphereTestParams stParams;
 	TangentialRedistParams* tanRedistParams = (tan_redistribute ? new TangentialRedistParams() : nullptr);
-	//if (tan_redistribute) tanRedistParams->omega = 10.0f;
+	tanRedistParams->type = 1;
 
 	std::fstream errLog("testSphere_errorLog.txt", std::fstream::out);
 	errLog << "================================\n";
 	errLog << ">>> Evolution error log ........\n";
-	float errPrev, err, EOC;
+	double errPrev, err, EOC;
 	for (uint i = 0; i < 4; i++) {
 		if (i > 0) errPrev = err;
 
-		float dt = 0.01f / pow(4, i);
+		double dt = 0.01 / pow(4, i);
 		eParams.dt = dt;
 		eParams.subdiv = i + 1;
 		stParams.testId = i;
@@ -202,29 +202,29 @@ void performUnitSphereTest(bool tan_redistribute = false) {
 
 int main()
 {
-	float r = 50.0f;
+	double r = 50.0;
 	unsigned int d = 3;
-	float a = 2.0f * r / sqrt(3.0f);
+	double a = 2.0 * r / sqrt(3.0);
 	unsigned int ns = 4;
 
 	VTKExporter e = VTKExporter();
 
-	/**/
+	/*
 	std::string name = "boxWithoutLid";
 	PrimitiveBox boxWithoutLid = PrimitiveBox(a, a, a, ns, ns, ns, true, name, false);
-	Matrix4 R = Matrix4().makeRotationAxis(1.0f, 0.0f, 0.0f, -M_PI / 2.0f);
+	Matrix4 R = Matrix4().makeRotationAxis(1.0, 0.0, 0.0, -M_PI / 2.0);
 	Matrix4 T = Matrix4().makeTranslation(-a / 2, -a / 2, -a / 2);
 	boxWithoutLid.applyMatrix(R);
 	boxWithoutLid.applyMatrix(T);
 	Deform def = Deform(&boxWithoutLid);
-	def.spherify(1.0f);
+	def.spherify(1.0);
 	Geometry result = def.result;
 
 	e.initExport(&result, name);
 
 	std::vector<std::vector<Vector3>> fvVerts = {};
 	std::vector<std::vector<std::vector<uint>>> adjacentPolys = {};
-	result.getVertexFiniteVolumes(&fvVerts, &adjacentPolys);
+	result.getVertexFiniteVolumes(&fvVerts, &adjacentPolys);*/
 
 	/*
 	uint geomId = 0;
@@ -247,17 +247,19 @@ int main()
 		}
 	}*/
 
-	e.exportGeometryFiniteVolumeGrid(&result, fvVerts, adjacentPolys, "boxWithoutLid_FVs");
+	//e.exportGeometryFiniteVolumeGrid(&result, fvVerts, adjacentPolys, "boxWithoutLid_FVs");
+
+
 
 	/*
 	for (uint i = 0; i < 4; i++) {
-		IcoSphere is = IcoSphere(i, 1.0f);
+		IcoSphere is = IcoSphere(i, 1.0);
 		e.initExport(&is, "icoSphere_subdiv" + std::to_string(i));
 
-		PrimitiveBox b = PrimitiveBox(1.0f, 1.0f, 1.0f, i + 1, i + 1, i + 1);
+		PrimitiveBox b = PrimitiveBox(1.0, 1.0, 1.0, i + 1, i + 1, i + 1);
 		e.initExport(&b, "box_subdiv" + std::to_string(i));
 
-		CubeSphere cs = CubeSphere(i + 2, 1.0f);
+		CubeSphere cs = CubeSphere(i + 2, 1.0);
 		e.initExport(&cs, "cubeSphere_subdiv" + std::to_string(i));
 	}*/
 
@@ -321,7 +323,7 @@ int main()
 
 	// ===== BUNNY SDF tests =============================
 
-	/*
+	/**/
 	uint res = 40; // octree resolution
 
 	// Vector3 axis = normalize(Vector3(1, 1, 1));
@@ -330,11 +332,11 @@ int main()
 	// === Timed code ============
 	OBJImporter obj = OBJImporter();
 	Geometry bunny = obj.importOBJGeometry("bunny_no_holes.obj");
-	bunny.applyMatrix(Matrix4().setToScale(0.2f, 0.2f, 0.2f));
+	bunny.applyMatrix(Matrix4().setToScale(0.02, 0.02, 0.02));
 	e.initExport(&bunny, "sfBunny");
 	// === Timed code ============
 	auto endObjLoad = std::chrono::high_resolution_clock::now();
-	std::chrono::duration<float> elapsedObj = (endObjLoad - startObjLoad);
+	std::chrono::duration<double> elapsedObj = (endObjLoad - startObjLoad);
 	std::cout << "Model loaded after " << elapsedObj.count() << " seconds" << std::endl;
 
 	
@@ -342,13 +344,13 @@ int main()
 
 	std::cout << bunny_sdf.getComputationProperties();
 
-	//bunny_sdf.exportGrid(&e, "bunnySDF");
-	//bunny_sdf.exportGradientField(&e, "bunnySDF_grad");
+	// bunny_sdf.exportGrid(&e, "bunnySDF");
+	// bunny_sdf.exportGradientField(&e, "bunnySDF_grad");
 
 	// ====== BUNNY Evolution =============================
 	EvolutionParams eParams;
 	eParams.name = "Bunny";
-	eParams.dt = 0.03f; eParams.NSteps = 110; eParams.subdiv = (uint)3; eParams.elType = ElementType::tri;
+	eParams.dt = 0.02; eParams.NSteps = 200; eParams.subdiv = (uint)3; eParams.elType = ElementType::tri;
 	eParams.saveStates = true; eParams.printStepOutput = true; eParams.writeTimeLog = true;
 	MeanCurvatureParams mcfParams;
 	mcfParams.saveAreaStates = true;
@@ -358,18 +360,20 @@ int main()
 	sdfParams.targetGeom = &bunny; sdfParams.sdfGrid = bunny_sdf.grid;
 	sdfParams.saveDistanceStates = true;
 	// sdfParams.saveGradientStates = true;
-	mcfParams.smoothSteps = 10;
+	//mcfParams.smoothSteps = 10;s
 	TangentialRedistParams tRedistParams;
-	tRedistParams.omega = 5.0f;
-	tRedistParams.saveTangentialVelocityStates = true;
+	tRedistParams.type = 1;
+	tRedistParams.omega_volume = 100.0;
+	tRedistParams.omega_angle = 3.0;
+	//tRedistParams.saveTangentialVelocityStates = true;
 
-	Evolver evolver(eParams, mcfParams, sdfParams, &tRedistParams);*/
+	Evolver evolver(eParams, mcfParams, sdfParams, &tRedistParams);
 
 	// cube with holes
 	/*
 	OBJImporter obj = OBJImporter();
 	Geometry cwh = obj.importOBJGeometry("cubeWithHoles.obj");
-	cwh.applyMatrix(Matrix4().setToScale(0.02f, 0.02f, 0.02f));
+	cwh.applyMatrix(Matrix4().setToScale(0.02, 0.02, 0.02));
 	std::string name = "evolvingCubeWithHoles";
 	e.initExport(&cwh, "cubeWithHoles");
 
@@ -382,7 +386,7 @@ int main()
 
 	EvolutionParams eParams;
 	eParams.name = name;
-	eParams.dt = 0.03f; eParams.NSteps = 150; eParams.subdiv = (uint)3; eParams.elType = ElementType::tri;
+	eParams.dt = 0.03; eParams.NSteps = 150; eParams.subdiv = (uint)3; eParams.elType = ElementType::tri;
 	eParams.printStepOutput = true; eParams.writeTimeLog = true;
 	MeanCurvatureParams mcfParams;
 	mcfParams.saveAreaStates = true; mcfParams.writeMeanAreaLog = true;
@@ -393,13 +397,19 @@ int main()
 	mcfParams.smoothSteps = 10;*/
 
 	//Evolver evolver(eParams, mcfParams, sdfParams);
-	
+
+	/*
+	OBJImporter obj = OBJImporter();
+	Geometry teapot = obj.importOBJGeometry("teapot.obj");
+	uint res = 40; // octree resolution
+	SDF teapot_sdf = SDF(&teapot, res);
+	teapot_sdf.exportGrid(&e, "teapot_SDF");*/
 
 	// arc
 	/*	
 	OBJImporter obj = OBJImporter();
 	Geometry arc = obj.importOBJGeometry("arc.obj");
-	arc.applyMatrix(Matrix4().setToScale(0.01f, 0.01f, 0.01f));
+	arc.applyMatrix(Matrix4().setToScale(0.01, 0.01, 0.01));
 	std::string name = "evolvingArc";
 	e.initExport(&arc, "arc");
 
@@ -412,7 +422,7 @@ int main()
 
 	EvolutionParams eParams;
 	eParams.name = name;
-	eParams.dt = 0.02f; eParams.NSteps = 150; eParams.subdiv = (uint)3; eParams.elType = ElementType::tri;
+	eParams.dt = 0.02; eParams.NSteps = 150; eParams.subdiv = (uint)3; eParams.elType = ElementType::tri;
 	eParams.saveStates = true; //eParams.printStepOutput = true; eParams.writeTimeLog = true; // eParams.printSolution = true;
 	MeanCurvatureParams mcfParams;
 	mcfParams.saveAreaStates = true; 
@@ -424,8 +434,8 @@ int main()
 	// sdfParams.saveGradientStates = true;
 	mcfParams.smoothSteps = 10;
 	TangentialRedistParams tRedistParams;
-	tRedistParams.omega_volume = 100.0f;
-	tRedistParams.omega_angle = 5.0f;
+	tRedistParams.omega_volume = 100.0;
+	tRedistParams.omega_angle = 5.0;
 	tRedistParams.type = 1;
 	tRedistParams.saveTangentialVelocityStates = true;
 
@@ -435,7 +445,7 @@ int main()
 	e.exportGeometryVertexNormals(&bunny, "bunnyNormals");
 	e.exportGeometryFiniteVolumeGrid(&bunny, "bunnyFVs");*/
 
-	//performUnitSphereTest(true);
+	// performUnitSphereTest(true);
 
 	/*
 	std::string name = "testBox";
@@ -452,7 +462,7 @@ int main()
 
 	EvolutionParams eParams;
 	eParams.name = name;
-	eParams.dt = 0.025f; eParams.NSteps = 100; eParams.subdiv = (uint)3; eParams.elType = ElementType::tri;
+	eParams.dt = 0.025; eParams.NSteps = 100; eParams.subdiv = (uint)3; eParams.elType = ElementType::tri;
 	eParams.saveStates = true; // eParams.printStepOutput = true; // eParams.printSolution = true; eParams.printHappenings = true; //eParams.writeTimeLog = true;
 	MeanCurvatureParams mcfParams;
 	mcfParams.saveAreaStates = true;
@@ -467,7 +477,7 @@ int main()
 	mcfParams.smoothSteps = 10;
 	mcfParams.initSmoothRate = 0.01;
 	TangentialRedistParams tRedistParams;
-	tRedistParams.omega = 200.0f;
+	tRedistParams.omega = 200.0;
 	tRedistParams.type = 1;
 	tRedistParams.saveTangentialVelocityStates = true;
 
@@ -475,9 +485,9 @@ int main()
 
 	/*
 	std::string name = "testEllipsoid";
-	// CubeSphere cs = CubeSphere(10, 50.0f, true, name);
-	IcoSphere is = IcoSphere(3, 1.0f, name);
-	Matrix4 M = Matrix4().setToScale(1.5f, 1.0f, 1.0f);
+	// CubeSphere cs = CubeSphere(10, 50.0, true, name);
+	IcoSphere is = IcoSphere(3, 1.0, name);
+	Matrix4 M = Matrix4().setToScale(1.5, 1.0, 1.0);
 	is.applyMatrix(M);
 	e.initExport(&is, name);
 	uint res = 40; // octree resolution
@@ -487,7 +497,7 @@ int main()
 
 	EvolutionParams eParams;
 	eParams.name = name;
-	eParams.dt = 0.005f; eParams.NSteps = 60; //eParams.subdiv = (uint)3; eParams.elType = ElementType::tri;
+	eParams.dt = 0.005; eParams.NSteps = 60; //eParams.subdiv = (uint)3; eParams.elType = ElementType::tri;
 	eParams.saveStates = true; // eParams.printStepOutput = true; eParams.writeTimeLog = true;
 	eParams.sourceGeometry = &is;
 	MeanCurvatureParams mcfParams;
@@ -499,7 +509,7 @@ int main()
 	//sdfParams.saveGradientStates = true;
 	//mcfParams.smoothSteps = 10;
 	TangentialRedistParams tRedistParams;
-	tRedistParams.omega = 1000.0f;
+	tRedistParams.omega = 1000.0;
 	tRedistParams.type = 1;
 	tRedistParams.saveTangentialVelocityStates = true;
 
@@ -508,8 +518,8 @@ int main()
 	
 	/*
 	std::string name = "cubeEllipsoidMCF";
-	CubeSphere cs = CubeSphere(10, 1.0f, false, name);
-	Matrix4 M = Matrix4().setToScale(2.0f, 1.0f, 1.0f);
+	CubeSphere cs = CubeSphere(10, 1.0, false, name);
+	Matrix4 M = Matrix4().setToScale(2.0, 1.0, 1.0);
 	cs.applyMatrix(M);
 	e.initExport(&cs, name);
 	//uint res = 40; // octree resolution
@@ -519,10 +529,10 @@ int main()
 
 	EvolutionParams eParams;
 	eParams.name = name;
-	eParams.dt = 0.001f; eParams.NSteps = 100; //eParams.subdiv = (uint)3; 
+	eParams.dt = 0.003; eParams.NSteps = 100; //eParams.subdiv = (uint)3; 
 	eParams.elType = ElementType::tri;
 	eParams.saveStates = true; eParams.printStepOutput = true;
-	eParams.printStepOutput = true; eParams.writeTimeLog = true;
+	//eParams.printStepOutput = true; eParams.writeTimeLog = true;
 	eParams.sourceGeometry = &cs;
 	MeanCurvatureParams mcfParams;
 	mcfParams.saveAreaStates = true; 
@@ -533,16 +543,70 @@ int main()
 	//sdfParams.saveGradientStates = true;
 	//mcfParams.smoothSteps = 10;
 	TangentialRedistParams tRedistParams;
-	tRedistParams.omega = 100.0f;
-	tRedistParams.saveTangentialVelocityStates = true;
+	tRedistParams.omega_volume = 200.0;
+	tRedistParams.type = 1;
+	tRedistParams.omega_angle = 0.0;
+	// tRedistParams.saveTangentialVelocityStates = true;
+
+	Evolver evolver(eParams, mcfParams, sdfParams, &tRedistParams);
+	*/
+
+	/*
+	std::string name = "DistortedIcoSphere";
+	OBJImporter obj = OBJImporter();
+	Geometry di = obj.importOBJGeometry("DistortedIcoSphere.obj");
+	Matrix4 M = Matrix4().setToScale(0.05, 0.05, 0.05);
+	di.applyMatrix(M);
+
+	EvolutionParams eParams;
+	eParams.name = name;
+	eParams.dt = 0.03; eParams.NSteps = 50; //eParams.subdiv = (uint)3; 
+	eParams.elType = ElementType::tri;
+	eParams.saveStates = true; eParams.printStepOutput = true;
+	//eParams.printStepOutput = true; eParams.writeTimeLog = true;
+	eParams.sourceGeometry = &di;
+	MeanCurvatureParams mcfParams;
+	mcfParams.saveAreaStates = true;
+	mcfParams.writeMeanAreaLog = true;
+	GradDistanceParams sdfParams;
+	//sdfParams.targetGeom = &cs; sdfParams.sdfGrid = csSDF.grid;
+	//sdfParams.saveDistanceStates = true;
+	//sdfParams.saveGradientStates = true;
+	//mcfParams.smoothSteps = 10;
+	TangentialRedistParams tRedistParams;
+	tRedistParams.omega_volume = 200.0;
+	tRedistParams.type = 1;
+	tRedistParams.omega_angle = 1.0;
+	// tRedistParams.saveTangentialVelocityStates = true;
 
 	Evolver evolver(eParams, mcfParams, sdfParams, &tRedistParams);*/
+
+	/*
+	std::string name = "DistortedIcoSphere_noRedist";
+	OBJImporter obj = OBJImporter();
+	Geometry di = obj.importOBJGeometry("DistortedIcoSphere.obj");
+	Matrix4 M = Matrix4().setToScale(0.05, 0.05, 0.05);
+	di.applyMatrix(M);
+
+	EvolutionParams eParams;
+	eParams.name = name;
+	eParams.dt = 0.03; eParams.NSteps = 50; //eParams.subdiv = (uint)3; 
+	eParams.elType = ElementType::tri;
+	eParams.saveStates = true; eParams.printStepOutput = true;
+	//eParams.printStepOutput = true; eParams.writeTimeLog = true;
+	eParams.sourceGeometry = &di;
+	MeanCurvatureParams mcfParams;
+	mcfParams.saveAreaStates = true;
+	mcfParams.writeMeanAreaLog = true;
+	GradDistanceParams sdfParams;
+
+	Evolver evolver(eParams, mcfParams, sdfParams, nullptr);*/
 
 	// uneven sphere:
 	/*
 	OBJImporter obj = OBJImporter();
 	Geometry uSphere = obj.importOBJGeometry("UnevenSphere.obj");
-	uSphere.applyMatrix(Matrix4().setToScale(0.02f, 0.02f, 0.02f));
+	uSphere.applyMatrix(Matrix4().setToScale(0.02, 0.02, 0.02));
 	std::string name = "UnevenSphere";
 	e.initExport(&uSphere, name);
 
@@ -553,7 +617,7 @@ int main()
 
 	EvolutionParams eParams;
 	eParams.name = name;
-	eParams.dt = 0.005f; eParams.NSteps = 50; eParams.elType = ElementType::tri;
+	eParams.dt = 0.005; eParams.NSteps = 50; eParams.elType = ElementType::tri;
 	eParams.saveStates = true; eParams.printStepOutput = true; // eParams.printSolution = true; eParams.printHappenings = true; //eParams.writeTimeLog = true;
 	eParams.sourceGeometry = &uSphere;
 	MeanCurvatureParams mcfParams;
@@ -566,13 +630,13 @@ int main()
 	//dfParams.targetGeom = &b; sdfParams.sdfGrid = boxSDF.grid;
 	//sdfParams.saveGradientStates = true;
 	TangentialRedistParams tRedistParams;
-	tRedistParams.omega = 10.0f;
+	tRedistParams.omega = 10.0;
 	tRedistParams.saveTangentialVelocityStates = true;
 
 	Evolver evolver(eParams, mcfParams, sdfParams, &tRedistParams);*/
 
 	/*
-	IcoSphere is(1, 1.0f);
+	IcoSphere is(1, 1.0);
 	e.initExport(&is, "icoSphere");
 	std::vector<std::vector<Vector3>> fvVerts = {};
 	std::vector<std::vector<std::vector<uint>>> adjacentPolys = {};
@@ -595,11 +659,11 @@ int main()
 
 	/*
 	uint i = 0;
-	float dt = 0.01f / pow(4, i);
-	Evolver sphereTest(dt, 0.06f, i, ElementType::tri, "testSphere", false, false, true);*/
+	double dt = 0.01 / pow(4, i);
+	Evolver sphereTest(dt, 0.06, i, ElementType::tri, "testSphere", false, false, true);*/
 
 	/*
-	Matrix4 sdfTransform = Matrix4().makeTranslation(0.5, 0.5, 0.5).multiply(Matrix4().setToScale(2.0f, 2.0f, 2.0f));
+	Matrix4 sdfTransform = Matrix4().makeTranslation(0.5, 0.5, 0.5).multiply(Matrix4().setToScale(2.0, 2.0, 2.0));
 	//.makeRotationAxis(axis.x, axis.y, axis.z, M_PI / 6.);
 	bunny_sdf.applyMatrix(sdfTransform);
 
@@ -642,7 +706,7 @@ int main()
 	Grid bunnySDF_Error = absGrid(subGrids(*bunny_sdf.grid, *bunny_sdf_b.grid));
 	bunnySDF_Error.exportToVTI("bunnySDF_" + std::to_string(res) + "FS_ERROR");
 
-	float error = bunnySDF_r_Error.getL2Norm();
+	double error = bunnySDF_r_Error.getL2Norm();
 	std::cout << "FS_ERROR_resized L2 Norm: " << error << std::endl;
 
 	error = bunnySDF_Error.getL2Norm();

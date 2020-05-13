@@ -66,9 +66,9 @@ Geometry OBJImporter::importOBJGeometry(std::string filename)
 			std::vector<std::string> tokens = std::vector<std::string>();
 			getTokens(line, tokens, " ", line.size());
 
-			float vx = std::stof(tokens[1]);
-			float vy = std::stof(tokens[2]);
-			float vz = std::stof(tokens[3]);
+			double vx = std::stof(tokens[1]);
+			double vy = std::stof(tokens[2]);
+			double vz = std::stof(tokens[3]);
 
 			vertices.push_back(Vector3(vx, vy, vz));
 		}
@@ -76,8 +76,8 @@ Geometry OBJImporter::importOBJGeometry(std::string filename)
 			std::vector<std::string> tokens = std::vector<std::string>();
 			getTokens(line, tokens, " ", line.size());
 
-			float vtx = std::stof(tokens[1]);
-			float vty = std::stof(tokens[2]);
+			double vtx = std::stof(tokens[1]);
+			double vty = std::stof(tokens[2]);
 
 			uvVertices.push_back(Vector3(vtx, vty, 0));
 		}
@@ -85,9 +85,9 @@ Geometry OBJImporter::importOBJGeometry(std::string filename)
 			std::vector<std::string> tokens = std::vector<std::string>();
 			getTokens(line, tokens, " ", line.size());
 
-			float nx = std::stof(tokens[1]);
-			float ny = std::stof(tokens[2]);
-			float nz = std::stof(tokens[3]);
+			double nx = std::stof(tokens[1]);
+			double ny = std::stof(tokens[2]);
+			double nz = std::stof(tokens[3]);
 
 			normals.push_back(Vector3(nx, ny, nz));
 		}
@@ -157,9 +157,9 @@ void OBJImporter::setGeometry(Geometry& geom,
 	unsigned int failedTriangulationCount = 0;
 
 	geom.uniqueVertices = std::vector<Vector3>(vertices.size());
-	geom.vertices = std::vector<float>(((size_t)3 * nTriangles));
+	geom.vertices = std::vector<double>(((size_t)3 * nTriangles));
 	geom.vertexIndices = std::vector<unsigned int>(nTriangles);
-	geom.normals = std::vector<float>(((size_t)3 * nTriangles));
+	geom.normals = std::vector<double>(((size_t)3 * nTriangles));
 	geom.triangulations = std::vector<BufferGeom::Triangulation>();
 
 	std::map<Vector3, unsigned int> vertexToIdx = std::map<Vector3, unsigned int>();
@@ -234,8 +234,8 @@ void OBJImporter::setGeometry(Geometry& geom,
 
 	if (failedTriangulationCount > 0) {
 		// triangulation failed and we skipped some triangles. We need to splice the unused part of the buffers..
-		geom.vertices = std::vector<float>(geom.vertices.begin(), geom.vertices.end() - ((size_t)failedTriangulationCount * 3));
+		geom.vertices = std::vector<double>(geom.vertices.begin(), geom.vertices.end() - ((size_t)failedTriangulationCount * 3));
 		geom.vertexIndices = std::vector<unsigned int>(geom.vertexIndices.begin(), geom.vertexIndices.end() - ((size_t)failedTriangulationCount));
-		geom.normals = std::vector<float>(geom.normals.begin(), geom.normals.end() - ((size_t)failedTriangulationCount * 3));
+		geom.normals = std::vector<double>(geom.normals.begin(), geom.normals.end() - ((size_t)failedTriangulationCount * 3));
 	}
 }

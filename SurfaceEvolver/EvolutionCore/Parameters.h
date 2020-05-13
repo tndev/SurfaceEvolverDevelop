@@ -11,8 +11,8 @@ enum class ElementType {
 };
 
 struct EvolutionParams {
-	float dt = 0.01f;
-	float tStop = 1.0f;
+	double dt = 0.01;
+	double tStop = 1.0;
 	int NSteps = 10;
 	unsigned int subdiv = 2;
 	ElementType elType = ElementType::tri;
@@ -34,7 +34,7 @@ struct EvolutionParams {
 };
 
 struct SphereTestParams {
-	float r0 = 1.0f;
+	double r0 = 1.0;
 	int testId = -1;
 
 	// ===== output flags ==========
@@ -44,9 +44,9 @@ struct SphereTestParams {
 
 struct MeanCurvatureParams {
 	// Laplace-Beltrami ctrl constants:
-	float rDecay = 1.0f;
-	float C1 = 1.0f;
-	float C2 = rDecay;
+	double rDecay = 1.0;
+	double C1 = 1.0;
+	double C2 = rDecay;
 
 	bool constant = false;
 
@@ -60,8 +60,8 @@ struct MeanCurvatureParams {
 	// =============================
 
 	int smoothSteps = -1; // -1 - no smooth steps
-	float initSmoothRate = 0.05f;
-	float smoothDecay = 0.1f;
+	double initSmoothRate = 0.05;
+	double smoothDecay = 0.1;
 };
 
 struct GradDistanceParams {
@@ -69,8 +69,8 @@ struct GradDistanceParams {
 	Grid* sdfGrid = nullptr;
 
 	// grad SDF ctrl constants:
-	float C = 1.0f;
-	float D = 0.0f;
+	double C = 1.0;
+	double D = 0.0;
 
 	bool constant = false;
 
@@ -82,8 +82,8 @@ struct GradDistanceParams {
 
 struct TangentialRedistParams {
 	// ctrl params
-	float omega_volume = 100.0f;
-	float omega_angle = 2.0f;
+	double omega_volume = 100.0;
+	double omega_angle = 2.0;
 
 	// ===== Redistribution type =======
 	int type = 0; // -1 - none, 0 - angle-based, 1 - volume-based, 2 - length-based

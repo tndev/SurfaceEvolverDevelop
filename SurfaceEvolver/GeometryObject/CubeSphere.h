@@ -10,11 +10,11 @@ class CubeSphere :
 {
 public:
 	unsigned int detail = 0;
-	float radius = 1.;
+	double radius = 1.;
 	bool quad = true;
 
 	CubeSphere();
-	CubeSphere(unsigned int detail, float radius, bool quad = true, std::string name = "");
+	CubeSphere(unsigned int detail, double radius, bool quad = true, std::string name = "");
 	~CubeSphere();
 
 	void build();

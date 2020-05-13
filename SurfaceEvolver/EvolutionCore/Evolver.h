@@ -30,22 +30,22 @@ private:
 	Vector3 center = Vector3(); // center of a test sphere geometry
 	
 	// mesh data
-	std::vector<float> fvAreas = {}; // vertex finite volume areas
-	std::vector<float> vCurvatures = {}; // vertex curvature scalars
+	std::vector<double> fvAreas = {}; // vertex finite volume areas
+	std::vector<double> vCurvatures = {}; // vertex curvature scalars
 	std::vector<Vector3> vCurvatureVectors = {}; // vertex curvature vectors
 	std::vector<Vector3> vNormals = {}; // vertex normals
-	std::vector<float> vDistances = {}; // vertex distances to target mesh
+	std::vector<double> vDistances = {}; // vertex distances to target mesh
 	std::vector<Vector3> vGradients = {}; // vertex gradients of distance func to target mesh
-	std::vector<float> vDotProducts = {}; // dot(-grad(SDF), N) for each vertex
+	std::vector<double> vDotProducts = {}; // dot(-grad(SDF), N) for each vertex
 	std::vector<Vector3> vNormalVelocityVectors = {}; // normal velocity vectors: v_N = eps(d) * h + eta(d) * N
-	std::vector<float> vNormalVelocities = {}; // normal velocity scalars: ||v_N|| = ||eps(d) * h + eta(d) * N||
+	std::vector<double> vNormalVelocities = {}; // normal velocity scalars: ||v_N|| = ||eps(d) * h + eta(d) * N||
 	std::vector<Vector3> vTangentialVelocities = {}; // tangential velocity data
 	//std::vector<Vector3> fvNormals = {}; // finite volume normals
 
 	//Geometry* dummyFVGeom = new Geometry();
 
-	float totalArea;
-	float totalCurvatureSqWeightedArea;
+	double totalArea;
+	double totalCurvatureSqWeightedArea;
 
 	// essential mesh data
 	std::vector<std::vector<Vector3>> fvVerts = {};
@@ -59,23 +59,24 @@ private:
 
 	std::fstream psi_log; // for redistribution potential
 	std::fstream psi_Sys_log; // for lin. system data of the redist. potential
+	std::fstream sum_rhs_log; // for verifying that redistribution potential system rhs has zero sum
 
 	// timer
 	std::chrono::high_resolution_clock::time_point startGlobalTime;
-	std::chrono::duration<float> elapsedTimeTotal;
+	std::chrono::duration<double> elapsedTimeTotal;
 
 	// ctrl params:
-	float rDecay = 1.0f; // radius for the mean curvature flow exponential decay parameter (C2 in eta(SDF))
-	float C1 = 1.0f;
-	float C2 = rDecay;
-	float C = -1.0f; // multiplies eta(SDF) function
-	float D = 0.0f; // multiplies sqrt(1 - dot(grad(SDF), N)^2)
-	float initSmoothRate = 0.5f;
-	float smoothDecay = 1.0f;
+	double rDecay = 1.0; // radius for the mean curvature flow exponential decay parameter (C2 in eta(SDF))
+	double C1 = 1.0;
+	double C2 = rDecay;
+	double C = -1.0; // multiplies eta(SDF) function
+	double D = 0.0; // multiplies sqrt(1 - dot(grad(SDF), N)^2)
+	double initSmoothRate = 0.5;
+	double smoothDecay = 1.0;
 
 	// tangential redistribution:
-	float omega_volume = 100.0f;
-	float omega_angle = 2.0f;
+	double omega_volume = 100.0;
+	double omega_angle = 2.0;
 	int redistribution_type = -1;
 
 	bool epsConstant = false; // Laplace-Beltrami func admits a constant value C1;
@@ -95,7 +96,7 @@ private:
 	void clearSystem();
 	void initSystem();
 
-	void getInterpolatedSDFValuesforVertex(Vector3* V, float* SDF_V, Vector3* gradSDF_V, std::vector<Vector3>& positionBuffer, std::vector<float>& valueBuffer);
+	void getInterpolatedSDFValuesforVertex(Vector3* V, double* SDF_V, Vector3* gradSDF_V, std::vector<Vector3>& positionBuffer, std::vector<double>& valueBuffer);
 	Vector3 getVolumeTangentialVelocityForVertex(Vector3& V, uint i);
 	Vector3 getAngleTangentialVelocityForVertex(Vector3& V, uint i);
 
@@ -111,15 +112,15 @@ private:
 	//void saveFVNormals(int step);
 	void saveRedistributionPotential();
 
-	float laplaceBeltramiCtrlFunc(float& SDF_V);
-	float laplaceBeltramiSmoothFunc(float t);
-	float etaCtrlFunc(float& SDF_V, Vector3& gradSDF_V, Vector3& nV);
-	float tangentialRedistDecayFunction(float& SDF_V);
-	float tangentialRedistCurvatureFunction(float& H);
+	double laplaceBeltramiCtrlFunc(double& SDF_V);
+	double laplaceBeltramiSmoothFunc(double t);
+	double etaCtrlFunc(double& SDF_V, Vector3& gradSDF_V, Vector3& nV);
+	double tangentialRedistDecayFunction(double& SDF_V);
+	double tangentialRedistCurvatureFunction(double& H);
 
 	void computeSurfaceNormalsAndCoVolumes();
-	void getTriangleEvolutionSystem(float smoothStep, float& meanArea);
-	void getQuadEvolutionSystem(float smoothStep, float& meanArea);
+	void getTriangleEvolutionSystem(double smoothStep, double& meanArea);
+	void getQuadEvolutionSystem(double smoothStep, double& meanArea);
 	void getTriangleRedistributionSystem();
 	void getQuadRedistributionSystem();
 	void getCurvaturesAndNormalVelocities();
@@ -133,12 +134,12 @@ private:
 	void exportGeometry(int step);
 	void exportResultGeometry(std::string suffix = "_result");
 	void exportVectorStates(int step);
-	void exportTestGeometry(int step, float t); // exports an ico/quad sphere determined by r(t) = sqrt(r0 * r0 - 4 * t) for comparison
+	void exportTestGeometry(int step, double t); // exports an ico/quad sphere determined by r(t) = sqrt(r0 * r0 - 4 * t) for comparison
 
 	// returns a specialized error compared to a mean-curvature contracting sphere
 	// with radius r(t) = sqrt(r0 * r0 - 4 * t)
-	float getSphereStepL2Error(float t);
-	float getSphereStepError(float t);
+	double getSphereStepL2Error(double t);
+	double getSphereStepError(double t);
 
 	// params:
 	uint subdiv = 2; // initial sphere subdivision detail
@@ -171,13 +172,13 @@ private:
 
 	// whether to compare evolution result with a mean-curvature contracting sphere and return an L2 error:
 	bool sphereTest = false;
-	float r0 = 1.0f; // test sphere initial radius
+	double r0 = 1.0; // test sphere initial radius
 
 	// flag whether to consider a signed distance function for evolution equation (automatically true when performing sphere test)
 	bool meanCurvatureFlow = false;
 
-	float dt = 0.01f; // time step
-	float tStop = 1.0f; // evolution stopping time
+	double dt = 0.01; // time step
+	double tStop = 1.0; // evolution stopping time
 	Grid* sdfGrid = nullptr; // signed distance function grid
 	ElementType elType = ElementType::tri;
 
@@ -187,7 +188,7 @@ private:
 	Box3 bbox;
 
 	// L2 error for numerical tests:
-	float sphereTestL2Error = 0.0f;
+	double sphereTestL2Error = 0.0;
 
 	// id of the sphere test
 	int testId = -1;
@@ -206,7 +207,7 @@ public:
 	~Evolver();
 
 	// getters:
-	inline float testL2Error() { return sphereTestL2Error; };
+	inline double testL2Error() { return sphereTestL2Error; };
 	inline uint nSteps() { return NSteps; };
 	inline uint nVerts() { return N; };
 };

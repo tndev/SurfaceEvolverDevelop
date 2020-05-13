@@ -434,7 +434,7 @@ AABBTree::AABBNode* AABBTree::getClosestNode(Vector3& point)
 	return nullptr;
 }
 
-int AABBTree::getClosestPrimitiveIdAndDist(Vector3& point, float* result)
+int AABBTree::getClosestPrimitiveIdAndDist(Vector3& point, double* result)
 {
 	AABBNode* closestNode = this->getClosestNode(point);
 	if (!closestNode) {

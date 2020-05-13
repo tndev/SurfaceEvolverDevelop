@@ -99,7 +99,7 @@ public:
 	void getPrimitivesInABox(Box3* box, std::vector<uint>* primIdBuffer);
 
 	AABBNode* getClosestNode(Vector3& point);
-	int getClosestPrimitiveIdAndDist(Vector3& point, float* result);
+	int getClosestPrimitiveIdAndDist(Vector3& point, double* result);
 
 	void applyMatrix(Matrix4& m);
 

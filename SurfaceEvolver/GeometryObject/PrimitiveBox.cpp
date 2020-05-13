@@ -16,7 +16,7 @@ PrimitiveBox::PrimitiveBox(const PrimitiveBox& other)
 	this->segments[1] = other.segments[2];
 }
 
-PrimitiveBox::PrimitiveBox(float x, float y, float z, unsigned int sx, unsigned int sy, unsigned int sz, bool quad, std::string name, bool lastWall)
+PrimitiveBox::PrimitiveBox(double x, double y, double z, unsigned int sx, unsigned int sy, unsigned int sz, bool quad, std::string name, bool lastWall)
 {
 	this->dimensions[0] = x;
 	this->dimensions[2] = y;
@@ -56,9 +56,9 @@ void PrimitiveBox::build()
 	//
 	// where 1 is the ground (xy) floor and wall 6 can be omitted
 
-	const float width = dimensions[0];
-	const float depth = dimensions[2];
-	const float height = dimensions[1];
+	const double width = dimensions[0];
+	const double depth = dimensions[2];
+	const double height = dimensions[1];
 
 	const unsigned int sw = segments[0];
 	const unsigned int sd = segments[2];
@@ -79,8 +79,8 @@ void PrimitiveBox::build()
 	const unsigned int normalBufferCount = 3 * 3 * 2 * faceCount;
 	const unsigned int vertexIndexBufferCount = 3 * 2 * faceCount;
 
-	vertices = std::vector<float>(vertexBufferCount);
-	normals = std::vector<float>(normalBufferCount);
+	vertices = std::vector<double>(vertexBufferCount);
+	normals = std::vector<double>(normalBufferCount);
 	vertexIndices = std::vector<unsigned int>(vertexIndexBufferCount);
 
 	triangulations = std::vector<std::vector<unsigned int>>();
@@ -134,8 +134,8 @@ void PrimitiveBox::build()
 	// wall 1:
 	for (unsigned int i = 0; i <= sd; i++) {
 		for (unsigned int j = 0; j <= sw; j++) {
-			vertices[3 * (i * nw + j)] = (1 - (float)j / (float)sw) * width;
-			vertices[3 * (i * nw + j) + 1] = (1 - (float)i / (float)sd) * depth;
+			vertices[3 * (i * nw + j)] = (1 - (double)j / (double)sw) * width;
+			vertices[3 * (i * nw + j) + 1] = (1 - (double)i / (double)sd) * depth;
 			vertices[3 * (i * nw + j) + 2] = 0;
 
 			// floor (wall 1) faces:
@@ -161,8 +161,8 @@ void PrimitiveBox::build()
 		currentNormal.set(1, 0, 0);
 		for (unsigned int j = 0; j <= sd; j++) {
 			vertices[3 * (startingId + i * rowLength + j)] = width;
-			vertices[3 * (startingId + i * rowLength + j) + 1] = (1 - (float)j / (float)sd) * depth;
-			vertices[3 * (startingId + i * rowLength + j) + 2] = (float)(i + 1) / (float)sh * height;
+			vertices[3 * (startingId + i * rowLength + j) + 1] = (1 - (double)j / (double)sd) * depth;
+			vertices[3 * (startingId + i * rowLength + j) + 2] = (double)(i + 1) / (double)sh * height;
 
 			// wall 2 faces: first row:
 			if (i == 0 && j > 0) {
@@ -190,9 +190,9 @@ void PrimitiveBox::build()
 		// wall 3:
 		currentNormal.set(0, -1, 0);
 		for (unsigned int j = 1; j <= sw; j++) {
-			vertices[3 * (startingId + i * rowLength + sd + j)] = (1 - (float)j / (float)sw) * width;
+			vertices[3 * (startingId + i * rowLength + sd + j)] = (1 - (double)j / (double)sw) * width;
 			vertices[3 * (startingId + i * rowLength + sd + j) + 1] = 0;
-			vertices[3 * (startingId + i * rowLength + sd + j) + 2] = (float)(i + 1) / (float)sh * height;
+			vertices[3 * (startingId + i * rowLength + sd + j) + 2] = (double)(i + 1) / (double)sh * height;
 
 			// wall 3 faces: first row:
 			if (i == 0) {
@@ -221,8 +221,8 @@ void PrimitiveBox::build()
 		currentNormal.set(-1, 0, 0);
 		for (unsigned int j = 1; j <= sd; j++) {
 			vertices[3 * (startingId + i * rowLength + sd + sw + j)] = 0;
-			vertices[3 * (startingId + i * rowLength + sd + sw + j) + 1] = (float)j / (float)sd * depth;
-			vertices[3 * (startingId + i * rowLength + sd + sw + j) + 2] = (float)(i + 1) / (float)sh * height;
+			vertices[3 * (startingId + i * rowLength + sd + sw + j) + 1] = (double)j / (double)sd * depth;
+			vertices[3 * (startingId + i * rowLength + sd + sw + j) + 2] = (double)(i + 1) / (double)sh * height;
 
 			// wall 4 faces: first row:
 			if (i == 0) {
@@ -257,8 +257,8 @@ void PrimitiveBox::build()
 
 		if (sw > 1) {
 			for (unsigned int j = 1; j < sw; j++) {
-				vertices[3 * (startingId + (i - 1) * (sw - 1) + j - 1)] = (1 - (float)j / (float)sw) * width;
-				vertices[3 * (startingId + (i - 1) * (sw - 1) + j - 1) + 1] = (float)i / (float)sd * depth;
+				vertices[3 * (startingId + (i - 1) * (sw - 1) + j - 1)] = (1 - (double)j / (double)sw) * width;
+				vertices[3 * (startingId + (i - 1) * (sw - 1) + j - 1) + 1] = (double)i / (double)sd * depth;
 				vertices[3 * (startingId + (i - 1) * (sw - 1) + j - 1) + 2] = height;
 
 				// ceiling wall (5) face: upper left corner:
@@ -362,9 +362,9 @@ void PrimitiveBox::build()
 		for (unsigned int i = 1; i < sh; i++) {
 			if (sw > 1) {
 				for (unsigned int j = 1; j < sw; j++) {
-					vertices[3 * (startingId + (i - 1) * (sw - 1) + j - 1)] = (1 - (float)j / (float)sw) * width;
+					vertices[3 * (startingId + (i - 1) * (sw - 1) + j - 1)] = (1 - (double)j / (double)sw) * width;
 					vertices[3 * (startingId + (i - 1) * (sw - 1) + j - 1) + 1] = depth;
-					vertices[3 * (startingId + (i - 1) * (sw - 1) + j - 1) + 2] = (1 - (float)i / (float)sh) * height;
+					vertices[3 * (startingId + (i - 1) * (sw - 1) + j - 1) + 2] = (1 - (double)i / (double)sh) * height;
 
 					// wall 6 face: upper left corner:
 					if (i == 1 && j == 1) {
@@ -490,7 +490,7 @@ void PrimitiveBox::build()
 	}	
 
 	// duplicate vertices into geometryVertices
-	std::vector<float> geometryVertices = std::vector<float>(3 * this->vertexIndices.size());
+	std::vector<double> geometryVertices = std::vector<double>(3 * this->vertexIndices.size());
 
 	for (unsigned int i = 0; i < this->vertexIndices.size(); i++) {
 		geometryVertices[i * 3] = this->vertices[this->vertexIndices[i] * 3];
@@ -500,5 +500,5 @@ void PrimitiveBox::build()
 
 	// copy unique vertex coords into uniqueVertices
 	this->uniqueVertices = std::vector<Vector3>(this->getVertices());
-	this->vertices = std::vector<float>(geometryVertices);
+	this->vertices = std::vector<double>(geometryVertices);
 }

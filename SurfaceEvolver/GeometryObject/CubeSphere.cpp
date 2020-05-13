@@ -4,7 +4,7 @@ CubeSphere::CubeSphere()
 {
 }
 
-CubeSphere::CubeSphere(unsigned int detail, float radius, bool quad, std::string name)
+CubeSphere::CubeSphere(unsigned int detail, double radius, bool quad, std::string name)
 {
 	this->detail = detail; this->radius = radius;
 	this->quad = quad;
@@ -23,15 +23,15 @@ CubeSphere::~CubeSphere()
 
 void CubeSphere::build()
 {
-	float a = 2.0f * radius / sqrt(3.0f);
+	double a = 2.0 * radius / sqrt(3.0);
 	PrimitiveBox box = PrimitiveBox(a, a, a, detail, detail, detail, quad);
 
 	// translate to center
-	box.applyMatrix(Matrix4().makeTranslation(-a / 2.0f, -a / 2.0f, -a / 2.0f));
+	box.applyMatrix(Matrix4().makeTranslation(-a / 2.0, -a / 2.0, -a / 2.0));
 
 	// spherify
 	Deform def = Deform(&box);
-	def.spherify(1.0f);
+	def.spherify(1.0);
 
 	Geometry result = def.result;
 	this->uniqueVertices = result.uniqueVertices;

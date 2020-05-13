@@ -7,14 +7,14 @@ class PrimitiveBox :
 	public Geometry
 {
 public:
-	float dimensions[3] = { 50.0f, 50.0f, 50.0f };
+	double dimensions[3] = { 50.0, 50.0, 50.0 };
 	unsigned int segments[3] = { 2, 2, 2 };
 	bool quad = true;
 	bool lastWall = true;
 
 	PrimitiveBox();
 	PrimitiveBox(const PrimitiveBox& other);
-	PrimitiveBox(float x, float y, float z, unsigned int sx, unsigned int sy, unsigned int sz, bool quad = true, std::string name = "", bool lastWall = true);
+	PrimitiveBox(double x, double y, double z, unsigned int sx, unsigned int sy, unsigned int sz, bool quad = true, std::string name = "", bool lastWall = true);
 	~PrimitiveBox();
 
 	void build();

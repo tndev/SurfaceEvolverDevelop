@@ -16,9 +16,9 @@ Geometry::~Geometry()
 Geometry::Geometry(const Geometry& other)
 {
 	name = std::string(other.name);
-	normals = std::vector<float>(other.normals);
+	normals = std::vector<double>(other.normals);
 	uniqueVertices = std::vector<Vector3>(other.uniqueVertices);
-	vertices = std::vector<float>(other.vertices);
+	vertices = std::vector<double>(other.vertices);
 	vertexIndices = std::vector<unsigned int>(other.vertexIndices);
 	triangulations = std::vector<std::vector<unsigned int>>(other.triangulations);
 }
@@ -69,7 +69,7 @@ void Geometry::computeNormals()
 	StructGeom::Triangle faceVerts = { &Vector3(), &Vector3(), &Vector3() };
 
 	Vector3 normal = Vector3();
-	this->normals = std::vector<float>(this->vertices.size());
+	this->normals = std::vector<double>(this->vertices.size());
 	for (unsigned int i = 0; i < this->vertices.size(); i += 9) {
 
 		for (unsigned int j = 0; j < 3; j++) {
@@ -104,7 +104,7 @@ void Geometry::fillVerticesFromUniqueVertices()
 	if (this->hasVertexIndices() && this->hasUniqueVertices()) {
 		uint N = vertexIndices.size();
 		this->vertices.clear();
-		this->vertices = std::vector<float>(3 * N);
+		this->vertices = std::vector<double>(3 * N);
 		for (uint i = 0; i < N; i++) {
 			this->vertices[(size_t)3 * i] = this->uniqueVertices[this->vertexIndices[i]].x;
 			this->vertices[(size_t)3 * i + 1] = this->uniqueVertices[this->vertexIndices[i]].y;
@@ -113,7 +113,7 @@ void Geometry::fillVerticesFromUniqueVertices()
 	}
 }
 
-void Geometry::setScalarData(std::vector<float>* data, std::string name)
+void Geometry::setScalarData(std::vector<double>* data, std::string name)
 {
 	if (!this->hasVertices() || this->uniqueVertices.size() != data->size()) return;
 
@@ -268,7 +268,7 @@ std::vector<Vector3> Geometry::getAngleWeightedVertexPseudoNormals()
 	this->getVertexToTriangleMap(&vertexToTriangles);
 	std::multimap<Vector3, BufferGeom::TriWithMarkedVertex>::iterator it;
 	Vector3* v; std::vector<Vector3*> verts = {};
-	float alpha; Vector3 triNormal = Vector3();
+	double alpha; Vector3 triNormal = Vector3();
 
 	for (uint i = 0; i < this->uniqueVertices.size(); i++) {
 		v = &this->uniqueVertices[i];
@@ -431,9 +431,9 @@ void Geometry::getVertexFiniteVolumes(std::vector<std::vector<Vector3>>* vVolVer
 				adjacentPolyIds->at(i).at(p).push_back(*nextIt);
 				nextIt = (std::next(nextIt) == P.end() ? P.begin() : std::next(nextIt));
 			}
-			centroid = 1.0f / ((float)P.size()) * centroid;
+			centroid = 1.0 / ((double)P.size()) * centroid;
 
-			volRingVerts.push_back(0.5f * (*v + uniqueVertices[leftId]));
+			volRingVerts.push_back(0.5 * (*v + uniqueVertices[leftId]));
 			volRingVerts.push_back(centroid);
 		}
 		if (!closedCycle) {
@@ -508,9 +508,9 @@ std::vector<Vector3> Geometry::getProjectionsAlongNormal(BufferGeom::Face& verti
 	std::vector<Vector3> projections = std::vector<Vector3>();
 	for (unsigned int k = 0; k < vertices.size(); k++) {
 		Vector3 vec = *vertices[k] - referencePoint;
-		float px = dot(vec, projX);
-		float py = dot(vec, projY);
-		projections.push_back(Vector3(px, py, 0.0f));
+		double px = dot(vec, projX);
+		double py = dot(vec, projY);
+		projections.push_back(Vector3(px, py, 0.0));
 	}
 
 	return projections;
@@ -601,7 +601,7 @@ template<class T>
 void flipArray(std::vector<T> arr, unsigned int elementSize) {
 	if (arr.size() && elementSize) {
 		unsigned int iStep = 3 * elementSize;
-		float tmp[3] = { 0.0f, 0.0f, 0.0f };
+		double tmp[3] = { 0.0, 0.0, 0.0 };
 		for (unsigned int i = 0; i < arr.size(); i += iStep) {
 			for (unsigned int j = 0; j < elementSize; j++) {
 				const unsigned int i0 = i + j;
@@ -624,8 +624,8 @@ void Geometry::flipFaceOrientation()
 }
 
 Matrix3 getSubMatrix3(Matrix4 m) {
-	float* e = m.elements;
-	float resultElems[9] = {
+	double* e = m.elements;
+	double resultElems[9] = {
 		e[0],	e[4],	e[8],
 		e[1],	e[5],	e[9],
 		e[2],	e[6],	e[10]
@@ -663,7 +663,7 @@ void Geometry::applyMatrix(Matrix4 m)
 		if (hasNormals) {
 			helperVector.set(normals[i0], normals[i1], normals[i2]);
 			helperVector.applyMatrix3(matrix3InverseTransposed);
-			const float length = helperVector.length();
+			const double length = helperVector.length();
 
 			normals[i0] = helperVector.x / length;
 			normals[i1] = helperVector.y / length;
@@ -843,12 +843,12 @@ Vector3 getTriangleNormal(StructGeom::Triangle triangle, Vector3& resultNormal)
 bool getPlaneBoxIntersection(Vector3* normal, Vector3* vert, Vector3* boxMax) {
 	int q;
 	Vector3 vmin, vmax;
-	float v;
+	double v;
 
 	for (q = 0; q <= 2; q++) {
 		v = vert->getCoordById(q);
 
-		if (normal->getCoordById(q) > 0.0f) {
+		if (normal->getCoordById(q) > 0.0) {
 			vmin.setCoordById(-boxMax->getCoordById(q) - v, q);
 			vmax.setCoordById(boxMax->getCoordById(q) - v, q);
 		} else {
@@ -857,8 +857,8 @@ bool getPlaneBoxIntersection(Vector3* normal, Vector3* vert, Vector3* boxMax) {
 		}
 	}
 
-	if (DOT((*normal), vmin) > 0.0f) return false;
-	if (DOT((*normal), vmax) >= 0.0f) return true;
+	if (DOT((*normal), vmin) > 0.0) return false;
+	if (DOT((*normal), vmax) >= 0.0) return true;
 	return false;
 }
 
@@ -915,7 +915,7 @@ bool getPlaneBoxIntersection(Vector3* normal, Vector3* vert, Vector3* boxMax) {
 
 bool getTriangleBoxIntersection(Vector3** T, Vector3* boxCenter, Vector3* boxHalfSize) {
 	Vector3 v0, v1, v2;
-	float min, max, p0, p1, p2, rad, fex, fey, fez;
+	double min, max, p0, p1, p2, rad, fex, fey, fez;
 	Vector3 normal, e0, e1, e2;
 
 	SUB(v0, (*T[0]), (*boxCenter));
@@ -982,18 +982,18 @@ template <typename T> int sgn(T val) {
 bool getEdgeBoxIntersection(Edge& vertices, Vector3* boxMin, Vector3* boxMax)
 {
 	Vector3 edge_direction = *vertices[1] - *vertices[0];
-	float edge_param = edge_direction.length();
+	double edge_param = edge_direction.length();
 	edge_direction = edge_direction / edge_param;
 
-	float t_min = -FLT_MAX;
-	float t_max = FLT_MAX;
+	double t_min = -FLT_MAX;
+	double t_max = FLT_MAX;
 
-	uint i; float t1, t2;
+	uint i; double t1, t2;
 
 	for (i = 0; i < 3; i++) {
 		if (edge_direction.getCoordById(i) > FLT_EPSILON) {
-			t1 = (boxMin->getCoordById(i) - vertices[0]->getCoordById(i)) * (1.0f / edge_direction.getCoordById(i));
-			t2 = (boxMax->getCoordById(i) - vertices[0]->getCoordById(i)) * (1.0f / edge_direction.getCoordById(i));
+			t1 = (boxMin->getCoordById(i) - vertices[0]->getCoordById(i)) * (1.0 / edge_direction.getCoordById(i));
+			t2 = (boxMax->getCoordById(i) - vertices[0]->getCoordById(i)) * (1.0 / edge_direction.getCoordById(i));
 
 			t_min = std::max(t_min, std::min(t1, t2));
 			t_max = std::min(t_max, std::max(t1, t2));
@@ -1005,10 +1005,10 @@ bool getEdgeBoxIntersection(Edge& vertices, Vector3* boxMin, Vector3* boxMax)
 		}
 	}
 
-	return (t_max >= t_min && t_max >= 0.0f && t_min <= edge_param);
+	return (t_max >= t_min && t_max >= 0.0 && t_min <= edge_param);
 }
 
-bool getPrimitiveBoxIntersection(Primitive& primitive, Vector3* boxCenter, Vector3* boxMin, Vector3* boxMax, Vector3* boxHalfSize, float offset)
+bool getPrimitiveBoxIntersection(Primitive& primitive, Vector3* boxCenter, Vector3* boxMin, Vector3* boxMax, Vector3* boxHalfSize, double offset)
 {
 	if (primitive.vertices.size() == 1) {
 		return (
@@ -1032,21 +1032,21 @@ bool getPrimitiveBoxIntersection(Primitive& primitive, Vector3* boxCenter, Vecto
 	return false;
 }
 
-float getDistanceToATriangleSq(Vector3** vertices, Vector3* point)
+double getDistanceToATriangleSq(Vector3** vertices, Vector3* point)
 {
 	Vector3 diff = *point - *vertices[0];
 	Vector3 edge0 = *vertices[1] - *vertices[0];
 	Vector3 edge1 = *vertices[2] - *vertices[0];
-	float a00 = DOT(edge0, edge0);
-	float a01 = DOT(edge0, edge1);
-	float a11 = DOT(edge1, edge1);
-	float b0 = -DOT(diff, edge0);
-	float b1 = -DOT(diff, edge1);
-	float const zero = (float)0;
-	float const one = (float)1;
-	float det = a00 * a11 - a01 * a01;
-	float t0 = a01 * b1 - a11 * b0;
-	float t1 = a01 * b0 - a00 * b1;
+	double a00 = DOT(edge0, edge0);
+	double a01 = DOT(edge0, edge1);
+	double a11 = DOT(edge1, edge1);
+	double b0 = -DOT(diff, edge0);
+	double b1 = -DOT(diff, edge1);
+	double const zero = (double)0;
+	double const one = (double)1;
+	double det = a00 * a11 - a01 * a01;
+	double t0 = a01 * b1 - a11 * b0;
+	double t1 = a01 * b0 - a00 * b1;
 
 	if (t0 + t1 <= det)	{
 		if (t0 < zero) {
@@ -1088,19 +1088,19 @@ float getDistanceToATriangleSq(Vector3** vertices, Vector3* point)
 				t0 = -b0 / a00;
 			}
 		} else { // region 0, interior		
-			float invDet = one / det;
+			double invDet = one / det;
 			t0 *= invDet;
 			t1 *= invDet;
 		}
 	} else {	
-		float tmp0, tmp1, numer, denom;
+		double tmp0, tmp1, numer, denom;
 
 		if (t0 < zero) { // region 2		
 			tmp0 = a01 + b0;
 			tmp1 = a11 + b1;
 			if (tmp1 > tmp0) {			
 				numer = tmp1 - tmp0;
-				denom = a00 - ((float)2) * a01 + a11;
+				denom = a00 - ((double)2) * a01 + a11;
 				if (numer >= denom) { // V1				
 					t0 = one;
 					t1 = zero;
@@ -1123,7 +1123,7 @@ float getDistanceToATriangleSq(Vector3** vertices, Vector3* point)
 			tmp1 = a00 + b0;
 			if (tmp1 > tmp0) {			
 				numer = tmp1 - tmp0;
-				denom = a00 - ((float)2) * a01 + a11;
+				denom = a00 - ((double)2) * a01 + a11;
 				if (numer >= denom) { // V2				
 					t1 = one;
 					t0 = zero;
@@ -1147,7 +1147,7 @@ float getDistanceToATriangleSq(Vector3** vertices, Vector3* point)
 				t0 = zero;
 				t1 = one;
 			} else {			
-				denom = a00 - ((float)2) * a01 + a11;
+				denom = a00 - ((double)2) * a01 + a11;
 				if (numer >= denom) { // V1				
 					t0 = one;
 					t1 = zero;
@@ -1164,14 +1164,14 @@ float getDistanceToATriangleSq(Vector3** vertices, Vector3* point)
 	return DOT(diff, diff);
 }
 
-int const sign(float x)
+int const sign(double x)
 {
 	return (x > 0 ? 1 : -1);
 }
 
-float dot2(Vector3 v) { return dot(v, v); }
+double dot2(Vector3 v) { return dot(v, v); }
 
-float getDistanceToATriangleSq2(Tri* vertices, Vector3& point)
+double getDistanceToATriangleSq2(Tri* vertices, Vector3& point)
 {
 	Vector3 ba = *vertices->at(1) - *vertices->at(0); Vector3 pa = point - *vertices->at(0);
 	Vector3 cb = *vertices->at(2) - *vertices->at(1); Vector3 pb = point - *vertices->at(1);
@@ -1183,22 +1183,22 @@ float getDistanceToATriangleSq2(Tri* vertices, Vector3& point)
 			 sign(dot(cross(ac, nor), pc)) < 2.0) ?		
 		std::fminf(
 			std::fminf(
-				dot2(ba * clamp( dot(ba, pa) / dot2(ba), 0.0f, 1.0f) - pa),
-				dot2(cb * clamp( dot(cb, pb) / dot2(cb), 0.0f, 1.0f) - pb)
+				dot2(ba * clamp( dot(ba, pa) / dot2(ba), 0.0, 1.0) - pa),
+				dot2(cb * clamp( dot(cb, pb) / dot2(cb), 0.0, 1.0) - pb)
 			),
-		dot2(ac * clamp( dot(ac, pc) / dot2(ac), 0.0f, 1.0f) - pc)
+		dot2(ac * clamp( dot(ac, pc) / dot2(ac), 0.0, 1.0) - pc)
 		) : dot(nor, pa) * dot(nor, pa) / dot2(nor));
 }
 
-float getDistanceToAnEdgeSq(Edge* vertices, Vector3& point)
+double getDistanceToAnEdgeSq(Edge* vertices, Vector3& point)
 {
-	float h = (*vertices->at(1) - *vertices->at(0)).length();
+	double h = (*vertices->at(1) - *vertices->at(0)).length();
 	Vector3 p = point;
-	p.y -= clamp(p.y, 0.0f, h);
+	p.y -= clamp(p.y, 0.0, h);
 	return p.length();
 }
 
-float getDistanceToAPrimitiveSq(Primitive& primitive, Vector3& point)
+double getDistanceToAPrimitiveSq(Primitive& primitive, Vector3& point)
 {
 	if (primitive.vertices.size() == 1) {
 		return (point - *primitive.vertices[0]).lengthSq();
@@ -1216,7 +1216,7 @@ float getDistanceToAPrimitiveSq(Primitive& primitive, Vector3& point)
 	}
 
 	std::cout << "invalid primitive vert count!" << std::endl;
-	return -1.0f;
+	return -1.0;
 }
 
 Vector3 getClosestPtOnATriangle(Tri* vertices, Vector3& point)
@@ -1224,16 +1224,16 @@ Vector3 getClosestPtOnATriangle(Tri* vertices, Vector3& point)
 	Vector3 diff = point - *vertices->at(0);
 	Vector3 edge0 = *vertices->at(1) - *vertices->at(0);
 	Vector3 edge1 = *vertices->at(2) - *vertices->at(0);
-	float a00 = dot(edge0, edge0);
-	float a01 = dot(edge0, edge1);
-	float a11 = dot(edge1, edge1);
-	float b0 = -dot(diff, edge0);
-	float b1 = -dot(diff, edge1);
-	float const zero = (float)0;
-	float const one = (float)1;
-	float det = a00 * a11 - a01 * a01;
-	float t0 = a01 * b1 - a11 * b0;
-	float t1 = a01 * b0 - a00 * b1;
+	double a00 = dot(edge0, edge0);
+	double a01 = dot(edge0, edge1);
+	double a11 = dot(edge1, edge1);
+	double b0 = -dot(diff, edge0);
+	double b1 = -dot(diff, edge1);
+	double const zero = (double)0;
+	double const one = (double)1;
+	double det = a00 * a11 - a01 * a01;
+	double t0 = a01 * b1 - a11 * b0;
+	double t1 = a01 * b0 - a00 * b1;
 
 	if (t0 + t1 <= det)
 	{
@@ -1305,14 +1305,14 @@ Vector3 getClosestPtOnATriangle(Tri* vertices, Vector3& point)
 		}
 		else  // region 0, interior
 		{
-			float invDet = one / det;
+			double invDet = one / det;
 			t0 *= invDet;
 			t1 *= invDet;
 		}
 	}
 	else
 	{
-		float tmp0, tmp1, numer, denom;
+		double tmp0, tmp1, numer, denom;
 
 		if (t0 < zero)  // region 2
 		{
@@ -1321,7 +1321,7 @@ Vector3 getClosestPtOnATriangle(Tri* vertices, Vector3& point)
 			if (tmp1 > tmp0)
 			{
 				numer = tmp1 - tmp0;
-				denom = a00 - ((float)2) * a01 + a11;
+				denom = a00 - ((double)2) * a01 + a11;
 				if (numer >= denom)  // V1
 				{
 					t0 = one;
@@ -1357,7 +1357,7 @@ Vector3 getClosestPtOnATriangle(Tri* vertices, Vector3& point)
 			if (tmp1 > tmp0)
 			{
 				numer = tmp1 - tmp0;
-				denom = a00 - ((float)2) * a01 + a11;
+				denom = a00 - ((double)2) * a01 + a11;
 				if (numer >= denom)  // V2
 				{
 					t1 = one;
@@ -1396,7 +1396,7 @@ Vector3 getClosestPtOnATriangle(Tri* vertices, Vector3& point)
 			}
 			else
 			{
-				denom = a00 - ((float)2) * a01 + a11;
+				denom = a00 - ((double)2) * a01 + a11;
 				if (numer >= denom)  // V1
 				{
 					t0 = one;
@@ -1416,49 +1416,49 @@ Vector3 getClosestPtOnATriangle(Tri* vertices, Vector3& point)
 
 Vector3 getClosestPtOnAnEdge(Edge* vertices, Vector3& point)
 {
-	float h = (*vertices->at(1) - *vertices->at(0)).length();
+	double h = (*vertices->at(1) - *vertices->at(0)).length();
 	Vector3 p = point;
-	p.y -= clamp(p.y, 0.0f, h);
+	p.y -= clamp(p.y, 0.0, h);
 
 	return p;
 }
 
 
 // https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
-float getRayTriangleIntersection(Vector3& rayStart, Vector3& rayDirection, Tri* tri, float minParam, float maxParam)
+double getRayTriangleIntersection(Vector3& rayStart, Vector3& rayDirection, Tri* tri, double minParam, double maxParam)
 {
-	const float EPSILON = 0.0000001;
+	const double EPSILON = 0.0000001;
 	Vector3 edge1, edge2, h, s, q;
-	float a, f, u, v;
+	double a, f, u, v;
 	edge1 = *tri->at(1) - *tri->at(0);
 	edge2 = *tri->at(2) - *tri->at(0);
 	h = cross(rayDirection, edge2);
 	a = dot(edge1, h);
 	if (a > -EPSILON && a < EPSILON) {
-		return -1.0f;    // This ray is parallel to this triangle.
+		return -1.0;    // This ray is parallel to this triangle.
 	}
 		
 	f = 1.0 / a;
 	s = rayStart - *tri->at(0);
 	u = f * dot(s, h);
 	if (u < 0.0 || u > 1.0) {
-		return -1.0f;
+		return -1.0;
 	}
 	q = cross(s, edge1);
 	v = f * dot(rayDirection, q);
 	if (v < 0.0 || u + v > 1.0) {
-		return -1.0f;
+		return -1.0;
 	}
 		
 	// At this stage we can compute t to find out where the intersection point is on the line.
-	float t = f * dot(edge2, q);
+	double t = f * dot(edge2, q);
 	bool inOrNoRange = t < minParam;
 	bool outOrNoRange = t > maxParam;
 	if (t > EPSILON && t < 1 / EPSILON && !inOrNoRange && !outOrNoRange) {
 		return t;
 	}
 	else {	// This means that there is a line intersection but not a ray intersection.
-		return -1.0f;
+		return -1.0;
 	}
 }
 
@@ -1471,7 +1471,7 @@ Primitive::~Primitive()
 {
 }
 
-float Primitive::getMinById(uint id)
+double Primitive::getMinById(uint id)
 {
 	if (vertices.size() == 1) {
 		return vertices[0]->getCoordById(id);
@@ -1490,10 +1490,10 @@ float Primitive::getMinById(uint id)
 	}
 
 	std::cout << "invalid primitive vertex count!" << std::endl;
-	return 0.0f;
+	return 0.0;
 }
 
-float Primitive::getMaxById(uint id)
+double Primitive::getMaxById(uint id)
 {
 	if (vertices.size() == 1) {
 		return vertices[0]->getCoordById(id);
@@ -1512,12 +1512,12 @@ float Primitive::getMaxById(uint id)
 	}
 
 	std::cout << "invalid primitive vertex count!" << std::endl;
-	return 0.0f;
+	return 0.0;
 }
 
-VertexScalarData::VertexScalarData(std::vector<float>* data, std::string name)
+VertexScalarData::VertexScalarData(std::vector<double>* data, std::string name)
 {
-	this->data = std::vector<float>(*data);
+	this->data = std::vector<double>(*data);
 	this->name = name;
 }
 
@@ -1525,7 +1525,7 @@ VertexScalarData::~VertexScalarData()
 {
 }
 
-float& VertexScalarData::operator[](int i)
+double& VertexScalarData::operator[](int i)
 {
 	return data[i];
 }

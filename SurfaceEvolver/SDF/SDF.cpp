@@ -34,7 +34,7 @@ SDF::SDF(Geometry* geom, uint resolution, bool computeSign, bool computeGradient
 		this->tri_aabb = new AABBTree(this->geom);
 
 		auto endSDF_AABB = std::chrono::high_resolution_clock::now();
-		std::chrono::duration<float> elapsedSDF_AABB = (endSDF_AABB - startSDF_AABB);
+		std::chrono::duration<double> elapsedSDF_AABB = (endSDF_AABB - startSDF_AABB);
 
 		auto startSDF_Octree = std::chrono::high_resolution_clock::now();
 
@@ -47,12 +47,12 @@ SDF::SDF(Geometry* geom, uint resolution, bool computeSign, bool computeGradient
 		}		
 
 		auto endSDF_Octree = std::chrono::high_resolution_clock::now();
-		std::chrono::duration<float> elapsedSDF_Octree = (endSDF_Octree - startSDF_Octree);
+		std::chrono::duration<double> elapsedSDF_Octree = (endSDF_Octree - startSDF_Octree);
 
-		std::chrono::duration<float> elapsedGridScale;
-		std::chrono::duration<float> elapsedSDF_FS;
+		std::chrono::duration<double> elapsedGridScale;
+		std::chrono::duration<double> elapsedSDF_FS;
 
-		std::chrono::duration<float> elapsedSDF_Sign;
+		std::chrono::duration<double> elapsedSDF_Sign;
 
 		if (scaleAndInterpolate && resolution > this->resolution_limit) {
 			auto startSDF_FS = std::chrono::high_resolution_clock::now();
@@ -72,12 +72,12 @@ SDF::SDF(Geometry* geom, uint resolution, bool computeSign, bool computeGradient
 				elapsedSDF_Sign = (endSDF_Sign - startSDF_Sign);
 			}
 
-			float origRes = std::floor((1.0f + 2.0f * this->grid->max_offset_factor) * resolution);
+			double origRes = std::floor((1.0 + 2.0 * this->grid->max_offset_factor) * resolution);
 
 			Vector3 scaleFactor = Vector3(
-				origRes / std::floor((1.0f + 2.0f * this->grid->max_offset_factor) * this->resolution_limit),
-				origRes / std::floor((1.0f + 2.0f * this->grid->max_offset_factor) * this->resolution_limit),
-				origRes / std::floor((1.0f + 2.0f * this->grid->max_offset_factor) * this->resolution_limit)
+				origRes / std::floor((1.0 + 2.0 * this->grid->max_offset_factor) * this->resolution_limit),
+				origRes / std::floor((1.0 + 2.0 * this->grid->max_offset_factor) * this->resolution_limit),
+				origRes / std::floor((1.0 + 2.0 * this->grid->max_offset_factor) * this->resolution_limit)
 			);
 
 			auto startGridScale = std::chrono::high_resolution_clock::now();
@@ -108,7 +108,7 @@ SDF::SDF(Geometry* geom, uint resolution, bool computeSign, bool computeGradient
 		}
 
 		auto endSDF = std::chrono::high_resolution_clock::now();
-		std::chrono::duration<float> elapsedSDF = (endSDF - startSDF);
+		std::chrono::duration<double> elapsedSDF = (endSDF - startSDF);
 
 		this->geom_properties = "=== " + this->geom->name + " === \n" + "verts: " + std::to_string(this->geom->uniqueVertices.size()) +
 			", triangles: " + std::to_string(this->tri_aabb->primitives.size()) + ", octree resolution: " + std::to_string(resolution) + "^3, grid resolution: " + std::to_string(this->grid->Nx) + "^3 " +
@@ -131,11 +131,11 @@ SDF::SDF(Geometry* geom, uint resolution, bool computeSign, bool computeGradient
 		this->tri_aabb = new AABBTree(this->geom);
 
 		auto endSDF_AABB = std::chrono::high_resolution_clock::now();
-		std::chrono::duration<float> elapsedSDF_AABB = (endSDF_AABB - startSDF_AABB);
+		std::chrono::duration<double> elapsedSDF_AABB = (endSDF_AABB - startSDF_AABB);
 
 		Box3 bbox = geom->getBoundingBox();
 		Vector3 size = bbox.getSize();
-		float maxDim = std::max({ size.x, size.y, size.z });
+		double maxDim = std::max({ size.x, size.y, size.z });
 		Box3 cubeBox = Box3(bbox.min, bbox.min + Vector3(maxDim, maxDim, maxDim));
 
 		this->grid = new Grid(resolution, resolution, resolution, bbox, cubeBox);
@@ -143,10 +143,10 @@ SDF::SDF(Geometry* geom, uint resolution, bool computeSign, bool computeGradient
 		this->grid->expand();
 		this->grid->aabbDistanceField(this->tri_aabb);
 		auto endSDF_Lookup = std::chrono::high_resolution_clock::now();
-		std::chrono::duration<float> elapsedSDF_Lookup = (endSDF_Lookup - startSDF_Lookup);
+		std::chrono::duration<double> elapsedSDF_Lookup = (endSDF_Lookup - startSDF_Lookup);
 
 		auto endSDF = std::chrono::high_resolution_clock::now();
-		std::chrono::duration<float> elapsedSDF = (endSDF - startSDF);
+		std::chrono::duration<double> elapsedSDF = (endSDF - startSDF);
 
 		this->geom_properties = "=== " + this->geom->name + " === \n" + "verts: " + std::to_string(this->geom->uniqueVertices.size()) +
 			", triangles: " + std::to_string(this->tri_aabb->primitives.size()) + ", grid resolution: " + std::to_string(this->grid->Nx) + "^3 \n";
@@ -160,7 +160,7 @@ SDF::SDF(Geometry* geom, uint resolution, bool computeSign, bool computeGradient
 
 		Box3 bbox = geom->getBoundingBox();
 		Vector3 size = bbox.getSize();
-		float maxDim = std::max({ size.x, size.y, size.z });
+		double maxDim = std::max({ size.x, size.y, size.z });
 		Box3 cubeBox = Box3(bbox.min, bbox.min + Vector3(maxDim, maxDim, maxDim));
 
 		this->grid = new Grid(resolution, resolution, resolution, bbox, cubeBox);
@@ -168,7 +168,7 @@ SDF::SDF(Geometry* geom, uint resolution, bool computeSign, bool computeGradient
 		this->grid->bruteForceDistanceField(geom);
 
 		auto endSDF = std::chrono::high_resolution_clock::now();
-		std::chrono::duration<float> elapsedSDF = (endSDF - startSDF);
+		std::chrono::duration<double> elapsedSDF = (endSDF - startSDF);
 
 		this->geom_properties = "=== " + this->geom->name + " === \n" + "verts: " + std::to_string(this->geom->uniqueVertices.size()) +
 			", triangles: " + std::to_string(this->geom->vertexIndices.size() / 3) + ", grid resolution: " + std::to_string(this->grid->Nx) + "^3 \n";
@@ -254,8 +254,8 @@ void SDF::applyMatrix(Matrix4& m)
 
 	auto endSDFRecompute = std::chrono::high_resolution_clock::now();
 
-	std::chrono::duration<float> elapsedSDF_Transform = (endSDFTransform - startSDFTransform);
-	std::chrono::duration<float> elapsedSDF_Recompute = (endSDFRecompute - startSDFRecompute);
+	std::chrono::duration<double> elapsedSDF_Transform = (endSDFTransform - startSDFTransform);
+	std::chrono::duration<double> elapsedSDF_Recompute = (endSDFRecompute - startSDFRecompute);
 
 	this->last_transform = "SDF Transform: " + std::to_string(elapsedSDF_Transform.count()) +
 		" s, SDF Recompute: " + std::to_string(elapsedSDF_Recompute.count()) +

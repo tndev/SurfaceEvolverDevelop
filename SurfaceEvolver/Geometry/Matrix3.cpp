@@ -9,7 +9,7 @@ Matrix3::Matrix3()
 
 Matrix3::Matrix3(const Matrix3& other)
 {
-	const float* e = other.elements;
+	const double* e = other.elements;
 	this->set(
 		e[0], e[1], e[2],
 		e[3], e[4], e[5],
@@ -17,9 +17,9 @@ Matrix3::Matrix3(const Matrix3& other)
 	);
 }
 
-Matrix3::Matrix3(float* elems)
+Matrix3::Matrix3(double* elems)
 {
-	float* e = elements;
+	double* e = elements;
 	e[0] = elems[0];	e[1] = elems[1];	e[2] = elems[2];
 	e[3] = elems[3];	e[4] = elems[4];	e[5] = elems[5];
 	e[6] = elems[6];	e[7] = elems[7];	e[8] = elems[8];
@@ -31,26 +31,26 @@ Matrix3::~Matrix3()
 
 bool Matrix3::isIdentity()
 {
-	float* e = elements;
+	double* e = elements;
 	return (
-		e[0] == 1.0f && e[1] == 0.0f && e[2] == 0.0f &&
-		e[3] == 0.0f &&	e[4] == 1.0f && e[5] == 0.0f && 
-		e[6] == 0.0f && e[7] == 0.0f &&	e[8] == 1.0f
+		e[0] == 1.0 && e[1] == 0.0 && e[2] == 0.0 &&
+		e[3] == 0.0 &&	e[4] == 1.0 && e[5] == 0.0 && 
+		e[6] == 0.0 && e[7] == 0.0 &&	e[8] == 1.0
 	);
 }
 
 void Matrix3::setToIdentity()
 {
 	this->set(
-		1.0f, 0.0f, 0.0f,
-		0.0f, 1.0f, 0.0f,
-		0.0f, 0.0f, 1.0f
+		1.0, 0.0, 0.0,
+		0.0, 1.0, 0.0,
+		0.0, 0.0, 1.0
 	);
 }
 
-void Matrix3::set(float m00, float m01, float m02, float m10, float m11, float m12, float m20, float m21, float m22)
+void Matrix3::set(double m00, double m01, double m02, double m10, double m11, double m12, double m20, double m21, double m22)
 {
-	float* e = elements;
+	double* e = elements;
 	e[0] = m00;		e[1] = m01;		e[2] = m02;
 	e[3] = m10;		e[4] = m11;		e[5] = m12;
 	e[6] = m20;		e[7] = m21;		e[8] = m22;
@@ -59,7 +59,7 @@ void Matrix3::set(float m00, float m01, float m02, float m10, float m11, float m
 void Matrix3::transpose()
 {
 
-	float* e = this->elements;
+	double* e = this->elements;
 	this->set(
 		e[0], e[6], e[9],
 		e[1], e[4], e[7],
@@ -67,18 +67,18 @@ void Matrix3::transpose()
 	);
 }
 
-void Matrix3::multiplyScalar(float scalar)
+void Matrix3::multiplyScalar(double scalar)
 {
-	float* e = this->elements;
+	double* e = this->elements;
 	for (int i = 0; i < 9; i++) {
 		e[i] *= scalar;
 	}
 }
 
-float Matrix3::determinant()
+double Matrix3::determinant()
 {
-	float* m = elements;
-	float value = 
+	double* m = elements;
+	double value = 
 		m[id(0, 0)] * m[id(1, 1)] * m[id(2, 2)] - m[id(0, 2)] * m[id(1, 1)] * m[id(2, 0)] +
 		m[id(0, 1)] * m[id(1, 2)] * m[id(2, 0)] - m[id(0, 1)] * m[id(1, 0)] * m[id(2, 2)] +
 		m[id(0, 2)] * m[id(1, 0)] * m[id(2, 1)] - m[id(0, 0)] * m[id(1, 2)] * m[id(2, 1)];
@@ -87,9 +87,9 @@ float Matrix3::determinant()
 
 Matrix3 Matrix3::getInverse(Matrix3& from)
 {
-	float* m = from.elements;
-	float* e = elements;
-	float det = from.determinant();
+	double* m = from.elements;
+	double* e = elements;
+	double det = from.determinant();
 	Matrix3 result = Matrix3();
 	int ex = singularity;
 	try {
@@ -97,7 +97,7 @@ Matrix3 Matrix3::getInverse(Matrix3& from)
 			throw singularity;
 		}
 		else {
-			float invDet = 1.0f / from.determinant();
+			double invDet = 1.0f / from.determinant();
 
 			e[id(0, 0)] = m[id(1, 1)] * m[id(2, 2)] - m[id(2, 1)] * m[id(1, 2)];
 			e[id(0, 1)] = m[id(0, 2)] * m[id(2, 1)] - m[id(0, 1)] * m[id(2, 2)];
@@ -140,17 +140,17 @@ Matrix3 Matrix3::operator-(Matrix3 other)
 Matrix3 Matrix3::operator*(Matrix3 other)
 {
 	Matrix3 result = Matrix3();
-	float* re = result.elements;
-	float* ae = elements;
-	float* be = other.elements;
+	double* re = result.elements;
+	double* ae = elements;
+	double* be = other.elements;
 
-	float a11 = ae[0], a12 = ae[3], a13 = ae[6];
-	float a21 = ae[1], a22 = ae[4], a23 = ae[7];
-	float a31 = ae[2], a32 = ae[5], a33 = ae[8];
+	double a11 = ae[0], a12 = ae[3], a13 = ae[6];
+	double a21 = ae[1], a22 = ae[4], a23 = ae[7];
+	double a31 = ae[2], a32 = ae[5], a33 = ae[8];
 
-	float b11 = be[0], b12 = be[3], b13 = be[6];
-	float b21 = be[1], b22 = be[4], b23 = be[7];
-	float b31 = be[2], b32 = be[5], b33 = be[8];
+	double b11 = be[0], b12 = be[3], b13 = be[6];
+	double b21 = be[1], b22 = be[4], b23 = be[7];
+	double b31 = be[2], b32 = be[5], b33 = be[8];
 
 	re[0] = a11 * b11 + a12 * b21 + a13 * b31;
 	re[3] = a11 * b12 + a12 * b22 + a13 * b32;
@@ -167,7 +167,7 @@ Matrix3 Matrix3::operator*(Matrix3 other)
 	return result;
 }
 
-Matrix3 operator*(float scalar, Matrix3 m)
+Matrix3 operator*(double scalar, Matrix3 m)
 {
 	Matrix3 result = m;
 	result.multiplyScalar(scalar);

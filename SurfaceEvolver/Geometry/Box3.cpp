@@ -43,13 +43,13 @@ void Box3::expandByPoint(Vector3 p)
 	this->max.max(p);
 }
 
-void Box3::expandByOffset(float offset)
+void Box3::expandByOffset(double offset)
 {
 	this->min.addScalar(-offset);
 	this->max.addScalar(offset);
 }
 
-void Box3::expandByFactor(float factor)
+void Box3::expandByFactor(double factor)
 {
 	Vector3 scale = this->getSize();
 	Vector3 scaled = factor * scale;

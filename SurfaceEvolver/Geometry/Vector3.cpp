@@ -18,14 +18,14 @@ Vector3::Vector3(const Vector3& other)
 	this->z = other.z;
 }
 
-Vector3::Vector3(float x, float y, float z)
+Vector3::Vector3(double x, double y, double z)
 {
 	this->x = x;
 	this->y = y;
 	this->z = z;
 }
 
-Vector3::Vector3(float v[3])
+Vector3::Vector3(double v[3])
 {
 	this->x = v[0]; this->y = v[1]; this->z = v[2];
 }
@@ -34,18 +34,18 @@ Vector3::~Vector3()
 {
 }
 
-void Vector3::set(float x, float y, float z)
+void Vector3::set(double x, double y, double z)
 {
 	this->x = x; this->y = y; this->z = z;
 }
 
-Vector3 Vector3::setAndReturn(float x, float y, float z)
+Vector3 Vector3::setAndReturn(double x, double y, double z)
 {
 	this->set(x, y, z);
 	return *this;
 }
 
-void Vector3::setCoordById(float val, unsigned int id)
+void Vector3::setCoordById(double val, unsigned int id)
 {
 	if (id == 0) {
 		x = val;
@@ -72,7 +72,7 @@ void Vector3::max(Vector3 other)
 	this->z = std::fmaxf(this->z, other.z);
 }
 
-float Vector3::getCoordById(unsigned int id)
+double Vector3::getCoordById(unsigned int id)
 {
 	if (id == 0) {
 		return this->x;
@@ -86,13 +86,13 @@ float Vector3::getCoordById(unsigned int id)
 bool Vector3::equals(Vector3 other)
 {
 	return (
-		fabs(this->x - other.x) < 2.0f * FLT_EPSILON &&
-		fabs(this->y - other.y) < 2.0f * FLT_EPSILON &&
-		fabs(this->z - other.z) < 2.0f * FLT_EPSILON
+		fabs(this->x - other.x) < 2.0 * FLT_EPSILON &&
+		fabs(this->y - other.y) < 2.0 * FLT_EPSILON &&
+		fabs(this->z - other.z) < 2.0 * FLT_EPSILON
 	);
 }
 
-bool Vector3::equalsWithEpsilon(Vector3 other, float epsilon)
+bool Vector3::equalsWithEpsilon(Vector3 other, double epsilon)
 {
 	return (
 		fabs(this->x - other.x) < epsilon &&
@@ -108,22 +108,22 @@ void Vector3::negate()
 	this->z = -z;
 }
 
-float Vector3::dot(Vector3 other)
+double Vector3::dot(Vector3 other)
 {
 	return x * other.x + y * other.y + z * other.z;
 }
 
-float Vector3::lengthSq()
+double Vector3::lengthSq()
 {
 	return x * x + y * y + z * z;
 }
 
-float Vector3::length()
+double Vector3::length()
 {
 	return sqrt(lengthSq());
 }
 
-void Vector3::toArray(float* a)
+void Vector3::toArray(double* a)
 {
 	a[0] = x;
 	a[1] = y;
@@ -134,10 +134,10 @@ void Vector3::applyQuaternion(Quaternion& q)
 {
 	// calculate quat * vector
 
-	float ix = q.w * x + q.y * z - q.z * y;
-	float iy = q.w * y + q.z * x - q.x * z;
-	float iz = q.w * z + q.x * y - q.y * x;
-	float iw = -q.x * x - q.y * y - q.z * z;
+	double ix = q.w * x + q.y * z - q.z * y;
+	double iy = q.w * y + q.z * x - q.x * z;
+	double iz = q.w * z + q.x * y - q.y * x;
+	double iw = -q.x * x - q.y * y - q.z * z;
 
 	// calculate result * inverse quat
 
@@ -146,7 +146,7 @@ void Vector3::applyQuaternion(Quaternion& q)
 	this->z = iz * q.w + iw * -q.z + ix * -q.y - iy * -q.x;
 }
 
-void Vector3::applyAxisAngle(Vector3& axis, float angle)
+void Vector3::applyAxisAngle(Vector3& axis, double angle)
 {
 	Quaternion q = Quaternion().setFromAxisAngleAndReturn(&axis, angle);
 	applyQuaternion(q);
@@ -155,8 +155,8 @@ void Vector3::applyAxisAngle(Vector3& axis, float angle)
 void Vector3::applyMatrix4(Matrix4& m)
 {
 	Vector3 a = *this;
-	float* e = m.elements;
-	float w = 1.0f / (e[12] * a.x + e[13] * a.y + e[14] * a.z + e[15]);
+	double* e = m.elements;
+	double w = 1.0 / (e[12] * a.x + e[13] * a.y + e[14] * a.z + e[15]);
 
 	this->x = (e[0] * a.x + e[1] * a.y + e[2] * a.z + e[3]) * w;
 	this->y = (e[4] * a.x + e[5] * a.y + e[6] * a.z + e[7]) * w;
@@ -165,7 +165,7 @@ void Vector3::applyMatrix4(Matrix4& m)
 
 void Vector3::normalize()
 {
-	float len = length();
+	double len = length();
 	int e = zeroVect;
 	try {
 		if (fabs(len) < FLT_MIN) {
@@ -180,7 +180,7 @@ void Vector3::normalize()
 	}
 }
 
-void Vector3::lerp(Vector3 other, float param)
+void Vector3::lerp(Vector3 other, double param)
 {
 	this->x += (other.x - x) * param;
 	this->y += (other.y - y) * param;
@@ -189,8 +189,8 @@ void Vector3::lerp(Vector3 other, float param)
 
 Vector3 Vector3::cross(Vector3 other)
 {
-	float ax = this->x, ay = this->y, az = this->z;
-	float bx = other.x, by = other.y, bz = other.z;
+	double ax = this->x, ay = this->y, az = this->z;
+	double bx = other.x, by = other.y, bz = other.z;
 
 	this->x = ay * bz - az * by;
 	this->y = az * bx - ax * bz;
@@ -205,7 +205,7 @@ Vector3 normalize(Vector3 target)
 	return target;
 }
 
-float dot(Vector3 a, Vector3 b)
+double dot(Vector3 a, Vector3 b)
 {
 	return Vector3(a).dot(b);
 }
@@ -216,7 +216,7 @@ Vector3 cross(Vector3 a, Vector3 b)
 	return a.cross(b);
 }
 
-Vector3 lerp(Vector3 v1, Vector3 v2, float param)
+Vector3 lerp(Vector3 v1, Vector3 v2, double param)
 {
 	Vector3 result = v1;
 	result.lerp(v2, param);
@@ -242,13 +242,13 @@ bool notEqual(Vector3& a, Vector3& b)
 void Vector3::applyMatrix3(Matrix3& m)
 {
 	Vector3 a = *this;
-	float* e = m.elements;
+	double* e = m.elements;
 	this->x = e[0] * x + e[3] * y + e[6] * z;
 	this->y = e[1] * x + e[4] * y + e[7] * z;
 	this->z = e[2] * x + e[5] * y + e[8] * z;
 }
 
-void Vector3::addScalar(float scalar)
+void Vector3::addScalar(double scalar)
 {
 	this->x += scalar;
 	this->y += scalar;
@@ -272,12 +272,12 @@ Vector3 Vector3::operator-(Vector3 other)
 	return Vector3(x - other.x, y - other.y, z - other.z);
 }
 
-Vector3 Vector3::operator*(float scalar)
+Vector3 Vector3::operator*(double scalar)
 {
 	return Vector3(scalar * x, scalar * y, scalar * z);
 }
 
-Vector3 Vector3::operator/(float scalar)
+Vector3 Vector3::operator/(double scalar)
 {
 	return Vector3(x / scalar, y / scalar, z / scalar);
 }
@@ -294,13 +294,13 @@ Vector3& Vector3::operator-=(const Vector3& other)
 	return *this;
 }
 
-Vector3& Vector3::operator*=(const float& scalar)
+Vector3& Vector3::operator*=(const double& scalar)
 {
 	this->x *= scalar; this->y *= scalar; this->z *= scalar;
 	return *this;
 }
 
-Vector3& Vector3::operator/=(const float& scalar)
+Vector3& Vector3::operator/=(const double& scalar)
 {
 	this->x /= scalar; this->y /= scalar; this->z /= scalar;
 	return *this;
@@ -320,12 +320,12 @@ Vector3 operator*(Matrix4 m, Vector3 a)
 	return result;
 }
 
-Vector3 operator*(float scalar, Vector3 a)
+Vector3 operator*(double scalar, Vector3 a)
 {
 	return Vector3(scalar * a.x, scalar * a.y, scalar * a.z);
 }
 
-Vector3 operator/(float scalar, Vector3 a)
+Vector3 operator/(double scalar, Vector3 a)
 {
 	return Vector3(a.x / scalar, a.y / scalar, a.z / scalar);
 }

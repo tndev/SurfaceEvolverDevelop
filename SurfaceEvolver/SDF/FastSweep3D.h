@@ -15,8 +15,8 @@ class FastSweep3D
 public:
 	Grid* grid = nullptr;
 
-	float f = 1.0f; // rhs
-	float h = 1.0f; // dx, dy, dz
+	double f = 1.0; // rhs
+	double h = 1.0; // dx, dy, dz
 
 	uint Nsweeps = 0;
 

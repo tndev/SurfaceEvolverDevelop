@@ -1,10 +1,10 @@
 ================================
 >>> Evolution error log ........
 dt = 0.01, Nsteps = 6, Nverts = 42
-L2Error = 0.00306693
+L2Error = 0.00306686
 dt = 0.0025, Nsteps = 24, Nverts = 162
-L2Error = 0.0889354, EOC = -4.85789
+L2Error = 0.000867567, EOC = 1.82172
 dt = 0.000625, Nsteps = 96, Nverts = 642
-L2Error = 0.00162938, EOC = 5.77036
+L2Error = 0.000210695, EOC = 2.04182
 dt = 0.00015625, Nsteps = 384, Nverts = 2562
-L2Error = 9.29379e-05, EOC = 4.13191
+L2Error = 5.14001e-05, EOC = 2.03531

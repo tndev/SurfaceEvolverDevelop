@@ -13,12 +13,12 @@ Deform::~Deform()
 {
 }
 
-void Deform::spherify(float param)
+void Deform::spherify(double param)
 {
 	result = Geometry(*geom);
 	Box3 bbox = geom->getBoundingBox();
 	Vector3 center = bbox.getCenter();
-	float radius = 0.5 * bbox.getSize().length();
+	double radius = 0.5 * bbox.getSize().length();
 
 	Vector3 vertex = Vector3();
 	Vector3 targetVertex = Vector3();

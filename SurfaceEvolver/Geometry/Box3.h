@@ -18,8 +18,8 @@ public:
 	bool intersectsBox(Box3& other);
 
 	void expandByPoint(Vector3 p);
-	void expandByOffset(float offset);
-	void expandByFactor(float factor);
+	void expandByOffset(double offset);
+	void expandByFactor(double factor);
 	Vector3 getCenter();
 	Vector3 getSize();
 	void setToCenter(Vector3* target);

@@ -27,19 +27,19 @@ public:
 
 		Box3 box;
 
-		float centroidDistance = INFINITY; // infinity unless it's a leaf
+		double centroidDistance = INFINITY; // infinity unless it's a leaf
 		uint depthLeft = MAX_OCTREE_DEPTH;
 
 		OctreeNode();
 		OctreeNode(const OctreeNode& other);
 		OctreeNode(Octree* tree, Box3 box, OctreeNode* parent = nullptr, uint depthLeft = MAX_OCTREE_DEPTH);
 		bool intersectsPrimitives(Box3* box);
-		bool isLargerThanLeaf(float* size);
+		bool isLargerThanLeaf(double* size);
 		bool isALeaf();
 
 		void getLeafNodes(std::vector<OctreeNode*>* leafBuffer);
 		void getLeafBoxes(std::vector<Box3*>* boxBuffer);
-		void getLeafBoxesAndValues(std::vector<Box3*>* boxBuffer, std::vector<float>* valueBuffer);
+		void getLeafBoxesAndValues(std::vector<Box3*>* boxBuffer, std::vector<double>* valueBuffer);
 
 		void applyMatrix(Matrix4& m);
 	};
@@ -50,9 +50,9 @@ public:
 	Box3 bbox;
 
 	uint depth = 0;
-	float leafSize = 1.0f;
+	double leafSize = 1.0;
 
-	float leaf_retrieve_time;
+	double leaf_retrieve_time;
 
 	uint nodeCount = 0;
 
@@ -69,7 +69,7 @@ public:
 	void GenerateLeafCellVisualisation(VTKExporter& e, bool visualizeCentroids = true);
 
 	void setLeafValueToScalarGrid(Grid* grid);
-	void setConstantValueToScalarGrid(Grid* grid, float value);
+	void setConstantValueToScalarGrid(Grid* grid, double value);
 
 	void applyMatrix(Matrix4& m);
 };

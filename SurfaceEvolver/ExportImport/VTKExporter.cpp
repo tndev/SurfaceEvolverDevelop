@@ -33,7 +33,7 @@ void VTKExporter::initExport(Geometry* object, std::string filename)
 	vtk << "vtk output" << std::endl;
 	vtk << "ASCII" << std::endl;
 	vtk << "DATASET " << this->outputType << std::endl;
-	vtk << "POINTS " << pointCount << " float" << std::endl;
+	vtk << "POINTS " << pointCount << " double" << std::endl;
 
 	// std::string newline = this->outputType == "POLYDATA" ? "\n" : "\n";
 	std::string newline = "\n";
@@ -98,7 +98,7 @@ void VTKExporter::initExport(Geometry* object, std::string filename)
 		vtk << "POINT_DATA " << pointCount << std::endl;
 
 		for (unsigned int t = 0; t < NTables; t++) {
-			vtk << "SCALARS " << object->scalarTables[t].name << " float 1" << std::endl;
+			vtk << "SCALARS " << object->scalarTables[t].name << " double 1" << std::endl;
 			vtk << "LOOKUP_TABLE default" << std::endl;
 
 			for (unsigned int i = 0; i < pointCount; i++) {
@@ -130,7 +130,7 @@ void VTKExporter::exportPointData(std::vector<Vector3> points, std::string filen
 	vtk << "vtk output" << std::endl;
 	vtk << "ASCII" << std::endl;
 	vtk << "DATASET " << this->outputType << std::endl;
-	vtk << "POINTS " << points.size() << " float" << std::endl << std::endl;
+	vtk << "POINTS " << points.size() << " double" << std::endl << std::endl;
 
 	for (auto&& p : points) {
 		vtk << p.x << " " << p.y << " " << p.z << std::endl;
@@ -152,7 +152,7 @@ void VTKExporter::exportGeometryVertexNormals(Geometry* object, std::string file
 	vtk << "vtk output" << std::endl;
 	vtk << "ASCII" << std::endl;
 	vtk << "DATASET UNSTRUCTURED_GRID" << std::endl;
-	vtk << "POINTS " << pointCount << " float" << std::endl;
+	vtk << "POINTS " << pointCount << " double" << std::endl;
 
 	if (pointCount > 0) {
 		for (int i = 0; i < pointCount; i++) {
@@ -161,7 +161,7 @@ void VTKExporter::exportGeometryVertexNormals(Geometry* object, std::string file
 	}
 
 	vtk << "POINT_DATA " << pointCount << std::endl;
-	vtk << "VECTORS normals float" << std::endl;
+	vtk << "VECTORS normals double" << std::endl;
 	if (pointCount > 0) {
 		std::vector<Vector3> pseudoNormals = object->getAngleWeightedVertexPseudoNormals();
 
@@ -230,7 +230,7 @@ void VTKExporter::exportGeometryFiniteVolumeGrid(
 			}
 		}
 
-		fvGeom.vertices = std::vector<float>(3 * fvGeom.vertexIndices.size());
+		fvGeom.vertices = std::vector<double>(3 * fvGeom.vertexIndices.size());
 		for (uint j = 0; j < fvGeom.vertexIndices.size(); j++) {
 			fvGeom.vertices[3 * j] = fvGeom.uniqueVertices[fvGeom.vertexIndices[j]].x;
 			fvGeom.vertices[3 * j + 1] = fvGeom.uniqueVertices[fvGeom.vertexIndices[j]].y;
@@ -256,7 +256,7 @@ void VTKExporter::exportVectorDataOnGeometry(Geometry* object, std::vector<Vecto
 	vtk << "vtk output" << std::endl;
 	vtk << "ASCII" << std::endl;
 	vtk << "DATASET UNSTRUCTURED_GRID" << std::endl;
-	vtk << "POINTS " << pointCount << " float" << std::endl;
+	vtk << "POINTS " << pointCount << " double" << std::endl;
 
 	if (pointCount > 0) {
 		for (int i = 0; i < pointCount; i++) {
@@ -265,7 +265,7 @@ void VTKExporter::exportVectorDataOnGeometry(Geometry* object, std::vector<Vecto
 	}
 
 	vtk << "POINT_DATA " << pointCount << std::endl;
-	vtk << "VECTORS normals float" << std::endl;
+	vtk << "VECTORS normals double" << std::endl;
 	if (pointCount > 0) {
 		for (auto&& v : *data) {
 			vtk << v.x << " " << v.y << " " << v.z << std::endl;

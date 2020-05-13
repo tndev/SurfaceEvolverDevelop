@@ -15,7 +15,7 @@ IcoSphere::IcoSphere(const IcoSphere& other)
 	radius = other.radius;
 }
 
-IcoSphere::IcoSphere(unsigned int detail, float radius, std::string name)
+IcoSphere::IcoSphere(unsigned int detail, double radius, std::string name)
 {
 	this->detail = detail; this->radius = radius;
 	if (name.empty()) {
@@ -36,13 +36,13 @@ using TriangleList = std::vector<BufferGeom::Triangle>;
 using VertexList = std::vector<Vector3>;
 
 namespace Icosahedron {
-	const float t = (1.0f + sqrt(5.0f)) / 2.0f;
-	const float norm = sqrt(1.0f + t * t);
+	const double t = (1.0 + sqrt(5.0)) / 2.0;
+	const double norm = sqrt(1.0 + t * t);
 
 	static const VertexList vertices = {
-		{-1.0f / norm, t / norm, 0.0f},    {1.0f / norm, t / norm, 0.0f},   {-1.0f / norm, -t / norm,  0.0f},    {1.0f / norm, -t / norm, 0.0f},
-		{0.0f, -1.0f / norm, t / norm},    {0.0f, 1.0f / norm, t / norm},    {0.0f, -1.0f / norm, -t / norm},    {0.0f, 1.0f / norm, -t / norm},
-		{t / norm, 0.0f, -1.0f / norm},    {t / norm, 0.0f, 1.0f / norm},    {-t / norm, 0.0f, -1.0f / norm},    {-t / norm, 0.0f, 1.0f / norm}
+		{-1.0 / norm, t / norm, 0.0},    {1.0 / norm, t / norm, 0.0},   {-1.0 / norm, -t / norm,  0.0},    {1.0 / norm, -t / norm, 0.0},
+		{0.0, -1.0 / norm, t / norm},    {0.0, 1.0 / norm, t / norm},    {0.0, -1.0 / norm, -t / norm},    {0.0, 1.0 / norm, -t / norm},
+		{t / norm, 0.0, -1.0 / norm},    {t / norm, 0.0, 1.0 / norm},    {-t / norm, 0.0, -1.0 / norm},    {-t / norm, 0.0, 1.0 / norm}
 	};
 
 	static const TriangleList triangles = {
@@ -116,8 +116,8 @@ void IcoSphere::build()
 		}
 	}
 
-	std::vector<float> geometryVertices = std::vector<float>(3 * this->vertexIndices.size());
-	this->normals = std::vector<float>(3 * this->vertexIndices.size());
+	std::vector<double> geometryVertices = std::vector<double>(3 * this->vertexIndices.size());
+	this->normals = std::vector<double>(3 * this->vertexIndices.size());
 
 
 	// apply radius to duplicate vertices
@@ -155,9 +155,9 @@ void IcoSphere::build()
 				Vector3 pC = Vector3(this->vertices[(size_t)3 * i2], this->vertices[(size_t)3 * i2 + 1], this->vertices[(size_t)3 * i2 + 2]);
 				Vector3 centroid = Vector3();
 
-				centroid = (pA + pB + pC) / 3.0f;
+				centroid = (pA + pB + pC) / 3.0;
 
-				float norm = centroid.length();
+				double norm = centroid.length();
 
 				this->normals[(size_t)9 * triId] = centroid.x / norm;
 				this->normals[(size_t)9 * triId + 1] = centroid.y / norm;
@@ -181,5 +181,5 @@ void IcoSphere::build()
 		triId++;
 	}
 
-	this->vertices = std::vector<float>(geometryVertices);
+	this->vertices = std::vector<double>(geometryVertices);
 }

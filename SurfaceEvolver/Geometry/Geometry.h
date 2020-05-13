@@ -54,18 +54,18 @@ struct Primitive {
 	Primitive(std::vector<Vector3*> verts);
 	~Primitive();
 
-	float getMinById(uint id); // returns coord of the lowest feature vertex
-	float getMaxById(uint id); // returns coord of the highest feature vertex
+	double getMinById(uint id); // returns coord of the lowest feature vertex
+	double getMaxById(uint id); // returns coord of the highest feature vertex
 };
 
 struct VertexScalarData {
 	std::string name = "scalar_data";
-	std::vector<float> data = {};
+	std::vector<double> data = {};
 
-	VertexScalarData(std::vector<float>* data, std::string name = "scalar_data");
+	VertexScalarData(std::vector<double>* data, std::string name = "scalar_data");
 	~VertexScalarData();
 
-	float& operator[](int i);
+	double& operator[](int i);
 };
 
 class Geometry
@@ -76,8 +76,8 @@ public:
 	// every time a geometry is created, it is preferrable to keep an additional array of vertices to, which
 	// vertexIndices actually point
 	std::vector<Vector3> uniqueVertices;
-	std::vector<float> vertices; // duplicated (for each triangle)
-	std::vector<float> normals; // vertex normals (for each triangle, i.e.: there's as many as there are vertex indices)
+	std::vector<double> vertices; // duplicated (for each triangle)
+	std::vector<double> normals; // vertex normals (for each triangle, i.e.: there's as many as there are vertex indices)
 	// [0, 1, 2, 0, 2, 3, ... ] (e.g.: quads are made of 2 consecutive triplets of vert indices)
 	std::vector<unsigned int> vertexIndices; // values correspond to the positions in uniqueVertices array;
 	std::vector<BufferGeom::Triangulation> triangulations; // each contains ids of triangles inside a polygon
@@ -102,7 +102,7 @@ public:
 	void computeTriangulations();
 	void fillVerticesFromUniqueVertices();
 
-	void setScalarData(std::vector<float>* data, std::string name = "scalar_data");
+	void setScalarData(std::vector<double>* data, std::string name = "scalar_data");
 	void clearScalarData();
 
 	// getters
@@ -143,16 +143,16 @@ Vector3 getTriangleNormal(StructGeom::Triangle triangle, Vector3& resultNormal);
 bool getPlaneBoxIntersection(Vector3* normal, Vector3* vert, Vector3* boxMax);
 bool getTriangleBoxIntersection(Vector3** T, Vector3* boxCenter, Vector3* boxHalfSize);
 bool getEdgeBoxIntersection(Edge& vertices, Vector3* boxMin, Vector3* boxMax);
-bool getPrimitiveBoxIntersection(Primitive& primitive, Vector3* boxCenter, Vector3* boxMin, Vector3* boxMax, Vector3* boxHalfSize, float offset = 0.0001f);
+bool getPrimitiveBoxIntersection(Primitive& primitive, Vector3* boxCenter, Vector3* boxMin, Vector3* boxMax, Vector3* boxHalfSize, double offset = 0.0001);
 
-float getRayTriangleIntersection(Vector3& rayStart, Vector3& rayDirection, Tri* tri, float minParam, float maxParam);
+double getRayTriangleIntersection(Vector3& rayStart, Vector3& rayDirection, Tri* tri, double minParam, double maxParam);
 
 // distances:
-float getDistanceToATriangleSq(Vector3** vertices, Vector3* point);
-float getDistanceToATriangleSq2(Tri* vertices, Vector3& point);
+double getDistanceToATriangleSq(Vector3** vertices, Vector3* point);
+double getDistanceToATriangleSq2(Tri* vertices, Vector3& point);
 // it's hard to say which one of the previous two is faster
-float getDistanceToAnEdgeSq(Edge* vertices, Vector3& point);
-float getDistanceToAPrimitiveSq(Primitive& primitive, Vector3& point);
+double getDistanceToAnEdgeSq(Edge* vertices, Vector3& point);
+double getDistanceToAPrimitiveSq(Primitive& primitive, Vector3& point);
 
 Vector3 getClosestPtOnATriangle(Tri* vertices, Vector3& point);
 Vector3 getClosestPtOnAnEdge(Edge* vertices, Vector3& point);

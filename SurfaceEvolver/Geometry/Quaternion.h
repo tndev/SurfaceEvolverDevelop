@@ -11,26 +11,26 @@ class Vector3;
 class Quaternion
 {
 public:
-	float x, y, z, w;
+	double x, y, z, w;
 
 	Quaternion();
 	Quaternion(const Quaternion& other);
-	Quaternion(float x, float y, float z, float w);
+	Quaternion(double x, double y, double z, double w);
 	~Quaternion();
 
-	void set(float x, float y, float z, float w);
+	void set(double x, double y, double z, double w);
 
-	float lengthSq();
-	float length();
-	float dot(Quaternion& q);
-	float angleTo(Quaternion& q);
+	double lengthSq();
+	double length();
+	double dot(Quaternion& q);
+	double angleTo(Quaternion& q);
 
 	void conjugate();
 	void normalize();
 
-	void setFromAxisAngle(Vector3* axis, float angle);
+	void setFromAxisAngle(Vector3* axis, double angle);
 	void setFromRotationMatrix(Matrix4* m);
-	Quaternion setFromAxisAngleAndReturn(Vector3* axis, float angle);
+	Quaternion setFromAxisAngleAndReturn(Vector3* axis, double angle);
 	Quaternion setFromRotationMatrixAndReturn(Matrix4* m);
 	void multiplyQuaternions(Quaternion& a, Quaternion& b);
 	void multiply(Quaternion& q);
@@ -40,6 +40,6 @@ public:
 Quaternion conjugate(Quaternion& q);
 Quaternion multiply(Quaternion& a, Quaternion& b);
 Quaternion normalize(Quaternion& q);
-float clamp(float v, float lo, float hi);
+double clamp(double v, double lo, double hi);
 
 #endif

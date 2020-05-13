@@ -30,8 +30,8 @@ void FastSweep3D::sweep(bool saveGridStates)
 {
 	const uint Nx = grid->Nx, Ny = grid->Ny, Nz = grid->Nz;
 	int s, ix, iy, iz, gridPos;
-	float aa[3], tmp, eps = 1e-6;
-	float d_curr, d_new, a, b, c, D;
+	double aa[3], tmp, eps = 1e-6;
+	double d_curr, d_new, a, b, c, D;
 
 	// sweep directions { start, end, step }
 	const int dirX[8][3] = { { 0, Nx - 1, 1 }, { Nx - 1, 0, -1 }, { Nx - 1, 0, -1 }, { Nx - 1, 0, -1 }, { Nx - 1, 0, -1 }, { 0, Nx - 1, 1 }, { 0, Nx - 1, 1 }, { 0, Nx - 1, 1 } };
@@ -99,21 +99,21 @@ void FastSweep3D::sweep(bool saveGridStates)
 							d_new = d_curr;
 						}
 						else {
-							a = 2.0f; b = -2.0f * (aa[0] + aa[1]);
+							a = 2.0; b = -2.0 * (aa[0] + aa[1]);
 							c = aa[0] * aa[0] + aa[1] * aa[1] - h * h * f * f;
-							D = sqrt(b * b - 4.0f * a * c);
+							D = sqrt(b * b - 4.0 * a * c);
 
-							d_curr = ((-b + D) > (-b - D) ? (-b + D) : (-b - D)) / (2.0f * a);
+							d_curr = ((-b + D) > (-b - D) ? (-b + D) : (-b - D)) / (2.0 * a);
 
 							if (d_curr <= (aa[2] + eps))
 								d_new = d_curr;
 							else {
-								a = 3.0f;
-								b = -2.0f * (aa[0] + aa[1] + aa[2]);
+								a = 3.0;
+								b = -2.0 * (aa[0] + aa[1] + aa[2]);
 								c = aa[0] * aa[0] + aa[1] * aa[1] + aa[2] * aa[2] - h * h * f * f;
-								D = sqrt(b * b - 4.0f * a * c);
+								D = sqrt(b * b - 4.0 * a * c);
 
-								d_new = ((-b + D) > (-b - D) ? (-b + D) : (-b - D)) / (2.0f * a);
+								d_new = ((-b + D) > (-b - D) ? (-b + D) : (-b - D)) / (2.0 * a);
 							}
 						}
 
