@@ -44,7 +44,7 @@ public:
 		bool isALeaf();
 		bool isALeafWithPrimitives();
 
-		float getSplitPosition(std::vector<uint>& primitiveIds, std::vector<uint>* out_left, std::vector<uint>* out_right);
+		double getSplitPosition(std::vector<uint>& primitiveIds, std::vector<uint>* out_left, std::vector<uint>* out_right);
 		float getAdaptivelyResampledSplitPosition(std::vector<uint>& primitiveIds, std::vector<uint>* out_left, std::vector<uint>* out_right);
 		float getCostEstimate(float splitPos, uint nLeft, uint nRight);
 		bool hasEnoughBranching(size_t nLeftPrims, size_t nRightPrims, size_t nPrims);

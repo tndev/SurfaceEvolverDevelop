@@ -34,6 +34,11 @@ Vector3::~Vector3()
 {
 }
 
+Vector3 Vector3::clone()
+{
+	return *this;
+}
+
 void Vector3::set(double x, double y, double z)
 {
 	this->x = x; this->y = y; this->z = z;
@@ -130,7 +135,7 @@ void Vector3::toArray(double* a)
 	a[2] = z;
 }
 
-void Vector3::applyQuaternion(Quaternion& q)
+Vector3& Vector3::applyQuaternion(Quaternion& q)
 {
 	// calculate quat * vector
 
@@ -144,15 +149,18 @@ void Vector3::applyQuaternion(Quaternion& q)
 	this->x = ix * q.w + iw * -q.x + iy * -q.z - iz * -q.y;
 	this->y = iy * q.w + iw * -q.y + iz * -q.x - ix * -q.z;
 	this->z = iz * q.w + iw * -q.z + ix * -q.y - iy * -q.x;
+
+	return *this;
 }
 
-void Vector3::applyAxisAngle(Vector3& axis, double angle)
+Vector3& Vector3::applyAxisAngle(Vector3& axis, double angle)
 {
 	Quaternion q = Quaternion().setFromAxisAngleAndReturn(&axis, angle);
 	applyQuaternion(q);
+	return *this;
 }
 
-void Vector3::applyMatrix4(Matrix4& m)
+Vector3& Vector3::applyMatrix4(Matrix4& m)
 {
 	Vector3 a = *this;
 	double* e = m.elements;
@@ -161,6 +169,7 @@ void Vector3::applyMatrix4(Matrix4& m)
 	this->x = (e[0] * a.x + e[1] * a.y + e[2] * a.z + e[3]) * w;
 	this->y = (e[4] * a.x + e[5] * a.y + e[6] * a.z + e[7]) * w;
 	this->z = (e[8] * a.x + e[9] * a.y + e[10] * a.z + e[11]) * w;
+	return *this;
 }
 
 void Vector3::normalize()
@@ -239,27 +248,38 @@ bool notEqual(Vector3& a, Vector3& b)
 	return !a.equals(b);
 }
 
-void Vector3::applyMatrix3(Matrix3& m)
+Vector3& Vector3::applyMatrix3(Matrix3& m)
 {
 	Vector3 a = *this;
 	double* e = m.elements;
 	this->x = e[0] * x + e[3] * y + e[6] * z;
 	this->y = e[1] * x + e[4] * y + e[7] * z;
 	this->z = e[2] * x + e[5] * y + e[8] * z;
+	return *this;
 }
 
-void Vector3::addScalar(double scalar)
+Vector3& Vector3::addScalar(double scalar)
 {
 	this->x += scalar;
 	this->y += scalar;
 	this->z += scalar;
+	return *this;
 }
 
-void Vector3::multiply(Vector3& other)
+Vector3& Vector3::subScalar(double scalar)
+{
+	this->x -= scalar;
+	this->y -= scalar;
+	this->z -= scalar;
+	return *this;
+}
+
+Vector3& Vector3::multiply(Vector3& other)
 {
 	this->x *= other.x;
 	this->y *= other.y;
 	this->z *= other.z;
+	return *this;
 }
 
 Vector3 Vector3::operator+(Vector3 other)

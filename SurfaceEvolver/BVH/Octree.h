@@ -59,7 +59,7 @@ public:
 	Octree();
 	// expecting a constructed AABBTree for fast lookup
 	Octree(const Octree& other);
-	Octree(AABBTree* aabbTree, Box3 bbox, uint resolution);
+	Octree(AABBTree* aabbTree, Box3& bbox, double leafSize);
 	~Octree();
 
 	void getAllNodes(std::vector<OctreeNode>* nodeBuffer);

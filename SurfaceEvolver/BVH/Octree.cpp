@@ -190,22 +190,27 @@ Octree::Octree(const Octree& other)
 	nodeCount = other.nodeCount;
 }
 
-Octree::Octree(AABBTree* aabbTree, Box3 bbox, uint resolution)
-{
+Octree::Octree(AABBTree* aabbTree, Box3& bbox, double leafSize) {
+
 	this->bbox = bbox;
-	Vector3 size = bbox.getSize();
-	double maxDim = std::max({ size.x, size.y, size.z });
+	//this->bbox.expandByFactor(1.1);
+	Vector3 boxCenter = bbox.getCenter();
 
-	// this cube box will be subdivided
-	Box3 cubeBox = Box3(bbox.min, bbox.min + Vector3(maxDim, maxDim, maxDim));
-	cubeBox.expandByFactor(1.1);
-	this->bbox.expandByFactor(1.1);
+	Vector3 gridCenterMin = Vector3(std::floor(boxCenter.x / leafSize - 0.5), std::floor(boxCenter.y / leafSize - 0.5), std::floor(boxCenter.z / leafSize - 0.5));
+	Vector3 gridCenterMax = Vector3(std::ceil(boxCenter.x / leafSize - 0.5), std::ceil(boxCenter.y / leafSize - 0.5), std::ceil(boxCenter.z / leafSize - 0.5));
+	Vector3 newGridCenter = (gridCenterMin + gridCenterMax) * leafSize / 2.0;
 
-	this->leafSize = maxDim / resolution;
-	this->cubeBox = cubeBox;
-	this->aabbTree = aabbTree; // for fast lookup
+	Vector3 boxSize = bbox.getSize();
+	double maxDim = std::max({ boxSize.x, boxSize.y, boxSize.z });
+	depth = std::floor(log2(maxDim / leafSize));
+	double boxHalfDim = pow(2, depth) * leafSize;
 
-	this->root = new OctreeNode(this, this->cubeBox);
+	cubeBox = Box3(newGridCenter.clone().subScalar(boxHalfDim), newGridCenter.clone().addScalar(boxHalfDim));
+
+	this->leafSize = leafSize;
+	this->aabbTree = aabbTree;
+
+	root = new OctreeNode(this, cubeBox);
 }
 
 Octree::~Octree()

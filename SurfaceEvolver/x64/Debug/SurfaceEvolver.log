@@ -1,7 +1,7 @@
-﻿  main.cpp
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\poly2tri\sweep\sweep_context.h(161,24): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.h(211,23): warning C4267: 'return': conversion from 'size_t' to 'unsigned int', possible loss of data
-D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\SurfaceEvolver\Main\main.cpp(182,12): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+﻿  Octree.cpp
+D:\VS_Projects\SurfaceEvolverDevelop\SurfaceEvolver\poly2tri\sweep\sweep_context.h(161,24): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+D:\VS_Projects\SurfaceEvolverDevelop\SurfaceEvolver\BVH\Octree.cpp(46,18): warning C4553: '==': result of expression not used; did you intend '='?
+D:\VS_Projects\SurfaceEvolverDevelop\SurfaceEvolver\BVH\Octree.cpp(205,20): warning C4244: '=': conversion from 'double' to 'unsigned int', possible loss of data
 LINK : warning LNK4075: ignoring '/INCREMENTAL' due to '/PROFILE' specification
 AABBTree.obj : warning LNK4075: ignoring '/EDITANDCONTINUE' due to '/OPT:REF' specification
-  SurfaceEvolver.vcxproj -> D:\VS Projects\SurfaceEvolver\SurfaceEvolverDevelop\x64\Debug\SurfaceEvolver.exe
+  SurfaceEvolver.vcxproj -> D:\VS_Projects\SurfaceEvolverDevelop\x64\Debug\SurfaceEvolver.exe

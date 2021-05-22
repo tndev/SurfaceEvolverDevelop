@@ -731,67 +731,137 @@ void AABBTree::AABBNode::construct(std::vector<uint>* primitiveIds, uint depthLe
 	}
 }
 
-float AABBTree::AABBNode::getSplitPosition(std::vector<uint>& primitiveIds, std::vector<uint>* out_left, std::vector<uint>* out_right)
+// find an optimal split position using an "Adaptive Error-Bounded Heuristic" (Hunt, Mark, Stoll)
+double AABBTree::AABBNode::getSplitPosition(std::vector<uint>& primitiveIds, std::vector<uint>* out_left, std::vector<uint>* out_right)
 {
-	const uint CUTS = 8; uint i, j;
-	float* splitPositions = new float[CUTS];
-	float* splitsLeft = new float[CUTS];
-	float* splitsRight = new float[CUTS];
+	const double tot_BoxArea = 2.0 * (this->bbox.max.x - this->bbox.min.x) +
+		2.0 * (this->bbox.max.y - this->bbox.min.y) +
+		2.0 * (this->bbox.max.z - this->bbox.min.z);
+	const uint CUTS = 4;
+	const uint N_primitives = primitiveIds.size();
+	uint i, j;
+
+	// === Stage 1: Initial sampling of C_L(x) and C_R(x) ========================================================
+
+	// split interval limits:
+	const double a = bbox.min.getCoordById(axis);
+	const double b = bbox.max.getCoordById(axis);
+
+	// splits:
+	std::vector<double> bCutPos = std::vector<double>(CUTS + 2);
+	for (i = 0; i <= CUTS + 1; i++) bCutPos[i] = a * (1.0 - ((double)i / (double)(CUTS + 1))) + b * ((double)i / (double)(CUTS + 1));
+
+	// set C_L(x) = 0, C_R(x) = 0
+	auto C_L = std::vector<uint>(CUTS + 2);
+	auto C_R = std::vector<uint>(CUTS + 2);
+
+	auto primMins = std::vector<double>(N_primitives);
+	auto primMaxes = std::vector<double>(N_primitives);
+
+	for (i = 0; i < N_primitives; i++) {
+		primMins[i] = this->tree->primitives[primitiveIds[i]].getMinById(this->axis);
+		primMaxes[i] = this->tree->primitives[primitiveIds[i]].getMaxById(this->axis);
+
+		for (j = 1; j <= CUTS; j++) {
+			C_L[j] += (primMins[i] < bCutPos[j] ? 1 : 0);
+			C_R[j] += (primMaxes[i] > bCutPos[j] ? 1 : 0);
+		}
+	}
+	C_L[5] = C_R[0] = N_primitives;
+	std::reverse(C_R.begin(), C_R.end()); // store in reverse since C_R(x) is non-increasing
+
+	// ===== Stage 2: Sample range [0, N_primitives] uniformly & count the number of samples within each segment ======
+
+	auto S_L = std::vector<double>(CUTS + 1);
+	auto S_R = std::vector<double>(CUTS + 1);
+
+	double ran_s;
 
 	for (i = 0; i < CUTS; i++) {
-		splitPositions[i] = 
-			bbox.min.getCoordById(axis) * (1.0f - ((float)(i + 1) / (float)(CUTS + 1.0f))) +
-			bbox.max.getCoordById(axis) * ((float)(i + 1) / (float)(CUTS + 1.0f));
-		splitsLeft[i] = 0.0f;
-		splitsRight[i] = 0.0f;
+		ran_s = (double)(i + 1) / (double)(CUTS + 1) * N_primitives;
+
+		for (j = 0; j <= CUTS; j++) {
+			S_L[j] += (ran_s > C_L[j] && ran_s < C_L[j + 1] ? 1 : 0);
+			S_R[j] += (ran_s > C_R[j] && ran_s < C_R[j + 1] ? 1 : 0);
+		}
 	}
+	std::reverse(S_R.begin(), S_R.end());
 
-	float min, max;
+	// ==== Stage 3: add more sampling positions to subdivided segments ===========================================
 
-	// count triangles for each split, we don't want to fill arrays here (lot of wasted cycles and memory ops)
-	for (i = 0; i < primitiveIds.size(); i++) {
-		min = this->tree->primitives[primitiveIds[i]].getMinById(axis);
-		max = this->tree->primitives[primitiveIds[i]].getMaxById(axis);
+	auto all_splt_L = std::vector<double>(2 * CUTS);
+	auto all_splt_R = std::vector<double>(2 * CUTS);
+	double segLen = (double)(b - a) / (double)(CUTS + 1);
+	uint nSeg_L = 0, nSeg_R = 0;
 
-		for (j = 0; j < CUTS; j++) {
-			if (min <= splitPositions[j]) {
-				++splitsLeft[j];
-			}
-			if (max >= splitPositions[j]) {
-				++splitsRight[j];
-			}
+	for (i = 0; i <= CUTS; i++) {
+		if (i > 0) {
+			all_splt_L[nSeg_L++] = bCutPos[i];
+			all_splt_R[nSeg_R++] = bCutPos[i];
+		}
+		for (j = 0; j < S_L[i]; j++) {
+			all_splt_L[nSeg_L++] = bCutPos[i] + (j + 1) / (S_L[i] + 1) * segLen;
+		}
+		for (j = 0; j < S_R[i]; j++) {
+			all_splt_R[nSeg_R++] = bCutPos[i] + (j + 1) / (S_R[i] + 1) * segLen;
 		}
 	}
 
-	// pick the best split location
-	float bestCost = FLT_MAX;
-	float bestSplitPosition = bbox.min.getCoordById(axis) * 0.5f + bbox.max.getCoordById(axis) * 0.5f;
-	for (i = 0; i < CUTS; i++) {
-		float cost = getCostEstimate(splitPositions[i], splitsLeft[i], splitsRight[i]);
-		if (cost < bestCost) {
-			bestCost = cost;
-			bestSplitPosition = splitPositions[i];
+	// Compute surface area heuristic SAH:
+	// remaining two dimensions of the child box candidates
+	const double boxDim0 = bbox.min.getCoordById((this->axis + 1) % 3) - bbox.min.getCoordById((this->axis + 1) % 3);
+	const double boxDim1 = bbox.min.getCoordById((this->axis + 2) % 3) - bbox.min.getCoordById((this->axis + 2) % 3);
+
+	auto SA_L = std::vector<double>(2 * CUTS);
+	auto SA_R = std::vector<double>(2 * CUTS);
+
+	// SA_L(x) = (boxDim_L(x) + boxDim0 + boxDim1) * 2.0 / tot_BoxArea
+	// SA_R(x) = (boxDim_R(x) + boxDim0 + boxDim1) * 2.0 / tot_BoxArea
+
+	for (i = 0; i < 2 * CUTS; i++) {
+		SA_L[i] = ((all_splt_L[i] - a) + boxDim0 + boxDim1) * 2.0 / tot_BoxArea;
+		SA_R[i] = ((b - all_splt_R[i]) + boxDim0 + boxDim1) * 2.0 / tot_BoxArea;
+	}
+
+	// ==== Stage 4: RESAMPLE C_L and C_R on all sample points & construct an approximation of cost(x) to minimize
+	double min, max;
+	auto cost = std::vector<double>(2 * CUTS);
+
+	// cost(x) = C_L(x) * SA_L(x) + C_R(x) * SA_R(x):
+	for (i = 0; i < N_primitives; i++) {
+		min = primMins[i];
+		max = primMaxes[i];
+
+		for (j = 0; j < 2 * CUTS; j++) {
+			cost[j] += (min < all_splt_L[j] ? 1 : 0) * SA_L[j] + (max > all_splt_R[j] ? 1 : 0)* SA_R[j];
 		}
 	}
 
-	// fill left and right arrays now that best split position is known
-	for (i = 0; i < primitiveIds.size(); i++) {
-		float min = this->tree->primitives[primitiveIds[i]].getMinById(axis);
-		float max = this->tree->primitives[primitiveIds[i]].getMaxById(axis);
+	// ==== Stage 5: Minimize cost(x) & classify primitives  =====================================================
 
-		if (min <= bestSplitPosition) {
+	double bestSplit, minCost = DBL_MAX;
+
+	for (i = 1; i < 2 * CUTS; i++) {
+		if (cost[i] < minCost) {
+			minCost = cost[i];
+			bestSplit = all_splt_L[i];
+		}
+	}
+
+	// fill left and right arrays now that best split position is known:
+	for (i = 0; i < N_primitives; i++) {
+		min = primMins[i];
+		max = primMaxes[i];
+
+		if (min <= bestSplit) {
 			out_left->push_back(primitiveIds[i]);
 		}
-		if (max >= bestSplitPosition) {
+		if (max >= bestSplit) {
 			out_right->push_back(primitiveIds[i]);
 		}
 	}
 
-	delete[] splitsLeft;
-	delete[] splitsRight;
-	delete[] splitPositions;
-
-	return bestSplitPosition;
+	return bestSplit;
 }
 
 // ============ Adaptive resampling helper macros ============

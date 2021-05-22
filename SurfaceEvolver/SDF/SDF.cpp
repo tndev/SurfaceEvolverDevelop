@@ -43,7 +43,8 @@ SDF::SDF(Geometry* geom, uint resolution, bool computeSign, bool computeGradient
 			this->octree = new Octree(this->tri_aabb, this->tri_aabb->bbox, this->resolution_limit);
 		}
 		else {
-			this->octree = new Octree(this->tri_aabb, this->tri_aabb->bbox, resolution);
+			double leafSize = this->tri_aabb->bbox.getSize().x / resolution;
+			this->octree = new Octree(this->tri_aabb, this->tri_aabb->bbox, leafSize);
 		}		
 
 		auto endSDF_Octree = std::chrono::high_resolution_clock::now();

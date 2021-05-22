@@ -162,6 +162,35 @@ void performSDFTest(uint res, Geometry& g, std::fstream& timing, VTKExporter& e)
 	AABBerror.exportToVTI("voxField_" + g.name + std::to_string(res) + "AABB_ERROR");
 }
 
+void PerformFastSweepSdfTestForObjModel(const std::string& fileName, const uint& targetGridResolution)
+{
+	std::fstream timing(fileName + "_" + std::to_string(targetGridResolution) + ".txt", std::fstream::out);
+
+	OBJImporter importer;
+	Geometry geom = importer.importOBJGeometry(fileName);
+
+	const uint octreeResolution = targetGridResolution;
+
+	const bool computeSign = true;
+	const bool notComputeGradient = false;
+	const bool notSaveGridStates = false;
+	const bool notScaleAndInterpolate = false;
+
+	SDF sdf_FS_r = SDF(&geom, octreeResolution, 
+		computeSign, notComputeGradient, notSaveGridStates, notScaleAndInterpolate, 
+		SDF_Method::fast_sweeping);
+
+	std::cout << sdf_FS_r.getComputationProperties();
+	timing << sdf_FS_r.getComputationProperties();
+
+	VTKExporter e;
+	std::cout << "Exporting to VTI: " << std::endl;
+	sdf_FS_r.exportGrid(&e, fileName + "_" + std::to_string(targetGridResolution)); // save to vti
+	std::cout << "... done" << std::endl;
+
+	timing.close();
+}
+
 
 void performUnitSphereTest(bool tan_redistribute = false) {
 	EvolutionParams eParams;
@@ -323,7 +352,7 @@ int main()
 
 	// ===== BUNNY SDF tests =============================
 
-	/**/
+	/*
 	uint res = 40; // octree resolution
 
 	// Vector3 axis = normalize(Vector3(1, 1, 1));
@@ -342,13 +371,13 @@ int main()
 	
 	SDF bunny_sdf = SDF(&bunny, res, true);
 
-	std::cout << bunny_sdf.getComputationProperties();
+	std::cout << bunny_sdf.getComputationProperties();*/
 
 	// bunny_sdf.exportGrid(&e, "bunnySDF");
 	// bunny_sdf.exportGradientField(&e, "bunnySDF_grad");
 
 	// ====== BUNNY Evolution =============================
-	EvolutionParams eParams;
+	/* EvolutionParams eParams;
 	eParams.name = "Bunny";
 	eParams.dt = 0.02; eParams.NSteps = 200; eParams.subdiv = (uint)3; eParams.elType = ElementType::tri;
 	eParams.saveStates = true; eParams.printStepOutput = true; eParams.writeTimeLog = true;
@@ -367,7 +396,7 @@ int main()
 	tRedistParams.omega_angle = 3.0;
 	//tRedistParams.saveTangentialVelocityStates = true;
 
-	Evolver evolver(eParams, mcfParams, sdfParams, &tRedistParams);
+	Evolver evolver(eParams, mcfParams, sdfParams, &tRedistParams); */
 
 	// cube with holes
 	/*
@@ -711,6 +740,8 @@ int main()
 
 	error = bunnySDF_Error.getL2Norm();
 	std::cout << "FS_ERROR L2 Norm: " << error << std::endl; */
+
+	PerformFastSweepSdfTestForObjModel("./TestModels/armadillo.obj", 80);
 
 	return 1;
 }

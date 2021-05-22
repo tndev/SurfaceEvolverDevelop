@@ -1,0 +1,6 @@
+=== ./TestModels/armadillo === 
+verts: 49990, triangles: 99976, octree resolution: 80^3, grid resolution: 169^3 
+computation times:  AABBTree: 0.916575 s, Octree: (build: 0.816988 s, get_leaves: 0.004840 s), FastSweep3D: 0.977103 s, 
+grid sign computation: 5.257004s
+====> TOTAL: 8.347978 s
+

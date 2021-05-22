@@ -19,6 +19,8 @@ public:
 	Vector3(double v[3]);
 	~Vector3();
 
+	Vector3 clone();
+
 	void set(double x, double y, double z);
 	Vector3 setAndReturn(double x, double y, double z);
 	void setCoordById(double val, unsigned int id);
@@ -40,12 +42,13 @@ public:
 
 	void toArray(double* a);
 
-	void applyQuaternion(Quaternion& q);
-	void applyAxisAngle(Vector3& axis, double angle);
-	void applyMatrix4(Matrix4& m);
-	void applyMatrix3(Matrix3& m);
-	void addScalar(double scalar);
-	void multiply(Vector3& other);
+	Vector3& applyQuaternion(Quaternion& q);
+	Vector3& applyAxisAngle(Vector3& axis, double angle);
+	Vector3& applyMatrix4(Matrix4& m);
+	Vector3& applyMatrix3(Matrix3& m);
+	Vector3& addScalar(double scalar);
+	Vector3& subScalar(double scalar);
+	Vector3& multiply(Vector3& other);
 
 	Vector3 operator+ (Vector3 other);
 	Vector3 operator- (Vector3 other);
