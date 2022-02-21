@@ -22,9 +22,8 @@ class AABBTree
 {
 public:
 	struct AABBNode {
-		AABBNode* parent = nullptr;
-		AABBNode* left = nullptr;
-		AABBNode* right = nullptr;
+		std::shared_ptr<AABBNode> left = nullptr;
+		std::shared_ptr<AABBNode> right = nullptr;
 
 		AABBTree* tree = nullptr;
 
@@ -35,22 +34,27 @@ public:
 
 		std::vector<uint> primitiveIds = {};
 
-		AABBNode();
+		AABBNode() = default;
 		AABBNode(const AABBNode& other);
-		AABBNode(std::vector<uint>* primitiveIds, Box3& bbox, AABBTree* tree, uint depthLeft = MAX_DEPTH, AABBNode* parent = nullptr);
-		~AABBNode();
+		AABBNode(const std::vector<uint>& primitiveIds, const Box3& bbox, AABBTree* tree, uint depthLeft);
+		~AABBNode() = default;
 
-		void construct(std::vector<uint>* primitiveIds, uint depthLeft);
+		void construct(const std::vector<uint>& primitiveIds, uint depthLeft);
 		bool isALeaf();
 		bool isALeafWithPrimitives();
 
-		double getSplitPosition(std::vector<uint>& primitiveIds, std::vector<uint>* out_left, std::vector<uint>* out_right);
-		float getAdaptivelyResampledSplitPosition(std::vector<uint>& primitiveIds, std::vector<uint>* out_left, std::vector<uint>* out_right);
+		double getSplitPosition(const std::vector<uint>& primitiveIds, std::vector<uint>& out_left, std::vector<uint>& out_right);
+		float getAdaptivelyResampledSplitPosition(const std::vector<uint>& primitiveIds, std::vector<uint>& out_left, std::vector<uint>& out_right);
 		float getCostEstimate(float splitPos, uint nLeft, uint nRight);
 		bool hasEnoughBranching(size_t nLeftPrims, size_t nRightPrims, size_t nPrims);
-		void filterPrimitives();  // returns only primitives which actually intersect leaf box
+		void filterPrimitives();  // filters only primitives which actually intersect leaf box
 
 		void applyMatrix(Matrix4& m);
+
+		bool useIntrinscs() const
+		{
+			return tree->useIntrinsics;
+		}
 	};
 
 	struct AABBRay {
@@ -74,15 +78,15 @@ public:
 	PrimitiveType type = PrimitiveType::tri;
 
 	std::vector<Primitive> primitives = {};
-	AABBNode* root = nullptr;
-	Geometry* geom = nullptr;
+	std::shared_ptr<AABBNode> root = nullptr;
+	std::shared_ptr<Geometry> geom = nullptr;
 
-	AABBTree();
+	AABBTree() = default;
 	AABBTree(const AABBTree& other);
-	AABBTree(Geometry* geom, PrimitiveType type = PrimitiveType::tri);
-	~AABBTree();
+	AABBTree(const Geometry& geom, PrimitiveType type = PrimitiveType::tri);
+	~AABBTree() = default;
 
-	
+	bool useIntrinsics = true;
 
 	uint getDepth();
 

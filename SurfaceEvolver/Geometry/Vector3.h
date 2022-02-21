@@ -32,13 +32,13 @@ public:
 	bool equalsWithEpsilon(Vector3 other, double epsilon);
 
 	void negate();
-	double dot(Vector3 other);
+	double dot(const Vector3& other) const;
 	void normalize();
 	void lerp(Vector3 other, double param);
 	Vector3 cross(Vector3 other);
 
-	double lengthSq();
-	double length();
+	double lengthSq() const;
+	double length() const;
 
 	void toArray(double* a);
 
@@ -50,10 +50,14 @@ public:
 	Vector3& subScalar(double scalar);
 	Vector3& multiply(Vector3& other);
 
-	Vector3 operator+ (Vector3 other);
-	Vector3 operator- (Vector3 other);
+	double angleTo(const Vector3& other) const;
+
+	Vector3 operator+ (Vector3& other);
+	Vector3 operator- (Vector3& other);
 	Vector3 operator* (double scalar);
 	Vector3 operator/ (double scalar);
+	Vector3 operator+ (const Vector3& other) const;
+	Vector3 operator- (const Vector3& other) const;
 	friend Vector3 operator* (Matrix3 m, Vector3 a);
 	friend Vector3 operator* (Matrix4 m, Vector3 a);
 	friend Vector3 operator* (double scalar, Vector3 a);

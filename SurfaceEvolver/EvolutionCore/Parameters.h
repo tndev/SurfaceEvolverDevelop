@@ -16,8 +16,10 @@ struct EvolutionParams {
 	int NSteps = 10;
 	unsigned int subdiv = 2;
 	ElementType elType = ElementType::tri;
+	double scale = 1.0;
 
 	std::string name = "Sphere";
+	std::string outputPath = "";
 
 	Geometry* sourceGeometry = nullptr;
 
@@ -86,8 +88,18 @@ struct TangentialRedistParams {
 	double omega_angle = 2.0;
 
 	// ===== Redistribution type =======
-	int type = 0; // -1 - none, 0 - angle-based, 1 - volume-based, 2 - length-based
-
+	/*
+	-1 - none,
+	 0 - angle-based,
+	 1 - volume-based,
+	 2 - Smith BET,
+	 3 - both 1 and 2,
+	 4 - both 0 and 2,
+	 5 - vector to smallest angle
+	 6 - body 0 and 1
+	*/
+	int type = 0;
+	
 	// ===== output flags ======
 	bool saveTangentialVelocityStates = false;
 	// ================

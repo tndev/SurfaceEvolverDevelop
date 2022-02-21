@@ -99,13 +99,13 @@ void Evolver::evolve()
 
 	uint TSteps = (smoothing_flag ? smoothSteps : NSteps);
 
-	if (redistribution_type > 0) {
-		psi_log = std::fstream(geomName + "_psiLog.txt", std::fstream::out);
-		psi_Sys_log = std::fstream(geomName + "_psiSysLog.txt", std::fstream::out);
-		sum_rhs_log = std::fstream(geomName + "_psiRhsSums.txt", std::fstream::out);
+	if (redistribution_type == 1) {
+		psi_log = std::fstream(targetPath + geomName + "_psiLog.txt", std::fstream::out);
+		psi_Sys_log = std::fstream(targetPath + geomName + "_psiSysLog.txt", std::fstream::out);
+		sum_rhs_log = std::fstream(targetPath + geomName + "_psiRhsSums.txt", std::fstream::out);
 		psi_log << "psi values:\n";
 		psi_Sys_log << "psi sys matrix & rhs\n";
-		sum_rhs_log << "======= RHS sums for " << NSteps << " ste[s\n";
+		sum_rhs_log << "======= RHS sums for " << NSteps << " steps\n";
 	}
 
 	for (int ti = tBegin; ti < tBegin + TSteps; ti++) {
@@ -142,7 +142,7 @@ void Evolver::evolve()
 
 		
 		// <======== T A N G E N T I A L   R E D I S T R I B U T I O N ===========
-		if (redistribution_type > 0) {
+		if (redistribution_type == 1 || redistribution_type == 3 || redistribution_type == 6) {
 			this->initSystem(); // prep linear system of dim NVerts * NVerts
 			if (this->elType == ElementType::tri) {
 				this->getTriangleRedistributionSystem();
@@ -330,7 +330,7 @@ void Evolver::evolve()
 		if (writeTimeLog) timingLog << total_time_message;
 	}
 
-	if (redistribution_type > 0) {
+	if (redistribution_type == 1) {
 		psi_log.close();
 		psi_Sys_log.close();
 		sum_rhs_log.close();
@@ -430,6 +430,32 @@ Vector3 Evolver::getAngleTangentialVelocityForVertex(Vector3& V, uint i)
 	vTanResult *= (omega_angle / m);
 
 	return vTanResult - dot(vTanResult, vNormals[i]) * vNormals[i];
+}
+
+Vector3 Evolver::getSmithBETangentialVelocityForVertex(Vector3& V, uint i)
+{
+	const size_t m = adjacentPolys[i].size();
+
+	Vector3 neighborhoodMeanVertex{};
+
+	for (uint p = 0; p < m; p++) {
+		// rays to neighboring vertices:
+		Vector3* F1 = &evolvedSurface->uniqueVertices[adjacentPolys[i][p][1]];
+
+		// rays to neighboring vertices:
+		Vector3 edge0 = V + normalize(*F1 - V);
+
+		neighborhoodMeanVertex += edge0;
+	}
+
+	neighborhoodMeanVertex *= (1.0 / m);
+	const auto vToMeanVertex = neighborhoodMeanVertex - V;
+	const auto vNormal = vNormals[i];
+	const double dotProd = dot(vToMeanVertex, vNormal);
+	const auto vNormalUpdate = dotProd * vNormal;
+	const auto vResultTanVelocity = vToMeanVertex - vNormalUpdate;
+
+	return vResultTanVelocity;
 }
 
 void Evolver::saveFVAreaScalars()
@@ -624,8 +650,40 @@ double Evolver::tangentialRedistDecayFunction(double& SDF_V)
 
 double Evolver::tangentialRedistCurvatureFunction(double& H)
 {
-	return exp(- H * H / 100);
-	// return 1.0;
+	return exp(-H * H);
+}
+
+Vector3 Evolver::getVectorToSmallestAngle(uint i)
+{
+	const auto& V = evolvedSurface->uniqueVertices[i]; // current vertex
+	const size_t m = adjacentPolys[i].size();
+
+	double minAngle = DBL_MAX;
+	Vector3 result;
+
+	for (uint p = 0; p < m; p++) {
+		const auto& adjacentPoly = adjacentPolys[i][p];
+
+		const auto& v0 = evolvedSurface->uniqueVertices[adjacentPoly[0]];
+		const auto& v1 = evolvedSurface->uniqueVertices[adjacentPoly[1]];
+		const auto& v2 = evolvedSurface->uniqueVertices[adjacentPoly[2]];
+
+		const auto e01 = v1 - v0;
+		const auto e02 = v2 - v0;
+
+		const double angle0 = e01.angleTo(e02);
+		if (angle0 < minAngle)
+		{
+			minAngle = angle0;
+			result.set(
+				v0.x - (v1.x + v2.x) / 2.0,
+				v0.y - (v1.y + v2.y) / 2.0,
+				v0.z - (v1.z + v2.z) / 2.0
+			);
+		}
+	}
+
+	return result;
 }
 
 void Evolver::computeSurfaceNormalsAndCoVolumes()
@@ -758,11 +816,54 @@ void Evolver::getTriangleEvolutionSystem(double smoothStep, double& meanArea)
 		// off-diag:
 		for (uint p = 0; p < m; p++) SysMatrix[i][adjacentPolys[i][p][1]] *= -(dt * eps) / coVolArea;
 
-		double rho = (!meanCurvatureFlow ? this->tangentialRedistCurvatureFunction(SDF_V) : 0.0);
+		double rho = (!meanCurvatureFlow ? this->tangentialRedistCurvatureFunction(vCurvatures[i]) : 0.0);
 		double beta = (redistribution_type > 0 ? 1.0 : 0.0);
 
 		// tangential redist:
-		Vector3 vT = (redistribution_type > -1 ? beta * getVolumeTangentialVelocityForVertex(Fi, i) + rho * getAngleTangentialVelocityForVertex(Fi, i) : Vector3());
+		Vector3 vT{};
+		if (redistribution_type == 0)
+		{
+			vT = rho * getAngleTangentialVelocityForVertex(Fi, i);
+		}
+		else if (redistribution_type == 1)
+		{
+			vT = beta * getVolumeTangentialVelocityForVertex(Fi, i);
+		}
+		else if (redistribution_type == 2)
+		{
+			vT = rho * getSmithBETangentialVelocityForVertex(Fi, i);
+		}
+		else if (redistribution_type == 3)
+		{
+			if (i % 2 == 0)
+			{
+				vT = rho * getSmithBETangentialVelocityForVertex(Fi, i);
+			}
+			else
+			{
+				vT = beta * getVolumeTangentialVelocityForVertex(Fi, i);
+			}
+		}
+		else if (redistribution_type == 4)
+		{			
+			vT = rho * getAngleTangentialVelocityForVertex(Fi, i) + rho * getSmithBETangentialVelocityForVertex(Fi, i);
+		}
+		else if (redistribution_type == 5)
+		{
+			vT = 0.1 * getVectorToSmallestAngle(i);
+		}
+		else if (redistribution_type == 6)
+		{
+			if (i % 2 == 0)
+			{
+				vT = rho * getAngleTangentialVelocityForVertex(Fi, i);
+			}
+			else
+			{
+				vT = beta * getVolumeTangentialVelocityForVertex(Fi, i);
+			}
+		}
+		
 		// overallTangentialVelocity += vT;
 		if (saveTangentialVelocityStates) vTangentialVelocities[i] = vT;
 
@@ -804,7 +905,8 @@ void Evolver::getQuadEvolutionSystem(double smoothStep, double& meanArea)
 		// SDF interpolation from values surrounding V
 		std::vector<Vector3> positionBuffer = {};
 		std::vector<double> valueBuffer = {};
-		double SDF_V, gradSDFx_V, gradSDFy_V, gradSDFz_V; Vector3 gradSDF_V = Vector3();
+		double SDF_V, gradSDFx_V, gradSDFy_V, gradSDFz_V;
+		Vector3 gradSDF_V = Vector3();
 
 		this->getInterpolatedSDFValuesforVertex(&Fi, &SDF_V, &gradSDF_V, positionBuffer, valueBuffer);
 
@@ -1038,21 +1140,21 @@ Vector3 Evolver::getVolumeTangentialVelocityForVertex(Vector3& V, uint i)
 void Evolver::openLogs()
 {
 	if (writeGenericLog) {
-		log = std::fstream(geomName + "_evolutionLog.txt", std::fstream::out);
+		log = std::fstream(targetPath + geomName + "_evolutionLog.txt", std::fstream::out);
 		log << log_header;
 	}
 
 	if (writeMeanAreaLog) {
-		meanAreaLog = std::fstream(geomName + "_meanAreaLog.txt", std::fstream::out);
+		meanAreaLog = std::fstream(targetPath + geomName + "_meanAreaLog.txt", std::fstream::out);
 	}
 
 	if (writeErrorLog) {
-		errorLog = std::fstream(geomName + "_errorLog(" + std::to_string(testId) + ").txt", std::fstream::out);
+		errorLog = std::fstream(targetPath + geomName + "_errorLog(" + std::to_string(testId) + ").txt", std::fstream::out);
 		errorLog << log_header;
 	}
 
 	if (writeTimeLog) {
-		timingLog = std::fstream(geomName + "_timingLog.txt", std::fstream::out);
+		timingLog = std::fstream(targetPath + geomName + "_timingLog.txt", std::fstream::out);
 		timingLog << log_header;
 	}
 }
@@ -1079,12 +1181,14 @@ void Evolver::updateGeometry(double* Fx, double* Fy, double* Fz)
 void Evolver::exportGeometry(int step)
 {
 	VTKExporter e = VTKExporter();
+	e.pathPrefix = targetPath;
 	e.initExport(evolvedSurface, geomName + (testId == -1 ? ""  : ("(" + std::to_string(testId) + ")")) + "_" + std::to_string(step));
 }
 
 void Evolver::exportResultGeometry(std::string suffix)
 {
 	VTKExporter e = VTKExporter();
+	e.pathPrefix = targetPath;
 	e.initExport(evolvedSurface, geomName + suffix);
 }
 
@@ -1151,6 +1255,12 @@ Evolver::Evolver(EvolutionParams& eParams, SphereTestParams& stParams, Tangentia
 		this->omega_angle = tanParams->omega_angle;
 		this->saveTangentialVelocityStates = tanParams->saveTangentialVelocityStates;
 	}
+
+	// target path
+	if (!eParams.outputPath.empty())
+	{
+		targetPath = eParams.outputPath;
+	}
 	// -----------------------------------------------------
 
 	this->init();
@@ -1216,6 +1326,12 @@ Evolver::Evolver(EvolutionParams& eParams, MeanCurvatureParams& mcfParams, GradD
 		this->omega_volume = tanParams->omega_volume;
 		this->omega_angle = tanParams->omega_angle;
 		this->saveTangentialVelocityStates = tanParams->saveTangentialVelocityStates;
+	}
+
+	// target path
+	if (!eParams.outputPath.empty())
+	{
+		targetPath = eParams.outputPath;
 	}
 	// -----------------------------------------------------
 

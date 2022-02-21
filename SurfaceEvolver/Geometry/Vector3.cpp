@@ -1,4 +1,7 @@
 #include "Vector3.h"
+
+#include <corecrt_math_defines.h>
+
 #include "Matrix4.h"
 #include "Quaternion.h"
 
@@ -113,17 +116,17 @@ void Vector3::negate()
 	this->z = -z;
 }
 
-double Vector3::dot(Vector3 other)
+double Vector3::dot(const Vector3& other) const
 {
 	return x * other.x + y * other.y + z * other.z;
 }
 
-double Vector3::lengthSq()
+double Vector3::lengthSq() const
 {
 	return x * x + y * y + z * z;
 }
 
-double Vector3::length()
+double Vector3::length() const
 {
 	return sqrt(lengthSq());
 }
@@ -282,12 +285,24 @@ Vector3& Vector3::multiply(Vector3& other)
 	return *this;
 }
 
-Vector3 Vector3::operator+(Vector3 other)
+double Vector3::angleTo(const Vector3& other) const
+{
+	const double den = sqrt(lengthSq() * other.lengthSq());
+
+	if (den < DBL_EPSILON)
+		return M_PI_2;
+
+	const double cosAngle = dot(other) / den;
+	
+	return acos(clamp(cosAngle, -1.0, 1.0));
+}
+
+Vector3 Vector3::operator+(Vector3& other)
 {
 	return Vector3(x + other.x, y + other.y, z + other.z);
 }
 
-Vector3 Vector3::operator-(Vector3 other)
+Vector3 Vector3::operator-(Vector3& other)
 {
 	return Vector3(x - other.x, y - other.y, z - other.z);
 }
@@ -300,6 +315,16 @@ Vector3 Vector3::operator*(double scalar)
 Vector3 Vector3::operator/(double scalar)
 {
 	return Vector3(x / scalar, y / scalar, z / scalar);
+}
+
+Vector3 Vector3::operator+(const Vector3& other) const
+{
+	return Vector3(x + other.x, y + other.y, z + other.z);
+}
+
+Vector3 Vector3::operator-(const Vector3& other) const
+{
+	return Vector3(x - other.x, y - other.y, z - other.z);
 }
 
 Vector3& Vector3::operator+=(const Vector3& other)

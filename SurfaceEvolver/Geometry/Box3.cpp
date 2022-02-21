@@ -20,7 +20,7 @@ Box3::Box3(const Box3& other)
 	this->max = other.max;
 }
 
-bool Box3::isEmpty()
+bool Box3::isEmpty() const
 {
 	return (
 		(this->min.x > FLT_MAX && this->min.y > FLT_MAX && this->min.z > FLT_MAX) && 
@@ -68,7 +68,7 @@ Vector3 Box3::getCenter()
 	return center;
 }
 
-Vector3 Box3::getSize()
+Vector3 Box3::getSize() const
 {
 	if (isEmpty()) {
 		return Vector3();

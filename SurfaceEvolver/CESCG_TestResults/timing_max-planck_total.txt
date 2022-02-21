@@ -1,0 +1,1 @@
+timingTotalMax-planckAMDRyzen = {0.550299, 0.763671};

@@ -1,9 +1,5 @@
 #include "FastSweep3D.h"
 
-FastSweep3D::FastSweep3D()
-{
-}
-
 FastSweep3D::FastSweep3D(const FastSweep3D& other)
 {
 	grid = other.grid;
@@ -12,7 +8,7 @@ FastSweep3D::FastSweep3D(const FastSweep3D& other)
 	Nsweeps = other.Nsweeps;
 }
 
-FastSweep3D::FastSweep3D(Grid* grid, uint Nsweeps, bool saveGridStates, bool blur)
+FastSweep3D::FastSweep3D(std::shared_ptr<Grid>& grid, uint Nsweeps, bool saveGridStates, bool blur)
 {
 	this->grid = grid;
 	this->h = this->grid->scale.x / this->grid->Nx;
@@ -20,10 +16,6 @@ FastSweep3D::FastSweep3D(Grid* grid, uint Nsweeps, bool saveGridStates, bool blu
 
 	this->sweep(saveGridStates);
 	if (blur) this->grid->blur();
-}
-
-FastSweep3D::~FastSweep3D()
-{
 }
 
 void FastSweep3D::sweep(bool saveGridStates)

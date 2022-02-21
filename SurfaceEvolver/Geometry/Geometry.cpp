@@ -53,20 +53,22 @@ bool Geometry::hasScalarData()
 	return scalarTables.size();
 }
 
-Box3 Geometry::getBoundingBox(Box3 bbox, Matrix4 matrix)
+Box3 Geometry::getBoundingBox() const
 {
+	Box3 result;
 	Vector3 helperVector = Vector3();
 	for (unsigned int i = 0; i < vertices.size(); i += 3) {
 		helperVector.set(vertices[i], vertices[i + 1], vertices[i + 2]);
-		helperVector.applyMatrix4(matrix);
-		bbox.expandByPoint(helperVector);
+		//helperVector.applyMatrix4(matrix);
+		result.expandByPoint(helperVector);
 	}
-	return bbox;
+	return result;
 }
 
 void Geometry::computeNormals()
 {
-	StructGeom::Triangle faceVerts = { &Vector3(), &Vector3(), &Vector3() };
+	Vector3 v0, v1, v2;
+	StructGeom::Triangle faceVerts = { &v0, &v1, &v2 };
 
 	Vector3 normal = Vector3();
 	this->normals = std::vector<double>(this->vertices.size());
@@ -182,28 +184,29 @@ std::vector<unsigned int> Geometry::getPolygonIndicesFromTriangles(std::vector<B
 	return std::vector<unsigned int>();
 }
 
-std::vector<Vector3> Geometry::getVertices()
+std::vector<Vector3> Geometry::getVertices() const
 {
 	std::vector<Vector3> result = std::vector<Vector3>();
-
+	result.reserve(vertices.size() / 3);
 	for (unsigned int i = 0; i < this->vertices.size(); i += 3) {
-		result.push_back(Vector3(this->vertices[i], this->vertices[i + 1], this->vertices[i + 2]));
+		result.emplace_back(Vector3(this->vertices[i], this->vertices[i + 1], this->vertices[i + 2]));
 	}
 	return result;
 }
 
-std::vector<Vector3> Geometry::getUniqueVertices()
+std::vector<Vector3> Geometry::getUniqueVertices() const
 {
 	return this->uniqueVertices;
 }
 
-std::vector<Primitive> Geometry::getPrimitives(PrimitiveType type)
+std::vector<Primitive> Geometry::getPrimitives(PrimitiveType type) const
 {
 	std::vector<Primitive> result = {};
+	result.reserve(vertexIndices.size() / 3);
 	if (type == PrimitiveType::vert) {
 		for (uint i = 0; i < this->uniqueVertices.size(); i++) {
-			std::vector<Vector3*> v = { &this->uniqueVertices[i] };
-			result.push_back(Primitive(v));
+			std::vector<Vector3*> v = { const_cast<Vector3*>(&this->uniqueVertices[i]) };
+			result.emplace_back(Primitive(v));
 		}
 	}
 	else if (type == PrimitiveType::edge) {
@@ -212,18 +215,18 @@ std::vector<Primitive> Geometry::getPrimitives(PrimitiveType type)
 		std::set<Edge>::iterator it;
 		for (it = edgesSet.begin(); it != edgesSet.end(); ++it) {
 			Edge e = *it;
-			result.push_back(Primitive({ e[0], e[1] }));
+			result.emplace_back(Primitive({ e[0], e[1] }));
 		}
 	}
 	else {	
 		for (uint i = 0; i < this->vertexIndices.size(); i += 3) {
 			Tri T = { 
-				&this->uniqueVertices[this->vertexIndices[i]],
-				&this->uniqueVertices[this->vertexIndices[i + 1]],
-				&this->uniqueVertices[this->vertexIndices[i + 2]]
+				const_cast<Vector3*>(&this->uniqueVertices[this->vertexIndices[i]]),
+				const_cast<Vector3*>(&this->uniqueVertices[this->vertexIndices[i + 1]]),
+				const_cast<Vector3*>(&this->uniqueVertices[this->vertexIndices[i + 2]])
 			};
 
-			result.push_back(Primitive(T));
+			result.emplace_back(Primitive(T));
 		}
 	}
 	return result;
@@ -598,14 +601,14 @@ std::vector<std::vector<unsigned int>> Geometry::getTriangulatedIndices(BufferGe
 }
 
 template<class T>
-void flipArray(std::vector<T> arr, unsigned int elementSize) {
+void flipArray(std::vector<T>& arr, const uint elementSize) {
 	if (arr.size() && elementSize) {
-		unsigned int iStep = 3 * elementSize;
+		uint iStep = 3 * elementSize;
 		double tmp[3] = { 0.0, 0.0, 0.0 };
 		for (unsigned int i = 0; i < arr.size(); i += iStep) {
 			for (unsigned int j = 0; j < elementSize; j++) {
-				const unsigned int i0 = i + j;
-				const unsigned int i1 = i + j + 2 * elementSize;
+				const uint i0 = i + j;
+				const uint i1 = i + j + 2 * elementSize;
 				tmp[j] = arr[i0];
 				arr[i0] = arr[i1];
 				arr[i1] = tmp[j];
@@ -689,6 +692,212 @@ Vector3 Geometry::getNormal(BufferGeom::Face f)
 	return normalize(normal);
 }
 
+bool Geometry::splitTriangle(const uint triId, const std::multimap<Edge, BufferGeom::Triangle>& edgeToTriangleMap)
+{
+	/*
+	// old indices
+	const uint i0 = vertexIndices[triId];
+	const uint i1 = vertexIndices[triId + 1];
+	const uint i2 = vertexIndices[triId + 2];
+	
+	auto& v0 = uniqueVertices[i0];
+	auto& v1 = uniqueVertices[i1];
+	auto& v2 = uniqueVertices[i2];
+
+	// midpoints
+	const auto m01 = 0.5 * (v0 + v1);
+	const auto m12 = 0.5 * (v1 + v2);
+	const auto m20 = 0.5 * (v2 + v0);
+
+	const uint nVertsOld = static_cast<uint>(uniqueVertices.size());
+
+	uniqueVertices.reserve(nVertsOld + 3);
+	uniqueVertices.emplace_back(m01, m12, m20);
+
+	// new indices
+	const uint j01 = nVertsOld;
+	const uint j12 = nVertsOld + 1;
+	const uint j20 = nVertsOld + 2;
+
+	// orig triangle edges
+	const Edge e01{ &v0, &v1 };
+	const Edge e12{ &v1, &v2 };
+	const Edge e20{ &v2, &v0 };
+
+	const BufferGeom::Triangle thisTriangle{ i0, i1, i2 };
+	const auto& thisTriangleIdSet = std::set(thisTriangle.begin(), thisTriangle.end());
+
+	bool e01HasAdjacentTri = false;
+	bool e12HasAdjacentTri = false;
+	bool e20HasAdjacentTri = false;
+
+	// ========= find opposing point in triangle adjacent to e01 ============
+	//
+	BufferGeom::Triangle adjTri01{};
+	auto adjTri01Iter = edgeToTriangleMap.find(e01);
+	if (adjTri01Iter == edgeToTriangleMap.end())
+		return false;
+	if (adjTri01Iter->second == thisTriangle)
+	{
+		adjTri01Iter = edgeToTriangleMap.find(e01);
+		
+		if (adjTri01Iter != edgeToTriangleMap.end())
+		{
+			if (adjTri01Iter->second == thisTriangle) // this shouldn't happen
+				return false;
+
+			adjTri01 = adjTri01Iter->second;
+			e01HasAdjacentTri = true;
+		}
+	}
+
+	uint opposingVertId01{};
+	for (const auto& i : adjTri01)
+	{
+		if(const auto foundIt = thisTriangleIdSet.find(i); foundIt == thisTriangleIdSet.cend())
+		{
+			opposingVertId01 = *foundIt;
+		}
+	}
+
+	// ========= find opposing point in triangle adjacent to e12 ============
+	//
+	BufferGeom::Triangle adjTri12{};
+	auto adjTri12Iter = edgeToTriangleMap.find(e12);
+	if (adjTri12Iter == edgeToTriangleMap.end())
+		return false;
+	if (adjTri12Iter->second == thisTriangle)
+	{
+		adjTri12Iter = edgeToTriangleMap.find(e12);
+
+		if (adjTri12Iter != edgeToTriangleMap.end())
+		{
+			if (adjTri12Iter->second == thisTriangle) // this shouldn't happen
+				return false;
+
+			adjTri12 = adjTri12Iter->second;
+			e12HasAdjacentTri = true;
+		}
+	}
+
+	uint opposingVertId12{};
+	for (const auto& i : adjTri12)
+	{
+		if (const auto foundIt = thisTriangleIdSet.find(i); foundIt == thisTriangleIdSet.cend())
+		{
+			opposingVertId12 = *foundIt;
+		}
+	}
+
+	// ========= find opposing point in triangle adjacent to e20 ============
+	//
+	BufferGeom::Triangle adjTri20{};
+	auto adjTri20Iter = edgeToTriangleMap.find(e20);
+	if (adjTri20Iter == edgeToTriangleMap.end())
+		return false;
+	if (adjTri20Iter->second == thisTriangle)
+	{
+		adjTri20Iter = edgeToTriangleMap.find(e20);
+
+		if (adjTri20Iter != edgeToTriangleMap.end())
+		{
+			if (adjTri20Iter->second == thisTriangle) // this shouldn't happen
+				return false;
+
+			adjTri20 = adjTri20Iter->second;
+			e20HasAdjacentTri = true;
+		}
+	}
+
+	uint opposingVertId20{};
+	for (const auto& i : adjTri20)
+	{
+		if (const auto foundIt = thisTriangleIdSet.find(i); foundIt == thisTriangleIdSet.cend())
+		{
+			opposingVertId20 = *foundIt;
+		}
+	}
+
+	// new indexing:
+	// previous index triple will be removed
+	// 4 internal triangle index triples are added, and
+	// 3 pairs of triangle index triples can be added if the triangle isn't a boundary triangle
+	// that is: up to 6 new index triples can be added
+
+	const size_t adjacentVertexIndicesCapacityIncrement = 3 * (
+		2 * (e01HasAdjacentTri ? 3 : 0) + // 6 new indices can be added for two triangles from split adjTri01
+		2 * (e12HasAdjacentTri ? 3 : 0) + // 6 new indices can be added for two triangles from split adjTri12
+		2 * (e20HasAdjacentTri ? 3 : 0)); // 6 new indices can be added for two triangles from split adjTri20
+
+	const size_t internalVertexIndicesCapacityIncrement = 9;
+	const size_t oldVertexIndicesCapacityDecrement = 3;
+
+	const size_t newVertexCapacityIncrement = adjacentVertexIndicesCapacityIncrement + internalVertexIndicesCapacityIncrement;
+	const size_t vertexIndicesCapacityIncrement = newVertexCapacityIncrement - oldVertexIndicesCapacityDecrement;
+
+	const auto currentTriangleBegin = vertexIndices.begin() + triId;
+	const auto currentTriangleEnd = vertexIndices.begin() + triId + 3;
+
+	const std::vector<uint> oldVertIdsBeforeCurrentTriangle{ vertexIndices.begin() , currentTriangleBegin };
+	const std::vector<uint> oldVertIdsAfterCurrentTriangle{ currentTriangleEnd, vertexIndices.end() };
+
+	std::vector addedVertexIndices = {
+		i0, j01, j20,
+		j01, i1, j12,
+		j01, j12, j20,
+		j20, j12, i2
+	};
+
+	if (e01HasAdjacentTri)
+	{
+		std::vector addedAdjacentVertIds01 = {
+			i0, opposingVertId01, j01,
+			opposingVertId01, i1, j01
+		};
+		
+		const size_t oldSize = addedVertexIndices.size();
+		const size_t newSize = oldSize + 6;
+
+		addedVertexIndices.reserve(newSize);
+		addedVertexIndices.insert(addedVertexIndices.end(), addedAdjacentVertIds01.begin(), addedAdjacentVertIds01.end());
+	}
+
+	if (e12HasAdjacentTri)
+	{
+		std::vector addedAdjacentVertIds12 = {
+			i1, opposingVertId12, j12,
+			opposingVertId12, i2, j12
+		};
+
+		const size_t oldSize = addedVertexIndices.size();
+		const size_t newSize = oldSize + 6;
+
+		addedVertexIndices.reserve(newSize);
+		addedVertexIndices.insert(addedVertexIndices.end(), addedAdjacentVertIds12.begin(), addedAdjacentVertIds12.end());
+	}
+
+	if (e20HasAdjacentTri)
+	{
+		std::vector addedAdjacentVertIds20 = {
+			i2, opposingVertId20, j20,
+			opposingVertId20, i0, j20
+		};
+
+		const size_t oldSize = addedVertexIndices.size();
+		const size_t newSize = oldSize + 6;
+
+		addedVertexIndices.reserve(newSize);
+		addedVertexIndices.insert(addedVertexIndices.end(), addedAdjacentVertIds20.begin(), addedAdjacentVertIds20.end());
+	}
+
+	// TODO: add new vertex indices to the end of the vertex index array
+	// if "split" added new vertex indices to the split triangle index position,
+	// other (remaining) triangles marked for splitting would need to be re-indexed
+	// the old triangle index triple just receives a "processed" flag
+	*/
+	return true;
+}
+
 void Geometry::clear()
 {
 	uniqueVertices.clear();
@@ -722,29 +931,29 @@ std::pair<std::vector<BufferGeom::Triangulation>, std::vector<size_t>> Geometry:
 	return result;
 }
 
-void Geometry::getTriangles(std::vector<Tri>* trianglesBuffer)
+void Geometry::getTriangles(std::vector<Tri>* trianglesBuffer) const
 {
 	for (unsigned int i = 0; i < this->vertexIndices.size(); i += 3) {
-		Vector3* v0 = &this->uniqueVertices[this->vertexIndices[i]];
-		Vector3* v1 = &this->uniqueVertices[this->vertexIndices[i + 1]];
-		Vector3* v2 = &this->uniqueVertices[this->vertexIndices[i + 2]];
+		const auto v0 = &this->uniqueVertices[this->vertexIndices[i]];
+		const auto v1 = &this->uniqueVertices[this->vertexIndices[i + 1]];
+		const auto v2 = &this->uniqueVertices[this->vertexIndices[i + 2]];
 
-		Tri T = { v0, v1, v2 };
+		Tri T = { const_cast<Vector3*>(v0), const_cast<Vector3*>(v1), const_cast<Vector3*>(v2) };
 
 		trianglesBuffer->push_back(T);
 	}
 }
 
 // TODO: "<" operator for an edge
-void Geometry::getEdgesSet(std::set<Edge>* edgesSet)
+void Geometry::getEdgesSet(std::set<Edge>* edgesSet) const
 {
 	std::pair<std::set<Edge>::iterator, bool> it;
 	for (uint i = 0; i < this->vertexIndices.size(); i += 3) {
 		BufferGeom::Triangle T = { this->vertexIndices[i],	this->vertexIndices[i + 1],	this->vertexIndices[i + 2] };
 		for (uint j = 0; j < 3; j++) {
 			Edge e = {
-				&this->uniqueVertices[this->vertexIndices[i + j]],
-				&this->uniqueVertices[this->vertexIndices[i + (j + 1) % 3]]
+				const_cast<Vector3*>(&this->uniqueVertices[this->vertexIndices[i + j]]),
+				const_cast<Vector3*>(&this->uniqueVertices[this->vertexIndices[i + (j + 1) % 3]])
 			};
 			it = edgesSet->insert(e);
 		}
@@ -1025,8 +1234,9 @@ bool getPrimitiveBoxIntersection(Primitive& primitive, Vector3* boxCenter, Vecto
 		t[0] = primitive.vertices[0];
 		t[1] = primitive.vertices[1];
 		t[2] = primitive.vertices[2];
-		return getTriangleBoxIntersection(t, boxCenter, boxHalfSize);
+		const bool value = getTriangleBoxIntersection(t, boxCenter, boxHalfSize);
 		delete[] t;
+		return value;
 	}
 
 	return false;
@@ -1161,6 +1371,7 @@ double getDistanceToATriangleSq(Vector3** vertices, Vector3* point)
 
 	Vector3 closest = *vertices[0] + t0 * edge0 + t1 * edge1;
 	SUB(diff, (*point), closest);
+	
 	return DOT(diff, diff);
 }
 
@@ -1211,8 +1422,9 @@ double getDistanceToAPrimitiveSq(Primitive& primitive, Vector3& point)
 		t[0] = primitive.vertices[0];
 		t[1] = primitive.vertices[1];
 		t[2] = primitive.vertices[2];
-		return getDistanceToATriangleSq(t, &point);
+		const bool value = getDistanceToATriangleSq(t, &point);
 		delete[] t;
+		return value;
 	}
 
 	std::cout << "invalid primitive vert count!" << std::endl;

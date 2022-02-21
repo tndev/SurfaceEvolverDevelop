@@ -1,40 +1,19 @@
 #include "Grid.h"
 
-Grid::Grid()
-{
-}
 
 Grid::Grid(const Grid& other)
-{
-	
+{	
 	this->Nx = other.Nx; this->Ny = other.Ny; this->Nz = other.Nz;
 
-	uint i;
+	this->gridExtent = other.gridExtent;
+	this->gradExtent = other.gradExtent;
 
-	if (other.field != nullptr) {
-		this->cleanField();
-		this->gridExtent = this->Nx * this->Ny * this->Nz;
-		this->field = new double[gridExtent];
-		this->frozenCells = new bool[gridExtent];
-		for (i = 0; i < gridExtent; i++) {
-			this->field[i] = other.field[i]; // initialize field
-			this->frozenCells[i] = other.frozenCells[i]; // unfreeze all
-		}
-	}
+	this->field = other.field;
+	this->frozenCells = other.frozenCells;
 
-	if (other.gradFieldX != nullptr && other.gradFieldY != nullptr && other.gradFieldZ != nullptr) {
-		this->cleanGrad();
-		this->gradExtent = (Nx - 2) * (Ny - 2) * (Nz - 2);
-		this->gradFieldX = new double[gradExtent];
-		this->gradFieldY = new double[gradExtent];
-		this->gradFieldZ = new double[gradExtent];
-	
-		for (i = 0; i < gradExtent; i++) {
-			this->gradFieldX[i] = other.gradFieldX[i];
-			this->gradFieldY[i] = other.gradFieldY[i];
-			this->gradFieldZ[i] = other.gradFieldZ[i];
-		}
-	}
+	this->gradFieldX = other.gradFieldX;
+	this->gradFieldY = other.gradFieldY;
+	this->gradFieldZ = other.gradFieldZ;
 
 	this->scale = other.scale;
 	this->bbox = other.bbox;
@@ -43,31 +22,22 @@ Grid::Grid(const Grid& other)
 	this->max = other.max;
 }
 
-Grid::Grid(uint Nx, uint Ny, uint Nz, Box3 bbox, Box3 cubeBox, double initVal)
+Grid::Grid(uint Nx, uint Ny, uint Nz, const Box3& bbox, const Box3& cubeBox, std::string geomName, double initVal)
 {
+	this->geomName = geomName;
 	this->cubeBox = cubeBox;
 	this->bbox = bbox;
 	this->scale = this->cubeBox.getSize();
 	this->Nx = Nx; this->Ny = Ny; this->Nz = Nz;
 
-	uint i; this->gridExtent = this->Nx * this->Ny * this->Nz;
-	this->field = new double[gridExtent];
-	this->frozenCells = new bool[gridExtent];
-	for (i = 0; i < gridExtent; i++) {
-		this->field[i] = initVal; // initialize field
-		this->frozenCells[i] = false; // unfreeze all
-	}
-}
-
-Grid::~Grid()
-{
-	this->cleanField();
-	this->cleanGrad();
+	this->gridExtent = this->Nx * this->Ny * this->Nz;
+	this->field = std::vector<double>(gridExtent, initVal);
+	this->frozenCells = std::vector<bool>(gridExtent, false);
 }
 
 void Grid::exportToVTI(std::string filename)
 {
-	std::fstream vti(filename + ".vti", std::fstream::out);
+	std::fstream vti(geomName + filename + ".vti", std::fstream::out);
 
 	Vector3 o = bbox.min; // origin
 	uint nx = Nx - 1;
@@ -83,8 +53,8 @@ void Grid::exportToVTI(std::string filename)
 	vti << "			<PointData Scalars=\"Scalars_\">" << std::endl;
 	vti << "				<DataArray type=\"Float32\" Name=\"Scalars_\" format=\"ascii\" RangeMin=\"" << min << "\" RangeMax=\"" << max << "\">" << std::endl;
 
-	for (uint i = 0; i < this->gridExtent; i ++) {
-		vti << (float)this->field[i] << std::endl;
+	for (const auto& val : field) {
+		vti << static_cast<float>(val) << std::endl;
 	}
 
 	vti << "				</DataArray>" << std::endl;
@@ -139,20 +109,15 @@ void Grid::exportGradientToVTK(std::string filename)
 
 void Grid::initToVal(double val)
 {
-	if (this->field) delete[] this->field;
-	if (this->frozenCells) delete[] this->frozenCells;
-	uint i;
-	this->field = new double[gridExtent];
-	this->frozenCells = new bool[gridExtent];
-	for (i = 0; i < gridExtent; i++) {
-		this->field[i] = val; // initialize field
-		this->frozenCells[i] = false; // unfreeze all
-	}
+	field.clear();
+	frozenCells.clear();
+	this->field = std::vector<double>(gridExtent, val);
+	this->frozenCells = std::vector<bool>(gridExtent, false);
 }
 
 void Grid::blur()
 {
-	auto applyGrid3x3Kernel = [&](double* bfield, uint ix, uint iy, uint iz) {
+	auto applyGrid3x3Kernel = [&](std::vector<double>& bfield, uint ix, uint iy, uint iz) {
 		double kernelSum = 0.0;
 		uint gridPos = 0;
 		for (int i = -1; i <= 1; i++) {
@@ -171,16 +136,14 @@ void Grid::blur()
 		field[gridPos] = result;
 	};
 
-	double* bfield = new double[gridExtent];
+	auto bfield = field;
 	for (uint i = 0; i < gridExtent; i++) bfield[i] = this->field[i];
 	for (uint iz = 1; iz < Nz - 1; iz++) {
 		for (uint iy = 1; iy < Ny - 1; iy++) {
 			for (uint ix = 1; ix < Nx - 1; ix++) applyGrid3x3Kernel(bfield, ix, iy, iz);
 		}
 	}
-	delete[] this->field;
-	this->field = new double[gridExtent];
-	for (uint i = 0; i < gridExtent; i++) this->field[i] = bfield[i];
+	field = bfield;
 }
 
 bool Grid::equalInDimTo(Grid& other)
@@ -217,8 +180,8 @@ void Grid::sub(Grid& other)
 
 void Grid::absField()
 {
-	for (uint i = 0; i < gridExtent; i++) {
-		this->field[i] = fabs(this->field[i]);
+	for (auto& elem : field) {
+		elem = std::fabs(elem);
 	}
 }
 
@@ -233,7 +196,7 @@ void Grid::negate()
 	}
 }
 
-void Grid::computeSignField(AABBTree* aabb)
+void Grid::computeSignField()
 {
 	/**/
 	this->negate();
@@ -268,7 +231,7 @@ void Grid::computeSignField(AABBTree* aabb)
 	stack.push(idsTriple);
 
 	// a simple voxel flood
-	while (stack.size()) {
+	while (!stack.empty()) {
 		idsTriple = stack.top();
 		stack.pop();
 
@@ -385,14 +348,9 @@ void Grid::computeGradient()
 	double dz = scale.z / nz;
 	this->gradExtent = (nx - 1) * (ny - 1) * (nz - 1);
 
-	if (gradFieldX != nullptr && gradFieldY != nullptr && gradFieldZ != nullptr) {
-		delete[] gradFieldX; gradFieldX = nullptr;
-		delete[] gradFieldY; gradFieldY = nullptr;
-		delete[] gradFieldZ; gradFieldZ = nullptr;
-	}
-	this->gradFieldX = new double[gradExtent]; // init vect field
-	this->gradFieldY = new double[gradExtent];
-	this->gradFieldZ = new double[gradExtent];
+	this->gradFieldX = std::vector<double>(gradExtent); // init vect field
+	this->gradFieldY = std::vector<double>(gradExtent);
+	this->gradFieldZ = std::vector<double>(gradExtent);
 
 	for (iz = 1; iz < nz; iz++) {
 		for (iy = 1; iy < ny; iy++) {
@@ -452,8 +410,8 @@ void Grid::expand(double initVal)
 
 	int ix, iy, iz, i, j, k, gridPosOld, gridPosNew;
 
-	double* newField = new double[gridExtent_new];
-	bool* newFrozenCells = new bool[gridExtent_new];
+	auto newField = std::vector<double>(gridExtent_new);
+	auto newFrozenCells = std::vector<bool>(gridExtent_new);
 
 	// initialize larger grid
 	for (i = 0; i < gridExtent_new; i++) {
@@ -498,25 +456,19 @@ void Grid::expand(double initVal)
 	this->gridExtent = Nx * Ny * Nz;
 	this->bbox = newBBox;
 
-	this->field = new double[gridExtent];
-	this->frozenCells = new bool[gridExtent];
-
-	for (i = 0; i < gridExtent; i++) {
-		field[i] = newField[i]; frozenCells[i] = newFrozenCells[i];
-	}
-
-	delete[] newField;
-	delete[] newFrozenCells;
+	this->field = newField;
+	this->frozenCells = newFrozenCells;
 }
 
-void Grid::clip(Box3& targetBox)
+void Grid::clip(const Box3& targetBox)
 {
 	Vector3 size = targetBox.getSize();
 	// resize within bounds
 	size.x = std::fminf(size.x, scale.x);
 	size.y = std::fminf(size.y, scale.y);
 	size.z = std::fminf(size.z, scale.z);
-	targetBox.setToSize(&size);
+	auto newTargetBox = targetBox;
+	newTargetBox.setToSize(&size);
 
 	double cellSize = scale.x / Nx;
 
@@ -525,10 +477,10 @@ void Grid::clip(Box3& targetBox)
 	uint Nz_new = std::floor(size.z / cellSize);
 	uint gridExtent_new = Nx_new * Ny_new * Nz_new;
 
-	int ix, iy, iz, i, gridPosOld, gridPosNew;
+	int ix, iy, iz, gridPosOld, gridPosNew;
 
-	double* newField = new double[gridExtent_new];
-	bool* newFrozenCells = new bool[gridExtent_new];
+	auto newField = std::vector<double>(gridExtent_new);
+	auto newFrozenCells = std::vector<bool>(gridExtent_new);
 
 	for (iz = 0; iz < Nz_new; iz++) {
 		for (iy = 0; iy < Ny_new; iy++) {
@@ -548,24 +500,17 @@ void Grid::clip(Box3& targetBox)
 
 	this->Nx = Nx_new; this->Ny = Ny_new; this->Nz = Nz_new;
 	this->gridExtent = Nx * Ny * Nz;
-	this->bbox = Box3(targetBox);
+	this->bbox = Box3(newTargetBox);
 
-	this->field = new double[gridExtent];
-	this->frozenCells = new bool[gridExtent];
-
-	for (i = 0; i < gridExtent; i++) {
-		field[i] = newField[i]; frozenCells[i] = newFrozenCells[i];
-	}
+	this->field = newField;
+	this->frozenCells = newFrozenCells;
 
 	this->scale = size;
-
-	delete[] newField;
-	delete[] newFrozenCells;
 }
 
 bool Grid::hasGradient()
 {
-	return (gradFieldX != nullptr && gradFieldY != nullptr && gradFieldZ != nullptr && gradExtent > 0);
+	return (!gradFieldX.empty() && !gradFieldY.empty() && !gradFieldZ.empty() && gradExtent > 0);
 }
 
 
@@ -650,23 +595,17 @@ void Grid::aabbDistanceField(AABBTree* aabb)
 
 void Grid::cleanField()
 {
-	if (this->field != nullptr) {
-		delete[] field; field = nullptr;
-	}
-	if (this->frozenCells != nullptr) {
-		delete[] frozenCells; frozenCells = nullptr;
-	}
+	field.clear();
+	frozenCells.clear();
 	Nx = 0, Ny = 0, Nz = 0;
 	scale = Vector3(1.0, 1.0, 1.0);
 }
 
 void Grid::cleanGrad()
 {
-	if (gradFieldX != nullptr && gradFieldY != nullptr && gradFieldZ != nullptr) {
-		delete[] gradFieldX; gradFieldX = nullptr;
-		delete[] gradFieldY; gradFieldY = nullptr;
-		delete[] gradFieldZ; gradFieldZ = nullptr;
-	}
+	gradFieldX.clear();
+	gradFieldY.clear();
+	gradFieldZ.clear();
 }
 
 void Grid::scaleBy(Vector3& s)
@@ -676,12 +615,10 @@ void Grid::scaleBy(Vector3& s)
 	this->Nx = (uint)std::floor(s.x * Nx);
 	this->Ny = (uint)std::floor(s.y * Ny);
 	this->Nz = (uint)std::floor(s.z * Nz);
-	uint oldExtent = oldNx * oldNy * oldNz, i;
-	double* oldField = new double[oldExtent];
-	for (i = 0; i < oldExtent; i++) oldField[i] = this->field[i];
+	auto oldField = field;
 
 	this->gridExtent = this->Nx * this->Ny * this->Nz;
-	this->field = new double[this->gridExtent];
+	this->field = std::vector<double>(this->gridExtent);
 	Vector3 p = Vector3(), o = bbox.min;
 	uint nx = Nx - 1;
 	uint ny = Ny - 1;
@@ -707,10 +644,11 @@ void Grid::scaleBy(Vector3& s)
 
 				positionBuffer.clear(); // for old min and max positions
 				valueBuffer.clear(); // for old cell vertex values
+				
 				this->getSurroundingCells(p, oldNx, oldNy, oldNz, oldField, &positionBuffer, &valueBuffer);
 
 				gridPos = Nx * Ny * iz + Nx * iy + ix;
-				field[gridPos] = (double)trilinearInterpolate(p, positionBuffer, valueBuffer);
+				field[gridPos] = trilinearInterpolate(p, positionBuffer, valueBuffer);
 			}
 		}
 	}
@@ -718,7 +656,7 @@ void Grid::scaleBy(Vector3& s)
 }
 
 void Grid::getSurroundingCells(Vector3& pos,
-	uint oldNx, uint oldNy, uint oldNz,	double* oldField,
+	uint oldNx, uint oldNy, uint oldNz, std::vector<double>& oldField,
 	std::vector<Vector3>* positionBuffer, std::vector<double>* valueBuffer)
 {
 	uint ix = std::min((uint)std::floor((pos.x - bbox.min.x) * oldNx / this->scale.x), oldNx - 1);
@@ -738,6 +676,7 @@ void Grid::getSurroundingCells(Vector3& pos,
 	uint i011 = oldNx * oldNy * iz1 + oldNx * iy1 + ix;
 	uint i111 = oldNx * oldNy * iz1 + oldNx * iy1 + ix1;
 
+	valueBuffer->reserve(8);
 	valueBuffer->push_back(oldField[i000]);
 	valueBuffer->push_back(oldField[i100]);
 	valueBuffer->push_back(oldField[i010]);
@@ -747,6 +686,7 @@ void Grid::getSurroundingCells(Vector3& pos,
 	valueBuffer->push_back(oldField[i011]);
 	valueBuffer->push_back(oldField[i111]);
 
+	positionBuffer->reserve(2);
 	positionBuffer->push_back(Vector3(
 		bbox.min.x + (double)ix / (double)oldNx * this->scale.x,
 		bbox.min.y + (double)iy / (double)oldNy * this->scale.y,
@@ -781,18 +721,12 @@ double Grid::getL2Norm()
 
 void Grid::clearFrozenCells()
 {
-	if (this->frozenCells) {
-		delete[] this->frozenCells;
-		this->frozenCells = nullptr;
-	}
+	frozenCells.clear();
 }
 
 void Grid::clearField()
 {
-	if (this->field) {
-		delete[] this->field;
-		this->field = nullptr;
-	}
+	field.clear();
 }
 
 Vector3 Grid::grad(Vector3& p, Vector3& dXYZ, std::vector<Vector3>* positionBuffer, std::vector<double>* valueBuffer)
@@ -816,6 +750,7 @@ Vector3 Grid::grad(Vector3& p, Vector3& dXYZ, std::vector<Vector3>* positionBuff
 	uint i011 = Nx * Ny * iz1 + Nx * iy1 + ix;
 	uint i111 = Nx * Ny * iz1 + Nx * iy1 + ix1;
 
+	valueBuffer->reserve(8);
 	valueBuffer->push_back(field[i000]);
 	valueBuffer->push_back(field[i100]);
 	valueBuffer->push_back(field[i010]);

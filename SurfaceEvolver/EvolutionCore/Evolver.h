@@ -51,6 +51,9 @@ private:
 	std::vector<std::vector<Vector3>> fvVerts = {};
 	std::vector<std::vector<std::vector<uint>>> adjacentPolys = {};
 
+	// target path (relative), needs to end with "/" so file names can follow
+	std::string targetPath = ""; // if empty output will be saved to exe working directory
+
 	// log files:
 	std::fstream log;
 	std::fstream meanAreaLog;
@@ -99,6 +102,7 @@ private:
 	void getInterpolatedSDFValuesforVertex(Vector3* V, double* SDF_V, Vector3* gradSDF_V, std::vector<Vector3>& positionBuffer, std::vector<double>& valueBuffer);
 	Vector3 getVolumeTangentialVelocityForVertex(Vector3& V, uint i);
 	Vector3 getAngleTangentialVelocityForVertex(Vector3& V, uint i);
+	Vector3 getSmithBETangentialVelocityForVertex(Vector3& V, uint i);
 
 	void saveFVAreaScalars();
 	void saveInterpolatedSDFValues();
@@ -117,6 +121,7 @@ private:
 	double etaCtrlFunc(double& SDF_V, Vector3& gradSDF_V, Vector3& nV);
 	double tangentialRedistDecayFunction(double& SDF_V);
 	double tangentialRedistCurvatureFunction(double& H);
+	Vector3 getVectorToSmallestAngle(uint i);
 
 	void computeSurfaceNormalsAndCoVolumes();
 	void getTriangleEvolutionSystem(double smoothStep, double& meanArea);

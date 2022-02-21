@@ -19,10 +19,7 @@ class Octree
 {
 public:
 	struct OctreeNode {
-		OctreeNode** children = nullptr;
-		// std::vector<OctreeNode*> children = {};
-
-		OctreeNode* parent = nullptr;
+		std::vector<std::shared_ptr<OctreeNode>> children{};
 		Octree* tree = nullptr;
 
 		Box3 box;
@@ -30,22 +27,23 @@ public:
 		double centroidDistance = INFINITY; // infinity unless it's a leaf
 		uint depthLeft = MAX_OCTREE_DEPTH;
 
-		OctreeNode();
+		OctreeNode() = default;
+		~OctreeNode() = default;
 		OctreeNode(const OctreeNode& other);
-		OctreeNode(Octree* tree, Box3 box, OctreeNode* parent = nullptr, uint depthLeft = MAX_OCTREE_DEPTH);
-		bool intersectsPrimitives(Box3* box);
-		bool isLargerThanLeaf(double* size);
+		OctreeNode(Octree* tree, Box3 box, uint depthLeft = MAX_OCTREE_DEPTH);
+		bool intersectsPrimitives(Box3& box);
+		bool isLargerThanLeaf(double size);
 		bool isALeaf();
 
-		void getLeafNodes(std::vector<OctreeNode*>* leafBuffer);
-		void getLeafBoxes(std::vector<Box3*>* boxBuffer);
-		void getLeafBoxesAndValues(std::vector<Box3*>* boxBuffer, std::vector<double>* valueBuffer);
+		void getLeafNodes(std::vector<OctreeNode*>& leafBuffer);
+		void getLeafBoxes(std::vector<Box3*>& boxBuffer);
+		void getLeafBoxesAndValues(std::vector<Box3*>& boxBuffer, std::vector<double>& valueBuffer);
 
 		void applyMatrix(Matrix4& m);
 	};
 
-	OctreeNode* root = nullptr;
-	AABBTree* aabbTree = nullptr;
+	std::shared_ptr<OctreeNode> root = nullptr;
+	std::shared_ptr<AABBTree> aabbTree = nullptr;
 	Box3 cubeBox;
 	Box3 bbox;
 
@@ -56,20 +54,20 @@ public:
 
 	uint nodeCount = 0;
 
-	Octree();
+	Octree() = default;
 	// expecting a constructed AABBTree for fast lookup
 	Octree(const Octree& other);
-	Octree(AABBTree* aabbTree, Box3& bbox, double leafSize);
-	~Octree();
+	Octree(const std::shared_ptr<AABBTree>& aabbTree, const Box3& bbox, uint resolution);
+	~Octree() = default;
 
-	void getAllNodes(std::vector<OctreeNode>* nodeBuffer);
+	void getAllNodes(std::vector<OctreeNode>& nodeBuffer);
 
-	void getLeafBoxGeoms(std::vector<Geometry>* geoms); // for visualisation
+	void getLeafBoxGeoms(std::vector<Geometry>& geoms); // for visualisation
 	void GenerateFullOctreeBoxVisualisation(VTKExporter& e);
 	void GenerateLeafCellVisualisation(VTKExporter& e, bool visualizeCentroids = true);
 
-	void setLeafValueToScalarGrid(Grid* grid);
-	void setConstantValueToScalarGrid(Grid* grid, double value);
+	void setLeafValueToScalarGrid(Grid& grid);
+	void setConstantValueToScalarGrid(Grid& grid, double value);
 
 	void applyMatrix(Matrix4& m);
 };

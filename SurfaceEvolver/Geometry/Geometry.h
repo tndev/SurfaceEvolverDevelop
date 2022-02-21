@@ -97,7 +97,7 @@ public:
 	bool hasTriangulations();
 	bool hasScalarData();
 
-	Box3 getBoundingBox(Box3 bbox = Box3(), Matrix4 matrix = Matrix4());
+	Box3 getBoundingBox() const;
 	void computeNormals();
 	void computeTriangulations();
 	void fillVerticesFromUniqueVertices();
@@ -110,11 +110,11 @@ public:
 	std::vector<Vector3> getProjectionsAlongNormal(BufferGeom::Face& vertices); // TODO: use Vector2
 	std::vector<std::vector<uint>> getTriangulatedIndices(BufferGeom::Face& vertices);
 	std::pair<std::vector<BufferGeom::Triangulation>, std::vector<size_t>> getSortedPolygonTriangulationsAndSizes();
-	void getTriangles(std::vector<Tri>* trianglesBuffer);
-	void getEdgesSet(std::set<Edge>* edgesSet);  // TODO: "<" operator for an edge
-	std::vector<Vector3> getVertices();
-	std::vector<Vector3> getUniqueVertices();
-	std::vector<Primitive> getPrimitives(PrimitiveType type);
+	void getTriangles(std::vector<Tri>* trianglesBuffer) const;
+	void getEdgesSet(std::set<Edge>* edgesSet) const;  // TODO: "<" operator for an edge
+	std::vector<Vector3> getVertices() const;
+	std::vector<Vector3> getUniqueVertices() const;
+	std::vector<Primitive> getPrimitives(PrimitiveType type) const;
 
 	void getVertexToTriangleMap(std::multimap<Vector3, BufferGeom::TriWithMarkedVertex>* buffer);
 	void getEdgeToTriangleMap(std::multimap<Edge, BufferGeom::Triangle>* buffer);
@@ -125,6 +125,8 @@ public:
 	// returns vertex ring corresponding to finite volume partitions of a ring of adjacent polygons
 	void getVertexFiniteVolumes(std::vector<std::vector<Vector3>>* vVolVerts, std::vector<std::vector<std::vector<uint>>>* adjacentPolyIds);
 	Vector3 getNormal(BufferGeom::Face f);
+
+	bool splitTriangle(const uint triId, const std::multimap<Edge, BufferGeom::Triangle>& edgeToTriangleMap);
 
 	void applyMatrix(Matrix4 m);
 protected:

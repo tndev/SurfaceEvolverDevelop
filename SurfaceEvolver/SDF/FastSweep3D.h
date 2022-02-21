@@ -13,17 +13,17 @@
 class FastSweep3D
 {
 public:
-	Grid* grid = nullptr;
+	std::shared_ptr<Grid> grid = nullptr;
 
 	double f = 1.0; // rhs
 	double h = 1.0; // dx, dy, dz
 
 	uint Nsweeps = 0;
 
-	FastSweep3D();
+	FastSweep3D() = default;
 	FastSweep3D(const FastSweep3D& other);
-	FastSweep3D(Grid* grid, uint Nsweeps, bool saveGridStates = false, bool blur = false);
-	~FastSweep3D();
+	FastSweep3D(std::shared_ptr<Grid>& grid, uint Nsweeps, bool saveGridStates = false, bool blur = false);
+	~FastSweep3D() = default;
 
 	void sweep(bool saveGridStates);
 };

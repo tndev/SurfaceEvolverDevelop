@@ -18,13 +18,14 @@
 class Grid
 {
 public:
-	double* field = nullptr;
-	bool* frozenCells = nullptr;
+	std::string geomName;
+	std::vector<double> field = {};
+	std::vector<bool> frozenCells = {};
 	// gradient dims are 2 less than field dims
 	// because we're using central differences for derivatives
-	double* gradFieldX = nullptr;
-	double* gradFieldY = nullptr;
-	double* gradFieldZ = nullptr;
+	std::vector<double> gradFieldX = {};
+	std::vector<double> gradFieldY = {};
+	std::vector<double> gradFieldZ = {};
 
 	uint gridExtent = 0; uint gradExtent = 0;
 	uint Nx, Ny, Nz; // index dims
@@ -35,10 +36,10 @@ public:
 	double min = 0.0;
 	double max = 100.0;
 
-	Grid();
+	Grid() = default;
 	Grid(const Grid& other);
-	Grid(uint Nx, uint Ny, uint Nz, Box3 bbox, Box3 cubeBox, double initVal = LARGE_VAL);
-	~Grid();
+	Grid(uint Nx, uint Ny, uint Nz, const Box3& bbox, const Box3& cubeBox, std::string geomName, double initVal = LARGE_VAL);
+	~Grid() = default;
 	bool equalInDimTo(Grid& other);
 
 	void exportToVTI(std::string filename);
@@ -52,10 +53,10 @@ public:
 	void sub(Grid& other);
 	void absField();
 	void negate();
-	void computeSignField(AABBTree* aabb);
+	void computeSignField();
 	void computeGradient();
 	void expand(double initVal = LARGE_VAL);
-	void clip(Box3& targetBox);
+	void clip(const Box3& targetBox);
 
 	bool hasGradient();
 
@@ -69,7 +70,7 @@ public:
 	// fraction of the scale with which the grid should exceed the mesh bbox
 	double max_offset_factor = 1.0;
 	void getSurroundingCells(Vector3& pos,
-		uint oldNx, uint oldNy, uint oldNz, double* oldField,
+		uint oldNx, uint oldNy, uint oldNz, std::vector<double>& oldField,
 		std::vector<Vector3>* positionBuffer, std::vector<double>* valueBuffer);
 
 	double getL2Norm();

@@ -14,14 +14,14 @@ public:
 	~Box3();
 	Box3(const Box3& other);
 
-	bool isEmpty();
+	bool isEmpty() const;
 	bool intersectsBox(Box3& other);
 
 	void expandByPoint(Vector3 p);
 	void expandByOffset(double offset);
 	void expandByFactor(double factor);
 	Vector3 getCenter();
-	Vector3 getSize();
+	Vector3 getSize() const;
 	void setToCenter(Vector3* target);
 	void setToSize(Vector3* target);
 	void setToHalfSize(Vector3* target);

@@ -110,7 +110,7 @@ void performSDFTest(uint res, Geometry& g, std::fstream& timing, VTKExporter& e)
 	std::cout << "init SDF..." << std::endl;
 
 	// Fast sweeping D, resized from 20 and interpolated
-	SDF sdf_FS_r = SDF(&g, res, false, false, false, true, SDF_Method::fast_sweeping);
+	SDF sdf_FS_r = SDF(g, res, "", false, false, false, true, SDF_Method::fast_sweeping);
 
 	std::cout << sdf_FS_r.getComputationProperties();
 	timing << sdf_FS_r.getComputationProperties();
@@ -118,7 +118,7 @@ void performSDFTest(uint res, Geometry& g, std::fstream& timing, VTKExporter& e)
 	sdf_FS_r.exportGrid(&e); // save to vti
 
 	// Fast sweeping DF
-	SDF sdf_FS = SDF(&g, res);
+	SDF sdf_FS = SDF(g, res, "");
 
 	std::cout << sdf_FS.getComputationProperties();
 	timing << sdf_FS.getComputationProperties();
@@ -126,7 +126,7 @@ void performSDFTest(uint res, Geometry& g, std::fstream& timing, VTKExporter& e)
 	sdf_FS.exportGrid(&e);
 
 	// AABB DF
-	SDF sdf_AABB = SDF(&g, res, false, false, false, false, SDF_Method::aabb_dist);
+	SDF sdf_AABB = SDF(g, res, "", false, false, false, false, SDF_Method::aabb_dist);
 
 	std::cout << sdf_AABB.getComputationProperties();
 	timing << sdf_AABB.getComputationProperties();
@@ -134,7 +134,7 @@ void performSDFTest(uint res, Geometry& g, std::fstream& timing, VTKExporter& e)
 	sdf_AABB.exportGrid(&e);
 
 	// Brute force DF
-	SDF sdf_Brute = SDF(&g, res, false, false, false, false, SDF_Method::brute_force);
+	SDF sdf_Brute = SDF(g, res, "", false, false, false, false, SDF_Method::brute_force);
 
 	std::cout << sdf_Brute.getComputationProperties();
 	timing << sdf_Brute.getComputationProperties();
@@ -162,6 +162,76 @@ void performSDFTest(uint res, Geometry& g, std::fstream& timing, VTKExporter& e)
 	AABBerror.exportToVTI("voxField_" + g.name + std::to_string(res) + "AABB_ERROR");
 }
 
+
+void performSimpleSDFTest(Geometry& g, const uint octreeResolution, std::fstream& timing, VTKExporter& e) {
+	std::cout << "init SDF for " << g.name << std::endl;
+
+	// Fast sweeping DF
+	SDF sdf_FS = SDF(g, octreeResolution, "");
+
+	std::cout << sdf_FS.getComputationProperties();
+	timing << sdf_FS.getComputationProperties();
+
+	sdf_FS.exportGrid(&e);
+}
+
+SDFTimeLog performSDFTestWithOutput(Geometry& g, const uint octreeResolution, VTKExporter& e)
+{
+    std::cout << "init SDF for " << g.name << std::endl;
+
+    const uint nAveragedCount = 10;
+    SDFTimeLog averagedTimeLog{0, 0, 0, 0, 0, 0};
+
+    std::cout << "Averaging time output for " << nAveragedCount << " runs:\n";
+
+    uint gridExtent = 0;
+	for (uint i = 0; i < nAveragedCount; i++)
+	{
+        std::cout << g.name << ", run " << (i + 1) << "...\n";
+		auto sdf_FS = SDF(g, octreeResolution, e.pathPrefix, true);
+        averagedTimeLog += sdf_FS.timeLog;
+		std::cout << sdf_FS.getComputationProperties();
+
+        if (i == 0) // save state of first simulation
+        {
+            gridExtent = sdf_FS.grid->gridExtent;
+            sdf_FS.exportGrid(&e);
+        }
+	}
+
+    averagedTimeLog /= nAveragedCount;
+    averagedTimeLog.GridRes = gridExtent;
+	
+    return averagedTimeLog;
+}
+
+void performLagrangianEvolutionTest(
+	Geometry& g, const uint octreeResolution, std::fstream& timing, VTKExporter& e, 
+	EvolutionParams& evolParams, MeanCurvatureParams& mcfParams, 
+	TangentialRedistParams& tRedistParams)
+{
+	if (evolParams.scale != 1.0)
+	{
+		g.applyMatrix(Matrix4().setToScale(evolParams.scale, evolParams.scale, evolParams.scale));		
+	}
+
+	std::cout << "init SDF for " << g.name << std::endl;
+
+	// Fast sweeping DF
+	SDF sdf_FS = SDF(g, octreeResolution, "");
+
+	std::cout << sdf_FS.getComputationProperties();
+	timing << sdf_FS.getComputationProperties();
+	sdf_FS.exportGrid(&e);
+
+	GradDistanceParams sdfParams;
+	sdfParams.targetGeom = &g;
+	sdfParams.sdfGrid = sdf_FS.grid.get();
+	sdfParams.saveDistanceStates = true;
+
+	Evolver evolver(evolParams, mcfParams, sdfParams, &tRedistParams);
+}
+
 void PerformFastSweepSdfTestForObjModel(const std::string& fileName, const uint& targetGridResolution)
 {
 	std::fstream timing(fileName + "_" + std::to_string(targetGridResolution) + ".txt", std::fstream::out);
@@ -172,12 +242,12 @@ void PerformFastSweepSdfTestForObjModel(const std::string& fileName, const uint&
 	const uint octreeResolution = targetGridResolution;
 
 	const bool computeSign = true;
-	const bool notComputeGradient = false;
-	const bool notSaveGridStates = false;
-	const bool notScaleAndInterpolate = false;
+	const bool computeGradient = false;
+	const bool saveGridStates = false;
+	const bool scaleAndInterpolate = false;
 
-	SDF sdf_FS_r = SDF(&geom, octreeResolution, 
-		computeSign, notComputeGradient, notSaveGridStates, notScaleAndInterpolate, 
+	SDF sdf_FS_r = SDF(geom, octreeResolution, "./CESCG_TestResults/",
+		computeSign, computeGradient, saveGridStates, scaleAndInterpolate, 
 		SDF_Method::fast_sweeping);
 
 	std::cout << sdf_FS_r.getComputationProperties();
@@ -190,7 +260,6 @@ void PerformFastSweepSdfTestForObjModel(const std::string& fileName, const uint&
 
 	timing.close();
 }
-
 
 void performUnitSphereTest(bool tan_redistribute = false) {
 	EvolutionParams eParams;
@@ -228,521 +297,203 @@ void performUnitSphereTest(bool tan_redistribute = false) {
 	errLog.close();
 }
 
-
 int main()
 {
-	double r = 50.0;
-	unsigned int d = 3;
-	double a = 2.0 * r / sqrt(3.0);
-	unsigned int ns = 4;
-
-	VTKExporter e = VTKExporter();
-
-	/*
-	std::string name = "boxWithoutLid";
-	PrimitiveBox boxWithoutLid = PrimitiveBox(a, a, a, ns, ns, ns, true, name, false);
-	Matrix4 R = Matrix4().makeRotationAxis(1.0, 0.0, 0.0, -M_PI / 2.0);
-	Matrix4 T = Matrix4().makeTranslation(-a / 2, -a / 2, -a / 2);
-	boxWithoutLid.applyMatrix(R);
-	boxWithoutLid.applyMatrix(T);
-	Deform def = Deform(&boxWithoutLid);
-	def.spherify(1.0);
-	Geometry result = def.result;
-
-	e.initExport(&result, name);
-
-	std::vector<std::vector<Vector3>> fvVerts = {};
-	std::vector<std::vector<std::vector<uint>>> adjacentPolys = {};
-	result.getVertexFiniteVolumes(&fvVerts, &adjacentPolys);*/
-
-	/*
-	uint geomId = 0;
-	for (int i = 0; i < result.uniqueVertices.size(); i++) {
-		bool fvOdd = fvVerts[i].size() % 2;
-		for (int j = 0; j < fvVerts[i].size(); j++) {			
-			if (fvOdd && j == fvVerts[i].size() - 1) {
-				continue;
-			}
-			e.exportGeometryFiniteVolumeGrid(&result, fvVerts, adjacentPolys, name + "FV_" + std::to_string(geomId), i, j);
-			if (i > 0) {
-				e.exportGeometryFiniteVolumeGrid(&result, fvVerts, adjacentPolys, name + "FVs_" + std::to_string(geomId), i - 1, -1, true);
-			}
-			else {
-				Geometry empty = Geometry();
-				e.initExport(&empty, name + "FVs_" + std::to_string(geomId));
-			}
-			std::cout << "triangle " << geomId << " exported" << std::endl;
-			geomId++;
-		}
-	}*/
-
-	//e.exportGeometryFiniteVolumeGrid(&result, fvVerts, adjacentPolys, "boxWithoutLid_FVs");
-
-
-
-	/*
-	for (uint i = 0; i < 4; i++) {
-		IcoSphere is = IcoSphere(i, 1.0);
-		e.initExport(&is, "icoSphere_subdiv" + std::to_string(i));
-
-		PrimitiveBox b = PrimitiveBox(1.0, 1.0, 1.0, i + 1, i + 1, i + 1);
-		e.initExport(&b, "box_subdiv" + std::to_string(i));
-
-		CubeSphere cs = CubeSphere(i + 2, 1.0);
-		e.initExport(&cs, "cubeSphere_subdiv" + std::to_string(i));
-	}*/
-
-	/*
-	bool iterateCubeSphereTest = false;
-
-	if (iterateCubeSphereTest) {
-		size_t min_Res = 20, max_Res = 60;
-		size_t min_Ns = 0, max_Ns = 5;
-		std::fstream timing_cubes("timing_cubes.txt", std::fstream::out);
-
-		Vector3 axis = normalize(Vector3(1, 1, 1));
-        
-		for (uint n = min_Ns; n < max_Ns; n++) {
-			for (uint i = 0; i <= 2; i++) {
-				uint res = min_Res * pow(2, i);
-
-				std::cout << "cube(" << n + 1 << "), grid_res = " << res << std::endl;
-				PrimitiveBox g1 = PrimitiveBox(a, a, a, n + 1, n + 1, n + 1);
-				g1.applyMatrix(Matrix4().makeRotationAxis(axis.x, axis.y, axis.z, M_PI / 6.));
-				e.initExport(&g1, "cube" + std::to_string(res) + "-" + std::to_string(n));
-
-				performSDFTest(res, g1, timing_cubes, e);
-
-				std::cout << "cubesphere(" << n + 1 << "), grid_res = " << res << std::endl;
-				CubeSphere g2 = CubeSphere(n + 1, r);
-				g2.applyMatrix(Matrix4().makeRotationAxis(axis.x, axis.y, axis.z, M_PI / 6.));
-				e.initExport(&g2, "cubesphere" + std::to_string(res) + "-" + std::to_string(n));
-
-				performSDFTest(res, g2, timing_cubes, e);
-			}
-		}
-		timing_cubes.close();
-	}
-
-
-	bool iterateIcoSphereTest = false;
-
-	if (iterateIcoSphereTest) {
-		size_t min_Res = 20, max_Res = 60;
-		size_t min_Ns = 0, max_Ns = 2;
-		std::fstream timing_ico("timing_ico.txt", std::fstream::out);
-
-		Vector3 axis = normalize(Vector3(1, 1, 1));
-
-		for (uint n = min_Ns; n < max_Ns; n++) {
-			for (uint i = 0; i <= 2; i++) {
-				uint res = min_Res * pow(2, i);
-
-				std::cout << "icosphere(" << n << "), grid_res = " << res << std::endl;
-				IcoSphere g0 = IcoSphere(n, r);
-				g0.applyMatrix(Matrix4().makeRotationAxis(axis.x, axis.y, axis.z, M_PI / 6.));
-				e.initExport(&g0, "icosphere" + std::to_string(res) + "-" + std::to_string(n));
-
-				performSDFTest(res, g0, timing_ico, e);
-			}
-		}
-
-		timing_ico.close();
-	}*/
-
-	// ===== BUNNY SDF tests =============================
-
-	/*
-	uint res = 40; // octree resolution
-
-	// Vector3 axis = normalize(Vector3(1, 1, 1));
-	
-	auto startObjLoad = std::chrono::high_resolution_clock::now();
-	// === Timed code ============
-	OBJImporter obj = OBJImporter();
-	Geometry bunny = obj.importOBJGeometry("bunny_no_holes.obj");
-	bunny.applyMatrix(Matrix4().setToScale(0.02, 0.02, 0.02));
-	e.initExport(&bunny, "sfBunny");
-	// === Timed code ============
-	auto endObjLoad = std::chrono::high_resolution_clock::now();
-	std::chrono::duration<double> elapsedObj = (endObjLoad - startObjLoad);
-	std::cout << "Model loaded after " << elapsedObj.count() << " seconds" << std::endl;
-
-	
-	SDF bunny_sdf = SDF(&bunny, res, true);
-
-	std::cout << bunny_sdf.getComputationProperties();*/
-
-	// bunny_sdf.exportGrid(&e, "bunnySDF");
-	// bunny_sdf.exportGradientField(&e, "bunnySDF_grad");
-
-	// ====== BUNNY Evolution =============================
-	/* EvolutionParams eParams;
-	eParams.name = "Bunny";
-	eParams.dt = 0.02; eParams.NSteps = 200; eParams.subdiv = (uint)3; eParams.elType = ElementType::tri;
-	eParams.saveStates = true; eParams.printStepOutput = true; eParams.writeTimeLog = true;
-	MeanCurvatureParams mcfParams;
-	mcfParams.saveAreaStates = true;
-	mcfParams.saveCurvatureStates = true;
-	mcfParams.writeMeanAreaLog = true;
-	GradDistanceParams sdfParams;
-	sdfParams.targetGeom = &bunny; sdfParams.sdfGrid = bunny_sdf.grid;
-	sdfParams.saveDistanceStates = true;
-	// sdfParams.saveGradientStates = true;
-	//mcfParams.smoothSteps = 10;s
-	TangentialRedistParams tRedistParams;
-	tRedistParams.type = 1;
-	tRedistParams.omega_volume = 100.0;
-	tRedistParams.omega_angle = 3.0;
-	//tRedistParams.saveTangentialVelocityStates = true;
-
-	Evolver evolver(eParams, mcfParams, sdfParams, &tRedistParams); */
-
-	// cube with holes
-	/*
-	OBJImporter obj = OBJImporter();
-	Geometry cwh = obj.importOBJGeometry("cubeWithHoles.obj");
-	cwh.applyMatrix(Matrix4().setToScale(0.02, 0.02, 0.02));
-	std::string name = "evolvingCubeWithHoles";
-	e.initExport(&cwh, "cubeWithHoles");
-
-	uint res = 40; // octree resolution
-	SDF cwh_sdf = SDF(&cwh, res);
-	// cwh_sdf.exportGrid(&e, "cubeWithHoles_SDF");
-	// cwh_sdf.exportGradientField(&e, "cubeWithHoles_SDF_grad");
-
-	std::cout << cwh_sdf.getComputationProperties();
-
-	EvolutionParams eParams;
-	eParams.name = name;
-	eParams.dt = 0.03; eParams.NSteps = 150; eParams.subdiv = (uint)3; eParams.elType = ElementType::tri;
-	eParams.printStepOutput = true; eParams.writeTimeLog = true;
-	MeanCurvatureParams mcfParams;
-	mcfParams.saveAreaStates = true; mcfParams.writeMeanAreaLog = true;
-	GradDistanceParams sdfParams;
-	sdfParams.targetGeom = &cwh; sdfParams.sdfGrid = cwh_sdf.grid;
-	sdfParams.saveDistanceStates = true;
-	// sdfParams.saveGradientStates = true;
-	mcfParams.smoothSteps = 10;*/
-
-	//Evolver evolver(eParams, mcfParams, sdfParams);
-
-	/*
-	OBJImporter obj = OBJImporter();
-	Geometry teapot = obj.importOBJGeometry("teapot.obj");
-	uint res = 40; // octree resolution
-	SDF teapot_sdf = SDF(&teapot, res);
-	teapot_sdf.exportGrid(&e, "teapot_SDF");*/
-
-	// arc
-	/*	
-	OBJImporter obj = OBJImporter();
-	Geometry arc = obj.importOBJGeometry("arc.obj");
-	arc.applyMatrix(Matrix4().setToScale(0.01, 0.01, 0.01));
-	std::string name = "evolvingArc";
-	e.initExport(&arc, "arc");
-
-	uint res = 40; // octree resolution
-	SDF arc_sdf = SDF(&arc, res);
-	// cwh_sdf.exportGrid(&e, "cubeWithHoles_SDF");
-	// cwh_sdf.exportGradientField(&e, "cubeWithHoles_SDF_grad");
-
-	std::cout << arc_sdf.getComputationProperties();
-
-	EvolutionParams eParams;
-	eParams.name = name;
-	eParams.dt = 0.02; eParams.NSteps = 150; eParams.subdiv = (uint)3; eParams.elType = ElementType::tri;
-	eParams.saveStates = true; //eParams.printStepOutput = true; eParams.writeTimeLog = true; // eParams.printSolution = true;
-	MeanCurvatureParams mcfParams;
-	mcfParams.saveAreaStates = true; 
-	mcfParams.saveCurvatureStates = true;
-	mcfParams.writeMeanAreaLog = true;
-	GradDistanceParams sdfParams;
-	sdfParams.targetGeom = &arc; sdfParams.sdfGrid = arc_sdf.grid;
-	sdfParams.saveDistanceStates = true;
-	// sdfParams.saveGradientStates = true;
-	mcfParams.smoothSteps = 10;
-	TangentialRedistParams tRedistParams;
-	tRedistParams.omega_volume = 100.0;
-	tRedistParams.omega_angle = 5.0;
-	tRedistParams.type = 1;
-	tRedistParams.saveTangentialVelocityStates = true;
-
-	Evolver evolver(eParams, mcfParams, sdfParams, &tRedistParams);*/
-
-	/*
-	e.exportGeometryVertexNormals(&bunny, "bunnyNormals");
-	e.exportGeometryFiniteVolumeGrid(&bunny, "bunnyFVs");*/
-
-	// performUnitSphereTest(true);
-
-	/*
-	std::string name = "testBox";
-	PrimitiveBox b = PrimitiveBox(1, 1, 1, 3, 3, 3, true, name);
-	Vector3 axis = Vector3(1, 1, 1);
-	axis.normalize();
-	Matrix4 M = Matrix4().makeRotationAxis(axis.x, axis.y, axis.z, M_PI / 6);
-	b.applyMatrix(M);
-	e.initExport(&b, name);
-	uint res = 40; // octree resolution
-	SDF boxSDF = SDF(&b, res, true, true);
-	//boxSDF.exportGrid(&e, "boxSDF");
-	//boxSDF.exportGradientField(&e, "boxSDF_Grad");
-
-	EvolutionParams eParams;
-	eParams.name = name;
-	eParams.dt = 0.025; eParams.NSteps = 100; eParams.subdiv = (uint)3; eParams.elType = ElementType::tri;
-	eParams.saveStates = true; // eParams.printStepOutput = true; // eParams.printSolution = true; eParams.printHappenings = true; //eParams.writeTimeLog = true;
-	MeanCurvatureParams mcfParams;
-	mcfParams.saveAreaStates = true;
-	mcfParams.saveCurvatureStates = true;
-	mcfParams.saveCurvatureVectors = true;
-	mcfParams.saveNormalVelocityStates = true;
-	mcfParams.writeMeanAreaLog = true;
-	GradDistanceParams sdfParams;
-	sdfParams.targetGeom = &b; sdfParams.sdfGrid = boxSDF.grid;
-	sdfParams.saveDistanceStates = true;
-	//sdfParams.saveGradientStates = true;
-	mcfParams.smoothSteps = 10;
-	mcfParams.initSmoothRate = 0.01;
-	TangentialRedistParams tRedistParams;
-	tRedistParams.omega = 200.0;
-	tRedistParams.type = 1;
-	tRedistParams.saveTangentialVelocityStates = true;
-
-	Evolver evolver(eParams, mcfParams, sdfParams, &tRedistParams);*/
-
-	/*
-	std::string name = "testEllipsoid";
-	// CubeSphere cs = CubeSphere(10, 50.0, true, name);
-	IcoSphere is = IcoSphere(3, 1.0, name);
-	Matrix4 M = Matrix4().setToScale(1.5, 1.0, 1.0);
-	is.applyMatrix(M);
-	e.initExport(&is, name);
-	uint res = 40; // octree resolution
-	SDF isSDF = SDF(&is, res, true, true);
-	//isSDF.exportGrid(&e, name + "SDF");
-	//isSDF.exportGradientField(&e, name + "SDF_Grad");
-
-	EvolutionParams eParams;
-	eParams.name = name;
-	eParams.dt = 0.005; eParams.NSteps = 60; //eParams.subdiv = (uint)3; eParams.elType = ElementType::tri;
-	eParams.saveStates = true; // eParams.printStepOutput = true; eParams.writeTimeLog = true;
-	eParams.sourceGeometry = &is;
-	MeanCurvatureParams mcfParams;
-	mcfParams.saveAreaStates = true; 
-	mcfParams.writeMeanAreaLog = true;
-	GradDistanceParams sdfParams;
-	//sdfParams.targetGeom = &is; sdfParams.sdfGrid = isSDF.grid;
-	//sdfParams.saveDistanceStates = true;
-	//sdfParams.saveGradientStates = true;
-	//mcfParams.smoothSteps = 10;
-	TangentialRedistParams tRedistParams;
-	tRedistParams.omega = 1000.0;
-	tRedistParams.type = 1;
-	tRedistParams.saveTangentialVelocityStates = true;
-
-	Evolver evolver(eParams, mcfParams, sdfParams, &tRedistParams);*/
-	
-	
-	/*
-	std::string name = "cubeEllipsoidMCF";
-	CubeSphere cs = CubeSphere(10, 1.0, false, name);
-	Matrix4 M = Matrix4().setToScale(2.0, 1.0, 1.0);
-	cs.applyMatrix(M);
-	e.initExport(&cs, name);
-	//uint res = 40; // octree resolution
-	//SDF csSDF = SDF(&cs, res, true, true);
-	//isSDF.exportGrid(&e, name + "SDF");
-	//isSDF.exportGradientField(&e, name + "SDF_Grad");
-
-	EvolutionParams eParams;
-	eParams.name = name;
-	eParams.dt = 0.003; eParams.NSteps = 100; //eParams.subdiv = (uint)3; 
-	eParams.elType = ElementType::tri;
-	eParams.saveStates = true; eParams.printStepOutput = true;
-	//eParams.printStepOutput = true; eParams.writeTimeLog = true;
-	eParams.sourceGeometry = &cs;
-	MeanCurvatureParams mcfParams;
-	mcfParams.saveAreaStates = true; 
-	mcfParams.writeMeanAreaLog = true;
-	GradDistanceParams sdfParams;
-	//sdfParams.targetGeom = &cs; sdfParams.sdfGrid = csSDF.grid;
-	//sdfParams.saveDistanceStates = true;
-	//sdfParams.saveGradientStates = true;
-	//mcfParams.smoothSteps = 10;
-	TangentialRedistParams tRedistParams;
-	tRedistParams.omega_volume = 200.0;
-	tRedistParams.type = 1;
-	tRedistParams.omega_angle = 0.0;
-	// tRedistParams.saveTangentialVelocityStates = true;
-
-	Evolver evolver(eParams, mcfParams, sdfParams, &tRedistParams);
-	*/
-
-	/*
-	std::string name = "DistortedIcoSphere";
-	OBJImporter obj = OBJImporter();
-	Geometry di = obj.importOBJGeometry("DistortedIcoSphere.obj");
-	Matrix4 M = Matrix4().setToScale(0.05, 0.05, 0.05);
-	di.applyMatrix(M);
-
-	EvolutionParams eParams;
-	eParams.name = name;
-	eParams.dt = 0.03; eParams.NSteps = 50; //eParams.subdiv = (uint)3; 
-	eParams.elType = ElementType::tri;
-	eParams.saveStates = true; eParams.printStepOutput = true;
-	//eParams.printStepOutput = true; eParams.writeTimeLog = true;
-	eParams.sourceGeometry = &di;
-	MeanCurvatureParams mcfParams;
-	mcfParams.saveAreaStates = true;
-	mcfParams.writeMeanAreaLog = true;
-	GradDistanceParams sdfParams;
-	//sdfParams.targetGeom = &cs; sdfParams.sdfGrid = csSDF.grid;
-	//sdfParams.saveDistanceStates = true;
-	//sdfParams.saveGradientStates = true;
-	//mcfParams.smoothSteps = 10;
-	TangentialRedistParams tRedistParams;
-	tRedistParams.omega_volume = 200.0;
-	tRedistParams.type = 1;
-	tRedistParams.omega_angle = 1.0;
-	// tRedistParams.saveTangentialVelocityStates = true;
-
-	Evolver evolver(eParams, mcfParams, sdfParams, &tRedistParams);*/
-
-	/*
-	std::string name = "DistortedIcoSphere_noRedist";
-	OBJImporter obj = OBJImporter();
-	Geometry di = obj.importOBJGeometry("DistortedIcoSphere.obj");
-	Matrix4 M = Matrix4().setToScale(0.05, 0.05, 0.05);
-	di.applyMatrix(M);
-
-	EvolutionParams eParams;
-	eParams.name = name;
-	eParams.dt = 0.03; eParams.NSteps = 50; //eParams.subdiv = (uint)3; 
-	eParams.elType = ElementType::tri;
-	eParams.saveStates = true; eParams.printStepOutput = true;
-	//eParams.printStepOutput = true; eParams.writeTimeLog = true;
-	eParams.sourceGeometry = &di;
-	MeanCurvatureParams mcfParams;
-	mcfParams.saveAreaStates = true;
-	mcfParams.writeMeanAreaLog = true;
-	GradDistanceParams sdfParams;
-
-	Evolver evolver(eParams, mcfParams, sdfParams, nullptr);*/
-
-	// uneven sphere:
-	/*
-	OBJImporter obj = OBJImporter();
-	Geometry uSphere = obj.importOBJGeometry("UnevenSphere.obj");
-	uSphere.applyMatrix(Matrix4().setToScale(0.02, 0.02, 0.02));
-	std::string name = "UnevenSphere";
-	e.initExport(&uSphere, name);
-
-	uint res = 40; // octree resolution
-	SDF us_sdf = SDF(&uSphere, res);
-
-	std::cout << us_sdf.getComputationProperties();
-
-	EvolutionParams eParams;
-	eParams.name = name;
-	eParams.dt = 0.005; eParams.NSteps = 50; eParams.elType = ElementType::tri;
-	eParams.saveStates = true; eParams.printStepOutput = true; // eParams.printSolution = true; eParams.printHappenings = true; //eParams.writeTimeLog = true;
-	eParams.sourceGeometry = &uSphere;
-	MeanCurvatureParams mcfParams;
-	mcfParams.saveAreaStates = true;
-	mcfParams.saveCurvatureStates = true;
-	mcfParams.saveCurvatureVectors = true;
-	mcfParams.saveNormalVelocityStates = true;
-	mcfParams.writeMeanAreaLog = true;
-	GradDistanceParams sdfParams;
-	//dfParams.targetGeom = &b; sdfParams.sdfGrid = boxSDF.grid;
-	//sdfParams.saveGradientStates = true;
-	TangentialRedistParams tRedistParams;
-	tRedistParams.omega = 10.0;
-	tRedistParams.saveTangentialVelocityStates = true;
-
-	Evolver evolver(eParams, mcfParams, sdfParams, &tRedistParams);*/
-
-	/*
-	IcoSphere is(1, 1.0);
-	e.initExport(&is, "icoSphere");
-	std::vector<std::vector<Vector3>> fvVerts = {};
-	std::vector<std::vector<std::vector<uint>>> adjacentPolys = {};
-	is.getVertexFiniteVolumes(&fvVerts, &adjacentPolys);
-	uint geomId = 0;
-	for (int i = 0; i < is.uniqueVertices.size(); i++) {
-		for (int j = 0; j < fvVerts[i].size(); j++) {
-			e.exportGeometryFiniteVolumeGrid(&is, fvVerts, adjacentPolys, "icoSphereFV_" + std::to_string(geomId), i, j);
-			if (i > 0) {
-				e.exportGeometryFiniteVolumeGrid(&is, fvVerts, adjacentPolys, "icoSphereFVs_" + std::to_string(geomId), i - 1, -1, true);
-			}
-			else {
-				Geometry empty = Geometry();
-				e.initExport(&empty, "icoSphereFVs_" + std::to_string(geomId));
-			}
-			std::cout << "triangle " << geomId << " exported" << std::endl;
-			geomId++;
-		}
-	}*/		
-
-	/*
-	uint i = 0;
-	double dt = 0.01 / pow(4, i);
-	Evolver sphereTest(dt, 0.06, i, ElementType::tri, "testSphere", false, false, true);*/
-
-	/*
-	Matrix4 sdfTransform = Matrix4().makeTranslation(0.5, 0.5, 0.5).multiply(Matrix4().setToScale(2.0, 2.0, 2.0));
-	//.makeRotationAxis(axis.x, axis.y, axis.z, M_PI / 6.);
-	bunny_sdf.applyMatrix(sdfTransform);
-
-	std::cout << bunny_sdf.last_transform;
-
-	bunny_sdf.exportGrid(&e, "bunnySDF_scaled");
-	e.initExport(*bunny_sdf.geom, "sfBunny_scaled");*/
-
-	/*
-	PrimitiveBox cube = PrimitiveBox(a, a, a, 4, 4, 4);
-	cube.applyMatrix(Matrix4().makeRotationAxis(axis.x, axis.y, axis.z, M_PI / 6.));
-	e.initExport(cube, "cube");
-
-	SDF cubeSDF = SDF(&cube, res, true); // signed dist to cube
-	std::cout << std::endl << cubeSDF.getComputationProperties();
-	cubeSDF.exportGrid(&e, "cubeSDF");*/
-	
-
-	// tree visualisation
-	/*
-	bunny_sdf.tri_aabb->GenerateFullTreeBoxVisualisation(e);
-	bunny_sdf.tri_aabb->GenerateFullLeafBoxVisualisation(e);
-	bunny_sdf.tri_aabb->GenerateStepwiseLeafBoxVisualisation(e);
-	bunny_sdf.octree->GenerateFullOctreeBoxVisualisation(e);
-	bunny_sdf.octree->GenerateLeafCellVisualisation(e); 
-	*/
-
-
-	/* The brute force DF of the bunny model will take ~27 min ! 
-	
-	SDF bunny_sdf_b = SDF(&bunny, res, false, SDF_Method::brute_force);
-
-	std::cout << bunny_sdf_b.getComputationProperties();
-
-	bunny_sdf_b.exportGrid(&e, "bunnySDF_b");
-
-	Grid bunnySDF_r_Error = absGrid(subGrids(*bunny_sdf_r.grid, *bunny_sdf_b.grid));
-	bunnySDF_r_Error.exportToVTI("bunnySDF_" + std::to_string(res) + "FS_ERROR_resized");
-
-	Grid bunnySDF_Error = absGrid(subGrids(*bunny_sdf.grid, *bunny_sdf_b.grid));
-	bunnySDF_Error.exportToVTI("bunnySDF_" + std::to_string(res) + "FS_ERROR");
-
-	double error = bunnySDF_r_Error.getL2Norm();
-	std::cout << "FS_ERROR_resized L2 Norm: " << error << std::endl;
-
-	error = bunnySDF_Error.getL2Norm();
-	std::cout << "FS_ERROR L2 Norm: " << error << std::endl; */
-
-	PerformFastSweepSdfTestForObjModel("./TestModels/armadillo.obj", 80);
-
-	return 1;
+    const std::vector<std::string> importedFilenames{
+        "armadillo.obj",
+        //                      "blub.obj",
+        "bunny.obj",
+        "max-planck.obj",
+        "nefertiti.obj",
+        "ogre.obj",
+        "spot.obj"
+    };
+
+    const std::string sourcePath = "./CESCG_TestData/";
+    const std::string targetPath = "./CESCG_TestResults/";
+
+    // ========= !!!!!!!!!!!!!!!!!!!!!!! ===================
+	// >>>>>>> CHANGE THIS WHEN YOU RUN ON A DIFFERENT MACHINE
+	// ========= !!!!!!!!!!!!!!!!!!!!!!! ===================
+    const std::string cpuName = "AMDRyzen";
+
+    VTKExporter vtkExp;
+    vtkExp.pathPrefix = targetPath;
+    OBJImporter objImp;
+    objImp.pathPrefix = sourcePath;
+
+    const bool performMeshSDFTests = true;
+    const bool performEvolutionTests = false;
+    const bool performUnitSphereTest = false;
+
+    // ================== S D F    T E S T S ========================================
+    if (performMeshSDFTests)
+    {
+        const std::vector<uint> octreeResolutions = {
+            20, 30, 40, 50, 60, 70, 80, 90
+        };
+
+        /**/
+        for (const auto& meshFileName : importedFilenames)
+        {
+            auto geom = objImp.importOBJGeometry(meshFileName);
+            auto timing_file_aabb = std::fstream(targetPath + "timing_" + geom.name + "_aabb.txt", std::fstream::out);
+            auto timing_file_octree = std::fstream(targetPath + "timing_" + geom.name + "_octree.txt", std::fstream::out);
+            auto timing_file_fs = std::fstream(targetPath + "timing_" + geom.name + "_fs.txt", std::fstream::out);
+            auto timing_file_flood = std::fstream(targetPath + "timing_" + geom.name + "_flood.txt", std::fstream::out);
+            auto timing_file_total = std::fstream(targetPath + "timing_" + geom.name + "_total.txt", std::fstream::out);
+
+            auto geomCapitalFirstLetter = std::string(1, toupper(geom.name[0]));
+            const size_t geomNameSize = geom.name.size();
+            timing_file_aabb << "timingAABB" + geomCapitalFirstLetter + geom.name.substr(1, geomNameSize) + cpuName + " = {";
+            timing_file_octree << "timingOctree" + geomCapitalFirstLetter + geom.name.substr(1, geomNameSize) + cpuName + " = {";
+            timing_file_fs << "timingFS" + geomCapitalFirstLetter + geom.name.substr(1, geomNameSize) + cpuName + " = {";
+            timing_file_flood << "timingFlood" + geomCapitalFirstLetter + geom.name.substr(1, geomNameSize) + cpuName + " = {";
+            timing_file_total << "timingTotal" + geomCapitalFirstLetter + geom.name.substr(1, geomNameSize) + cpuName + " = {";
+
+            for (const auto& res : octreeResolutions)
+            {
+                const auto tLog = performSDFTestWithOutput(geom, res, vtkExp);
+                timing_file_aabb << tLog.AABBTreeTime << (res != *(octreeResolutions.end() - 1) ? ", " : "");
+                timing_file_octree << tLog.OctreeTime << (res != *(octreeResolutions.end() - 1) ? ", " : "");
+                timing_file_fs << tLog.FastSweepingTime << (res != *(octreeResolutions.end() - 1) ? ", " : "");
+                timing_file_flood << tLog.SignFloodFillTime << (res != *(octreeResolutions.end() - 1) ? ", " : "");
+                timing_file_total << tLog.TotalTime << (res != *(octreeResolutions.end() - 1) ? ", " : "");
+            }
+
+            timing_file_aabb << "};";
+            timing_file_octree << "};";
+            timing_file_fs << "};";
+            timing_file_flood << "};";
+            timing_file_total << "};";
+        	
+            timing_file_aabb.close();
+            timing_file_octree.close();
+            timing_file_fs.close();
+            timing_file_flood.close();
+            timing_file_total.close();
+        }
+    }
+
+    // ========= E V O L V E R    T E S T S ========================================
+
+    if (performEvolutionTests)
+    {
+        const uint baselineOctreeRes = 40;
+
+        // open Evolver timings:    
+        auto timing_armadillo2 = std::fstream(targetPath + "timing_armadillo2.txt", std::fstream::out);
+        auto timing_blub2 = std::fstream(targetPath + "timing_blub2.txt", std::fstream::out);
+        auto timing_bunny2 = std::fstream(targetPath + "timing_bunny2.txt", std::fstream::out);
+        auto timing_max_planck2 = std::fstream(targetPath + "timing_max-planck2.txt", std::fstream::out);
+        auto timing_nefertiti2 = std::fstream(targetPath + "timing_nefertiti2.txt", std::fstream::out);
+        auto timing_ogre2 = std::fstream(targetPath + "timing_ogre2.txt", std::fstream::out);
+        auto timing_spot2 = std::fstream(targetPath + "timing_spot2.txt", std::fstream::out);
+
+        std::map<uint, std::fstream*> indexedTimingFilesMap2{};
+        indexedTimingFilesMap2[0] = &timing_armadillo2;
+        indexedTimingFilesMap2[1] = &timing_blub2;
+        indexedTimingFilesMap2[2] = &timing_bunny2;
+        indexedTimingFilesMap2[3] = &timing_max_planck2;
+        indexedTimingFilesMap2[4] = &timing_nefertiti2;
+        indexedTimingFilesMap2[5] = &timing_ogre2;
+        indexedTimingFilesMap2[6] = &timing_spot2;
+
+        constexpr uint nIcoVerts0 = 12;
+        constexpr uint nIcoTris0 = 20;
+        constexpr uint nIcoEdges0 = 30;
+        constexpr double octreeExpansionFactor = 1.1;
+        constexpr double sdfGridExpandOffsetFactor = 1.0;
+        constexpr double icoStartRadiusFactor = 0.4;
+
+        const uint icoSubdiv = 3;
+
+        const double dt = 0.05;
+        const uint NSteps = 100;
+
+        // =============================================
+        // Evolver parameters:
+
+        EvolutionParams evolParams;
+        evolParams.subdiv = icoSubdiv;
+        evolParams.dt = dt;
+        evolParams.NSteps = NSteps;
+        evolParams.name = "UnnamedEvolution"; // add geom name
+        evolParams.saveStates = true;
+        evolParams.printStepOutput = true;
+        evolParams.writeTimeLog = true;
+        evolParams.outputPath = targetPath;
+        MeanCurvatureParams mcfParams;
+        mcfParams.saveAreaStates = true;
+        mcfParams.saveCurvatureStates = true;
+        mcfParams.writeMeanAreaLog = true;
+        TangentialRedistParams tanRedistParams;
+        tanRedistParams.type = 0;
+        tanRedistParams.omega_volume = 100.0;
+        tanRedistParams.omega_angle = 0.5;
+
+        const double stabilityEmphasis = 0.9;
+
+        uint timingId = 0; // a shitty way to iterate through multiple open timing files
+        /**/
+        for (const auto& meshFileName : importedFilenames)
+        {
+            auto geom = objImp.importOBJGeometry(meshFileName);
+
+            // ========== scale factor estim ================
+
+            auto bbox = geom.getBoundingBox();
+            auto bboxSize = bbox.getSize();
+            const double minBoxSize = std::min<double>({ bboxSize.x, bboxSize.y, bboxSize.z });
+            const double limitIcoRadius = 0.5 * minBoxSize;
+            const uint expectedVertexCount = (nIcoEdges0 * (pow(4, icoSubdiv) - 1) + 3 * nIcoVerts0) / 3;
+
+            const double maxBoxSize = std::max<double>({ bboxSize.x, bboxSize.y, bboxSize.z });
+            const double startingIcoRadius = icoStartRadiusFactor * octreeExpansionFactor * (minBoxSize + 4 * sdfGridExpandOffsetFactor * maxBoxSize);
+            std::cout << "----------------------------------------------\n";
+            std::cout << "startingIcoRadius = " << startingIcoRadius << "\n";
+            std::cout << "limitIcoRadius = " << limitIcoRadius << "\n";
+            std::cout << "----------------------------------------------\n";
+
+            const double startingMeanCoVolArea = 4.0 * M_PI * startingIcoRadius * startingIcoRadius / expectedVertexCount;
+            const double expectedMeanCoVolArea = 4.0 * M_PI * limitIcoRadius * limitIcoRadius / expectedVertexCount;
+            std::cout << "expectedMeanCoVolArea = " << expectedMeanCoVolArea << "\n";
+            std::cout << "startingMeanCoVolArea = " << startingMeanCoVolArea << "\n";
+            const double factoredMeanCoVolArea = stabilityEmphasis * expectedMeanCoVolArea + (1.0 - stabilityEmphasis) * startingMeanCoVolArea;
+            std::cout << "factoredMeanCoVolArea = " << factoredMeanCoVolArea << "\n";
+
+            const double scaleFactor = dt / factoredMeanCoVolArea;
+            std::cout << "scaleFactor = " << scaleFactor << "\n";
+            std::cout << "----------------------------------------------\n";
+
+            const auto bboxCenter = bbox.getCenter();
+            Matrix4 geomTransformationMatrix(
+                scaleFactor, 0.0, 0.0, -bboxCenter.x,
+                0.0, scaleFactor, 0.0, -bboxCenter.y,
+                0.0, 0.0, scaleFactor, -bboxCenter.z,
+                0.0, 0.0, 0.0, 1.0
+            );
+
+            geom.applyMatrix(geomTransformationMatrix);
+
+            evolParams.name = geom.name;
+
+            performLagrangianEvolutionTest(geom, baselineOctreeRes, *indexedTimingFilesMap2[timingId],
+                vtkExp, evolParams, mcfParams, tanRedistParams);
+            timingId++;
+        }
+
+    }
+
+    // FUCKING ICOSPHERE:
+
+    /*for (int s = 1; s < 6; s++)
+    {
+        IcoSphere ico(s, 1.0);
+        std::cout << ico.uniqueVertices.size() << "\n";
+    }*/
+
+    return 1;
 }
+
 

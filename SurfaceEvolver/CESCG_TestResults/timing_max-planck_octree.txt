@@ -1,0 +1,1 @@
+timingOctreeMax-planckAMDRyzen = {0.0785011, 0.138799};
