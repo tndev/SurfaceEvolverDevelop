@@ -1,0 +1,5 @@
+=== spot === 
+verts: 2930, triangles: 5856, octree resolution: 40^3, grid resolution: 97^3 
+computation times:  AABBTree: 0.027619 s, Octree: (build: 0.058634 s, get_leaves: 0.000312 s), FastSweep3D: 0.135894 s, 
+====> TOTAL: 0.222146 s
+

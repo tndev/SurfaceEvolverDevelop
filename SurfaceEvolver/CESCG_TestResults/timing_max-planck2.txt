@@ -1,0 +1,5 @@
+=== nefertiti === 
+verts: 1009118, triangles: 2018232, octree resolution: 40^3, grid resolution: 97^3 
+computation times:  AABBTree: 4.211337 s, Octree: (build: 0.795397 s, get_leaves: 0.000305 s), FastSweep3D: 0.125279 s, 
+====> TOTAL: 5.132013 s
+

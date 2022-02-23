@@ -99,7 +99,7 @@ void Evolver::evolve()
 
 	uint TSteps = (smoothing_flag ? smoothSteps : NSteps);
 
-	if (redistribution_type == 1) {
+	if (redistribution_type == 1 || redistribution_type == 3 || redistribution_type == 6) {
 		psi_log = std::fstream(targetPath + geomName + "_psiLog.txt", std::fstream::out);
 		psi_Sys_log = std::fstream(targetPath + geomName + "_psiSysLog.txt", std::fstream::out);
 		sum_rhs_log = std::fstream(targetPath + geomName + "_psiRhsSums.txt", std::fstream::out);
@@ -330,7 +330,7 @@ void Evolver::evolve()
 		if (writeTimeLog) timingLog << total_time_message;
 	}
 
-	if (redistribution_type == 1) {
+	if (redistribution_type == 1 || redistribution_type == 3 || redistribution_type == 6) {
 		psi_log.close();
 		psi_Sys_log.close();
 		sum_rhs_log.close();
@@ -370,11 +370,10 @@ void Evolver::initSystem()
 	}
 }
 
-void Evolver::getInterpolatedSDFValuesforVertex(
-	Vector3* V, double* SDF_V, Vector3* gradSDF_V, std::vector<Vector3>& positionBuffer, std::vector<double>& valueBuffer)
+void Evolver::getInterpolatedSDFValuesForVertex(
+	Vector3* V, double* SDF_V, Vector3* gradSDF_V, std::vector<Vector3>& positionBuffer, std::vector<double>& valueBuffer) const
 {
 	const uint Nx = sdfGrid->Nx, Ny = sdfGrid->Ny, Nz = sdfGrid->Nz;
-	double gradSDFx_V, gradSDFy_V, gradSDFz_V, norm;
 	// SDF value
 	positionBuffer.clear(); // for old min and max positions
 	valueBuffer.clear(); // for SDF cell vertex values
@@ -386,23 +385,23 @@ void Evolver::getInterpolatedSDFValuesforVertex(
 	positionBuffer.clear(); // for old min and max positions
 	valueBuffer.clear(); // for grad SDF x cell vertex values
 	sdfGrid->getSurroundingCells(*V, Nx - 2, Ny - 2, Nz - 2, sdfGrid->gradFieldX, &positionBuffer, &valueBuffer);
-	gradSDFx_V = trilinearInterpolate(*V, positionBuffer, valueBuffer);
+	double gradSDFx_V = trilinearInterpolate(*V, positionBuffer, valueBuffer);
 
 	// grad SDF y
 	positionBuffer.clear(); // for old min and max positions
 	valueBuffer.clear(); // for grad SDF y cell vertex values
 	sdfGrid->getSurroundingCells(*V, Nx - 2, Ny - 2, Nz - 2, sdfGrid->gradFieldY, &positionBuffer, &valueBuffer);
-	gradSDFy_V = trilinearInterpolate(*V, positionBuffer, valueBuffer);
+	double gradSDFy_V = trilinearInterpolate(*V, positionBuffer, valueBuffer);
 
 	// grad SDF z
 	positionBuffer.clear(); // for old min and max positions
 	valueBuffer.clear(); // for grad SDF z cell vertex values
 	sdfGrid->getSurroundingCells(*V, Nx - 2, Ny - 2, Nz - 2, sdfGrid->gradFieldZ, &positionBuffer, &valueBuffer);
-	gradSDFz_V = trilinearInterpolate(*V, positionBuffer, valueBuffer);
+	double gradSDFz_V = trilinearInterpolate(*V, positionBuffer, valueBuffer);
 
-	norm = sqrt(gradSDFx_V * gradSDFx_V + gradSDFy_V * gradSDFy_V + gradSDFz_V * gradSDFz_V);
+	double norm = sqrt(gradSDFx_V * gradSDFx_V + gradSDFy_V * gradSDFy_V + gradSDFz_V * gradSDFz_V);
 
-	if (fabs(norm) > FLT_EPSILON) {
+	if (norm > FLT_EPSILON) {
 		gradSDF_V->set(gradSDFx_V / norm, gradSDFy_V / norm, gradSDFz_V / norm);
 	}
 	else {
@@ -546,7 +545,7 @@ void Evolver::saveInterpolatedDotValues()
 		std::vector<Vector3> positionBuffer = {};
 		std::vector<double> valueBuffer = {};
 		double SDF_V; Vector3 gradSDF_V = Vector3();
-		this->getInterpolatedSDFValuesforVertex(&Fi, &SDF_V, &gradSDF_V, positionBuffer, valueBuffer);
+		this->getInterpolatedSDFValuesForVertex(&Fi, &SDF_V, &gradSDF_V, positionBuffer, valueBuffer);
 
 		vDotProducts[i] = dot(-1.0 * gradSDF_V, vNormals[i]);
 	}
@@ -575,7 +574,7 @@ void Evolver::saveInterpolatedSDFGradients()
 		std::vector<Vector3> positionBuffer = {};
 		std::vector<double> valueBuffer = {};
 		double SDF_V; Vector3 gradSDF_V = Vector3();
-		this->getInterpolatedSDFValuesforVertex(&Fi, &SDF_V, &gradSDF_V, positionBuffer, valueBuffer);
+		this->getInterpolatedSDFValuesForVertex(&Fi, &SDF_V, &gradSDF_V, positionBuffer, valueBuffer);
 
 		vGradients[i] = gradSDF_V;
 	}
@@ -650,7 +649,8 @@ double Evolver::tangentialRedistDecayFunction(double& SDF_V)
 
 double Evolver::tangentialRedistCurvatureFunction(double& H)
 {
-	return exp(-H * H);
+	return 1.0;
+	//return exp(-H * H / 100);
 }
 
 Vector3 Evolver::getVectorToSmallestAngle(uint i)
@@ -749,12 +749,12 @@ void Evolver::getTriangleEvolutionSystem(double smoothStep, double& meanArea)
 		double SDF_V; Vector3 gradSDF_V = Vector3();
 
 		if (!meanCurvatureFlow) {
-			this->getInterpolatedSDFValuesforVertex(&Fi, &SDF_V, &gradSDF_V, positionBuffer, valueBuffer);
+			this->getInterpolatedSDFValuesForVertex(&Fi, &SDF_V, &gradSDF_V, positionBuffer, valueBuffer);
 			eps = laplaceBeltramiCtrlFunc(SDF_V);
 		}
 		else if (smoothing_flag) {
 			if (sdfGrid && (saveDistanceStates || saveGradientStates)) {
-				this->getInterpolatedSDFValuesforVertex(&Fi, &SDF_V, &gradSDF_V, positionBuffer, valueBuffer);
+				this->getInterpolatedSDFValuesForVertex(&Fi, &SDF_V, &gradSDF_V, positionBuffer, valueBuffer);
 			}
 			eps = laplaceBeltramiSmoothFunc(smoothStep);
 		}
@@ -816,7 +816,7 @@ void Evolver::getTriangleEvolutionSystem(double smoothStep, double& meanArea)
 		// off-diag:
 		for (uint p = 0; p < m; p++) SysMatrix[i][adjacentPolys[i][p][1]] *= -(dt * eps) / coVolArea;
 
-		double rho = (!meanCurvatureFlow ? this->tangentialRedistCurvatureFunction(vCurvatures[i]) : 0.0);
+		double rho = (!meanCurvatureFlow ? this->tangentialRedistCurvatureFunction(SDF_V) : 0.0);
 		double beta = (redistribution_type > 0 ? 1.0 : 0.0);
 
 		// tangential redist:
@@ -869,6 +869,7 @@ void Evolver::getTriangleEvolutionSystem(double smoothStep, double& meanArea)
 
 		// grad dist func:
 		double eta = ( meanCurvatureFlow ? 0.0 : this->etaCtrlFunc(SDF_V, gradSDF_V, vNormals[i]) );
+		//eta *= eps;
 
 		sysRhsX[i] = Fi.x + dt * eta * vNormals[i].x + dt * vT.x;
 		sysRhsY[i] = Fi.y + dt * eta * vNormals[i].y + dt * vT.y;
@@ -908,7 +909,7 @@ void Evolver::getQuadEvolutionSystem(double smoothStep, double& meanArea)
 		double SDF_V, gradSDFx_V, gradSDFy_V, gradSDFz_V;
 		Vector3 gradSDF_V = Vector3();
 
-		this->getInterpolatedSDFValuesforVertex(&Fi, &SDF_V, &gradSDF_V, positionBuffer, valueBuffer);
+		this->getInterpolatedSDFValuesForVertex(&Fi, &SDF_V, &gradSDF_V, positionBuffer, valueBuffer);
 
 		double eps = laplaceBeltramiCtrlFunc(SDF_V);
 
@@ -1029,7 +1030,7 @@ void Evolver::getCurvaturesAndNormalVelocities()
 		double SDF_V; Vector3 gradSDF_V = Vector3();
 
 		if (!meanCurvatureFlow) {
-			this->getInterpolatedSDFValuesforVertex(&Fi, &SDF_V, &gradSDF_V, positionBuffer, valueBuffer);
+			this->getInterpolatedSDFValuesForVertex(&Fi, &SDF_V, &gradSDF_V, positionBuffer, valueBuffer);
 			eps = laplaceBeltramiCtrlFunc(SDF_V);
 		}
 

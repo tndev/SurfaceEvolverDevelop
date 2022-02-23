@@ -1,0 +1,5 @@
+=== ogre === 
+verts: 19985, triangles: 39856, octree resolution: 40^3, grid resolution: 117^3 
+computation times:  AABBTree: 0.165483 s, Octree: (build: 0.115961 s, get_leaves: 0.000328 s), FastSweep3D: 0.174584 s, 
+====> TOTAL: 0.456028 s
+

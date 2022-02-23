@@ -1,0 +1,57 @@
+=============================================================
+----------------------- Initializing ------------------------
+------------ S U R F A C E    E V O L U T I O N -------------
+>> NSteps = 100, dt = 0.030000, tStop = 3.000000
+>> Model: nefertiti, NVerts = 642
+>> SDF grid bounds: min = (-2.397594, -2.639127, -2.896490), max = (2.397594, 2.639127, 2.896490)
+>> SDF resolution: 97 x 107 x 117
+-------------------------------------------------------------
+starting evolution ...
+-------- time step ti = 1, t = 0.030000 -----------
+finite volume mean area: 0.0716691
+-------- time step ti = 2, t = 0.060000 -----------
+finite volume mean area: 0.0647511
+-------- time step ti = 3, t = 0.090000 -----------
+finite volume mean area: 0.0582875
+-------- time step ti = 4, t = 0.120000 -----------
+finite volume mean area: 0.052254
+-------- time step ti = 5, t = 0.150000 -----------
+finite volume mean area: 0.0466295
+-------- time step ti = 6, t = 0.180000 -----------
+finite volume mean area: 0.041396
+-------- time step ti = 7, t = 0.210000 -----------
+finite volume mean area: 0.0365366
+-------- time step ti = 8, t = 0.240000 -----------
+finite volume mean area: 0.0320353
+-------- time step ti = 9, t = 0.270000 -----------
+finite volume mean area: 0.0278794
+-------- time step ti = 10, t = 0.300000 -----------
+finite volume mean area: 0.0240566
+-------- time step ti = 11, t = 0.330000 -----------
+finite volume mean area: 0.0205557
+-------- time step ti = 12, t = 0.360000 -----------
+finite volume mean area: 0.017366
+-------- time step ti = 13, t = 0.390000 -----------
+finite volume mean area: 0.0144768
+-------- time step ti = 14, t = 0.420000 -----------
+finite volume mean area: 0.0119149
+-------- time step ti = 15, t = 0.450000 -----------
+finite volume mean area: 0.00966164
+-------- time step ti = 16, t = 0.480000 -----------
+finite volume mean area: 0.00771802
+-------- time step ti = 17, t = 0.510000 -----------
+finite volume mean area: 0.00601884
+-------- time step ti = 18, t = 0.540000 -----------
+finite volume mean area: 0.00452769
+-------- time step ti = 19, t = 0.570000 -----------
+finite volume mean area: 0.00320576
+-------- time step ti = 20, t = 0.600000 -----------
+finite volume mean area: 0.00205032
+-------- time step ti = 21, t = 0.630000 -----------
+finite volume mean area: 0.00108313
+-------- time step ti = 22, t = 0.660000 -----------
+finite volume mean area: 0.0003885
+-------- time step ti = 23, t = 0.690000 -----------
+finite volume mean area: 4.96486e-05
+
+ Total time for 100 steps: 0.969924 s

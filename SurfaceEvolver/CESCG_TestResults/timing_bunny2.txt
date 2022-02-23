@@ -1,0 +1,5 @@
+=== max-planck === 
+verts: 50077, triangles: 99991, octree resolution: 40^3, grid resolution: 100^3 
+computation times:  AABBTree: 0.393903 s, Octree: (build: 0.160877 s, get_leaves: 0.000304 s), FastSweep3D: 0.128135 s, 
+====> TOTAL: 0.682915 s
+

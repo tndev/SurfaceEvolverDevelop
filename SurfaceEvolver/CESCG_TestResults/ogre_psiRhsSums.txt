@@ -1,0 +1,2 @@
+======= RHS sums for 100 steps
+Sum(rhs) = -2.77621e-07

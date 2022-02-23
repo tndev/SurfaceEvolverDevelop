@@ -218,7 +218,7 @@ void performLagrangianEvolutionTest(
 	std::cout << "init SDF for " << g.name << std::endl;
 
 	// Fast sweeping DF
-	SDF sdf_FS = SDF(g, octreeResolution, "");
+	SDF sdf_FS = SDF(g, octreeResolution, e.pathPrefix);
 
 	std::cout << sdf_FS.getComputationProperties();
 	timing << sdf_FS.getComputationProperties();
@@ -322,7 +322,7 @@ int main()
     OBJImporter objImp;
     objImp.pathPrefix = sourcePath;
 
-    const bool performMeshSDFTests = true;
+    const bool performMeshSDFTests = false;
     const bool performEvolutionTests = false;
     const bool performUnitSphereTest = false;
 
@@ -408,7 +408,7 @@ int main()
 
         const uint icoSubdiv = 3;
 
-        const double dt = 0.05;
+        const double dt = 0.03;
         const uint NSteps = 100;
 
         // =============================================
@@ -429,10 +429,10 @@ int main()
         mcfParams.writeMeanAreaLog = true;
         TangentialRedistParams tanRedistParams;
         tanRedistParams.type = 0;
-        tanRedistParams.omega_volume = 100.0;
+        tanRedistParams.omega_volume = 5.0;
         tanRedistParams.omega_angle = 0.5;
 
-        const double stabilityEmphasis = 0.9;
+        const double stabilityEmphasis = 0.5;
 
         uint timingId = 0; // a shitty way to iterate through multiple open timing files
         /**/
@@ -445,7 +445,7 @@ int main()
             auto bbox = geom.getBoundingBox();
             auto bboxSize = bbox.getSize();
             const double minBoxSize = std::min<double>({ bboxSize.x, bboxSize.y, bboxSize.z });
-            const double limitIcoRadius = 0.5 * minBoxSize;
+            const double limitIcoRadius = icoStartRadiusFactor * minBoxSize;
             const uint expectedVertexCount = (nIcoEdges0 * (pow(4, icoSubdiv) - 1) + 3 * nIcoVerts0) / 3;
 
             const double maxBoxSize = std::max<double>({ bboxSize.x, bboxSize.y, bboxSize.z });
@@ -462,7 +462,7 @@ int main()
             const double factoredMeanCoVolArea = stabilityEmphasis * expectedMeanCoVolArea + (1.0 - stabilityEmphasis) * startingMeanCoVolArea;
             std::cout << "factoredMeanCoVolArea = " << factoredMeanCoVolArea << "\n";
 
-            const double scaleFactor = dt / factoredMeanCoVolArea;
+            const double scaleFactor = 1.0 / (dt * factoredMeanCoVolArea);
             std::cout << "scaleFactor = " << scaleFactor << "\n";
             std::cout << "----------------------------------------------\n";
 
@@ -492,6 +492,56 @@ int main()
         IcoSphere ico(s, 1.0);
         std::cout << ico.uniqueVertices.size() << "\n";
     }*/
+
+    /**/
+    uint res = 40; // octree resolution
+
+    // Vector3 axis = normalize(Vector3(1, 1, 1));
+
+    auto startObjLoad = std::chrono::high_resolution_clock::now();
+    // === Timed code ============
+    OBJImporter obj = OBJImporter();
+    obj.pathPrefix = sourcePath;
+    Geometry geom = obj.importOBJGeometry("armadillo.obj");
+    geom.applyMatrix(Matrix4().setToScale(0.03, 0.03, 0.03));
+    VTKExporter e;
+    e.pathPrefix = targetPath;
+    e.initExport(&geom, geom.name);
+    // === Timed code ============
+    auto endObjLoad = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsedObj = (endObjLoad - startObjLoad);
+    std::cout << "Model loaded after " << elapsedObj.count() << " seconds" << std::endl;
+
+
+    SDF geom_sdf = SDF(geom, res, targetPath, true);
+
+    std::cout << geom_sdf.getComputationProperties();
+
+    //geom_sdf.exportGrid(&e, "geomSDF");
+    // geom_sdf.exportGradientField(&e, "geomSDF_grad");
+
+    // ====== geom Evolution =============================
+    EvolutionParams eParams;
+    eParams.name = geom.name;
+    eParams.dt = 0.01; eParams.NSteps = 200; eParams.subdiv = (uint)3; eParams.elType = ElementType::tri;
+    eParams.saveStates = true; eParams.printStepOutput = true; eParams.writeTimeLog = true;
+    eParams.outputPath = targetPath;
+    MeanCurvatureParams mcfParams;
+    mcfParams.saveAreaStates = true;
+    mcfParams.saveCurvatureStates = true;
+    mcfParams.writeMeanAreaLog = true;
+    GradDistanceParams sdfParams;
+    sdfParams.targetGeom = &geom; sdfParams.sdfGrid = geom_sdf.grid.get();
+    sdfParams.saveDistanceStates = true;
+    // sdfParams.saveGradientStates = true;
+    //mcfParams.smoothSteps = 10;s
+    TangentialRedistParams tRedistParams;
+    tRedistParams.type = 0;
+    tRedistParams.omega_volume = 0.5;
+    tRedistParams.omega_angle = 0.5;
+    //tRedistParams.saveTangentialVelocityStates = true;
+
+    Evolver evolver(eParams, mcfParams, sdfParams, &tRedistParams);
 
     return 1;
 }

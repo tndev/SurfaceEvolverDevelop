@@ -99,7 +99,7 @@ private:
 	void clearSystem();
 	void initSystem();
 
-	void getInterpolatedSDFValuesforVertex(Vector3* V, double* SDF_V, Vector3* gradSDF_V, std::vector<Vector3>& positionBuffer, std::vector<double>& valueBuffer);
+	void getInterpolatedSDFValuesForVertex(Vector3* V, double* SDF_V, Vector3* gradSDF_V, std::vector<Vector3>& positionBuffer, std::vector<double>& valueBuffer) const;
 	Vector3 getVolumeTangentialVelocityForVertex(Vector3& V, uint i);
 	Vector3 getAngleTangentialVelocityForVertex(Vector3& V, uint i);
 	Vector3 getSmithBETangentialVelocityForVertex(Vector3& V, uint i);

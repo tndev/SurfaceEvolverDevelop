@@ -1,0 +1,5 @@
+=== bunny === 
+verts: 35947, triangles: 69451, octree resolution: 40^3, grid resolution: 116^3 
+computation times:  AABBTree: 0.275380 s, Octree: (build: 0.155241 s, get_leaves: 0.000446 s), FastSweep3D: 0.152534 s, 
+====> TOTAL: 0.583155 s
+

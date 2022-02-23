@@ -17,6 +17,7 @@ Grid::Grid(const Grid& other)
 
 	this->scale = other.scale;
 	this->bbox = other.bbox;
+	this->cubeBox = other.cubeBox;
 
 	this->min = other.min;
 	this->max = other.max;
