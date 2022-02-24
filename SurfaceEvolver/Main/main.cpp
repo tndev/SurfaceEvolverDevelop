@@ -215,10 +215,12 @@ void performLagrangianEvolutionTest(
 		g.applyMatrix(Matrix4().setToScale(evolParams.scale, evolParams.scale, evolParams.scale));		
 	}
 
+    e.initExport(&g, g.name);
+
 	std::cout << "init SDF for " << g.name << std::endl;
 
 	// Fast sweeping DF
-	SDF sdf_FS = SDF(g, octreeResolution, e.pathPrefix);
+	SDF sdf_FS = SDF(g, octreeResolution, e.pathPrefix, true);
 
 	std::cout << sdf_FS.getComputationProperties();
 	timing << sdf_FS.getComputationProperties();
@@ -315,14 +317,14 @@ int main()
     // ========= !!!!!!!!!!!!!!!!!!!!!!! ===================
 	// >>>>>>> CHANGE THIS WHEN YOU RUN ON A DIFFERENT MACHINE
 	// ========= !!!!!!!!!!!!!!!!!!!!!!! ===================
-    const std::string cpuName = "AMDRyzen";
+    const std::string cpuName = "IntelI7";
 
     VTKExporter vtkExp;
     vtkExp.pathPrefix = targetPath;
     OBJImporter objImp;
     objImp.pathPrefix = sourcePath;
 
-    const bool performMeshSDFTests = false;
+    const bool performMeshSDFTests = true;
     const bool performEvolutionTests = false;
     const bool performUnitSphereTest = false;
 
@@ -408,8 +410,8 @@ int main()
 
         const uint icoSubdiv = 3;
 
-        const double dt = 0.03;
-        const uint NSteps = 100;
+        const double dt = 0.01;
+        const uint NSteps = 200;
 
         // =============================================
         // Evolver parameters:
@@ -432,7 +434,9 @@ int main()
         tanRedistParams.omega_volume = 5.0;
         tanRedistParams.omega_angle = 0.5;
 
-        const double stabilityEmphasis = 0.5;
+        // 0 - starting surface, 1 - end surface
+        //const double stabilityEmphasis = -0.275;
+        const double stabilityEmphasis = 0.0;
 
         uint timingId = 0; // a shitty way to iterate through multiple open timing files
         /**/
@@ -451,6 +455,7 @@ int main()
             const double maxBoxSize = std::max<double>({ bboxSize.x, bboxSize.y, bboxSize.z });
             const double startingIcoRadius = icoStartRadiusFactor * octreeExpansionFactor * (minBoxSize + 4 * sdfGridExpandOffsetFactor * maxBoxSize);
             std::cout << "----------------------------------------------\n";
+            std::cout << "minBoxSize = " << minBoxSize << "\n";
             std::cout << "startingIcoRadius = " << startingIcoRadius << "\n";
             std::cout << "limitIcoRadius = " << limitIcoRadius << "\n";
             std::cout << "----------------------------------------------\n";
@@ -462,11 +467,12 @@ int main()
             const double factoredMeanCoVolArea = stabilityEmphasis * expectedMeanCoVolArea + (1.0 - stabilityEmphasis) * startingMeanCoVolArea;
             std::cout << "factoredMeanCoVolArea = " << factoredMeanCoVolArea << "\n";
 
-            const double scaleFactor = 1.0 / (dt * factoredMeanCoVolArea);
+            const double scaleFactor = pow(dt / factoredMeanCoVolArea, 1.0 / 3.0);
             std::cout << "scaleFactor = " << scaleFactor << "\n";
             std::cout << "----------------------------------------------\n";
 
             const auto bboxCenter = bbox.getCenter();
+            std::cout << "bboxCenter = " << bboxCenter << "\n";
             Matrix4 geomTransformationMatrix(
                 scaleFactor, 0.0, 0.0, -bboxCenter.x,
                 0.0, scaleFactor, 0.0, -bboxCenter.y,
@@ -485,25 +491,17 @@ int main()
 
     }
 
-    // FUCKING ICOSPHERE:
-
-    /*for (int s = 1; s < 6; s++)
-    {
-        IcoSphere ico(s, 1.0);
-        std::cout << ico.uniqueVertices.size() << "\n";
-    }*/
-
-    /**/
+    /*
     uint res = 40; // octree resolution
-
-    // Vector3 axis = normalize(Vector3(1, 1, 1));
 
     auto startObjLoad = std::chrono::high_resolution_clock::now();
     // === Timed code ============
     OBJImporter obj = OBJImporter();
     obj.pathPrefix = sourcePath;
-    Geometry geom = obj.importOBJGeometry("armadillo.obj");
-    geom.applyMatrix(Matrix4().setToScale(0.03, 0.03, 0.03));
+    Geometry geom = obj.importOBJGeometry("nefertiti.obj");
+    const double scaleF = 0.03 / 4.0;
+    std::cout << "scaleFactor = " << scaleF << "\n";
+    geom.applyMatrix(Matrix4().setToScale(scaleF, scaleF, scaleF));
     VTKExporter e;
     e.pathPrefix = targetPath;
     e.initExport(&geom, geom.name);
@@ -541,7 +539,7 @@ int main()
     tRedistParams.omega_angle = 0.5;
     //tRedistParams.saveTangentialVelocityStates = true;
 
-    Evolver evolver(eParams, mcfParams, sdfParams, &tRedistParams);
+    Evolver evolver(eParams, mcfParams, sdfParams, &tRedistParams);*/
 
     return 1;
 }

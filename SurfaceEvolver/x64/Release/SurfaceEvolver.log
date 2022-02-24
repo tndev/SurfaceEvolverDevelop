@@ -1,25 +1,37 @@
-﻿  Evolver.cpp
-C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\poly2tri\sweep\sweep_context.h(161,24): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
-C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.h(217,23): warning C4267: 'return': conversion from 'size_t' to 'unsigned int', possible loss of data
-C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(20,11): warning C4244: 'initializing': conversion from 'double' to 'unsigned int', possible loss of data
-C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(78,30): warning C4267: 'argument': conversion from 'size_t' to 'const unsigned int', possible loss of data
-C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(79,30): warning C4267: 'argument': conversion from 'size_t' to 'const unsigned int', possible loss of data
-C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(80,30): warning C4267: 'argument': conversion from 'size_t' to 'const unsigned int', possible loss of data
-C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(111,27): warning C4018: '<': signed/unsigned mismatch
-C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(415,34): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
-C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(469,35): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
-C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(765,35): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
-C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(916,35): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
-C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(909,17): warning C4101: 'gradSDFx_V': unreferenced local variable
-C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(909,41): warning C4101: 'gradSDFz_V': unreferenced local variable
-C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(909,29): warning C4101: 'gradSDFy_V': unreferenced local variable
-C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(958,35): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
-C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(1037,35): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
-C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(1099,34): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
-C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(1231,27): warning C4244: '=': conversion from 'double' to 'unsigned int', possible loss of data
+﻿  Grid.cpp
+C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\poly2tri\sweep\sweep_context.h(161,24): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(367,18): warning C4018: '<': signed/unsigned mismatch
+C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(368,19): warning C4018: '<': signed/unsigned mismatch
+C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(369,20): warning C4018: '<': signed/unsigned mismatch
+C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(348,18): warning C4101: 'i': unreferenced local variable
+C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(411,95): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(411,82): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(411,58): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(429,16): warning C4018: '<': signed/unsigned mismatch
+C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(444,23): warning C4018: '<': signed/unsigned mismatch
+C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(446,24): warning C4018: '<': signed/unsigned mismatch
+C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(448,25): warning C4018: '<': signed/unsigned mismatch
+C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(479,35): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(479,26): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(480,35): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(480,26): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(481,35): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(481,26): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(487,14): warning C4244: 'initializing': conversion from 'double' to 'unsigned int', possible loss of data
+C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(488,14): warning C4244: 'initializing': conversion from 'double' to 'unsigned int', possible loss of data
+C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(489,14): warning C4244: 'initializing': conversion from 'double' to 'unsigned int', possible loss of data
+C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(497,18): warning C4018: '<': signed/unsigned mismatch
+C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(498,19): warning C4018: '<': signed/unsigned mismatch
+C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(499,20): warning C4018: '<': signed/unsigned mismatch
+C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(544,18): warning C4018: '<': signed/unsigned mismatch
+C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(545,19): warning C4018: '<': signed/unsigned mismatch
+C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(546,20): warning C4018: '<': signed/unsigned mismatch
+C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(588,18): warning C4018: '<': signed/unsigned mismatch
+C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(589,19): warning C4018: '<': signed/unsigned mismatch
+C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(590,20): warning C4018: '<': signed/unsigned mismatch
   Generating code
-  1 of 3355 functions (<0.1%) were compiled, the rest were copied from previous compilation.
+  2 of 3356 functions (<0.1%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    11 functions had inline decision re-evaluated but remain unchanged
+    23 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
-  SurfaceEvolver.vcxproj -> C:\Users\Martin\source\repos\SurfaceEvolverDevelop\x64\Release\SurfaceEvolver.exe
+  SurfaceEvolver.vcxproj -> C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\x64\Release\SurfaceEvolver.exe

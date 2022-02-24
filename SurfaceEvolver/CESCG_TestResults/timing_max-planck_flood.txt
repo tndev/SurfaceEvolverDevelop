@@ -1,1 +1,0 @@
-timingFloodMax-planckAMDRyzen = {0.0366889, 0.150949};

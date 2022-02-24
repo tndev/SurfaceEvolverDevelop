@@ -1,1 +1,0 @@
-timingFSMax-planckAMDRyzen = {0.0140253, 0.0504272};

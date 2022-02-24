@@ -3,6 +3,7 @@
 
 Grid::Grid(const Grid& other)
 {	
+	this->geomName = other.geomName;
 	this->Nx = other.Nx; this->Ny = other.Ny; this->Nz = other.Nz;
 
 	this->gridExtent = other.gridExtent;
@@ -25,6 +26,16 @@ Grid::Grid(const Grid& other)
 
 Grid::Grid(uint Nx, uint Ny, uint Nz, const Box3& bbox, const Box3& cubeBox, std::string geomName, double initVal)
 {
+	// ----------------------------------------------------
+	// trim geom path
+	/*std::string delim = "/";
+	size_t foundPos = 0;
+	do
+	{
+		foundPos = geomName.find(delim);
+		geomName = geomName.substr(foundPos + 1);
+	} while (foundPos < geomName.size());*/
+	// -----------------------------------------------------
 	this->geomName = geomName;
 	this->cubeBox = cubeBox;
 	this->bbox = bbox;
