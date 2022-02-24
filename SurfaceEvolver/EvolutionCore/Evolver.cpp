@@ -647,10 +647,11 @@ double Evolver::tangentialRedistDecayFunction(double& SDF_V)
 	return (20 * SDF_V + rDecay) / (21 * rDecay);
 }
 
-double Evolver::tangentialRedistCurvatureFunction(double& H)
+double Evolver::tangentialRedistCurvatureFunction(double H, double D)
 {
-	//return 1.0;
-	return exp(-H * H / 100);
+	return H * std::fabs(D);
+	//return 1 - exp(-H * H / 100);
+	//return 1.0 / (exp(H + std::fabs(D) + 1.0));
 }
 
 Vector3 Evolver::getVectorToSmallestAngle(uint i)
@@ -816,7 +817,7 @@ void Evolver::getTriangleEvolutionSystem(double smoothStep, double& meanArea)
 		// off-diag:
 		for (uint p = 0; p < m; p++) SysMatrix[i][adjacentPolys[i][p][1]] *= -(dt * eps) / coVolArea;
 
-		double rho = (!meanCurvatureFlow ? this->tangentialRedistCurvatureFunction(vCurvatures[i]) : 0.0);
+		double rho = (!meanCurvatureFlow ? this->tangentialRedistCurvatureFunction(vCurvatures[i], SDF_V) : 0.0);
 		double beta = (redistribution_type > 0 ? 1.0 : 0.0);
 
 		// tangential redist:

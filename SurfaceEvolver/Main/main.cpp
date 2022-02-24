@@ -302,7 +302,7 @@ void performUnitSphereTest(bool tan_redistribute = false) {
 int main()
 {
     const std::vector<std::string> importedFilenames{
-        //"armadillo.obj",
+        "armadillo.obj",
         //                      "blub.obj",
         "bunny.obj",
         "max-planck.obj",
@@ -324,8 +324,8 @@ int main()
     OBJImporter objImp;
     objImp.pathPrefix = sourcePath;
 
-    const bool performMeshSDFTests = true;
-    const bool performEvolutionTests = false;
+    const bool performMeshSDFTests = false;
+    const bool performEvolutionTests = true;
     const bool performUnitSphereTest = false;
 
     // ================== S D F    T E S T S ========================================
@@ -410,7 +410,7 @@ int main()
 
         const uint icoSubdiv = 3;
 
-        const double dt = 0.01;
+        const double dt = 0.02;
         const uint NSteps = 200;
 
         // =============================================

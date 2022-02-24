@@ -1,46 +1,25 @@
-﻿  Geometry.cpp
+﻿  Evolver.cpp
 C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\poly2tri\sweep\sweep_context.h(161,24): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
-C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(96,127): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
-C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(107,32): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
-C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(579,15): warning C4101: 'e': unreferenced local variable
-C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(976,51): warning C4267: '+=': conversion from 'size_t' to 'unsigned int', possible loss of data
-C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(977,57): warning C4267: '+=': conversion from 'size_t' to 'unsigned int', possible loss of data
-C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(989,73): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
-C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(989,73): warning C4267: 'initializing': conversion from 'size_t' to 'const unsigned int', possible loss of data
-C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(990,75): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
-C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(990,75): warning C4267: 'initializing': conversion from 'size_t' to 'const unsigned int', possible loss of data
-C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(1140,16): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(1141,16): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(1142,16): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(1148,16): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(1149,16): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(1150,16): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(1156,16): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(1157,16): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(1158,16): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(1398,9): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(1397,9): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(1400,7): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(1692,77): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(1692,46): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(1699,30): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(1698,30): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(1696,29): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(1714,77): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(1714,46): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(1721,30): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(1720,30): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(1718,29): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(614,20): warning C4244: '=': conversion from 'double' to '_Ty', possible loss of data
-          with
-          [
-              _Ty=unsigned int
-          ]
-C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Geometry.cpp(626): message : see reference to function template instantiation 'void flipArray<unsigned int>(std::vector<unsigned int,std::allocator<unsigned int>> &,const unsigned int)' being compiled
+C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.h(217,23): warning C4267: 'return': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(20,11): warning C4244: 'initializing': conversion from 'double' to 'unsigned int', possible loss of data
+C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(78,30): warning C4267: 'argument': conversion from 'size_t' to 'const unsigned int', possible loss of data
+C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(79,30): warning C4267: 'argument': conversion from 'size_t' to 'const unsigned int', possible loss of data
+C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(80,30): warning C4267: 'argument': conversion from 'size_t' to 'const unsigned int', possible loss of data
+C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(111,27): warning C4018: '<': signed/unsigned mismatch
+C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(415,34): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(469,35): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(766,35): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(917,35): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(910,17): warning C4101: 'gradSDFx_V': unreferenced local variable
+C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(910,41): warning C4101: 'gradSDFz_V': unreferenced local variable
+C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(910,29): warning C4101: 'gradSDFy_V': unreferenced local variable
+C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(959,35): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(1038,35): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(1100,34): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(1232,27): warning C4244: '=': conversion from 'double' to 'unsigned int', possible loss of data
   Generating code
-  Previous IPDB and IOBJ mismatch, fall back to full compilation.
-C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\poly2tri\sweep\sweep.cc(773): warning C4715: 'p2t::Sweep::NextFlipPoint': not all control paths return a value
-C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(929): warning C4723: potential divide by 0
-  All 3374 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  2 of 3356 functions (<0.1%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    11 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   SurfaceEvolver.vcxproj -> C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\x64\Release\SurfaceEvolver.exe

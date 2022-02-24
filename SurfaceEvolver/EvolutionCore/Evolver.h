@@ -120,7 +120,7 @@ private:
 	double laplaceBeltramiSmoothFunc(double t);
 	double etaCtrlFunc(double& SDF_V, Vector3& gradSDF_V, Vector3& nV);
 	double tangentialRedistDecayFunction(double& SDF_V);
-	double tangentialRedistCurvatureFunction(double& H);
+	double tangentialRedistCurvatureFunction(double H, double D = 0.0);
 	Vector3 getVectorToSmallestAngle(uint i);
 
 	void computeSurfaceNormalsAndCoVolumes();
