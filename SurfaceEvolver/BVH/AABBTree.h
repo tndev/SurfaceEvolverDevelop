@@ -86,7 +86,7 @@ public:
 	AABBTree(const Geometry& geom, PrimitiveType type = PrimitiveType::tri);
 	~AABBTree() = default;
 
-	bool useIntrinsics = true;
+	bool useIntrinsics = false;
 
 	uint getDepth();
 

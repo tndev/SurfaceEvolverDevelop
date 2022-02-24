@@ -1,8 +1,1 @@
-﻿  main.cpp
-C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\poly2tri\sweep\sweep_context.h(161,24): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
-C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.h(217,23): warning C4267: 'return': conversion from 'size_t' to 'unsigned int', possible loss of data
-C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\Main\main.cpp(449,102): warning C4244: 'initializing': conversion from 'double' to 'unsigned int', possible loss of data
-C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\Main\main.cpp(449,44): warning C4244: 'initializing': conversion from 'double' to 'const unsigned int', possible loss of data
-LINK : warning LNK4075: ignoring '/INCREMENTAL' due to '/PROFILE' specification
-AABBTree.obj : warning LNK4075: ignoring '/EDITANDCONTINUE' due to '/OPT:REF' specification
-  SurfaceEvolver.vcxproj -> C:\Users\Martin\source\repos\SurfaceEvolverDevelop\x64\Debug\SurfaceEvolver.exe
+﻿  SurfaceEvolver.vcxproj -> C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\x64\Debug\SurfaceEvolver.exe

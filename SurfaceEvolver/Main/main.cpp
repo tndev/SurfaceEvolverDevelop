@@ -188,7 +188,7 @@ SDFTimeLog performSDFTestWithOutput(Geometry& g, const uint octreeResolution, VT
 	for (uint i = 0; i < nAveragedCount; i++)
 	{
         std::cout << g.name << ", run " << (i + 1) << "...\n";
-		auto sdf_FS = SDF(g, octreeResolution, e.pathPrefix, true);
+		auto sdf_FS = SDF(g, octreeResolution, e.pathPrefix, false);
         averagedTimeLog += sdf_FS.timeLog;
 		std::cout << sdf_FS.getComputationProperties();
 
@@ -302,7 +302,7 @@ void performUnitSphereTest(bool tan_redistribute = false) {
 int main()
 {
     const std::vector<std::string> importedFilenames{
-        "armadillo.obj",
+        //"armadillo.obj",
         //                      "blub.obj",
         "bunny.obj",
         "max-planck.obj",

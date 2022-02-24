@@ -60,7 +60,7 @@ SDF::SDF(const Geometry& geom, uint resolution, std::string path, bool computeSi
 
 			this->grid = std::make_shared<Grid>(Grid(
 				this->resolution_limit,this->resolution_limit, this->resolution_limit,
-				this->octree->bbox, this->octree->cubeBox, pathPrefix + tri_aabb->geom->name));
+				this->octree->bbox, this->octree->cubeBox, pathPrefix + tri_aabb->geom->name, LARGE_VAL));
 			this->octree->setLeafValueToScalarGrid(*this->grid);
 			this->grid->expand();
 			this->fastSweep = std::make_shared<FastSweep3D>(FastSweep3D(this->grid, 8, saveGridStates));
@@ -94,7 +94,7 @@ SDF::SDF(const Geometry& geom, uint resolution, std::string path, bool computeSi
 			VTKExporter exporter = VTKExporter();
 
 			this->grid = std::make_shared<Grid>(Grid(resolution, resolution, resolution,
-				this->octree->bbox, this->octree->cubeBox, pathPrefix + tri_aabb->geom->name));
+				this->octree->bbox, this->octree->cubeBox, pathPrefix + tri_aabb->geom->name, LARGE_VAL));
 			this->octree->setLeafValueToScalarGrid(*this->grid);
 			
 			this->grid->expand();
@@ -152,7 +152,7 @@ SDF::SDF(const Geometry& geom, uint resolution, std::string path, bool computeSi
 		double maxDim = std::max({ size.x, size.y, size.z });
 		Box3 cubeBox = Box3(bbox.min, bbox.min + Vector3(maxDim, maxDim, maxDim));
 
-		this->grid = std::make_shared<Grid>(Grid(resolution, resolution, resolution, bbox, cubeBox, pathPrefix + tri_aabb->geom->name));
+		this->grid = std::make_shared<Grid>(Grid(resolution, resolution, resolution, bbox, cubeBox, pathPrefix + tri_aabb->geom->name, LARGE_VAL));
 		auto startSDF_Lookup = std::chrono::high_resolution_clock::now();
 		this->grid->expand();
 		this->grid->aabbDistanceField(tri_aabb.get());

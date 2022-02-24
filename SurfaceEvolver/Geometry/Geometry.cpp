@@ -1422,7 +1422,7 @@ double getDistanceToAPrimitiveSq(Primitive& primitive, Vector3& point)
 		t[0] = primitive.vertices[0];
 		t[1] = primitive.vertices[1];
 		t[2] = primitive.vertices[2];
-		const bool value = getDistanceToATriangleSq(t, &point);
+		const double value = getDistanceToATriangleSq(t, &point);
 		delete[] t;
 		return value;
 	}
