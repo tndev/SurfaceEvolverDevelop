@@ -50,8 +50,7 @@ Octree::OctreeNode::OctreeNode(Octree* tree, Box3 box, uint depthLeft)
 					SET_BOX_MAX_COORD(childBox, this->box, i, j, k);
 
 					if (intersectsPrimitives(childBox)) {
-						this->children.emplace_back(std::make_shared<OctreeNode>(
-							OctreeNode(this->tree, childBox, depthLeft - 1)));
+						this->children.emplace_back(std::make_shared<OctreeNode>(this->tree, childBox, depthLeft - 1));
 					}
 				}
 			}
@@ -211,7 +210,7 @@ Octree::Octree(const std::shared_ptr<AABBTree>& aabbTree, const Box3& bbox, uint
 	this->cubeBox = cubeBox;
 	this->aabbTree = aabbTree; // for fast lookup
 
-	this->root = std::make_shared<OctreeNode>(OctreeNode(this, this->cubeBox));
+	this->root = std::make_shared<OctreeNode>(this, this->cubeBox);
 }
 
 void Octree::getAllNodes(std::vector<OctreeNode>& nodeBuffer)

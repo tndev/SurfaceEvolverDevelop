@@ -83,7 +83,7 @@ public:
 
 	AABBTree() = default;
 	AABBTree(const AABBTree& other);
-	AABBTree(const Geometry& geom, PrimitiveType type = PrimitiveType::tri);
+	AABBTree(const std::weak_ptr<Geometry>& geomPtr, PrimitiveType type = PrimitiveType::tri);
 	~AABBTree() = default;
 
 	bool useIntrinsics = false;

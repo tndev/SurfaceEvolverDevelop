@@ -649,8 +649,8 @@ double Evolver::tangentialRedistDecayFunction(double& SDF_V)
 
 double Evolver::tangentialRedistCurvatureFunction(double H, double D)
 {
-	return H * std::fabs(D);
-	//return 1 - exp(-H * H / 100);
+	const double val = std::fabs(D);
+	return 1 - exp(-val * val);
 	//return 1.0 / (exp(H + std::fabs(D) + 1.0));
 }
 

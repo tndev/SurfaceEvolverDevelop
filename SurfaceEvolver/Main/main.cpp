@@ -317,7 +317,8 @@ int main()
     // ========= !!!!!!!!!!!!!!!!!!!!!!! ===================
 	// >>>>>>> CHANGE THIS WHEN YOU RUN ON A DIFFERENT MACHINE
 	// ========= !!!!!!!!!!!!!!!!!!!!!!! ===================
-    const std::string cpuName = "IntelI7";
+    //const std::string cpuName = "IntelI7";
+    const std::string cpuName = "AMDRyzen";
 
     VTKExporter vtkExp;
     vtkExp.pathPrefix = targetPath;
@@ -410,7 +411,7 @@ int main()
 
         const uint icoSubdiv = 3;
 
-        const double dt = 0.02;
+        const double dt = 0.015;
         const uint NSteps = 200;
 
         // =============================================
@@ -425,6 +426,7 @@ int main()
         evolParams.printStepOutput = true;
         evolParams.writeTimeLog = true;
         evolParams.outputPath = targetPath;
+        //evolParams.printSolution = true;
         MeanCurvatureParams mcfParams;
         mcfParams.saveAreaStates = true;
         mcfParams.saveCurvatureStates = true;

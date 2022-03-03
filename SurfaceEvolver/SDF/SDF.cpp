@@ -23,7 +23,7 @@ SDF::SDF(const Geometry& geom, uint resolution, std::string path, bool computeSi
 {
 	pathPrefix = path;
 	this->resolution = resolution;
-	this->geom = std::make_shared<Geometry>(geom);
+	this->geom = std::make_shared<Geometry>(geom); // creates a copy
 	this->method = method;
 
 	if (method == SDF_Method::fast_sweeping) {
@@ -32,7 +32,7 @@ SDF::SDF(const Geometry& geom, uint resolution, std::string path, bool computeSi
 
 		auto startSDF_AABB = std::chrono::high_resolution_clock::now();
 
-		tri_aabb = std::make_shared<AABBTree>(AABBTree(geom));
+		tri_aabb = std::make_shared<AABBTree>(this->geom);
 
 		auto endSDF_AABB = std::chrono::high_resolution_clock::now();
 		std::chrono::duration<double> elapsedSDF_AABB = (endSDF_AABB - startSDF_AABB);
@@ -41,10 +41,10 @@ SDF::SDF(const Geometry& geom, uint resolution, std::string path, bool computeSi
 
 		if (scaleAndInterpolate && resolution > resolution_limit) {
 			resolution = resolution_limit;
-			octree = std::make_shared<Octree>(Octree(tri_aabb, tri_aabb->bbox, resolution_limit));
+			octree = std::make_shared<Octree>(tri_aabb, tri_aabb->bbox, resolution_limit);
 		}
 		else {
-			octree = std::make_shared<Octree>(Octree(tri_aabb, tri_aabb->bbox, resolution));
+			octree = std::make_shared<Octree>(tri_aabb, tri_aabb->bbox, resolution);
 		}		
 
 		auto endSDF_Octree = std::chrono::high_resolution_clock::now();
@@ -58,12 +58,12 @@ SDF::SDF(const Geometry& geom, uint resolution, std::string path, bool computeSi
 		if (scaleAndInterpolate && resolution > this->resolution_limit) {
 			auto startSDF_FS = std::chrono::high_resolution_clock::now();
 
-			this->grid = std::make_shared<Grid>(Grid(
+			this->grid = std::make_shared<Grid>(
 				this->resolution_limit,this->resolution_limit, this->resolution_limit,
-				this->octree->bbox, this->octree->cubeBox, pathPrefix + tri_aabb->geom->name, LARGE_VAL));
+				this->octree->bbox, this->octree->cubeBox, pathPrefix + tri_aabb->geom->name, LARGE_VAL);
 			this->octree->setLeafValueToScalarGrid(*this->grid);
 			this->grid->expand();
-			this->fastSweep = std::make_shared<FastSweep3D>(FastSweep3D(this->grid, 8, saveGridStates));
+			this->fastSweep = std::make_shared<FastSweep3D>(this->grid, 8, saveGridStates);
 
 			auto endSDF_FS = std::chrono::high_resolution_clock::now();
 			elapsedSDF_FS = (endSDF_FS - startSDF_FS);
@@ -93,12 +93,12 @@ SDF::SDF(const Geometry& geom, uint resolution, std::string path, bool computeSi
 			
 			VTKExporter exporter = VTKExporter();
 
-			this->grid = std::make_shared<Grid>(Grid(resolution, resolution, resolution,
-				this->octree->bbox, this->octree->cubeBox, pathPrefix + tri_aabb->geom->name, LARGE_VAL));
+			this->grid = std::make_shared<Grid>(resolution, resolution, resolution,
+				this->octree->bbox, this->octree->cubeBox, pathPrefix + tri_aabb->geom->name, LARGE_VAL);
 			this->octree->setLeafValueToScalarGrid(*this->grid);
 			
 			this->grid->expand();
-			this->fastSweep = std::make_shared<FastSweep3D>(FastSweep3D(this->grid, 8, saveGridStates));
+			this->fastSweep = std::make_shared<FastSweep3D>(this->grid, 8, saveGridStates);
 
 			auto endSDF_FS = std::chrono::high_resolution_clock::now();
 			elapsedSDF_FS = (endSDF_FS - startSDF_FS);
@@ -142,7 +142,7 @@ SDF::SDF(const Geometry& geom, uint resolution, std::string path, bool computeSi
 
 		auto startSDF_AABB = std::chrono::high_resolution_clock::now();
 
-		this->tri_aabb = std::make_shared<AABBTree>(AABBTree(*this->geom));
+		this->tri_aabb = std::make_shared<AABBTree>(this->geom);
 
 		auto endSDF_AABB = std::chrono::high_resolution_clock::now();
 		std::chrono::duration<double> elapsedSDF_AABB = (endSDF_AABB - startSDF_AABB);
@@ -152,7 +152,7 @@ SDF::SDF(const Geometry& geom, uint resolution, std::string path, bool computeSi
 		double maxDim = std::max({ size.x, size.y, size.z });
 		Box3 cubeBox = Box3(bbox.min, bbox.min + Vector3(maxDim, maxDim, maxDim));
 
-		this->grid = std::make_shared<Grid>(Grid(resolution, resolution, resolution, bbox, cubeBox, pathPrefix + tri_aabb->geom->name, LARGE_VAL));
+		this->grid = std::make_shared<Grid>(resolution, resolution, resolution, bbox, cubeBox, pathPrefix + tri_aabb->geom->name, LARGE_VAL);
 		auto startSDF_Lookup = std::chrono::high_resolution_clock::now();
 		this->grid->expand();
 		this->grid->aabbDistanceField(tri_aabb.get());
@@ -177,7 +177,7 @@ SDF::SDF(const Geometry& geom, uint resolution, std::string path, bool computeSi
 		double maxDim = std::max({ size.x, size.y, size.z });
 		Box3 cubeBox = Box3(bbox.min, bbox.min + Vector3(maxDim, maxDim, maxDim));
 
-		grid = std::make_shared<Grid>(Grid(resolution, resolution, resolution, bbox, cubeBox, pathPrefix + tri_aabb->geom->name));
+		grid = std::make_shared<Grid>(resolution, resolution, resolution, bbox, cubeBox, pathPrefix + tri_aabb->geom->name);
 		grid->expand();
 		grid->bruteForceDistanceField(this->geom.get());
 
@@ -255,14 +255,14 @@ void SDF::applyMatrix(Matrix4& m)
 
 	auto startSDFRecompute = std::chrono::high_resolution_clock::now();
 
-	this->octree = std::make_shared<Octree>(Octree(this->tri_aabb, this->tri_aabb->bbox, resolution));
+	this->octree = std::make_shared<Octree>(this->tri_aabb, this->tri_aabb->bbox, resolution);
 
-	this->grid = std::make_shared<Grid>(Grid(resolution, resolution, resolution,
-		this->octree->bbox, this->octree->cubeBox, tri_aabb->geom->name));
+	this->grid = std::make_shared<Grid>(resolution, resolution, resolution,
+		this->octree->bbox, this->octree->cubeBox, tri_aabb->geom->name);
 
 	this->octree->setLeafValueToScalarGrid(*this->grid);
 	
-	this->fastSweep = std::make_shared<FastSweep3D>(FastSweep3D(this->grid, 8));
+	this->fastSweep = std::make_shared<FastSweep3D>(this->grid, 8);
 
 	auto endSDFRecompute = std::chrono::high_resolution_clock::now();
 

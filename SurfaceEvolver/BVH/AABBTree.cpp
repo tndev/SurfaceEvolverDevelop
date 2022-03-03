@@ -11,22 +11,22 @@ AABBTree::AABBTree(const AABBTree& other)
 	root = other.root;
 }
 
-AABBTree::AABBTree(const Geometry& geom, PrimitiveType type)
+AABBTree::AABBTree(const std::weak_ptr<Geometry>& geomPtr, PrimitiveType type)
+	: geom(geomPtr)
 {
 	this->type = type;
-	this->primitives = geom.getPrimitives(type);
-	this->bbox = geom.getBoundingBox();
+	this->primitives = geom->getPrimitives(type);
+	this->bbox = geom->getBoundingBox();
 	this->bbox.min.addScalar(-0.001);
 	this->bbox.max.addScalar(0.001);
 
-	this->geom = std::make_shared<Geometry>(geom);
 
 	// generate index array to primitives
 	std::vector<uint> primitiveIds(primitives.size());
 	std::iota(primitiveIds.begin(), primitiveIds.end(), 0);
 
 	// generate root and all that follow
-	this->root = std::make_shared<AABBNode>(AABBNode(primitiveIds, bbox, this, MAX_DEPTH));
+	this->root = std::make_shared<AABBNode>(primitiveIds, bbox, this, MAX_DEPTH);
 }
 
 uint AABBTree::getDepth()
@@ -709,7 +709,7 @@ void AABBTree::AABBNode::construct(const std::vector<uint>& primitiveIds, uint d
 		Box3 bboxLeft = this->bbox;
 		bboxLeft.max.setCoordById(this->splitPosition, this->axis);
 		bboxLeft.expandByFactor(1.01);
-		this->left = std::make_shared<AABBNode>(AABBNode(leftPrimitiveIds, bboxLeft, this->tree, depthLeft - 1));
+		this->left = std::make_shared<AABBNode>(leftPrimitiveIds, bboxLeft, this->tree, depthLeft - 1);
 
 		if (this->left->primitiveIds.empty() && this->left->left == nullptr && this->left->right == nullptr) {
 			this->left = nullptr;
@@ -720,7 +720,7 @@ void AABBTree::AABBNode::construct(const std::vector<uint>& primitiveIds, uint d
 		Box3 bboxRight = this->bbox;
 		bboxRight.min.setCoordById(this->splitPosition, this->axis);
 		bboxRight.expandByFactor(1.01);
-		this->right = std::make_shared<AABBNode>(AABBNode(rightPrimitiveIds, bboxRight, this->tree, depthLeft - 1));
+		this->right = std::make_shared<AABBNode>(rightPrimitiveIds, bboxRight, this->tree, depthLeft - 1);
 
 		if (this->right->primitiveIds.empty() && this->right->left == nullptr && this->right->right == nullptr) {
 			this->right = nullptr;
