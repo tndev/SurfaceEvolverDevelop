@@ -59,23 +59,23 @@ void Grid::exportToVTI(std::string filename)
 	double dy = scale.y / Ny;
 	double dz = scale.z / Nz;
 
-	vti << "<VTKFile type=\"ImageData\" version=\"1.0\" byte_order=\"LittleEndian\" header_type=\"UInt64\">" << std::endl;
-	vti << "	<ImageData WholeExtent=\"0 " << nx << " 0 " << ny << " 0 " << nz << "\" Origin=\"" << o.x + 0.5 * dx << " " << o.y + 0.5 * dy << " " << o.z + 0.5 * dz << "\" Spacing=\"" << dx << " " << dy << " " << dz << "\">" << std::endl;
-	vti << "		<Piece Extent=\"0 " << nx << " 0 " << ny << " 0 " << nz << "\">" << std::endl;
-	vti << "			<PointData Scalars=\"Scalars_\">" << std::endl;
-	vti << "				<DataArray type=\"Float32\" Name=\"Scalars_\" format=\"ascii\" RangeMin=\"" << min << "\" RangeMax=\"" << max << "\">" << std::endl;
+	vti << "<VTKFile type=\"ImageData\" version=\"1.0\" byte_order=\"LittleEndian\" header_type=\"UInt64\">\n";
+	vti << "	<ImageData WholeExtent=\"0 " << nx << " 0 " << ny << " 0 " << nz << "\" Origin=\"" << o.x + 0.5 * dx << " " << o.y + 0.5 * dy << " " << o.z + 0.5 * dz << "\" Spacing=\"" << dx << " " << dy << " " << dz << "\">\n";
+	vti << "		<Piece Extent=\"0 " << nx << " 0 " << ny << " 0 " << nz << "\">\n";
+	vti << "			<PointData Scalars=\"Scalars_\">\n";
+	vti << "				<DataArray type=\"Float32\" Name=\"Scalars_\" format=\"ascii\" RangeMin=\"" << min << "\" RangeMax=\"" << max << "\">\n";
 
 	for (const auto& val : field) {
-		vti << static_cast<float>(val) << std::endl;
+		vti << static_cast<float>(val) << "\n";
 	}
 
-	vti << "				</DataArray>" << std::endl;
-	vti << "			</PointData>" << std::endl;
-	vti << "		<CellData>" << std::endl;
-	vti << "		</CellData>" << std::endl;
-	vti << "	</Piece>" << std::endl;
-	vti << "	</ImageData>" << std::endl;
-	vti << "</VTKFile>";
+	vti << "				</DataArray>\n";
+	vti << "			</PointData>\n";
+	vti << "		<CellData>\n";
+	vti << "		</CellData>\n";
+	vti << "	</Piece>\n";
+	vti << "	</ImageData>\n";
+	vti << "</VTKFile>\n";
 
 	vti.close();
 }

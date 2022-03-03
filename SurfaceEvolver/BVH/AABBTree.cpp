@@ -11,7 +11,7 @@ AABBTree::AABBTree(const AABBTree& other)
 	root = other.root;
 }
 
-AABBTree::AABBTree(const std::weak_ptr<Geometry>& geomPtr, PrimitiveType type)
+AABBTree::AABBTree(const std::shared_ptr<Geometry>& geomPtr, PrimitiveType type)
 	: geom(geomPtr)
 {
 	this->type = type;

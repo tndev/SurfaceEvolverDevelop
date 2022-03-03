@@ -193,8 +193,8 @@ C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\Geometry\Vecto
   main.cpp
 C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\poly2tri\sweep\sweep_context.h(161,24): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
 C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.h(217,23): warning C4267: 'return': conversion from 'size_t' to 'unsigned int', possible loss of data
-C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\Main\main.cpp(455,102): warning C4244: 'initializing': conversion from 'double' to 'unsigned int', possible loss of data
-C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\Main\main.cpp(455,44): warning C4244: 'initializing': conversion from 'double' to 'const unsigned int', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\Main\main.cpp(457,102): warning C4244: 'initializing': conversion from 'double' to 'unsigned int', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\Main\main.cpp(457,44): warning C4244: 'initializing': conversion from 'double' to 'const unsigned int', possible loss of data
   shapes.cc
   advancing_front.cc
   Compiling...
@@ -294,6 +294,6 @@ C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\Utils\LinearSo
   Previous IPDB not found, fall back to full compilation.
 C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\poly2tri\sweep\sweep.cc(773): warning C4715: 'p2t::Sweep::NextFlipPoint': not all control paths return a value
 C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(930): warning C4723: potential divide by 0
-  All 3354 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  All 3342 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
   Finished generating code
   SurfaceEvolver.vcxproj -> C:\Users\Martin\source\repos\SurfaceEvolverDevelop\x64\Release\SurfaceEvolver.exe

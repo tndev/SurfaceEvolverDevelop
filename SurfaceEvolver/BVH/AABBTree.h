@@ -83,10 +83,10 @@ public:
 
 	AABBTree() = default;
 	AABBTree(const AABBTree& other);
-	AABBTree(const std::weak_ptr<Geometry>& geomPtr, PrimitiveType type = PrimitiveType::tri);
+	AABBTree(const std::shared_ptr<Geometry>& geomPtr, PrimitiveType type = PrimitiveType::tri);
 	~AABBTree() = default;
 
-	bool useIntrinsics = false;
+	bool useIntrinsics = true;
 
 	uint getDepth();
 

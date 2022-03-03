@@ -175,7 +175,7 @@ void performSimpleSDFTest(Geometry& g, const uint octreeResolution, std::fstream
 	sdf_FS.exportGrid(&e);
 }
 
-SDFTimeLog performSDFTestWithOutput(Geometry& g, const uint octreeResolution, VTKExporter& e)
+SDFTimeLog performSDFTestWithOutput(Geometry& g, const uint octreeResolution, VTKExporter& e, const bool computeSign)
 {
     std::cout << "init SDF for " << g.name << std::endl;
 
@@ -188,7 +188,7 @@ SDFTimeLog performSDFTestWithOutput(Geometry& g, const uint octreeResolution, VT
 	for (uint i = 0; i < nAveragedCount; i++)
 	{
         std::cout << g.name << ", run " << (i + 1) << "...\n";
-		auto sdf_FS = SDF(g, octreeResolution, e.pathPrefix, false);
+		auto sdf_FS = SDF(g, octreeResolution, e.pathPrefix, computeSign);
         averagedTimeLog += sdf_FS.timeLog;
 		std::cout << sdf_FS.getComputationProperties();
 
@@ -325,8 +325,8 @@ int main()
     OBJImporter objImp;
     objImp.pathPrefix = sourcePath;
 
-    const bool performMeshSDFTests = false;
-    const bool performEvolutionTests = true;
+    const bool performMeshSDFTests = true;
+    const bool performEvolutionTests = false;
     const bool performUnitSphereTest = false;
 
     // ================== S D F    T E S T S ========================================
@@ -335,6 +335,8 @@ int main()
         const std::vector<uint> octreeResolutions = {
             20, 30, 40, 50, 60, 70, 80, 90
         };
+
+        const bool computeSign = true;
 
         /**/
         for (const auto& meshFileName : importedFilenames)
@@ -356,7 +358,7 @@ int main()
 
             for (const auto& res : octreeResolutions)
             {
-                const auto tLog = performSDFTestWithOutput(geom, res, vtkExp);
+                const auto tLog = performSDFTestWithOutput(geom, res, vtkExp, computeSign);
                 timing_file_aabb << tLog.AABBTreeTime << (res != *(octreeResolutions.end() - 1) ? ", " : "");
                 timing_file_octree << tLog.OctreeTime << (res != *(octreeResolutions.end() - 1) ? ", " : "");
                 timing_file_fs << tLog.FastSweepingTime << (res != *(octreeResolutions.end() - 1) ? ", " : "");
