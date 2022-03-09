@@ -8,6 +8,8 @@
 #include <iostream>
 #ifdef _MSC_VER
 #include <intrin.h>
+#include <array>
+#include <string>
 #endif
 
 #ifdef __GNUC__
@@ -39,78 +41,44 @@ unsigned long long _xgetbv(unsigned int index)
 #ifndef CPUINFO_H_
 #define CPUINFO_H_
 
-void getCPUInfo(bool* buffer) {
-	bool sseSupportted = false;
-	bool sse2Supportted = false;
-	bool sse3Supportted = false;
-	bool ssse3Supportted = false;
-	bool sse4_1Supportted = false;
-	bool sse4_2Supportted = false;
-	bool sse4aSupportted = false;
-	bool sse5Supportted = false;
-	bool avxSupportted = false;
+std::string GetCPUInfo()
+{
+    // 4 is essentially hardcoded due to the __cpuid function requirements.
+    // NOTE: Results are limited to whatever the sizeof(int) * 4 is...
+    std::array<int, 4> integerBuffer = {};
+    constexpr size_t sizeofIntegerBuffer = sizeof(int) * integerBuffer.size();
 
-	int cpuinfo[4];
-	__cpuid(cpuinfo, 1);
+    std::array<char, 64> charBuffer = {};
 
-	// Check SSE, SSE2, SSE3, SSSE3, SSE4.1, and SSE4.2 support
-	sseSupportted = cpuinfo[3] & (1 << 25) || false;
-	sse2Supportted = cpuinfo[3] & (1 << 26) || false;
-	sse3Supportted = cpuinfo[2] & (1 << 0) || false;
-	ssse3Supportted = cpuinfo[2] & (1 << 9) || false;
-	sse4_1Supportted = cpuinfo[2] & (1 << 19) || false;
-	sse4_2Supportted = cpuinfo[2] & (1 << 20) || false;
+    // The information you wanna query __cpuid for.
+    // https://docs.microsoft.com/en-us/cpp/intrinsics/cpuid-cpuidex?view=vs-2019
+    constexpr std::array<int, 3> functionIds = {
+        // Manufacturer
+        //  EX: "Intel(R) Core(TM"
+        0x8000'0002,
+        // Model
+        //  EX: ") i7-8700K CPU @"
+        0x8000'0003,
+        // Clockspeed
+        //  EX: " 3.70GHz"
+        0x8000'0004
+    };
 
-	// ----------------------------------------------------------------------
+    std::string cpu;
 
-	// Check AVX support
-	// References
-	// http://software.intel.com/en-us/blogs/2011/04/14/is-avx-enabled/
-	// http://insufficientlycomplicated.wordpress.com/2011/11/07/detecting-intel-advanced-vector-extensions-avx-in-visual-studio/
+    for (int id : functionIds)
+    {
+        // Get the data for the current ID.
+        __cpuid(integerBuffer.data(), id);
 
-	avxSupportted = cpuinfo[2] & (1 << 28) || false;
-	bool osxsaveSupported = cpuinfo[2] & (1 << 27) || false;
-	if (osxsaveSupported && avxSupportted)
-	{
-		// _XCR_XFEATURE_ENABLED_MASK = 0
-		unsigned long long xcrFeatureMask = _xgetbv(0);
-		avxSupportted = (xcrFeatureMask & 0x6) == 0x6;
-	}
+        // Copy the raw data from the integer buffer into the character buffer
+        std::memcpy(charBuffer.data(), integerBuffer.data(), sizeofIntegerBuffer);
 
-	// ----------------------------------------------------------------------
+        // Copy that data into a std::string
+        cpu += std::string(charBuffer.data());
+    }
 
-	// Check SSE4a and SSE5 support
-
-	// Get the number of valid extended IDs
-	__cpuid(cpuinfo, 0x80000000);
-	int numExtendedIds = cpuinfo[0];
-	if (numExtendedIds >= 0x80000001)
-	{
-		__cpuid(cpuinfo, 0x80000001);
-		sse4aSupportted = cpuinfo[2] & (1 << 6) || false;
-		sse5Supportted = cpuinfo[2] & (1 << 11) || false;
-	}
-
-	// ----------------------------------------------------------------------
-
-	/*
-	std::cout << "SSE:" << (sseSupportted ? 1 : 0) << std::endl;
-	std::cout << "SSE2:" << (sse2Supportted ? 1 : 0) << std::endl;
-	std::cout << "SSE3:" << (sse3Supportted ? 1 : 0) << std::endl;
-	std::cout << "SSE4.1:" << (sse4_1Supportted ? 1 : 0) << std::endl;
-	std::cout << "SSE4.2:" << (sse4_2Supportted ? 1 : 0) << std::endl;
-	std::cout << "SSE4a:" << (sse4aSupportted ? 1 : 0) << std::endl;
-	std::cout << "SSE5:" << (sse5Supportted ? 1 : 0) << std::endl;
-	std::cout << "AVX:" << (avxSupportted ? 1 : 0) << std::endl;*/
-
-	buffer[0] = sseSupportted;
-	buffer[1] = sse2Supportted;
-	buffer[2] = sse3Supportted;
-	buffer[3] = sse4_1Supportted;
-	buffer[4] = sse4_2Supportted;
-	buffer[5] = sse4aSupportted;
-	buffer[6] = sse5Supportted;
-	buffer[7] = avxSupportted;
+    return cpu;
 }
 
 /**/
@@ -128,6 +96,25 @@ bool isAVXSupported() {
 	}
 
 	return avxSupported;
+}
+
+static std::string FilterSpecialSymbolsFromString(const std::string& inputString)
+{
+    std::string final;
+    for (const auto& symbol : inputString)
+    {
+        if ((symbol >= '0' && symbol <= '9') || (symbol >= 'a' && symbol <= 'z') || (symbol >= 'A' && symbol <= 'Z') || symbol == '_')
+        {
+            final += symbol;
+        }
+    }
+    return final;
+}
+
+std::string GetParsedCPUName()
+{
+	const auto unparsedResult = GetCPUInfo();
+    return FilterSpecialSymbolsFromString(unparsedResult);
 }
 
 #endif

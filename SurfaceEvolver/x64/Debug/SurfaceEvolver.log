@@ -1,1 +1,150 @@
-﻿  SurfaceEvolver.vcxproj -> C:\Users\mcavarga\source\repos\SurfaceEvolverDevelop\x64\Debug\SurfaceEvolver.exe
+﻿  AABBTree.cpp
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\poly2tri\sweep\sweep_context.h(161,24): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(63,27): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(139,38): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(192,72): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(221,35): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(232,21): warning C4267: 'return': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(269,72): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(295,35): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(504,14): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(505,14): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(506,14): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(522,14): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(523,14): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(524,14): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(544,72): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(572,14): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(573,14): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(574,14): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(608,12): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(609,12): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(610,12): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(611,12): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(612,12): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(613,12): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(615,27): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(616,27): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(617,28): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(618,28): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(624,28): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(625,28): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(716,47): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(757,47): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(757,47): warning C4267: 'initializing': conversion from 'size_t' to 'const unsigned int', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(858,18): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(864,28): warning C4244: '=': conversion from '_Ty' to 'float', possible loss of data
+          with
+          [
+              _Ty=double
+          ]
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(924,28): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(924,26): warning C4244: 'initializing': conversion from 'double' to 'const float', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(930,39): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(930,16): warning C4244: 'initializing': conversion from 'double' to 'const float', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(931,39): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(931,16): warning C4244: 'initializing': conversion from 'double' to 'const float', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(961,41): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(966,67): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(967,68): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(1054,16): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(1055,16): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(982,21): warning C4101: 'cMax': unreferenced local variable
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(982,15): warning C4101: 'cMin': unreferenced local variable
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(1169,17): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\BVH\AABBTree.cpp(1170,18): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+  Octree.cpp
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\poly2tri\sweep\sweep_context.h(161,24): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\BVH\Octree.cpp(39,18): warning C4553: '==': result of expression not used; did you intend '='?
+  EvolutionRemesher.cpp
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\poly2tri\sweep\sweep_context.h(161,24): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.h(217,23): warning C4267: 'return': conversion from 'size_t' to 'unsigned int', possible loss of data
+  Evolver.cpp
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\poly2tri\sweep\sweep_context.h(161,24): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.h(217,23): warning C4267: 'return': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(20,11): warning C4244: 'initializing': conversion from 'double' to 'unsigned int', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(78,30): warning C4267: 'argument': conversion from 'size_t' to 'const unsigned int', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(79,30): warning C4267: 'argument': conversion from 'size_t' to 'const unsigned int', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(80,30): warning C4267: 'argument': conversion from 'size_t' to 'const unsigned int', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(111,27): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(415,34): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(469,35): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(766,35): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(917,35): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(910,17): warning C4101: 'gradSDFx_V': unreferenced local variable
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(910,41): warning C4101: 'gradSDFz_V': unreferenced local variable
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(910,29): warning C4101: 'gradSDFy_V': unreferenced local variable
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(959,35): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(1038,35): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(1100,34): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.cpp(1232,27): warning C4244: '=': conversion from 'double' to 'unsigned int', possible loss of data
+  main.cpp
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\poly2tri\sweep\sweep_context.h(161,24): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\EvolutionCore\Evolver.h(217,23): warning C4267: 'return': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\Main\main.cpp(454,102): warning C4244: 'initializing': conversion from 'double' to 'unsigned int', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\Main\main.cpp(454,44): warning C4244: 'initializing': conversion from 'double' to 'const unsigned int', possible loss of data
+  FastSweep3D.cpp
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\poly2tri\sweep\sweep_context.h(161,24): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(29,35): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(29,50): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(29,69): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(29,88): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(29,107): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(29,129): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(29,147): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(29,165): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(30,35): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(30,53): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(30,68): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(30,87): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(30,109): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(30,127): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(30,142): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(30,161): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(31,35): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(31,53): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(31,71): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(31,86): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(31,105): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(31,124): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(31,143): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(31,165): warning C4838: conversion from 'unsigned int' to 'const int' requires a narrowing conversion
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\FastSweep3D.cpp(37,16): warning C4018: '<': signed/unsigned mismatch
+  Grid.cpp
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\poly2tri\sweep\sweep_context.h(161,24): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(367,18): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(368,19): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(369,20): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(348,18): warning C4101: 'i': unreferenced local variable
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(411,95): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(411,82): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(411,58): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(429,16): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(444,23): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(446,24): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(448,25): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(479,35): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(479,26): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(480,35): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(480,26): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(481,35): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(481,26): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(487,14): warning C4244: 'initializing': conversion from 'double' to 'unsigned int', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(488,14): warning C4244: 'initializing': conversion from 'double' to 'unsigned int', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(489,14): warning C4244: 'initializing': conversion from 'double' to 'unsigned int', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(497,18): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(498,19): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(499,20): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(544,18): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(545,19): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(546,20): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(588,18): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(589,19): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\Grid.cpp(590,20): warning C4018: '<': signed/unsigned mismatch
+  SDF.cpp
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\poly2tri\sweep\sweep_context.h(161,24): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Martin\source\repos\SurfaceEvolverDevelop\SurfaceEvolver\SDF\SDF.cpp(168,87): warning C4129: 'w': unrecognized character escape sequence
+  Generating Code...
+LINK : warning LNK4075: ignoring '/INCREMENTAL' due to '/PROFILE' specification
+AABBTree.obj : warning LNK4075: ignoring '/EDITANDCONTINUE' due to '/OPT:REF' specification
+  SurfaceEvolver.vcxproj -> C:\Users\Martin\source\repos\SurfaceEvolverDevelop\x64\Debug\SurfaceEvolver.exe

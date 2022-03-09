@@ -18,7 +18,6 @@ c:\users\martin\source\repos\surfaceevolverdevelop\surfaceevolver\x64\release\ob
 c:\users\martin\source\repos\surfaceevolverdevelop\surfaceevolver\x64\release\evolver.obj
 c:\users\martin\source\repos\surfaceevolverdevelop\surfaceevolver\x64\release\evolutionremesher.obj
 c:\users\martin\source\repos\surfaceevolverdevelop\surfaceevolver\x64\release\octree.obj
-c:\users\martin\source\repos\surfaceevolverdevelop\surfaceevolver\x64\release\aabbtree.obj
 c:\users\martin\source\repos\surfaceevolverdevelop\surfaceevolver\x64\release\linearsolver.obj
 c:\users\martin\source\repos\surfaceevolverdevelop\surfaceevolver\x64\release\sdf.obj
 c:\users\martin\source\repos\surfaceevolverdevelop\surfaceevolver\x64\release\grid.obj
@@ -26,13 +25,6 @@ c:\users\martin\source\repos\surfaceevolverdevelop\surfaceevolver\x64\release\fa
 c:\users\martin\source\repos\surfaceevolverdevelop\surfaceevolver\x64\release\sweep_context.obj
 c:\users\martin\source\repos\surfaceevolverdevelop\surfaceevolver\x64\release\sweep.obj
 c:\users\martin\source\repos\surfaceevolverdevelop\surfaceevolver\x64\release\cdt.obj
-c:\users\martin\source\repos\surfaceevolverdevelop\x64\release\surfaceevolver.exe
-c:\users\martin\source\repos\surfaceevolverdevelop\surfaceevolver\x64\release\surfaceevolver.ipdb
-c:\users\martin\source\repos\surfaceevolverdevelop\surfaceevolver\x64\release\surfaceevolver.iobj
-c:\users\martin\source\repos\surfaceevolverdevelop\x64\release\surfaceevolver.pdb
 c:\users\martin\source\repos\surfaceevolverdevelop\surfaceevolver\x64\release\surfaceevolver.tlog\cl.command.1.tlog
 c:\users\martin\source\repos\surfaceevolverdevelop\surfaceevolver\x64\release\surfaceevolver.tlog\cl.read.1.tlog
 c:\users\martin\source\repos\surfaceevolverdevelop\surfaceevolver\x64\release\surfaceevolver.tlog\cl.write.1.tlog
-c:\users\martin\source\repos\surfaceevolverdevelop\surfaceevolver\x64\release\surfaceevolver.tlog\link.command.1.tlog
-c:\users\martin\source\repos\surfaceevolverdevelop\surfaceevolver\x64\release\surfaceevolver.tlog\link.read.1.tlog
-c:\users\martin\source\repos\surfaceevolverdevelop\surfaceevolver\x64\release\surfaceevolver.tlog\link.write.1.tlog

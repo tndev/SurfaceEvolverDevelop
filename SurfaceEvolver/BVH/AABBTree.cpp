@@ -1,6 +1,24 @@
 #include "AABBTree.h"
 
+#include "../GeometryObject/PrimitiveBox.h"
+
+#include <nmmintrin.h>
+#include <immintrin.h>
+
+#include <stack>
 #include <numeric>
+
+static bool sUseIntrinsics = false;
+
+bool UseIntrinsics()
+{
+	return sUseIntrinsics;
+}
+
+void SetUseIntrinsics(const bool value)
+{
+	sUseIntrinsics = value;
+}
 
 AABBTree::AABBTree(const AABBTree& other)
 {

@@ -1,16 +1,16 @@
 #ifndef AABBTREE_H_
 #define AABBTREE_H_
 
-#include <stack>
-#include <nmmintrin.h>
-#include <immintrin.h>
-#include "../GeometryObject/PrimitiveBox.h"
 #include "../ExportImport/VTKExporter.h"
 
 #define MAX_DEPTH 20
 
 #define uint unsigned int
 #define uint32 uint32_t
+
+void SetUseIntrinsics(const bool value);
+
+[[nodiscard]] bool UseIntrinsics();
 
 /*
 	An AABB (Axis-Aligned Bounding Box) tree is a binary space partitioning structure which accelerates
@@ -86,7 +86,7 @@ public:
 	AABBTree(const std::shared_ptr<Geometry>& geomPtr, PrimitiveType type = PrimitiveType::tri);
 	~AABBTree() = default;
 
-	bool useIntrinsics = true;
+	bool useIntrinsics = UseIntrinsics();
 
 	uint getDepth();
 

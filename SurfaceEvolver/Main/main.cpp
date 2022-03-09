@@ -16,7 +16,6 @@
 #include "../Utils/CPUInfo.h"
 #include "../EvolutionCore/Evolver.h"
 #include "../EvolutionCore/Parameters.h"
-#include "../EvolutionCore/EvolutionRemesher.h"
 
 //   DONE:
 //
@@ -314,11 +313,9 @@ int main()
     const std::string sourcePath = "./CESCG_TestData/";
     const std::string targetPath = "./CESCG_TestResults/";
 
-    // ========= !!!!!!!!!!!!!!!!!!!!!!! ===================
-	// >>>>>>> CHANGE THIS WHEN YOU RUN ON A DIFFERENT MACHINE
-	// ========= !!!!!!!!!!!!!!!!!!!!!!! ===================
-    //const std::string cpuName = "IntelI7";
-    const std::string cpuName = "AMDRyzen";
+    SetUseIntrinsics(true);
+    const std::string cpuName = GetParsedCPUName();
+    const std::string intrinStr = (UseIntrinsics() ? "Intrin" : "NoIntrin");
 
     VTKExporter vtkExp;
     vtkExp.pathPrefix = targetPath;
@@ -350,11 +347,11 @@ int main()
 
             auto geomCapitalFirstLetter = std::string(1, toupper(geom.name[0]));
             const size_t geomNameSize = geom.name.size();
-            timing_file_aabb << "timingAABB" + geomCapitalFirstLetter + geom.name.substr(1, geomNameSize) + cpuName + " = {";
-            timing_file_octree << "timingOctree" + geomCapitalFirstLetter + geom.name.substr(1, geomNameSize) + cpuName + " = {";
-            timing_file_fs << "timingFS" + geomCapitalFirstLetter + geom.name.substr(1, geomNameSize) + cpuName + " = {";
-            timing_file_flood << "timingFlood" + geomCapitalFirstLetter + geom.name.substr(1, geomNameSize) + cpuName + " = {";
-            timing_file_total << "timingTotal" + geomCapitalFirstLetter + geom.name.substr(1, geomNameSize) + cpuName + " = {";
+            timing_file_aabb << "timingAABB" + geomCapitalFirstLetter + geom.name.substr(1, geomNameSize) + cpuName + intrinStr + " = {";
+            timing_file_octree << "timingOctree" + geomCapitalFirstLetter + geom.name.substr(1, geomNameSize) + cpuName + intrinStr + " = {";
+            timing_file_fs << "timingFS" + geomCapitalFirstLetter + geom.name.substr(1, geomNameSize) + cpuName + intrinStr + " = {";
+            timing_file_flood << "timingFlood" + geomCapitalFirstLetter + geom.name.substr(1, geomNameSize) + cpuName + intrinStr + " = {";
+            timing_file_total << "timingTotal" + geomCapitalFirstLetter + geom.name.substr(1, geomNameSize) + cpuName + intrinStr + " = {";
 
             for (const auto& res : octreeResolutions)
             {
